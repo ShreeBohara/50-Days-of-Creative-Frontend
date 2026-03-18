@@ -7,6 +7,32 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <main class="app-shell">
+      <canvas class="particle-canvas" data-particle-canvas aria-hidden="true"></canvas>
+
+      <section class="ui-panel" aria-label="Particle text controls">
+        <p class="eyebrow">Day 01 / Creative Frontend</p>
+        <h1>Particle Text Morphing</h1>
+        <p class="ui-copy">
+          Type a word and watch it dissolve into a responsive field of particles.
+        </p>
+
+        <form class="word-form" data-word-form>
+          <label class="sr-only" for="word-input">Enter a word to morph on the canvas</label>
+          <input
+            id="word-input"
+            class="word-input"
+            data-word-input
+            type="text"
+            maxlength="18"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Enter a word"
+          />
+        </form>
+      </section>
+    </main>
+
     <script src="./script.js"></script>
   </body>
 </html>
