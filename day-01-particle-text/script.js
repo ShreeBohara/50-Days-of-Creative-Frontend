@@ -197,7 +197,7 @@ function fitFontSizeToViewport(word) {
 }
 
 function getSampleGap(fontSize) {
-  return clamp(Math.round(fontSize / 34), 4, 8);
+  return clamp(Math.round(fontSize / 52), 3, 6);
 }
 
 function drawTextToOffscreen(word) {
@@ -301,9 +301,19 @@ function handleInput(event) {
 }
 
 function restoreWord() {
-  if (!normalizeWord(input.value)) {
+  const normalizedWord = normalizeWord(input.value);
+
+  if (!normalizedWord) {
     input.value = state.lastValidWord;
+    return;
   }
+
+  if (normalizedWord !== state.word) {
+    setWord(normalizedWord);
+    return;
+  }
+
+  input.value = normalizedWord;
 }
 
 function updatePointerPosition(event) {
@@ -358,6 +368,7 @@ function init() {
   window.addEventListener("pointermove", updatePointerPosition, { passive: true });
   window.addEventListener("pointerleave", clearPointerPosition);
   window.addEventListener("pointercancel", clearPointerPosition);
+  window.addEventListener("pointerup", clearPointerPosition);
   window.addEventListener("resize", handleResize);
 }
 
