@@ -2,6 +2,8 @@
 
 A full-screen Canvas experiment where typed words resolve into a field of drifting particles that smoothly morph between shapes and react to pointer movement.
 
+Live demo: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shreebohara.github.io/50-Days-of-Creative-Frontend/)
+
 ## Tech Used
 
 - HTML5
