@@ -16,7 +16,9 @@ const config = {
   maxParticles: 4800,
   maxFontSize: 340,
   minFontSize: 120,
+  inactiveAlpha: 0.02,
   particleEase: 0.045,
+  particleFadeEase: 0.12,
   particleSizeMax: 2.8,
   particleSizeMin: 1.1,
   particleVelocityDamping: 0.84,
@@ -48,16 +50,34 @@ function normalizeWord(value) {
 }
 
 class Particle {
-  constructor(target) {
+  constructor() {
     const { width, height } = state.viewport;
 
     this.x = randomBetween(0, width);
     this.y = randomBetween(0, height);
     this.vx = randomBetween(-1, 1);
     this.vy = randomBetween(-1, 1);
+    this.targetX = this.x;
+    this.targetY = this.y;
+    this.size = randomBetween(config.particleSizeMin, config.particleSizeMax);
+    this.alpha = config.inactiveAlpha;
+    this.targetAlpha = config.inactiveAlpha;
+  }
+
+  retarget(target) {
     this.targetX = target.x;
     this.targetY = target.y;
-    this.size = randomBetween(config.particleSizeMin, config.particleSizeMax);
+    this.targetAlpha = 0.94;
+  }
+
+  release(index) {
+    const { width, height } = state.viewport;
+    const angle = index * 0.23;
+    const radius = 20 + (index % 32) * 2.4;
+
+    this.targetX = width * 0.5 + Math.cos(angle) * radius;
+    this.targetY = height * 0.5 + Math.sin(angle) * radius;
+    this.targetAlpha = config.inactiveAlpha;
   }
 
   update() {
@@ -70,11 +90,12 @@ class Particle {
     this.vy *= config.particleVelocityDamping;
     this.x += this.vx;
     this.y += this.vy;
+    this.alpha += (this.targetAlpha - this.alpha) * config.particleFadeEase;
   }
 
   draw() {
     context.beginPath();
-    context.fillStyle = "rgba(235, 247, 255, 0.92)";
+    context.fillStyle = `rgba(235, 247, 255, ${this.alpha})`;
     context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     context.fill();
   }
@@ -188,8 +209,25 @@ function sampleTextTargets(word) {
   return limitTargets(targets);
 }
 
-function buildParticles(targets) {
-  state.particles = targets.map((target) => new Particle(target));
+function ensureParticlePool() {
+  while (state.particles.length < config.maxParticles) {
+    state.particles.push(new Particle());
+  }
+}
+
+function assignParticleTargets(targets) {
+  ensureParticlePool();
+
+  state.particles.forEach((particle, index) => {
+    const target = targets[index];
+
+    if (target) {
+      particle.retarget(target);
+      return;
+    }
+
+    particle.release(index);
+  });
 }
 
 function setWord(nextWord) {
@@ -202,7 +240,7 @@ function setWord(nextWord) {
   state.word = normalizedWord;
   state.lastValidWord = normalizedWord;
   state.targets = sampleTextTargets(normalizedWord);
-  buildParticles(state.targets);
+  assignParticleTargets(state.targets);
   input.value = normalizedWord;
   return true;
 }
