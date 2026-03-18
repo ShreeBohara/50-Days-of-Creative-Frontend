@@ -11,6 +11,7 @@ const offscreenContext = offscreenCanvas.getContext("2d", { willReadFrequently: 
 
 const config = {
   alphaThreshold: 120,
+  driftStrength: 1.35,
   fontFamily: '"Space Grotesk", "Avenir Next", "Segoe UI", sans-serif',
   fontWeight: 700,
   maxParticles: 4800,
@@ -30,6 +31,7 @@ const state = {
   animationFrame: 0,
   particles: [],
   targets: [],
+  time: 0,
   word: DEFAULT_WORD,
   lastValidWord: DEFAULT_WORD,
   viewport: {
@@ -52,6 +54,21 @@ function randomBetween(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+function mixColorChannel(start, end, factor) {
+  return Math.round(start + (end - start) * factor);
+}
+
+function getParticleColor(y, alpha) {
+  const normalizedY = clamp(y / state.viewport.height, 0, 1);
+  const startColor = { r: 124, g: 246, b: 255 };
+  const endColor = { r: 255, g: 94, b: 219 };
+  const r = mixColorChannel(startColor.r, endColor.r, normalizedY);
+  const g = mixColorChannel(startColor.g, endColor.g, normalizedY);
+  const b = mixColorChannel(startColor.b, endColor.b, normalizedY);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function normalizeWord(value) {
   return value.replace(/\s+/g, " ").trim().slice(0, MAX_WORD_LENGTH).toUpperCase();
 }
@@ -68,6 +85,8 @@ class Particle {
     this.targetY = this.y;
     this.size = randomBetween(config.particleSizeMin, config.particleSizeMax);
     this.alpha = config.inactiveAlpha;
+    this.driftOffset = randomBetween(0, Math.PI * 2);
+    this.driftSpeed = randomBetween(0.8, 1.6);
     this.targetAlpha = config.inactiveAlpha;
   }
 
@@ -88,6 +107,10 @@ class Particle {
   }
 
   update() {
+    const driftX = Math.cos(state.time * this.driftSpeed + this.driftOffset) * config.driftStrength;
+    const driftY =
+      Math.sin(state.time * (this.driftSpeed * 1.1) + this.driftOffset) * config.driftStrength;
+
     if (state.pointer.active) {
       const dx = this.x - state.pointer.x;
       const dy = this.y - state.pointer.y;
@@ -100,8 +123,8 @@ class Particle {
       }
     }
 
-    const deltaX = this.targetX - this.x;
-    const deltaY = this.targetY - this.y;
+    const deltaX = this.targetX + driftX - this.x;
+    const deltaY = this.targetY + driftY - this.y;
 
     this.vx += deltaX * config.particleEase;
     this.vy += deltaY * config.particleEase;
@@ -114,7 +137,7 @@ class Particle {
 
   draw() {
     context.beginPath();
-    context.fillStyle = `rgba(235, 247, 255, ${this.alpha})`;
+    context.fillStyle = getParticleColor(this.y, this.alpha);
     context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     context.fill();
   }
@@ -294,7 +317,8 @@ function clearPointerPosition() {
   state.pointer.y = Number.POSITIVE_INFINITY;
 }
 
-function renderFrame() {
+function renderFrame(timestamp = 0) {
+  state.time = timestamp * 0.001;
   context.clearRect(0, 0, state.viewport.width, state.viewport.height);
 
   for (const particle of state.particles) {
