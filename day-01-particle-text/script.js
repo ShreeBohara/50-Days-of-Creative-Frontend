@@ -16,9 +16,15 @@ const config = {
   maxParticles: 4800,
   maxFontSize: 340,
   minFontSize: 120,
+  particleEase: 0.045,
+  particleSizeMax: 2.8,
+  particleSizeMin: 1.1,
+  particleVelocityDamping: 0.84,
 };
 
 const state = {
+  animationFrame: 0,
+  particles: [],
   targets: [],
   word: DEFAULT_WORD,
   lastValidWord: DEFAULT_WORD,
@@ -33,8 +39,45 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 function normalizeWord(value) {
   return value.replace(/\s+/g, " ").trim().slice(0, MAX_WORD_LENGTH).toUpperCase();
+}
+
+class Particle {
+  constructor(target) {
+    const { width, height } = state.viewport;
+
+    this.x = randomBetween(0, width);
+    this.y = randomBetween(0, height);
+    this.vx = randomBetween(-1, 1);
+    this.vy = randomBetween(-1, 1);
+    this.targetX = target.x;
+    this.targetY = target.y;
+    this.size = randomBetween(config.particleSizeMin, config.particleSizeMax);
+  }
+
+  update() {
+    const deltaX = this.targetX - this.x;
+    const deltaY = this.targetY - this.y;
+
+    this.vx += deltaX * config.particleEase;
+    this.vy += deltaY * config.particleEase;
+    this.vx *= config.particleVelocityDamping;
+    this.vy *= config.particleVelocityDamping;
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+
+  draw() {
+    context.beginPath();
+    context.fillStyle = "rgba(235, 247, 255, 0.92)";
+    context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    context.fill();
+  }
 }
 
 function setCanvasSize() {
@@ -145,6 +188,10 @@ function sampleTextTargets(word) {
   return limitTargets(targets);
 }
 
+function buildParticles(targets) {
+  state.particles = targets.map((target) => new Particle(target));
+}
+
 function setWord(nextWord) {
   const normalizedWord = normalizeWord(nextWord);
 
@@ -155,6 +202,7 @@ function setWord(nextWord) {
   state.word = normalizedWord;
   state.lastValidWord = normalizedWord;
   state.targets = sampleTextTargets(normalizedWord);
+  buildParticles(state.targets);
   input.value = normalizedWord;
   return true;
 }
@@ -177,6 +225,17 @@ function restoreWord() {
   }
 }
 
+function renderFrame() {
+  context.clearRect(0, 0, state.viewport.width, state.viewport.height);
+
+  for (const particle of state.particles) {
+    particle.update();
+    particle.draw();
+  }
+
+  state.animationFrame = window.requestAnimationFrame(renderFrame);
+}
+
 function init() {
   if (!canvas || !context || !offscreenContext || !input || !form) {
     return;
@@ -184,6 +243,7 @@ function init() {
 
   setCanvasSize();
   setWord(DEFAULT_WORD);
+  renderFrame();
 
   input.addEventListener("input", handleInput);
   input.addEventListener("blur", restoreWord);
