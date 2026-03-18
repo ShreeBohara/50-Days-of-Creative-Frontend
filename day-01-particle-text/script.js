@@ -30,6 +30,7 @@ const config = {
 const state = {
   animationFrame: 0,
   particles: [],
+  resizeFrame: 0,
   targets: [],
   time: 0,
   word: DEFAULT_WORD,
@@ -317,6 +318,16 @@ function clearPointerPosition() {
   state.pointer.y = Number.POSITIVE_INFINITY;
 }
 
+function handleResize() {
+  window.cancelAnimationFrame(state.resizeFrame);
+
+  state.resizeFrame = window.requestAnimationFrame(() => {
+    setCanvasSize();
+    state.targets = sampleTextTargets(state.word);
+    assignParticleTargets(state.targets);
+  });
+}
+
 function renderFrame(timestamp = 0) {
   state.time = timestamp * 0.001;
   context.clearRect(0, 0, state.viewport.width, state.viewport.height);
@@ -347,6 +358,7 @@ function init() {
   window.addEventListener("pointermove", updatePointerPosition, { passive: true });
   window.addEventListener("pointerleave", clearPointerPosition);
   window.addEventListener("pointercancel", clearPointerPosition);
+  window.addEventListener("resize", handleResize);
 }
 
 init();

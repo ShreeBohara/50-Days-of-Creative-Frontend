@@ -131,3 +131,26 @@ input {
   white-space: nowrap;
   border: 0;
 }
+
+@media (max-width: 720px) {
+  .ui-panel {
+    bottom: 1rem;
+    width: min(100vw - 1rem, 28rem);
+    padding: 1rem;
+    border-radius: 1.25rem;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+  }
+
+  .ui-copy {
+    margin-bottom: 0.85rem;
+    font-size: 0.92rem;
+  }
+
+  .word-input {
+    padding: 0.88rem 1rem;
+  }
+}
