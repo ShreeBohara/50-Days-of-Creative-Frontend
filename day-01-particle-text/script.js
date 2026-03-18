@@ -22,6 +22,8 @@ const config = {
   particleSizeMax: 2.8,
   particleSizeMin: 1.1,
   particleVelocityDamping: 0.84,
+  repulsionForce: 1.8,
+  repulsionRadius: 110,
 };
 
 const state = {
@@ -34,6 +36,11 @@ const state = {
     width: 0,
     height: 0,
     dpr: 1,
+  },
+  pointer: {
+    active: false,
+    x: Number.POSITIVE_INFINITY,
+    y: Number.POSITIVE_INFINITY,
   },
 };
 
@@ -81,6 +88,18 @@ class Particle {
   }
 
   update() {
+    if (state.pointer.active) {
+      const dx = this.x - state.pointer.x;
+      const dy = this.y - state.pointer.y;
+      const distance = Math.hypot(dx, dy);
+
+      if (distance > 0 && distance < config.repulsionRadius) {
+        const strength = (1 - distance / config.repulsionRadius) * config.repulsionForce;
+        this.vx += (dx / distance) * strength;
+        this.vy += (dy / distance) * strength;
+      }
+    }
+
     const deltaX = this.targetX - this.x;
     const deltaY = this.targetY - this.y;
 
@@ -263,6 +282,18 @@ function restoreWord() {
   }
 }
 
+function updatePointerPosition(event) {
+  state.pointer.active = true;
+  state.pointer.x = event.clientX;
+  state.pointer.y = event.clientY;
+}
+
+function clearPointerPosition() {
+  state.pointer.active = false;
+  state.pointer.x = Number.POSITIVE_INFINITY;
+  state.pointer.y = Number.POSITIVE_INFINITY;
+}
+
 function renderFrame() {
   context.clearRect(0, 0, state.viewport.width, state.viewport.height);
 
@@ -289,6 +320,9 @@ function init() {
     event.preventDefault();
     restoreWord();
   });
+  window.addEventListener("pointermove", updatePointerPosition, { passive: true });
+  window.addEventListener("pointerleave", clearPointerPosition);
+  window.addEventListener("pointercancel", clearPointerPosition);
 }
 
 init();
