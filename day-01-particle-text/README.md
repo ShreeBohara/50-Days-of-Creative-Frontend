@@ -4,6 +4,8 @@ A full-screen Canvas experiment where typed words resolve into a field of drifti
 
 Live demo: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shreebohara.github.io/50-Days-of-Creative-Frontend/)
 
+This project is deployed from the `day-01-particle-text/` folder through a GitHub Pages Actions workflow.
+
 ## Tech Used
 
 - HTML5
