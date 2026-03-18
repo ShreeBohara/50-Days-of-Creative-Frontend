@@ -1,1 +1,133 @@
-/* Day 1 styles will be built incrementally. */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");
+
+:root {
+  color-scheme: dark;
+  --bg-top: #04111f;
+  --bg-mid: #071b2d;
+  --bg-bottom: #02060d;
+  --panel-surface: rgba(7, 14, 25, 0.76);
+  --panel-border: rgba(135, 194, 255, 0.16);
+  --text-primary: #f5fbff;
+  --text-muted: rgba(220, 236, 255, 0.72);
+  --accent: #7cf6ff;
+  --accent-secondary: #ff5edb;
+  --input-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(77, 181, 255, 0.14), transparent 38%),
+    radial-gradient(circle at 85% 25%, rgba(255, 94, 219, 0.16), transparent 24%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 44%, var(--bg-bottom) 100%);
+  color: var(--text-primary);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+.ui-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 2;
+  width: min(30rem, calc(100vw - 2rem));
+  padding: 1.1rem 1.1rem 1.15rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, rgba(10, 18, 31, 0.88), var(--panel-surface));
+  backdrop-filter: blur(18px);
+  box-shadow: var(--input-shadow);
+  transform: translateX(-50%);
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.ui-panel h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 3vw, 2.4rem);
+  line-height: 1;
+}
+
+.ui-copy {
+  margin: 0.65rem 0 1rem;
+  max-width: 28rem;
+  color: var(--text-muted);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.word-form {
+  margin: 0;
+}
+
+.word-input {
+  width: 100%;
+  border: 1px solid rgba(124, 246, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(2, 8, 15, 0.84);
+  color: var(--text-primary);
+  padding: 0.95rem 1.1rem;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.word-input::placeholder {
+  color: rgba(216, 231, 255, 0.42);
+}
+
+.word-input:focus {
+  border-color: rgba(124, 246, 255, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(124, 246, 255, 0.18),
+    0 18px 48px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
