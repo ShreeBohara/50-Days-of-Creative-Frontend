@@ -19,6 +19,7 @@ function setCardTilt(card, event) {
   card.style.setProperty("--card-rotate-y", `${rotateY.toFixed(2)}deg`);
   card.style.setProperty("--pointer-x", `${(relativeX * 100).toFixed(2)}%`);
   card.style.setProperty("--pointer-y", `${(relativeY * 100).toFixed(2)}%`);
+  card.style.setProperty("--shine-shift", `${(relativeX * 100).toFixed(2)}%`);
 }
 
 function resetCardTilt(card) {
@@ -27,6 +28,7 @@ function resetCardTilt(card) {
   card.style.setProperty("--card-rotate-y", "0deg");
   card.style.setProperty("--pointer-x", "50%");
   card.style.setProperty("--pointer-y", "50%");
+  card.style.setProperty("--shine-shift", "50%");
 }
 
 function initTiltCard() {
