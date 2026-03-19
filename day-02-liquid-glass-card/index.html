@@ -7,7 +7,57 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main></main>
+    <main class="page-shell">
+      <div class="backdrop" aria-hidden="true">
+        <span class="blob blob-one"></span>
+        <span class="blob blob-two"></span>
+        <span class="blob blob-three"></span>
+      </div>
+
+      <section class="card-stage" aria-label="Liquid glass profile card demo">
+        <article class="glass-card" data-tilt-card>
+          <div class="glass-card__shine" aria-hidden="true"></div>
+          <div class="glass-card__content">
+            <p class="eyebrow">Day 02 / Creative Frontend</p>
+
+            <header class="profile-block">
+              <div class="avatar" aria-hidden="true">SB</div>
+
+              <div class="profile-copy">
+                <h1>Shree Bohara</h1>
+                <p class="profile-title">Creative Frontend Builder</p>
+                <p class="profile-summary">
+                  Building tactile interfaces with motion, depth, and a little bit of drama.
+                </p>
+              </div>
+            </header>
+
+            <section class="stats-grid" aria-label="Profile highlights">
+              <article class="stat-card">
+                <span class="stat-value" data-stat-value data-target="12">0</span>
+                <span class="stat-label">Live experiments</span>
+              </article>
+              <article class="stat-card">
+                <span class="stat-value" data-stat-value data-target="08">0</span>
+                <span class="stat-label">Design systems</span>
+              </article>
+              <article class="stat-card">
+                <span class="stat-value" data-stat-value data-target="24">0</span>
+                <span class="stat-label">Motion studies</span>
+              </article>
+            </section>
+
+            <footer class="card-footer">
+              <a class="cta-button" href="https://github.com/ShreeBohara" target="_blank" rel="noreferrer">
+                Explore the build
+              </a>
+
+              <p class="footer-note">Hover or drag across the card to bend the glass.</p>
+            </footer>
+          </div>
+        </article>
+      </section>
+    </main>
 
     <script src="./script.js"></script>
   </body>
