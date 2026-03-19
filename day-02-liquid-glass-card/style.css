@@ -9,7 +9,11 @@
     linear-gradient(135deg, #12071c 0%, #291540 38%, #102a59 68%, #081d33 100%);
   --text-primary: #fdf9ff;
   --text-muted: rgba(245, 241, 255, 0.76);
+  --card-surface: rgba(255, 255, 255, 0.12);
+  --card-surface-strong: rgba(255, 255, 255, 0.2);
   --surface-outline: rgba(255, 255, 255, 0.14);
+  --shadow-soft: 0 1.35rem 3.2rem rgba(7, 11, 28, 0.28);
+  --shadow-deep: 0 2.4rem 5.5rem rgba(3, 6, 18, 0.38);
 }
 
 * {
@@ -97,13 +101,50 @@ a {
 }
 
 .glass-card {
+  position: relative;
   width: min(100%, 25rem);
   min-height: 31.25rem;
   border-radius: 2rem;
-  border: 1px solid var(--surface-outline);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08)),
+    rgba(12, 18, 42, 0.26);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    var(--shadow-soft),
+    var(--shadow-deep);
+  overflow: hidden;
+  backdrop-filter: blur(26px) saturate(165%);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.26), transparent 38%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.2), transparent 36%, rgba(255, 255, 255, 0.06) 72%, rgba(255, 255, 255, 0.16));
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: calc(2rem - 1px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 18%, rgba(255, 255, 255, 0.02) 100%);
+  opacity: 0.78;
+  pointer-events: none;
 }
 
 .glass-card__content {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 1.75rem;
   padding: 2rem;
@@ -133,7 +174,12 @@ a {
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0.14) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 1.4rem 2.8rem rgba(10, 22, 55, 0.22);
 }
 
 .profile-copy {
@@ -175,6 +221,11 @@ a {
 .stat-card {
   display: grid;
   gap: 0.45rem;
+  padding: 1rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1.2rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .stat-value {
@@ -201,7 +252,12 @@ a {
   justify-content: center;
   min-height: 3.5rem;
   padding: 0.85rem 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 1rem 2rem rgba(9, 16, 40, 0.26);
   font-size: 0.96rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -209,7 +265,10 @@ a {
 }
 
 .glass-card__shine {
-  display: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 @keyframes blob-float {
@@ -220,5 +279,13 @@ a {
 
   50% {
     transform: translate3d(0, -1.8rem, 0) scale(1.08);
+  }
+}
+
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+  .glass-card {
+    background:
+      linear-gradient(145deg, rgba(38, 45, 82, 0.96), rgba(21, 31, 68, 0.9)),
+      rgba(17, 20, 44, 0.92);
   }
 }
