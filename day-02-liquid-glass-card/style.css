@@ -9,9 +9,6 @@
     linear-gradient(135deg, #12071c 0%, #291540 38%, #102a59 68%, #081d33 100%);
   --text-primary: #fdf9ff;
   --text-muted: rgba(245, 241, 255, 0.76);
-  --card-surface: rgba(255, 255, 255, 0.12);
-  --card-surface-strong: rgba(255, 255, 255, 0.2);
-  --surface-outline: rgba(255, 255, 255, 0.14);
   --shadow-soft: 0 1.35rem 3.2rem rgba(7, 11, 28, 0.28);
   --shadow-deep: 0 2.4rem 5.5rem rgba(3, 6, 18, 0.38);
   --card-rotate-x: 0deg;
@@ -49,6 +46,7 @@ a {
   background: var(--bg-canvas);
 }
 
+/* Soft atmospheric blobs keep the scene moving behind the glass. */
 .backdrop {
   position: absolute;
   inset: 0;
@@ -105,6 +103,7 @@ a {
   padding: 2rem;
 }
 
+/* The card combines translucent fills, inner highlights, and deep shadows. */
 .glass-card {
   position: relative;
   width: min(100%, 25rem);
@@ -421,6 +420,29 @@ a {
     background:
       linear-gradient(145deg, rgba(38, 45, 82, 0.96), rgba(21, 31, 68, 0.9)),
       rgba(17, 20, 44, 0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .glass-card {
+    transform:
+      perspective(1200px)
+      rotateX(0deg)
+      rotateY(0deg)
+      translateZ(0);
+  }
+
+  .glass-card__shine {
+    transform: translateX(0) rotate(14deg);
   }
 }
 

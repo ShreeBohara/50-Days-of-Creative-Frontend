@@ -10,6 +10,7 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
+// Map pointer position to CSS custom properties so CSS owns the visual response.
 function setCardTilt(card, event) {
   const bounds = card.getBoundingClientRect();
   const relativeX = clamp((event.clientX - bounds.left) / bounds.width, 0, 1);
@@ -69,6 +70,7 @@ function initTiltCard() {
   });
 }
 
+// Count up the stat values on load for a subtle dashboard-like reveal.
 function animateStatValue(element) {
   const targetText = element.dataset.target ?? element.textContent ?? "0";
   const targetValue = Number.parseInt(targetText, 10);
