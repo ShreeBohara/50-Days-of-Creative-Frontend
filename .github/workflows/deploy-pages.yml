@@ -1,12 +1,15 @@
-name: Deploy Day 01 to GitHub Pages
+name: Deploy Creative Frontend Gallery
 
 on:
   push:
     branches:
       - main
     paths:
+      - "index.html"
+      - "site.css"
       - "day-01-particle-text/**"
-      - ".github/workflows/deploy-day-01-pages.yml"
+      - "day-02-liquid-glass-card/**"
+      - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
 
@@ -32,10 +35,17 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Stage static site bundle
+        run: |
+          mkdir -p _site
+          cp index.html site.css _site/
+          cp -R day-01-particle-text _site/
+          cp -R day-02-liquid-glass-card _site/
+
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./day-01-particle-text
+          path: ./_site
 
       - name: Deploy to GitHub Pages
         id: deployment

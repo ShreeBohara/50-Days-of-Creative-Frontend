@@ -2,9 +2,9 @@
 
 A full-screen Canvas experiment where typed words resolve into a field of drifting particles that smoothly morph between shapes and react to pointer movement.
 
-Live demo: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shreebohara.github.io/50-Days-of-Creative-Frontend/)
+Live demo: [shreebohara.github.io/50-Days-of-Creative-Frontend/day-01-particle-text/](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-01-particle-text/)
 
-This project is deployed from the `day-01-particle-text/` folder through a GitHub Pages Actions workflow.
+This project is published as part of the repo's multi-demo GitHub Pages bundle.
 
 ## Tech Used
 

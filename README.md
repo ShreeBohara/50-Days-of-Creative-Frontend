@@ -2,8 +2,11 @@
 
 A daily playground for bold frontend experiments built with static HTML, CSS, and JavaScript.
 
+Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shreebohara.github.io/50-Days-of-Creative-Frontend/)
+
 ## Projects
 
 | Day | Project | Description | Live | Folder |
-| --- | --- | --- | --- |
-| 01 | Particle Text Morphing | Canvas-based particle typography that morphs between words and repels from the pointer. | [View site](https://shreebohara.github.io/50-Days-of-Creative-Frontend/) | [day-01-particle-text](./day-01-particle-text/) |
+| --- | --- | --- | --- | --- |
+| 01 | Particle Text Morphing | Canvas-based particle typography that morphs between words and repels from the pointer. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-01-particle-text/) | [day-01-particle-text](./day-01-particle-text/) |
+| 02 | Liquid Glass Card | Frosted glass profile card with 3D tilt, animated refraction, and a rotating conic border. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-02-liquid-glass-card/) | [day-02-liquid-glass-card](./day-02-liquid-glass-card/) |
