@@ -1,8 +1,10 @@
 "use strict";
 
 const tiltCard = document.querySelector("[data-tilt-card]");
+const statValues = document.querySelectorAll("[data-stat-value]");
 
 const TILT_LIMIT = 12;
+const COUNTER_DURATION = 1300;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -50,4 +52,41 @@ function initTiltCard() {
   });
 }
 
+function animateStatValue(element) {
+  const targetText = element.dataset.target ?? element.textContent ?? "0";
+  const targetValue = Number.parseInt(targetText, 10);
+
+  if (!Number.isFinite(targetValue)) {
+    element.textContent = targetText;
+    return;
+  }
+
+  const minimumDigits = targetText.length;
+  const startTime = window.performance.now();
+
+  function tick(now) {
+    const elapsed = now - startTime;
+    const progress = clamp(elapsed / COUNTER_DURATION, 0, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = Math.round(targetValue * eased);
+
+    element.textContent = String(value).padStart(minimumDigits, "0");
+
+    if (progress < 1) {
+      window.requestAnimationFrame(tick);
+    }
+  }
+
+  window.requestAnimationFrame(tick);
+}
+
+function initStatCounters() {
+  statValues.forEach((element, index) => {
+    window.setTimeout(() => {
+      animateStatValue(element);
+    }, index * 110);
+  });
+}
+
 initTiltCard();
+initStatCounters();
