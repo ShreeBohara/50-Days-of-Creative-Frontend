@@ -149,12 +149,39 @@ a {
 .glass-card::after {
   content: "";
   position: absolute;
-  inset: 1px;
+  inset: 2px;
   border-radius: calc(2rem - 1px);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 18%, rgba(255, 255, 255, 0.02) 100%);
   opacity: 0.78;
   pointer-events: none;
+}
+
+.glass-card__border {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.16) 0deg,
+      rgba(255, 186, 103, 0.92) 55deg,
+      rgba(79, 236, 255, 0.95) 140deg,
+      rgba(255, 84, 193, 0.92) 215deg,
+      rgba(255, 255, 255, 0.14) 360deg
+    );
+  opacity: 0.95;
+  pointer-events: none;
+  animation: border-spin 9s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 1px;
 }
 
 .glass-card__content {
@@ -327,6 +354,16 @@ a {
 
   50% {
     transform: translate3d(0, -1.8rem, 0) scale(1.08);
+  }
+}
+
+@keyframes border-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 
