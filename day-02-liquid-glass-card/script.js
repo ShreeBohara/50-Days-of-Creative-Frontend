@@ -42,12 +42,29 @@ function initTiltCard() {
     tiltCard.classList.add("is-active");
   });
 
+  tiltCard.addEventListener("pointerdown", (event) => {
+    tiltCard.classList.add("is-active");
+
+    if (event.pointerType === "touch") {
+      tiltCard.setPointerCapture(event.pointerId);
+      setCardTilt(tiltCard, event);
+    }
+  });
+
   tiltCard.addEventListener("pointermove", (event) => {
     tiltCard.classList.add("is-active");
     setCardTilt(tiltCard, event);
   });
 
   tiltCard.addEventListener("pointerleave", () => {
+    resetCardTilt(tiltCard);
+  });
+
+  tiltCard.addEventListener("pointerup", () => {
+    resetCardTilt(tiltCard);
+  });
+
+  tiltCard.addEventListener("pointercancel", () => {
     resetCardTilt(tiltCard);
   });
 }

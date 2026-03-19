@@ -423,3 +423,80 @@ a {
       rgba(17, 20, 44, 0.92);
   }
 }
+
+@media (max-width: 720px) {
+  .card-stage {
+    padding: 1.1rem;
+  }
+
+  .glass-card {
+    width: min(100%, 30rem);
+    min-height: auto;
+    border-radius: 1.65rem;
+  }
+
+  .glass-card::after {
+    border-radius: calc(1.65rem - 1px);
+  }
+
+  .glass-card__content {
+    gap: 1.35rem;
+    padding: 1.35rem;
+  }
+
+  .profile-block {
+    gap: 1rem;
+  }
+
+  .profile-copy h1 {
+    font-size: clamp(2rem, 10vw, 2.8rem);
+  }
+
+  .stats-grid {
+    gap: 0.7rem;
+  }
+
+  .stat-card {
+    padding: 0.85rem 0.75rem;
+    border-radius: 1rem;
+  }
+
+  .cta-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .blob-one {
+    width: 15rem;
+    height: 15rem;
+  }
+
+  .blob-two {
+    width: 13rem;
+    height: 13rem;
+  }
+
+  .blob-three {
+    right: -12%;
+    bottom: 4%;
+    width: 17rem;
+    height: 17rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-summary,
+  .stat-label,
+  .footer-note {
+    font-size: 0.9rem;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .glass-card {
+    touch-action: none;
+  }
+}
