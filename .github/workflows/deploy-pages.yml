@@ -9,6 +9,7 @@ on:
       - "site.css"
       - "day-01-particle-text/**"
       - "day-02-liquid-glass-card/**"
+      - "day-03-solar-system/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -41,6 +42,7 @@ jobs:
           cp index.html site.css _site/
           cp -R day-01-particle-text _site/
           cp -R day-02-liquid-glass-card _site/
+          cp -R day-03-solar-system _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

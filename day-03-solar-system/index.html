@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 03 | Interactive Solar System</title>
+    <meta
+      name="description"
+      content="A cinematic interactive solar system built with Three.js, orbiting planets, and click-to-focus planet details."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="space-app">
+      <div class="space-app__bg" aria-hidden="true">
+        <span class="space-app__glow space-app__glow--one"></span>
+        <span class="space-app__glow space-app__glow--two"></span>
+        <span class="space-app__grid"></span>
+      </div>
+
+      <section class="scene-shell" aria-label="Interactive 3D solar system">
+        <div class="scene-copy">
+          <p class="eyebrow">Day 03 / Creative Frontend</p>
+          <h1>Orbit a cinematic miniature solar system.</h1>
+          <p class="scene-copy__lead">
+            Drag to explore, scroll to zoom, and click a planet to drift in for a closer look.
+          </p>
+          <div class="scene-copy__chips" aria-hidden="true">
+            <span>Three.js</span>
+            <span>Orbit Controls</span>
+            <span>Procedural Materials</span>
+          </div>
+        </div>
+
+        <div class="scene-root" data-scene-root aria-label="3D solar system canvas"></div>
+
+        <div class="scene-hint" aria-hidden="true">
+          <span>Click a planet to focus</span>
+          <span>Press ESC to reset</span>
+        </div>
+
+        <aside class="info-panel" data-info-panel aria-hidden="true">
+          <div class="info-panel__aurora" aria-hidden="true"></div>
+          <button class="info-panel__close" type="button" data-close-panel aria-label="Close planet details">
+            Close
+          </button>
+
+          <p class="info-panel__eyebrow">Planet Profile</p>
+          <h2 class="info-panel__title" data-planet-name>Earth</h2>
+          <p class="info-panel__subtitle" data-planet-tagline>Blue world with restless weather systems.</p>
+
+          <dl class="info-panel__facts">
+            <div>
+              <dt>Diameter</dt>
+              <dd data-planet-diameter>12,742 km</dd>
+            </div>
+            <div>
+              <dt>Distance from Sun</dt>
+              <dd data-planet-distance>149.6 million km</dd>
+            </div>
+            <div>
+              <dt>Orbit Pace</dt>
+              <dd data-planet-speed>1.00x</dd>
+            </div>
+          </dl>
+
+          <p class="info-panel__fact" data-planet-fact>
+            Earth is the only known world with liquid water oceans on its surface.
+          </p>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

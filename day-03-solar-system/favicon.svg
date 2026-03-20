@@ -1,0 +1,25 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="36" fill="url(#bg)" />
+  <circle cx="45" cy="45" r="22" fill="url(#sun)" />
+  <circle cx="82" cy="82" r="11" fill="url(#planet)" />
+  <path d="M18 86C32 72 54 64 84 64C101 64 112 69 118 75" stroke="url(#orbit)" stroke-width="6" stroke-linecap="round" stroke-opacity="0.85" />
+  <defs>
+    <linearGradient id="bg" x1="18" y1="12" x2="112" y2="114" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111F" />
+      <stop offset="1" stop-color="#02050D" />
+    </linearGradient>
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 37) rotate(46.1233) scale(37.5228)">
+      <stop stop-color="#FFE6A8" />
+      <stop offset="0.56" stop-color="#FFB65F" />
+      <stop offset="1" stop-color="#FF7D3D" />
+    </radialGradient>
+    <linearGradient id="planet" x1="74" y1="72" x2="90" y2="94" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9DE4FF" />
+      <stop offset="1" stop-color="#3F78FF" />
+    </linearGradient>
+    <linearGradient id="orbit" x1="18" y1="86" x2="118" y2="75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6FA2FF" />
+      <stop offset="1" stop-color="#FFC982" />
+    </linearGradient>
+  </defs>
+</svg>
