@@ -1,5 +1,44 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.166.1/+esm";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/controls/OrbitControls.js/+esm";
+
+function showFatalError(message) {
+  if (document.querySelector("[data-scene-error]")) {
+    return;
+  }
+
+  const panel = document.createElement("div");
+  panel.setAttribute("data-scene-error", "");
+  panel.setAttribute("role", "status");
+  panel.style.position = "fixed";
+  panel.style.right = "1rem";
+  panel.style.bottom = "1rem";
+  panel.style.zIndex = "10";
+  panel.style.maxWidth = "min(28rem, calc(100vw - 2rem))";
+  panel.style.padding = "0.9rem 1rem";
+  panel.style.border = "1px solid rgba(255, 159, 122, 0.38)";
+  panel.style.borderRadius = "1rem";
+  panel.style.background = "rgba(28, 10, 14, 0.86)";
+  panel.style.color = "#ffe4d8";
+  panel.style.backdropFilter = "blur(18px)";
+  panel.style.webkitBackdropFilter = "blur(18px)";
+  panel.style.boxShadow = "0 1rem 2.4rem rgba(0, 0, 0, 0.35)";
+  panel.textContent = `Scene error: ${message}`;
+  document.body.append(panel);
+}
+
+window.addEventListener("error", (event) => {
+  const message = event.error?.message ?? event.message;
+
+  if (message) {
+    showFatalError(message);
+  }
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  const reason = event.reason;
+  const message = reason instanceof Error ? reason.message : String(reason);
+  showFatalError(message);
+});
 
 const sceneRoot = document.querySelector("[data-scene-root]");
 const infoPanel = document.querySelector("[data-info-panel]");
