@@ -12,6 +12,44 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <main class="visualizer-page">
+      <canvas class="visualizer-canvas" data-spectrum-canvas aria-label="Circular audio spectrum visualizer"></canvas>
+
+      <section class="visualizer-overlay" aria-label="Circular Audio Spectrum controls">
+        <header class="hero-copy">
+          <p class="eyebrow">Day 04 / Creative Frontend</p>
+          <h1>Circular Audio Spectrum</h1>
+          <p class="intro-copy">
+            Upload an MP3 or WAV to drive the spectrum, or press play to explore the built-in
+            demo mode.
+          </p>
+        </header>
+
+        <div class="control-panel">
+          <label class="upload-control" for="audio-upload">
+            <span>Upload MP3 or WAV</span>
+            <input
+              id="audio-upload"
+              type="file"
+              accept=".mp3,.wav,audio/mpeg,audio/wav,audio/wave,audio/x-wav,audio/*"
+              data-audio-input
+            />
+          </label>
+
+          <button type="button" class="play-toggle" data-play-toggle aria-pressed="false">
+            Play Demo
+          </button>
+
+          <div class="status-stack" aria-live="polite">
+            <p class="status-label" data-status-label>Ready to listen</p>
+            <p class="track-label" data-track-label>No file loaded. Demo mode is available.</p>
+          </div>
+        </div>
+      </section>
+
+      <audio data-audio-element preload="metadata" hidden></audio>
+    </main>
+
     <script src="./script.js"></script>
   </body>
 </html>
