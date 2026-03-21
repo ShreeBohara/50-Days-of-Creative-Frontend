@@ -11,17 +11,24 @@ const audioElement = document.querySelector("[data-audio-element]");
 
 const FFT_SIZE = 256;
 const BIN_COUNT = FFT_SIZE / 2;
+const FULL_CIRCLE = Math.PI * 2;
 
 const state = {
   audioContext: null,
   analyser: null,
-  frequencyData: null,
+  frequencyData: new Uint8Array(BIN_COUNT),
   mediaSourceNode: null,
   currentObjectUrl: "",
   activeMode: "idle",
   isPlaying: false,
   selectedFileName: "",
+  frameId: 0,
+  width: 0,
+  height: 0,
+  dpr: 1,
 };
+
+const context = canvas?.getContext("2d");
 
 function setStatus(primary, secondary) {
   if (statusLabel) {
@@ -178,11 +185,107 @@ function bindEvents() {
   }
 
   window.addEventListener("beforeunload", revokeObjectUrl);
+  window.addEventListener("resize", resizeCanvas);
 }
 
-if (!canvas || !fileInput || !playToggle || !statusLabel || !trackLabel || !audioElement) {
+function resizeCanvas() {
+  if (!canvas || !context) {
+    return;
+  }
+
+  const bounds = canvas.getBoundingClientRect();
+  const nextWidth = Math.max(1, Math.round(bounds.width));
+  const nextHeight = Math.max(1, Math.round(bounds.height));
+  const nextDpr = Math.max(1, window.devicePixelRatio || 1);
+
+  state.width = nextWidth;
+  state.height = nextHeight;
+  state.dpr = nextDpr;
+
+  canvas.width = Math.round(nextWidth * nextDpr);
+  canvas.height = Math.round(nextHeight * nextDpr);
+  context.setTransform(nextDpr, 0, 0, nextDpr, 0, 0);
+}
+
+function getFrequencySnapshot() {
+  if (!state.frequencyData) {
+    return null;
+  }
+
+  if (state.analyser) {
+    state.analyser.getByteFrequencyData(state.frequencyData);
+  } else {
+    state.frequencyData.fill(0);
+  }
+
+  return state.frequencyData;
+}
+
+function drawOrb(centerX, centerY, radius) {
+  if (!context) {
+    return;
+  }
+
+  context.beginPath();
+  context.fillStyle = "rgba(255, 197, 126, 0.82)";
+  context.arc(centerX, centerY, radius, 0, FULL_CIRCLE);
+  context.fill();
+}
+
+function drawSpectrumBars(centerX, centerY, baseRadius, maxBarHeight, frequencyData) {
+  if (!context || !frequencyData) {
+    return;
+  }
+
+  context.lineCap = "round";
+
+  for (let index = 0; index < BIN_COUNT; index += 1) {
+    const intensity = frequencyData[index] / 255;
+    const angle = (-Math.PI / 2) + (index / BIN_COUNT) * FULL_CIRCLE;
+    const barHeight = 10 + (intensity * maxBarHeight);
+    const startRadius = baseRadius;
+    const endRadius = startRadius + barHeight;
+    const startX = centerX + Math.cos(angle) * startRadius;
+    const startY = centerY + Math.sin(angle) * startRadius;
+    const endX = centerX + Math.cos(angle) * endRadius;
+    const endY = centerY + Math.sin(angle) * endRadius;
+
+    context.strokeStyle = "rgba(126, 213, 255, 0.78)";
+    context.lineWidth = 2.5 + (intensity * 2.5);
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(endX, endY);
+    context.stroke();
+  }
+}
+
+function renderFrame() {
+  if (!context) {
+    return;
+  }
+
+  const width = state.width || window.innerWidth;
+  const height = state.height || window.innerHeight;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const minDimension = Math.min(width, height);
+  const orbRadius = minDimension * 0.1;
+  const barRadius = orbRadius + (minDimension * 0.085);
+  const barTravel = minDimension * 0.18;
+  const frequencySnapshot = getFrequencySnapshot();
+
+  context.clearRect(0, 0, width, height);
+  drawOrb(centerX, centerY, orbRadius);
+  drawSpectrumBars(centerX, centerY, barRadius, barTravel, frequencySnapshot);
+
+  state.frameId = window.requestAnimationFrame(renderFrame);
+}
+
+if (!canvas || !fileInput || !playToggle || !statusLabel || !trackLabel || !audioElement || !context) {
   throw new Error("Audio visualizer UI failed to initialize because required elements are missing.");
 }
 
 bindEvents();
 updatePlayToggleLabel();
+resizeCanvas();
+renderFrame();
