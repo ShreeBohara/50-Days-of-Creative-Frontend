@@ -33,6 +33,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: day-03-solar-system/package-lock.json
+
+      - name: Install Day 03 app dependencies
+        working-directory: day-03-solar-system
+        run: npm ci
+
+      - name: Build Day 03 app
+        working-directory: day-03-solar-system
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -42,7 +57,8 @@ jobs:
           cp index.html site.css _site/
           cp -R day-01-particle-text _site/
           cp -R day-02-liquid-glass-card _site/
-          cp -R day-03-solar-system _site/
+          mkdir -p _site/day-03-solar-system
+          cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

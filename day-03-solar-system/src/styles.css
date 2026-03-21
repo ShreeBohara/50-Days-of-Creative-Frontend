@@ -1,0 +1,629 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Cormorant+Garamond:wght@600;700&display=swap");
+
+:root {
+  color-scheme: dark;
+  --bg-main: #050816;
+  --bg-panel: rgba(10, 16, 32, 0.62);
+  --bg-panel-strong: rgba(10, 16, 32, 0.82);
+  --line: rgba(206, 224, 255, 0.15);
+  --text: #f5f7ff;
+  --muted: rgba(214, 225, 255, 0.74);
+  --accent: #a7d8ff;
+  --warm: #ffc48a;
+  --shadow: 0 1.8rem 4rem rgba(0, 0, 0, 0.34);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  background: var(--bg-main);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+}
+
+.day03-app {
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(98, 133, 255, 0.22), transparent 22%),
+    radial-gradient(circle at 82% 18%, rgba(255, 171, 103, 0.12), transparent 24%),
+    linear-gradient(180deg, #040714 0%, #060d1b 42%, #040711 100%);
+}
+
+.day03-app__bg,
+.solar-canvas-shell {
+  position: fixed;
+  inset: 0;
+}
+
+.solar-canvas-shell {
+  z-index: 1;
+}
+
+.day03-app__bg {
+  z-index: 0;
+  pointer-events: none;
+}
+
+.day03-app__gradient,
+.day03-app__grid {
+  position: absolute;
+  inset: 0;
+}
+
+.day03-app__gradient--warm {
+  background: radial-gradient(circle at 84% 22%, rgba(255, 155, 86, 0.18), transparent 24%);
+}
+
+.day03-app__gradient--cool {
+  background: radial-gradient(circle at 24% 24%, rgba(83, 126, 255, 0.2), transparent 26%);
+}
+
+.day03-app__grid {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 6rem 6rem;
+  mask-image: radial-gradient(circle at center, black, transparent 84%);
+  opacity: 0.34;
+}
+
+.canvas-loader {
+  position: fixed;
+  inset: auto auto 1.2rem 1.2rem;
+  z-index: 4;
+  padding: 0.82rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(8, 13, 27, 0.8);
+  color: rgba(227, 236, 255, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero-overlay,
+.chapter-rail,
+.quality-badge,
+.quick-jump,
+.planet-drawer {
+  position: fixed;
+  z-index: 4;
+}
+
+.hero-overlay {
+  top: clamp(1rem, 3vw, 2rem);
+  left: clamp(1rem, 3vw, 2rem);
+  width: min(31rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.hero-overlay__panel,
+.story-card,
+.planet-drawer,
+.quality-badge,
+.quick-jump,
+.chapter-rail,
+.fallback-view__hero,
+.fallback-view__chapter,
+.fallback-view__planet-card {
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    var(--bg-panel);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: var(--shadow);
+}
+
+.hero-overlay__panel {
+  padding: 1.4rem 1.4rem 1.5rem;
+  border-radius: 2rem;
+}
+
+.hero-overlay__eyebrow,
+.story-card__eyebrow,
+.planet-drawer__eyebrow,
+.fallback-view__eyebrow,
+.fallback-view__chapter p {
+  margin: 0 0 0.9rem;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.hero-overlay h1,
+.story-card h2,
+.planet-drawer h2,
+.fallback-view h1,
+.fallback-view__chapter h2 {
+  margin: 0;
+  font-family: "Cormorant Garamond", "Georgia", serif;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+
+.hero-overlay h1 {
+  font-size: clamp(3.2rem, 6vw, 5.8rem);
+  max-width: 10ch;
+}
+
+.hero-overlay__lead,
+.hero-overlay__body,
+.story-card p,
+.planet-drawer__subtitle,
+.planet-drawer__copy,
+.fallback-view p,
+.fallback-view__chapter p,
+.fallback-view__planet-card h3,
+.fallback-view__planet-card span {
+  color: var(--muted);
+}
+
+.hero-overlay__lead {
+  margin: 1rem 0 0;
+  max-width: 29rem;
+  font-size: 1.04rem;
+  line-height: 1.72;
+}
+
+.hero-overlay__body {
+  margin: 0.9rem 0 0;
+  max-width: 28rem;
+  line-height: 1.7;
+}
+
+.hero-overlay__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.25rem;
+}
+
+.hero-overlay__chips span,
+.quality-badge span,
+.quick-jump__item,
+.planet-drawer__jump,
+.planet-drawer__close {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.hero-overlay__chips span {
+  padding: 0.58rem 0.95rem;
+  color: rgba(231, 238, 255, 0.82);
+  font-size: 0.86rem;
+}
+
+.chapter-rail {
+  top: 50%;
+  right: clamp(1rem, 3vw, 2rem);
+  display: grid;
+  gap: 0.7rem;
+  transform: translateY(-50%);
+  padding: 0.9rem;
+  border-radius: 1.5rem;
+}
+
+.chapter-rail__item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(217, 228, 255, 0.72);
+  cursor: pointer;
+}
+
+.chapter-rail__dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.chapter-rail__label {
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.chapter-rail__item.is-active .chapter-rail__dot {
+  transform: scale(1.2);
+  border-color: rgba(255, 212, 161, 0.8);
+  background: linear-gradient(135deg, rgba(255, 212, 161, 0.86), rgba(139, 214, 255, 0.9));
+}
+
+.chapter-rail__item.is-active .chapter-rail__label {
+  color: white;
+}
+
+.quality-badge {
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.8rem;
+  border-radius: 999px;
+}
+
+.quality-badge span {
+  padding: 0.5rem 0.8rem;
+  color: rgba(232, 238, 255, 0.82);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.quick-jump {
+  bottom: clamp(1rem, 3vw, 1.8rem);
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  width: min(50rem, calc(100vw - 2rem));
+  padding: 0.85rem;
+  border-radius: 1.5rem;
+  transform: translateX(-50%);
+}
+
+.quick-jump__item {
+  padding: 0.68rem 1rem;
+  color: rgba(228, 236, 255, 0.88);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.quick-jump__item:hover,
+.quick-jump__item:focus-visible,
+.planet-drawer__jump:hover,
+.planet-drawer__close:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.quick-jump__item.is-active {
+  border-color: rgba(255, 212, 161, 0.48);
+  background: linear-gradient(135deg, rgba(255, 204, 146, 0.22), rgba(108, 162, 255, 0.16));
+}
+
+.planet-drawer {
+  top: 1.2rem;
+  right: 1.2rem;
+  width: min(25rem, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border-radius: 1.85rem;
+  opacity: 0;
+  transform: translateX(42px);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.planet-drawer__glow {
+  position: absolute;
+  inset: -18% auto auto -12%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(155, 216, 255, 0.28), rgba(155, 216, 255, 0) 72%);
+  filter: blur(18px);
+}
+
+.planet-drawer__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.55rem 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.planet-drawer h2 {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(2.5rem, 4vw, 3.6rem);
+}
+
+.planet-drawer__subtitle,
+.planet-drawer__copy {
+  position: relative;
+  z-index: 1;
+  line-height: 1.7;
+}
+
+.planet-drawer__subtitle {
+  margin: 0.8rem 0 1rem;
+}
+
+.planet-drawer__stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.planet-drawer__stats article {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.planet-drawer__stats span,
+.planet-drawer__details span {
+  color: rgba(220, 230, 255, 0.64);
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.planet-drawer__stats strong {
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.planet-drawer__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.planet-drawer__jump {
+  margin-top: 1.1rem;
+  padding: 0.72rem 1rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.story-shell {
+  position: relative;
+  z-index: 3;
+}
+
+.story-section {
+  min-height: 100vh;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+}
+
+.story-card {
+  width: min(29rem, calc(100vw - 2rem));
+  padding: 1.25rem 1.25rem 1.4rem;
+  border-radius: 1.85rem;
+  margin-right: clamp(0rem, 8vw, 7.5rem);
+}
+
+.story-card h2 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+.story-card__summary {
+  margin: 0.9rem 0 0.8rem;
+  font-size: 1.04rem;
+}
+
+.story-card p {
+  line-height: 1.72;
+}
+
+.fallback-view {
+  min-height: 100vh;
+  padding: clamp(1rem, 4vw, 2rem);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(94, 126, 255, 0.2), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(255, 173, 104, 0.14), transparent 22%),
+    linear-gradient(180deg, #040714 0%, #060d1b 42%, #040711 100%);
+}
+
+.fallback-view__hero,
+.fallback-view__chapters,
+.fallback-view__planet-grid {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.fallback-view__hero {
+  padding: clamp(1.3rem, 4vw, 2rem);
+  border-radius: 2rem;
+}
+
+.fallback-view h1 {
+  max-width: 10ch;
+  font-size: clamp(3rem, 7vw, 5.4rem);
+}
+
+.fallback-view__chapters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.fallback-view__chapter,
+.fallback-view__planet-card {
+  padding: 1.1rem;
+  border-radius: 1.4rem;
+}
+
+.fallback-view__chapter h2,
+.fallback-view__planet-card h3 {
+  margin: 0;
+  font-family: "Cormorant Garamond", "Georgia", serif;
+  line-height: 0.96;
+}
+
+.fallback-view__planet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.fallback-view__planet-card {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fallback-view__planet-card p {
+  margin: 0;
+  color: var(--warm);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  .hero-overlay__panel,
+  .story-card,
+  .planet-drawer,
+  .quality-badge,
+  .quick-jump,
+  .chapter-rail,
+  .fallback-view__hero,
+  .fallback-view__chapter,
+  .fallback-view__planet-card {
+    background: var(--bg-panel-strong);
+  }
+}
+
+@media (max-width: 1100px) {
+  .chapter-rail {
+    display: none;
+  }
+
+  .quality-badge {
+    top: auto;
+    bottom: 6.9rem;
+  }
+
+  .story-card {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    padding: 1rem 1rem 0;
+  }
+
+  .hero-overlay__panel {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+      rgba(7, 12, 26, 0.78);
+  }
+
+  .quality-badge {
+    right: 1rem;
+    bottom: 7rem;
+  }
+
+  .planet-drawer {
+    top: auto;
+    bottom: 6rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+
+  .story-section {
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 17rem;
+  }
+
+  .story-card {
+    width: 100%;
+  }
+
+  .fallback-view__chapters,
+  .fallback-view__planet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .day03-app__grid {
+    background-size: 4rem 4rem;
+  }
+
+  .hero-overlay h1,
+  .fallback-view h1 {
+    max-width: 9ch;
+    font-size: clamp(2.8rem, 12vw, 4.2rem);
+  }
+
+  .hero-overlay__chips {
+    display: none;
+  }
+
+  .quality-badge {
+    left: 1rem;
+    right: 1rem;
+    justify-content: center;
+    bottom: 8rem;
+  }
+
+  .canvas-loader {
+    left: 1rem;
+    bottom: 12rem;
+  }
+
+  .quality-badge span {
+    text-align: center;
+  }
+
+  .quick-jump {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .planet-drawer__stats,
+  .fallback-view__planet-grid,
+  .fallback-view__chapters {
+    grid-template-columns: 1fr;
+  }
+}

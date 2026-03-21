@@ -1,17 +1,19 @@
-# Day 03 - Interactive Solar System
+# Day 03 - Cinematic Solar System
 
-A cinematic Three.js solar system with orbiting planets, a deep starfield, and click-to-focus planet details.
+A premium React + React Three Fiber solar system with scroll-led chapters, shader-driven planets, guided camera motion, and an editorial planet drawer.
 
 ## Tech Used
 
 - HTML5
 - CSS3
-- Vanilla JavaScript
-- Three.js via CDN
+- React
+- TypeScript
+- React Three Fiber / Drei
+- GSAP + Lenis
 
 ## What I Learned
 
-Keeping camera targets, orbit controls, and selected-object state in one loop makes interactive 3D scenes feel much more stable.
+Once a 3D experience becomes narrative instead of purely interactive, camera state and scroll state need to be orchestrated as one system.
 
 ## Live Demo
 
