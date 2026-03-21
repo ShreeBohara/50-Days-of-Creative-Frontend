@@ -1,0 +1,27 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="32" fill="url(#bg)" />
+  <circle cx="64" cy="64" r="18" fill="url(#orb)" />
+  <path d="M64 18V34" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M95.8198 32.1802L87.3345 43.4939" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M109 64H93" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M95.8198 95.8198L84.5061 87.3345" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M64 110V94" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M32.1802 95.8198L40.6655 84.5061" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M19 64H35" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <path d="M32.1802 32.1802L43.4939 40.6655" stroke="url(#bars)" stroke-width="8" stroke-linecap="round" />
+  <defs>
+    <linearGradient id="bg" x1="18" y1="10" x2="109" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#060816" />
+      <stop offset="1" stop-color="#0E1830" />
+    </linearGradient>
+    <radialGradient id="orb" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(56 52) rotate(49.3987) scale(33.2799)">
+      <stop stop-color="#FFF0B7" />
+      <stop offset="0.56" stop-color="#FF9A57" />
+      <stop offset="1" stop-color="#FF4F95" />
+    </radialGradient>
+    <linearGradient id="bars" x1="27" y1="26" x2="103" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFB061" />
+      <stop offset="1" stop-color="#58DEFF" />
+    </linearGradient>
+  </defs>
+</svg>
