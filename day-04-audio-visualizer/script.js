@@ -25,6 +25,7 @@ const state = {
   demoNodes: null,
   demoPulseIndex: 0,
   frameId: 0,
+  resizeObserver: null,
   width: 0,
   height: 0,
   dpr: 1,
@@ -415,6 +416,13 @@ function bindEvents() {
 
   window.addEventListener("beforeunload", revokeObjectUrl);
   window.addEventListener("resize", resizeCanvas);
+
+  if ("ResizeObserver" in window) {
+    state.resizeObserver = new ResizeObserver(() => {
+      resizeCanvas();
+    });
+    state.resizeObserver.observe(canvas);
+  }
 }
 
 function resizeCanvas() {
