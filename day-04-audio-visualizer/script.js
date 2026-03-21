@@ -13,6 +13,7 @@ const FFT_SIZE = 256;
 const BIN_COUNT = FFT_SIZE / 2;
 const FULL_CIRCLE = Math.PI * 2;
 
+// Keep audio and render state in one place so file playback and demo mode can share the analyser.
 const state = {
   audioContext: null,
   analyser: null,
@@ -70,6 +71,7 @@ function revokeObjectUrl() {
   }
 }
 
+// Lazily build the audio graph after a user gesture so browsers allow playback.
 function ensureAudioGraph() {
   if (!AudioContextClass || !audioElement) {
     setStatus("Audio setup is unavailable.", "This browser does not support the Web Audio API.");
@@ -138,7 +140,7 @@ function pauseUploadedAudio(resetTime = false) {
 
 async function playUploadedAudio() {
   if (!audioElement?.src) {
-    setStatus("Upload a track first.", "Demo mode will be added in a later commit.");
+    setStatus("Upload a track first.", "Press play without a file to launch demo mode instead.");
     return;
   }
 
@@ -149,7 +151,15 @@ async function playUploadedAudio() {
   }
 
   state.activeMode = "file";
-  await audioElement.play();
+  try {
+    await audioElement.play();
+  } catch (error) {
+    state.isPlaying = false;
+    updatePlayToggleLabel();
+    setStatus("Playback needs a fresh tap.", "Your browser blocked the play request. Try again.");
+    return;
+  }
+
   syncPlaybackState();
   setStatus("Playing uploaded audio.", state.selectedFileName || "Custom track");
 }
@@ -173,8 +183,10 @@ function handleFileSelection(event) {
 
   setStatus("Track loaded.", `${file.name} is ready to play.`);
   updatePlayToggleLabel();
+  event.target.value = "";
 }
 
+// Demo mode schedules repeating gain envelopes so the analyser sees rhythmic low-end spikes.
 function scheduleDemoPulse() {
   if (!state.demoNodes || !state.audioContext) {
     return;
@@ -393,6 +405,12 @@ async function handlePlayToggle() {
   await playDemoMode();
 }
 
+function cleanupResources() {
+  stopDemoMode();
+  revokeObjectUrl();
+  state.resizeObserver?.disconnect();
+}
+
 function bindEvents() {
   if (fileInput) {
     fileInput.addEventListener("change", handleFileSelection);
@@ -414,7 +432,7 @@ function bindEvents() {
     });
   }
 
-  window.addEventListener("beforeunload", revokeObjectUrl);
+  window.addEventListener("beforeunload", cleanupResources);
   window.addEventListener("resize", resizeCanvas);
 
   if ("ResizeObserver" in window) {
@@ -425,6 +443,7 @@ function bindEvents() {
   }
 }
 
+// Match the canvas backing store to CSS pixels so the spectrum stays sharp on retina screens.
 function resizeCanvas() {
   if (!canvas || !context) {
     return;
@@ -571,6 +590,7 @@ function drawBackgroundFlash(centerX, centerY, minDimension) {
   context.fillRect(0, 0, state.width, state.height);
 }
 
+// A lightweight rolling baseline keeps the beat detector reactive without flashing constantly.
 function updateBeatDetection(frequencyData, now) {
   const bassEnergy = getAverageEnergy(frequencyData, 0, 12);
   const baseline = state.bassBaseline || bassEnergy;

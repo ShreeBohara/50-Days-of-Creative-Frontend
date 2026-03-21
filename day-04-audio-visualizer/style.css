@@ -68,6 +68,7 @@ input {
   pointer-events: none;
 }
 
+/* The copy stays light while the control HUD acts like an anchored instrument panel. */
 .hero-copy,
 .control-panel {
   width: min(100%, 32rem);
@@ -224,6 +225,7 @@ input {
 
   .control-panel {
     width: 100%;
+    align-items: stretch;
     border-radius: 1.3rem;
     padding: 0.85rem;
   }
