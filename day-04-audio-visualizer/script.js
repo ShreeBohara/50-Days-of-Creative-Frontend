@@ -28,6 +28,7 @@ const state = {
   dpr: 1,
   bassBaseline: 0,
   pulseStrength: 0,
+  flashStrength: 0,
   lastBeatTime: 0,
 };
 
@@ -266,10 +267,14 @@ function drawOrb(centerX, centerY, radius, frequencyData) {
   gradient.addColorStop(0.58, `hsla(${20 + (midEnergy * 32)}, 94%, ${62 + (midEnergy * 10)}%, 0.88)`);
   gradient.addColorStop(1, "hsla(192, 88%, 58%, 0.35)");
 
+  context.save();
+  context.shadowColor = "rgba(255, 160, 94, 0.52)";
+  context.shadowBlur = radius * 0.9;
   context.beginPath();
   context.fillStyle = gradient;
   context.arc(centerX, centerY, radius, 0, FULL_CIRCLE);
   context.fill();
+  context.restore();
 }
 
 function drawSpectrumBars(centerX, centerY, baseRadius, maxBarHeight, frequencyData) {
@@ -289,14 +294,48 @@ function drawSpectrumBars(centerX, centerY, baseRadius, maxBarHeight, frequencyD
     const startY = centerY + Math.sin(angle) * startRadius;
     const endX = centerX + Math.cos(angle) * endRadius;
     const endY = centerY + Math.sin(angle) * endRadius;
+    const glowColor = getBarColor(index, intensity, 0.24 + (intensity * 0.18));
+    const crispColor = getBarColor(index, intensity, 0.92);
 
-    context.strokeStyle = getBarColor(index, intensity, 0.88);
+    context.strokeStyle = glowColor;
+    context.shadowColor = glowColor;
+    context.shadowBlur = 18 + (intensity * 20);
+    context.lineWidth = 5 + (intensity * 4.5);
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(endX, endY);
+    context.stroke();
+
+    context.shadowBlur = 0;
+    context.strokeStyle = crispColor;
     context.lineWidth = 2.5 + (intensity * 2.5);
     context.beginPath();
     context.moveTo(startX, startY);
     context.lineTo(endX, endY);
     context.stroke();
   }
+}
+
+function drawBackgroundFlash(centerX, centerY, minDimension) {
+  if (!context) {
+    return;
+  }
+
+  const flashGradient = context.createRadialGradient(
+    centerX,
+    centerY,
+    minDimension * 0.12,
+    centerX,
+    centerY,
+    minDimension * 0.82
+  );
+
+  flashGradient.addColorStop(0, `hsla(35, 100%, 72%, ${0.045 + (state.flashStrength * 0.08)})`);
+  flashGradient.addColorStop(0.52, `hsla(198, 96%, 62%, ${0.024 + (state.flashStrength * 0.05)})`);
+  flashGradient.addColorStop(1, "hsla(230, 88%, 12%, 0)");
+
+  context.fillStyle = flashGradient;
+  context.fillRect(0, 0, state.width, state.height);
 }
 
 function updateBeatDetection(frequencyData, now) {
@@ -312,8 +351,10 @@ function updateBeatDetection(frequencyData, now) {
   if (detectedBeat) {
     state.lastBeatTime = now;
     state.pulseStrength = 1;
+    state.flashStrength = 1;
   } else {
     state.pulseStrength *= 0.91;
+    state.flashStrength *= 0.9;
   }
 }
 
@@ -337,6 +378,7 @@ function renderFrame() {
   const barTravel = minDimension * 0.18;
 
   context.clearRect(0, 0, width, height);
+  drawBackgroundFlash(centerX, centerY, minDimension);
   drawOrb(centerX, centerY, orbRadius, frequencySnapshot);
   drawSpectrumBars(centerX, centerY, barRadius, barTravel, frequencySnapshot);
 
