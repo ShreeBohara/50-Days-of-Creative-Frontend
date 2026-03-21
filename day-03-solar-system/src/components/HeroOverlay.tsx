@@ -34,22 +34,39 @@ export function HeroOverlay() {
   }, [activeChapter, selectedPlanet]);
 
   return (
-    <section className="hero-overlay" ref={overlayRef}>
+    <section className={selected ? "hero-overlay hero-overlay--compact" : "hero-overlay"} ref={overlayRef}>
       <div className="hero-overlay__panel">
         <p className="hero-overlay__eyebrow" data-hero-animate>
           {selected ? `Planet Focus / ${selected.name}` : chapter.eyebrow}
         </p>
-        <h1 data-hero-animate>{selected ? selected.subtitle : chapter.title}</h1>
+        <h1 data-hero-animate>{selected ? selected.name : chapter.title}</h1>
         <p className="hero-overlay__lead" data-hero-animate>
-          {selected ? selected.story : chapter.summary}
+          {selected ? selected.subtitle : chapter.summary}
         </p>
-        <p className="hero-overlay__body" data-hero-animate>
-          {selected ? `${selected.distance} from the Sun · ${selected.yearLength} year · ${selected.moons}` : chapter.body}
-        </p>
+        {selected ? (
+          <div className="hero-overlay__meta" data-hero-animate>
+            <span>{selected.distance}</span>
+            <span>{selected.yearLength}</span>
+            <span>{selected.moons}</span>
+          </div>
+        ) : (
+          <p className="hero-overlay__body" data-hero-animate>
+            {chapter.body}
+          </p>
+        )}
         <div className="hero-overlay__chips" data-hero-animate>
-          <span>React Three Fiber</span>
-          <span>GSAP Story Motion</span>
-          <span>{qualityMode} quality</span>
+          {selected ? (
+            <>
+              <span>Drag to orbit</span>
+              <span>Press Esc to reset</span>
+            </>
+          ) : (
+            <>
+              <span>React Three Fiber</span>
+              <span>GSAP Story Motion</span>
+              <span>{qualityMode} quality</span>
+            </>
+          )}
         </div>
       </div>
     </section>

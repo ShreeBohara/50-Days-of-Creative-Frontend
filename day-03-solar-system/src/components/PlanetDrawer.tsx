@@ -9,7 +9,6 @@ export function PlanetDrawer() {
   const overlayOpen = useSolarStore((state) => state.overlayOpen);
   const selectPlanet = useSolarStore((state) => state.selectPlanet);
   const setOverlayOpen = useSolarStore((state) => state.setOverlayOpen);
-  const setGuidedCameraActive = useSolarStore((state) => state.setGuidedCameraActive);
 
   const planet = selectedPlanet ? planetsById[selectedPlanet] : null;
 
@@ -70,26 +69,10 @@ export function PlanetDrawer() {
         </article>
       </div>
 
-      <p className="planet-drawer__copy">{planet.story}</p>
-
       <div className="planet-drawer__details">
         <span>Day length: {planet.dayLength}</span>
         <span>Year length: {planet.yearLength}</span>
       </div>
-
-      <button
-        type="button"
-        className="planet-drawer__jump"
-        onClick={() => {
-          setGuidedCameraActive(true);
-          document.getElementById(`chapter-${planet.chapter}`)?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }}
-      >
-        Jump to {chapter.title.split(" ")[0]} chapter
-      </button>
     </aside>
   );
 }

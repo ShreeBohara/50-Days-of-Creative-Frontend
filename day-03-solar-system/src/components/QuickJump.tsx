@@ -4,6 +4,7 @@ import { useSolarStore } from "../store/solarStore";
 export function QuickJump() {
   const selectedPlanet = useSolarStore((state) => state.selectedPlanet);
   const selectPlanet = useSolarStore((state) => state.selectPlanet);
+  const setActiveChapter = useSolarStore((state) => state.setActiveChapter);
   const setGuidedCameraActive = useSolarStore((state) => state.setGuidedCameraActive);
 
   return (
@@ -15,11 +16,8 @@ export function QuickJump() {
           className={selectedPlanet === planet.id ? "quick-jump__item is-active" : "quick-jump__item"}
           onClick={() => {
             setGuidedCameraActive(true);
+            setActiveChapter(planet.chapter);
             selectPlanet(planet.id);
-            document.getElementById(`chapter-${planet.chapter}`)?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
           }}
         >
           {planet.name}

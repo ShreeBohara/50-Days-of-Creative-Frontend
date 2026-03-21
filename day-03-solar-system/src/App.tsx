@@ -22,6 +22,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function App() {
   const storyShellRef = useRef<HTMLElement | null>(null);
   const { reducedMotion, webglSupported, initialQuality } = useEnvironment();
+  const selectedPlanet = useSolarStore((state) => state.selectedPlanet);
   const setActiveChapter = useSolarStore((state) => state.setActiveChapter);
   const setQualityMode = useSolarStore((state) => state.setQualityMode);
   const setReducedMotion = useSolarStore((state) => state.setReducedMotion);
@@ -111,7 +112,7 @@ export default function App() {
   }
 
   return (
-    <div className="day03-app">
+    <div className={selectedPlanet ? "day03-app is-planet-focus" : "day03-app"}>
       <div className="day03-app__bg" aria-hidden="true">
         <span className="day03-app__gradient day03-app__gradient--warm"></span>
         <span className="day03-app__gradient day03-app__gradient--cool"></span>

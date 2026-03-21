@@ -1,8 +1,8 @@
 import { Line, useCursor } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { planets, planetsById, type PlanetDefinition } from "../data/solarData";
+import { planets, planetsById, type PlanetDefinition, type PlanetId } from "../data/solarData";
 import { useSolarStore } from "../store/solarStore";
 
 const vertexShader = `
@@ -161,9 +161,16 @@ function orbitPoints(radius: number) {
   });
 }
 
+const runtimePlanetMeshes = new Map<PlanetId, THREE.Mesh>();
+
+export function getPlanetMesh(id: PlanetId) {
+  return runtimePlanetMeshes.get(id) ?? null;
+}
+
 function PlanetMesh({ planet, angleOffset }: { planet: PlanetDefinition; angleOffset: number }) {
   const groupRef = useRef<THREE.Group | null>(null);
   const meshRef = useRef<THREE.Mesh | null>(null);
+  const auraMaterialRef = useRef<THREE.MeshBasicMaterial | null>(null);
   const ringRef = useRef<THREE.ShaderMaterial | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const [hovered, setHovered] = useState(false);
@@ -173,6 +180,21 @@ function PlanetMesh({ planet, angleOffset }: { planet: PlanetDefinition; angleOf
   const qualityMode = useSolarStore((state) => state.qualityMode);
 
   useCursor(hovered);
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) {
+      return;
+    }
+
+    runtimePlanetMeshes.set(planet.id, mesh);
+
+    return () => {
+      if (runtimePlanetMeshes.get(planet.id) === mesh) {
+        runtimePlanetMeshes.delete(planet.id);
+      }
+    };
+  }, [planet.id]);
 
   const uniforms = useMemo(
     () => ({
@@ -197,7 +219,8 @@ function PlanetMesh({ planet, angleOffset }: { planet: PlanetDefinition; angleOf
 
   useFrame((state, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = angleOffset + state.clock.elapsedTime * planet.orbitSpeed * 0.12;
+      const orbitScale = selectedPlanet ? 0.04 : 0.12;
+      groupRef.current.rotation.y = angleOffset + state.clock.elapsedTime * planet.orbitSpeed * orbitScale;
       groupRef.current.rotation.z = planet.tilt * 0.12;
     }
 
@@ -225,6 +248,11 @@ function PlanetMesh({ planet, angleOffset }: { planet: PlanetDefinition; angleOf
     if (ringRef.current) {
       ringRef.current.uniforms.uTime.value = state.clock.elapsedTime;
     }
+
+    if (auraMaterialRef.current) {
+      const targetOpacity = selectedPlanet === planet.id ? 0.18 : hovered ? 0.07 : 0.02;
+      auraMaterialRef.current.opacity = THREE.MathUtils.lerp(auraMaterialRef.current.opacity, targetOpacity, 0.14);
+    }
   });
 
   return (
@@ -241,10 +269,6 @@ function PlanetMesh({ planet, angleOffset }: { planet: PlanetDefinition; angleOf
           event.stopPropagation();
           setActiveChapter(planet.chapter);
           selectPlanet(planet.id);
-          document.getElementById(`chapter-${planet.chapter}`)?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
         }}
       >
         <sphereGeometry args={[planet.size, qualityMode === "high" ? 80 : 56, qualityMode === "high" ? 80 : 56]} />
@@ -253,6 +277,18 @@ function PlanetMesh({ planet, angleOffset }: { planet: PlanetDefinition; angleOf
           uniforms={uniforms}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
+        />
+      </mesh>
+
+      <mesh position={[planet.orbitRadius, 0, 0]}>
+        <sphereGeometry args={[planet.size * 1.38, 48, 48]} />
+        <meshBasicMaterial
+          ref={auraMaterialRef}
+          color={planet.palette.glow}
+          transparent
+          opacity={0.02}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
         />
       </mesh>
 

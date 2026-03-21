@@ -3,6 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { chaptersById, planetsById } from "../data/solarData";
+import { getPlanetMesh } from "./PlanetSystem";
 import { useSolarStore } from "../store/solarStore";
 
 export function CinematicCamera() {
@@ -12,6 +13,8 @@ export function CinematicCamera() {
   const holdUntilRef = useRef(0);
   const positionTarget = useMemo(() => new THREE.Vector3(), []);
   const lookTarget = useMemo(() => new THREE.Vector3(), []);
+  const focusOffset = useMemo(() => new THREE.Vector3(), []);
+  const planetWorldPosition = useMemo(() => new THREE.Vector3(), []);
   const activeChapter = useSolarStore((state) => state.activeChapter);
   const selectedPlanet = useSolarStore((state) => state.selectedPlanet);
   const guided = useSolarStore((state) => state.isGuidedCameraActive);
@@ -34,12 +37,28 @@ export function CinematicCamera() {
 
     const chapter = chaptersById[activeChapter];
     const planet = selectedPlanet ? planetsById[selectedPlanet] : null;
-    const desiredPosition = planet?.focus.position ?? chapter.camera.position;
-    const desiredTarget = planet?.focus.target ?? chapter.camera.target;
     const desiredFov = planet ? 30 : chapter.camera.fov ?? 38;
 
-    positionTarget.set(...desiredPosition);
-    lookTarget.set(...desiredTarget);
+    if (planet && selectedPlanet) {
+      const selectedMesh = getPlanetMesh(selectedPlanet);
+
+      if (selectedMesh) {
+        selectedMesh.getWorldPosition(planetWorldPosition);
+        focusOffset.set(
+          planet.focus.position[0] - planet.focus.target[0],
+          planet.focus.position[1] - planet.focus.target[1],
+          planet.focus.position[2] - planet.focus.target[2]
+        );
+        positionTarget.copy(planetWorldPosition).add(focusOffset);
+        lookTarget.copy(planetWorldPosition);
+      } else {
+        positionTarget.set(...planet.focus.position);
+        lookTarget.set(...planet.focus.target);
+      }
+    } else {
+      positionTarget.set(...chapter.camera.position);
+      lookTarget.set(...chapter.camera.target);
+    }
 
     const shouldGuide = guided && state.clock.elapsedTime > holdUntilRef.current;
     const positionLerp = reducedMotion ? 0.14 : planet ? 0.065 : 0.045;
@@ -52,6 +71,8 @@ export function CinematicCamera() {
       perspectiveCamera.updateProjectionMatrix();
     }
 
+    controls.minDistance = planet ? Math.max(planet.size * 2.6, 6) : 14;
+    controls.maxDistance = planet ? Math.max(planet.size * 7.4, 20) : 160;
     controls.autoRotate = !selectedPlanet && activeChapter === "overview" && shouldGuide;
     controls.autoRotateSpeed = 0.28;
     controls.update();
