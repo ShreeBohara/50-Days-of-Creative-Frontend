@@ -221,13 +221,50 @@ function getFrequencySnapshot() {
   return state.frequencyData;
 }
 
-function drawOrb(centerX, centerY, radius) {
+function getAverageEnergy(frequencyData, startIndex, endIndex) {
+  const upperBound = Math.min(endIndex, frequencyData.length);
+  let total = 0;
+  let count = 0;
+
+  for (let index = startIndex; index < upperBound; index += 1) {
+    total += frequencyData[index];
+    count += 1;
+  }
+
+  return count ? total / count : 0;
+}
+
+function getBarColor(index, intensity, alpha = 1) {
+  const progress = index / Math.max(1, BIN_COUNT - 1);
+  const hue = 28 + (progress * 178);
+  const saturation = 88;
+  const lightness = 56 + (intensity * 16);
+
+  return `hsla(${hue.toFixed(2)}, ${saturation}%, ${lightness.toFixed(2)}%, ${alpha})`;
+}
+
+function drawOrb(centerX, centerY, radius, frequencyData) {
   if (!context) {
     return;
   }
 
+  const lowEnergy = getAverageEnergy(frequencyData, 0, 10) / 255;
+  const midEnergy = getAverageEnergy(frequencyData, 24, 62) / 255;
+  const gradient = context.createRadialGradient(
+    centerX - (radius * 0.32),
+    centerY - (radius * 0.32),
+    radius * 0.2,
+    centerX,
+    centerY,
+    radius
+  );
+
+  gradient.addColorStop(0, `hsla(${36 + (lowEnergy * 10)}, 100%, ${76 + (lowEnergy * 8)}%, 0.95)`);
+  gradient.addColorStop(0.58, `hsla(${20 + (midEnergy * 32)}, 94%, ${62 + (midEnergy * 10)}%, 0.88)`);
+  gradient.addColorStop(1, "hsla(192, 88%, 58%, 0.35)");
+
   context.beginPath();
-  context.fillStyle = "rgba(255, 197, 126, 0.82)";
+  context.fillStyle = gradient;
   context.arc(centerX, centerY, radius, 0, FULL_CIRCLE);
   context.fill();
 }
@@ -250,7 +287,7 @@ function drawSpectrumBars(centerX, centerY, baseRadius, maxBarHeight, frequencyD
     const endX = centerX + Math.cos(angle) * endRadius;
     const endY = centerY + Math.sin(angle) * endRadius;
 
-    context.strokeStyle = "rgba(126, 213, 255, 0.78)";
+    context.strokeStyle = getBarColor(index, intensity, 0.88);
     context.lineWidth = 2.5 + (intensity * 2.5);
     context.beginPath();
     context.moveTo(startX, startY);
@@ -275,7 +312,7 @@ function renderFrame() {
   const frequencySnapshot = getFrequencySnapshot();
 
   context.clearRect(0, 0, width, height);
-  drawOrb(centerX, centerY, orbRadius);
+  drawOrb(centerX, centerY, orbRadius, frequencySnapshot);
   drawSpectrumBars(centerX, centerY, barRadius, barTravel, frequencySnapshot);
 
   state.frameId = window.requestAnimationFrame(renderFrame);
