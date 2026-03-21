@@ -26,6 +26,9 @@ const state = {
   width: 0,
   height: 0,
   dpr: 1,
+  bassBaseline: 0,
+  pulseStrength: 0,
+  lastBeatTime: 0,
 };
 
 const context = canvas?.getContext("2d");
@@ -296,20 +299,42 @@ function drawSpectrumBars(centerX, centerY, baseRadius, maxBarHeight, frequencyD
   }
 }
 
+function updateBeatDetection(frequencyData, now) {
+  const bassEnergy = getAverageEnergy(frequencyData, 0, 12);
+  const baseline = state.bassBaseline || bassEnergy;
+
+  state.bassBaseline = (baseline * 0.92) + (bassEnergy * 0.08);
+
+  const baselineThreshold = Math.max(68, state.bassBaseline * 1.32);
+  const cooldownElapsed = now - state.lastBeatTime > 240;
+  const detectedBeat = bassEnergy > baselineThreshold && cooldownElapsed;
+
+  if (detectedBeat) {
+    state.lastBeatTime = now;
+    state.pulseStrength = 1;
+  } else {
+    state.pulseStrength *= 0.91;
+  }
+}
+
 function renderFrame() {
   if (!context) {
     return;
   }
 
+  const now = window.performance.now();
   const width = state.width || window.innerWidth;
   const height = state.height || window.innerHeight;
   const centerX = width / 2;
   const centerY = height / 2;
   const minDimension = Math.min(width, height);
-  const orbRadius = minDimension * 0.1;
+  const frequencySnapshot = getFrequencySnapshot();
+
+  updateBeatDetection(frequencySnapshot, now);
+
+  const orbRadius = (minDimension * 0.1) * (1 + (state.pulseStrength * 0.24));
   const barRadius = orbRadius + (minDimension * 0.085);
   const barTravel = minDimension * 0.18;
-  const frequencySnapshot = getFrequencySnapshot();
 
   context.clearRect(0, 0, width, height);
   drawOrb(centerX, centerY, orbRadius, frequencySnapshot);
