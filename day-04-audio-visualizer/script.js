@@ -22,6 +22,8 @@ const state = {
   activeMode: "idle",
   isPlaying: false,
   selectedFileName: "",
+  demoNodes: null,
+  demoPulseIndex: 0,
   frameId: 0,
   width: 0,
   height: 0,
@@ -50,7 +52,12 @@ function updatePlayToggleLabel() {
   }
 
   const hasFile = Boolean(audioElement?.src);
-  const nextLabel = state.isPlaying ? "Pause" : hasFile ? "Play Upload" : "Play Demo";
+  let nextLabel = hasFile ? "Play Upload" : "Play Demo";
+
+  if (state.isPlaying) {
+    nextLabel = state.activeMode === "demo" ? "Pause Demo" : "Pause Upload";
+  }
+
   playToggle.textContent = nextLabel;
   playToggle.setAttribute("aria-pressed", String(state.isPlaying));
 }
@@ -105,17 +112,26 @@ async function resumeAudioContext() {
 }
 
 function syncPlaybackState() {
+  if (state.activeMode === "demo") {
+    updatePlayToggleLabel();
+    return;
+  }
+
   state.isPlaying = Boolean(audioElement && !audioElement.paused && !audioElement.ended);
   updatePlayToggleLabel();
 }
 
-function stopUploadedAudio() {
+function pauseUploadedAudio(resetTime = false) {
   if (!audioElement) {
     return;
   }
 
   audioElement.pause();
-  audioElement.currentTime = 0;
+
+  if (resetTime) {
+    audioElement.currentTime = 0;
+  }
+
   syncPlaybackState();
 }
 
@@ -144,7 +160,7 @@ function handleFileSelection(event) {
     return;
   }
 
-  stopUploadedAudio();
+  stopActiveSource({ resetFilePosition: true });
   revokeObjectUrl();
 
   state.currentObjectUrl = URL.createObjectURL(file);
@@ -158,14 +174,222 @@ function handleFileSelection(event) {
   updatePlayToggleLabel();
 }
 
-async function handlePlayToggle() {
-  if (state.isPlaying) {
-    stopUploadedAudio();
-    setStatus("Playback paused.", state.selectedFileName || "Upload a track or wait for demo mode.");
+function scheduleDemoPulse() {
+  if (!state.demoNodes || !state.audioContext) {
     return;
   }
 
-  await playUploadedAudio();
+  const { bassGain, midGain, airGain, midFilter } = state.demoNodes;
+  const step = state.demoPulseIndex % 8;
+  const accent = step % 4 === 0 ? 1 : 0.76 + (Math.random() * 0.12);
+  const spacing = step % 4 === 3 ? 430 : 320;
+  const now = state.audioContext.currentTime;
+
+  bassGain.gain.cancelScheduledValues(now);
+  bassGain.gain.setValueAtTime(0.0001, now);
+  bassGain.gain.linearRampToValueAtTime(0.18 * accent, now + 0.02);
+  bassGain.gain.exponentialRampToValueAtTime(0.024, now + 0.34);
+
+  midGain.gain.cancelScheduledValues(now);
+  midGain.gain.setValueAtTime(0.028, now);
+  midGain.gain.linearRampToValueAtTime(0.085 * accent, now + 0.04);
+  midGain.gain.exponentialRampToValueAtTime(0.02, now + 0.32);
+
+  airGain.gain.cancelScheduledValues(now);
+  airGain.gain.setValueAtTime(0.014, now);
+  airGain.gain.linearRampToValueAtTime(0.035 + (accent * 0.016), now + 0.08);
+  airGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+  midFilter.frequency.cancelScheduledValues(now);
+  midFilter.frequency.setValueAtTime(520 + (step * 45), now);
+  midFilter.frequency.linearRampToValueAtTime(980 + (accent * 90), now + 0.12);
+  midFilter.frequency.exponentialRampToValueAtTime(620, now + 0.4);
+
+  state.demoPulseIndex += 1;
+  state.demoNodes.pulseTimer = window.setTimeout(scheduleDemoPulse, spacing);
+}
+
+function stopDemoMode() {
+  if (!state.demoNodes) {
+    return;
+  }
+
+  const {
+    bassOsc,
+    midOsc,
+    airOsc,
+    motionOsc,
+    motionDepth,
+    bassFilter,
+    midFilter,
+    airFilter,
+    bassGain,
+    midGain,
+    airGain,
+    masterGain,
+    pulseTimer,
+  } = state.demoNodes;
+
+  window.clearTimeout(pulseTimer);
+
+  [bassOsc, midOsc, airOsc, motionOsc].forEach((node) => {
+    try {
+      node.stop();
+    } catch (error) {
+      // Oscillators may already be stopped during rapid source changes.
+    }
+  });
+
+  [
+    motionDepth,
+    bassFilter,
+    midFilter,
+    airFilter,
+    bassGain,
+    midGain,
+    airGain,
+    masterGain,
+    bassOsc,
+    midOsc,
+    airOsc,
+    motionOsc,
+  ].forEach((node) => {
+    node.disconnect();
+  });
+
+  state.demoNodes = null;
+  state.isPlaying = false;
+  state.activeMode = audioElement?.src ? "file" : "idle";
+  updatePlayToggleLabel();
+}
+
+async function playDemoMode() {
+  const ready = await resumeAudioContext();
+
+  if (!ready || !state.audioContext || !state.analyser) {
+    return;
+  }
+
+  stopActiveSource({ resetFilePosition: false });
+
+  const bassOsc = state.audioContext.createOscillator();
+  const midOsc = state.audioContext.createOscillator();
+  const airOsc = state.audioContext.createOscillator();
+  const motionOsc = state.audioContext.createOscillator();
+  const motionDepth = state.audioContext.createGain();
+  const bassFilter = state.audioContext.createBiquadFilter();
+  const midFilter = state.audioContext.createBiquadFilter();
+  const airFilter = state.audioContext.createBiquadFilter();
+  const bassGain = state.audioContext.createGain();
+  const midGain = state.audioContext.createGain();
+  const airGain = state.audioContext.createGain();
+  const masterGain = state.audioContext.createGain();
+
+  bassOsc.type = "sine";
+  bassOsc.frequency.value = 56;
+  midOsc.type = "triangle";
+  midOsc.frequency.value = 196;
+  airOsc.type = "sawtooth";
+  airOsc.frequency.value = 392;
+  motionOsc.type = "sine";
+  motionOsc.frequency.value = 0.11;
+
+  motionDepth.gain.value = 8;
+
+  bassFilter.type = "lowpass";
+  bassFilter.frequency.value = 190;
+  bassFilter.Q.value = 0.85;
+
+  midFilter.type = "bandpass";
+  midFilter.frequency.value = 620;
+  midFilter.Q.value = 0.65;
+
+  airFilter.type = "highpass";
+  airFilter.frequency.value = 1200;
+  airFilter.Q.value = 0.5;
+
+  bassGain.gain.value = 0.0001;
+  midGain.gain.value = 0.02;
+  airGain.gain.value = 0.01;
+  masterGain.gain.value = 0.45;
+
+  motionOsc.connect(motionDepth);
+  motionDepth.connect(midOsc.detune);
+  motionDepth.connect(airOsc.detune);
+
+  bassOsc.connect(bassFilter);
+  bassFilter.connect(bassGain);
+  bassGain.connect(masterGain);
+
+  midOsc.connect(midFilter);
+  midFilter.connect(midGain);
+  midGain.connect(masterGain);
+
+  airOsc.connect(airFilter);
+  airFilter.connect(airGain);
+  airGain.connect(masterGain);
+
+  masterGain.connect(state.analyser);
+
+  bassOsc.start();
+  midOsc.start();
+  airOsc.start();
+  motionOsc.start();
+
+  state.demoNodes = {
+    bassOsc,
+    midOsc,
+    airOsc,
+    motionOsc,
+    motionDepth,
+    bassFilter,
+    midFilter,
+    airFilter,
+    bassGain,
+    midGain,
+    airGain,
+    masterGain,
+    pulseTimer: 0,
+  };
+  state.demoPulseIndex = 0;
+  state.activeMode = "demo";
+  state.isPlaying = true;
+
+  scheduleDemoPulse();
+  updatePlayToggleLabel();
+  setStatus("Playing demo mode.", "Synthetic pulses are driving the spectrum.");
+}
+
+function stopActiveSource({ resetFilePosition }) {
+  if (state.activeMode === "demo") {
+    stopDemoMode();
+    return;
+  }
+
+  if (audioElement?.src) {
+    pauseUploadedAudio(resetFilePosition);
+  }
+}
+
+async function handlePlayToggle() {
+  if (state.isPlaying) {
+    if (state.activeMode === "demo") {
+      stopDemoMode();
+      setStatus("Demo mode paused.", "Upload a track or restart the demo whenever you're ready.");
+      return;
+    }
+
+    pauseUploadedAudio(false);
+    setStatus("Playback paused.", state.selectedFileName || "Upload a track or start demo mode.");
+    return;
+  }
+
+  if (audioElement?.src) {
+    await playUploadedAudio();
+    return;
+  }
+
+  await playDemoMode();
 }
 
 function bindEvents() {
@@ -183,6 +407,7 @@ function bindEvents() {
     audioElement.addEventListener("play", syncPlaybackState);
     audioElement.addEventListener("pause", syncPlaybackState);
     audioElement.addEventListener("ended", () => {
+      state.activeMode = "file";
       syncPlaybackState();
       setStatus("Playback complete.", state.selectedFileName || "Upload another track to continue.");
     });
