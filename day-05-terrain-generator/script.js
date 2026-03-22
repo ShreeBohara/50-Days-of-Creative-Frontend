@@ -15,6 +15,16 @@ const state = {
   controls: null,
   clock: new THREE.Clock(),
   terrain: null,
+  noise2D: null,
+  params: {
+    seed: "alpine",
+    amplitude: 45,
+    frequency: 0.012,
+    octaves: 6,
+    lacunarity: 2.0,
+    persistence: 0.5,
+    waterLevel: -4,
+  },
 };
 
 /* ── Renderer ────────────────────────────────────────────── */
@@ -73,10 +83,59 @@ function initLights() {
   state.scene.add(hemi);
 }
 
+/* ── Noise ───────────────────────────────────────────────── */
+function hashSeed(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  }
+  return h;
+}
+
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+function seedNoise(seed) {
+  const h = hashSeed(seed);
+  const rng = seededRandom(Math.abs(h) || 1);
+  state.noise2D = createNoise2D(rng);
+}
+
+function fbm(x, z, params) {
+  let value = 0;
+  let amp = params.amplitude;
+  let freq = params.frequency;
+  for (let i = 0; i < params.octaves; i++) {
+    value += state.noise2D(x * freq, z * freq) * amp;
+    freq *= params.lacunarity;
+    amp *= params.persistence;
+  }
+  return value;
+}
+
 /* ── Terrain Mesh ────────────────────────────────────────── */
+function applyNoiseDisplacement(geo, params) {
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    pos.setY(i, fbm(x, z, params));
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
+}
+
 function initTerrain() {
   const geo = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, SEGMENTS, SEGMENTS);
   geo.rotateX(-Math.PI / 2);
+
+  seedNoise(state.params.seed);
+  applyNoiseDisplacement(geo, state.params);
 
   const mat = new THREE.MeshStandardMaterial({
     color: 0x888888,
