@@ -12,7 +12,7 @@ const offscreenContext = offscreenCanvas.getContext("2d", { willReadFrequently: 
 const config = {
   alphaThreshold: 120,
   driftStrength: 1.35,
-  fontFamily: '"Space Grotesk", "Avenir Next", "Segoe UI", sans-serif',
+  fontFamily: '"IBM Plex Mono", monospace',
   fontWeight: 700,
   maxParticles: 4800,
   maxFontSize: 340,
@@ -61,8 +61,8 @@ function mixColorChannel(start, end, factor) {
 
 function getParticleColor(y, alpha) {
   const normalizedY = clamp(y / state.viewport.height, 0, 1);
-  const startColor = { r: 124, g: 246, b: 255 };
-  const endColor = { r: 255, g: 94, b: 219 };
+  const startColor = { r: 255, g: 255, b: 255 };
+  const endColor = { r: 255, g: 61, b: 0 };
   const r = mixColorChannel(startColor.r, endColor.r, normalizedY);
   const g = mixColorChannel(startColor.g, endColor.g, normalizedY);
   const b = mixColorChannel(startColor.b, endColor.b, normalizedY);
@@ -291,6 +291,9 @@ function setWord(nextWord) {
 function handleInput(event) {
   const nextWord = normalizeWord(event.target.value);
 
+  input.classList.add("flash");
+  setTimeout(() => input.classList.remove("flash"), 120);
+
   if (!nextWord) {
     return;
   }
@@ -320,6 +323,11 @@ function updatePointerPosition(event) {
   state.pointer.active = true;
   state.pointer.x = event.clientX;
   state.pointer.y = event.clientY;
+
+  const readout = document.querySelector("[data-coord-readout]");
+  if (readout) {
+    readout.textContent = `x: ${event.clientX} y: ${event.clientY}`;
+  }
 }
 
 function clearPointerPosition() {
