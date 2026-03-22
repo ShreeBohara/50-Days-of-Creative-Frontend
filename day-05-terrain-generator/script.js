@@ -5,12 +5,16 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { createNoise2D } from "simplex-noise";
 
 /* ── State ───────────────────────────────────────────────── */
+const TERRAIN_SIZE = 400;
+const SEGMENTS = 200;
+
 const state = {
   renderer: null,
   scene: null,
   camera: null,
   controls: null,
   clock: new THREE.Clock(),
+  terrain: null,
 };
 
 /* ── Renderer ────────────────────────────────────────────── */
@@ -69,6 +73,21 @@ function initLights() {
   state.scene.add(hemi);
 }
 
+/* ── Terrain Mesh ────────────────────────────────────────── */
+function initTerrain() {
+  const geo = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, SEGMENTS, SEGMENTS);
+  geo.rotateX(-Math.PI / 2);
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    flatShading: true,
+    vertexColors: false,
+  });
+
+  state.terrain = new THREE.Mesh(geo, mat);
+  state.scene.add(state.terrain);
+}
+
 /* ── Resize ──────────────────────────────────────────────── */
 function handleResize() {
   const w = window.innerWidth;
@@ -93,6 +112,7 @@ function init() {
   initCamera();
   initControls();
   initLights();
+  initTerrain();
 
   window.addEventListener("resize", handleResize);
   animate();
