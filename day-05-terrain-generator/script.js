@@ -6,7 +6,7 @@ import { createNoise2D } from "simplex-noise";
 
 /* ── State ───────────────────────────────────────────────── */
 const TERRAIN_SIZE = 400;
-const SEGMENTS = 200;
+const SEGMENTS = window.innerWidth < 768 ? 100 : 200;
 
 const state = {
   renderer: null,
@@ -365,6 +365,17 @@ function init() {
   }
 
   window.addEventListener("resize", handleResize);
+
+  // Mobile panel toggle
+  const panel = document.querySelector(".control-panel");
+  if (panel && window.innerWidth <= 640) {
+    panel.addEventListener("click", (e) => {
+      if (e.target === panel || e.target.classList.contains("panel-title")) {
+        panel.classList.toggle("expanded");
+      }
+    });
+  }
+
   animate();
 }
 
