@@ -118,6 +118,54 @@ function fbm(x, z, params) {
   return value;
 }
 
+/* ── Height Coloring ─────────────────────────────────────── */
+const BIOMES = [
+  { t: 0.0,  color: new THREE.Color(0x1a3a5c) }, // deep water
+  { t: 0.18, color: new THREE.Color(0x2d7ea8) }, // shallow water
+  { t: 0.28, color: new THREE.Color(0xd4b483) }, // sand
+  { t: 0.34, color: new THREE.Color(0x4a8c3f) }, // grass
+  { t: 0.55, color: new THREE.Color(0x2d5a27) }, // forest
+  { t: 0.70, color: new THREE.Color(0x6b6b6b) }, // rock
+  { t: 0.85, color: new THREE.Color(0xf0f0f5) }, // snow
+];
+
+function biomeColor(t) {
+  if (t <= BIOMES[0].t) return BIOMES[0].color.clone();
+  if (t >= BIOMES[BIOMES.length - 1].t) return BIOMES[BIOMES.length - 1].color.clone();
+  for (let i = 1; i < BIOMES.length; i++) {
+    if (t <= BIOMES[i].t) {
+      const prev = BIOMES[i - 1];
+      const curr = BIOMES[i];
+      const f = (t - prev.t) / (curr.t - prev.t);
+      return prev.color.clone().lerp(curr.color, f);
+    }
+  }
+  return BIOMES[BIOMES.length - 1].color.clone();
+}
+
+function applyVertexColors(geo) {
+  const pos = geo.attributes.position;
+  let minY = Infinity, maxY = -Infinity;
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i);
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  const range = maxY - minY || 1;
+  const colors = new Float32Array(pos.count * 3);
+  const c = new THREE.Color();
+
+  for (let i = 0; i < pos.count; i++) {
+    const t = (pos.getY(i) - minY) / range;
+    const bc = biomeColor(t);
+    colors[i * 3] = bc.r;
+    colors[i * 3 + 1] = bc.g;
+    colors[i * 3 + 2] = bc.b;
+  }
+
+  geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+}
+
 /* ── Terrain Mesh ────────────────────────────────────────── */
 function applyNoiseDisplacement(geo, params) {
   const pos = geo.attributes.position;
@@ -136,11 +184,11 @@ function initTerrain() {
 
   seedNoise(state.params.seed);
   applyNoiseDisplacement(geo, state.params);
+  applyVertexColors(geo);
 
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x888888,
     flatShading: true,
-    vertexColors: false,
+    vertexColors: true,
   });
 
   state.terrain = new THREE.Mesh(geo, mat);
