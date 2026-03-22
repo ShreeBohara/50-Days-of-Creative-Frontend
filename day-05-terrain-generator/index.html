@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 05 | Procedural 3D Terrain Generator</title>
+    <meta
+      name="description"
+      content="Procedurally generated 3D terrain with height-based biome coloring, interactive controls, and cinematic camera modes."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+          "simplex-noise": "https://cdn.jsdelivr.net/npm/simplex-noise@4.0.3/dist/esm/simplex-noise.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="terrain-canvas"></canvas>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+      <p class="loading-text">Generating terrain...</p>
+    </div>
+
+    <!-- Hero overlay -->
+    <header class="hero-overlay">
+      <p class="eyebrow">Day 05 / Creative Frontend</p>
+      <h1>Procedural Terrain</h1>
+      <p class="subtitle">Simplex noise landscapes with biome coloring</p>
+    </header>
+
+    <!-- Control panel -->
+    <section class="control-panel" aria-label="Terrain parameters">
+      <h2 class="panel-title">Parameters</h2>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Seed</span>
+          <input type="text" id="ctrl-seed" value="alpine" class="seed-input" />
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Amplitude</span>
+          <output id="out-amplitude">45</output>
+        </label>
+        <input type="range" id="ctrl-amplitude" min="5" max="80" step="1" value="45" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Frequency</span>
+          <output id="out-frequency">0.012</output>
+        </label>
+        <input type="range" id="ctrl-frequency" min="0.002" max="0.04" step="0.001" value="0.012" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Octaves</span>
+          <output id="out-octaves">6</output>
+        </label>
+        <input type="range" id="ctrl-octaves" min="1" max="8" step="1" value="6" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Water Level</span>
+          <output id="out-waterLevel">-4</output>
+        </label>
+        <input type="range" id="ctrl-waterLevel" min="-20" max="10" step="0.5" value="-4" />
+      </div>
+
+      <div class="panel-actions">
+        <button id="btn-regenerate" class="btn-regenerate" type="button">Regenerate</button>
+        <button id="btn-camera" class="btn-camera" type="button" aria-pressed="false">
+          Orbit
+        </button>
+      </div>
+    </section>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
