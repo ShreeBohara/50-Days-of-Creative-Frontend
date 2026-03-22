@@ -17,6 +17,8 @@ const state = {
   terrain: null,
   water: null,
   noise2D: null,
+  cameraMode: "orbit",
+  flyoverT: 0,
   params: {
     seed: "alpine",
     amplitude: 45,
@@ -27,6 +29,8 @@ const state = {
     waterLevel: -4,
   },
 };
+
+const CAMERA_MODES = ["orbit", "flyover", "manual"];
 
 /* ── Renderer ────────────────────────────────────────────── */
 function initRenderer() {
@@ -272,6 +276,47 @@ function bindControls() {
       rebuildTerrain();
     });
   }
+
+  const camBtn = document.getElementById("btn-camera");
+  if (camBtn) {
+    camBtn.addEventListener("click", () => {
+      const idx = CAMERA_MODES.indexOf(state.cameraMode);
+      state.cameraMode = CAMERA_MODES[(idx + 1) % CAMERA_MODES.length];
+      camBtn.textContent = state.cameraMode.charAt(0).toUpperCase() + state.cameraMode.slice(1);
+      applyCameraMode();
+    });
+  }
+}
+
+function applyCameraMode() {
+  if (state.cameraMode === "orbit") {
+    state.controls.autoRotate = true;
+    state.controls.autoRotateSpeed = 0.5;
+    state.controls.enabled = true;
+  } else if (state.cameraMode === "flyover") {
+    state.controls.autoRotate = false;
+    state.controls.enabled = false;
+    state.flyoverT = 0;
+  } else {
+    state.controls.autoRotate = false;
+    state.controls.enabled = true;
+  }
+}
+
+function updateFlyover(dt) {
+  state.flyoverT += dt * 0.15;
+  const t = state.flyoverT;
+  const half = TERRAIN_SIZE * 0.4;
+  const x = Math.sin(t) * half;
+  const z = Math.cos(t * 0.7) * half;
+  const flyHeight = state.params.amplitude * 1.2 + 20;
+
+  state.camera.position.set(x, flyHeight, z);
+  state.camera.lookAt(
+    Math.sin(t + 0.3) * half * 0.3,
+    0,
+    Math.cos(t * 0.7 + 0.3) * half * 0.3
+  );
 }
 
 /* ── Resize ──────────────────────────────────────────────── */
@@ -287,10 +332,15 @@ function handleResize() {
 /* ── Animation Loop ──────────────────────────────────────── */
 function animate() {
   requestAnimationFrame(animate);
+  const dt = state.clock.getDelta();
   const t = state.clock.getElapsedTime();
 
   if (state.water) {
     state.water.position.y = state.params.waterLevel + Math.sin(t * 0.8) * 0.15;
+  }
+
+  if (state.cameraMode === "flyover") {
+    updateFlyover(dt);
   }
 
   state.controls.update();
@@ -307,6 +357,7 @@ function init() {
   initTerrain();
   initWater();
   bindControls();
+  applyCameraMode();
 
   const loadingOverlay = document.getElementById("loading-overlay");
   if (loadingOverlay) {
