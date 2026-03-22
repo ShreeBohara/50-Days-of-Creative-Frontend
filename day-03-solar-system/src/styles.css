@@ -1,16 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Cormorant+Garamond:wght@600;700&display=swap");
+/* ── Archival / Mission Control ──────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap");
 
 :root {
   color-scheme: dark;
   --bg-main: #050816;
-  --bg-panel: rgba(10, 16, 32, 0.62);
-  --bg-panel-strong: rgba(10, 16, 32, 0.82);
-  --line: rgba(206, 224, 255, 0.15);
-  --text: #f5f7ff;
-  --muted: rgba(214, 225, 255, 0.74);
-  --accent: #a7d8ff;
-  --warm: #ffc48a;
-  --shadow: 0 1.8rem 4rem rgba(0, 0, 0, 0.34);
+  --bg-panel: rgba(12, 10, 6, 0.82);
+  --bg-panel-strong: rgba(12, 10, 6, 0.92);
+  --line: rgba(212, 168, 83, 0.18);
+  --text: #e8dcc8;
+  --muted: rgba(232, 220, 200, 0.64);
+  --accent: #d4a853;
+  --warm: #d4a853;
+  --data: #8fb87e;
+  --shadow: 0 1.2rem 3rem rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -29,7 +32,7 @@ body,
 }
 
 body {
-  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "Source Serif 4", Georgia, serif;
   background: var(--bg-main);
   color: var(--text);
 }
@@ -41,10 +44,7 @@ button {
 .day03-app {
   position: relative;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(98, 133, 255, 0.22), transparent 22%),
-    radial-gradient(circle at 82% 18%, rgba(255, 171, 103, 0.12), transparent 24%),
-    linear-gradient(180deg, #040714 0%, #060d1b 42%, #040711 100%);
+  background: linear-gradient(180deg, #040711 0%, #060d1b 42%, #040711 100%);
 }
 
 .day03-app__bg,
@@ -69,34 +69,33 @@ button {
 }
 
 .day03-app__gradient--warm {
-  background: radial-gradient(circle at 84% 22%, rgba(255, 155, 86, 0.18), transparent 24%);
+  background: radial-gradient(circle at 84% 22%, rgba(212, 168, 83, 0.1), transparent 24%);
 }
 
 .day03-app__gradient--cool {
-  background: radial-gradient(circle at 24% 24%, rgba(83, 126, 255, 0.2), transparent 26%);
+  background: radial-gradient(circle at 24% 24%, rgba(143, 184, 126, 0.08), transparent 26%);
 }
 
 .day03-app__grid {
   background:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    linear-gradient(rgba(212, 168, 83, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 168, 83, 0.025) 1px, transparent 1px);
   background-size: 6rem 6rem;
   mask-image: radial-gradient(circle at center, black, transparent 84%);
-  opacity: 0.34;
+  opacity: 0.5;
 }
 
 .canvas-loader {
   position: fixed;
   inset: auto auto 1.2rem 1.2rem;
   z-index: 4;
-  padding: 0.82rem 1rem;
+  padding: 0.7rem 1rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(8, 13, 27, 0.8);
-  color: rgba(227, 236, 255, 0.82);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  font-size: 0.76rem;
+  border-radius: 2px;
+  background: var(--bg-panel-strong);
+  color: var(--data);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -121,6 +120,7 @@ button {
   width: min(21rem, calc(100vw - 2rem));
 }
 
+/* ── Shared panel style: opaque, sharp corners, CRT lines ── */
 .hero-overlay__panel,
 .story-card,
 .planet-drawer,
@@ -131,19 +131,25 @@ button {
 .fallback-view__chapter,
 .fallback-view__planet-card {
   border: 1px solid var(--line);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
-    var(--bg-panel);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border-radius: 2px;
+  background: var(--bg-panel);
   box-shadow: var(--shadow);
+  /* CRT scan lines */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(212, 168, 83, 0.02) 2px,
+      rgba(212, 168, 83, 0.02) 3px
+    );
 }
 
 .hero-overlay__panel {
   padding: 1.4rem 1.4rem 1.5rem;
-  border-radius: 2rem;
 }
 
+/* ── Eyebrows ──────────────────────────────────────────── */
 .hero-overlay__eyebrow,
 .story-card__eyebrow,
 .planet-drawer__eyebrow,
@@ -151,21 +157,24 @@ button {
 .fallback-view__chapter p {
   margin: 0 0 0.9rem;
   color: var(--accent);
-  font-size: 0.76rem;
-  font-weight: 700;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
 }
 
+/* ── Headings ──────────────────────────────────────────── */
 .hero-overlay h1,
 .story-card h2,
 .planet-drawer h2,
 .fallback-view h1,
 .fallback-view__chapter h2 {
   margin: 0;
-  font-family: "Cormorant Garamond", "Georgia", serif;
-  letter-spacing: -0.04em;
-  line-height: 0.92;
+  font-family: "Libre Caslon Display", Georgia, serif;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: var(--text);
 }
 
 .hero-overlay h1 {
@@ -173,6 +182,7 @@ button {
   max-width: 10ch;
 }
 
+/* ── Body text ─────────────────────────────────────────── */
 .hero-overlay__lead,
 .hero-overlay__body,
 .story-card p,
@@ -197,6 +207,7 @@ button {
   line-height: 1.7;
 }
 
+/* ── Meta tags ─────────────────────────────────────────── */
 .hero-overlay__meta {
   display: flex;
   flex-wrap: wrap;
@@ -205,12 +216,13 @@ button {
 }
 
 .hero-overlay__meta span {
-  padding: 0.48rem 0.72rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(231, 238, 255, 0.78);
-  font-size: 0.76rem;
+  padding: 0.42rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(212, 168, 83, 0.04);
+  color: var(--data);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.04em;
 }
 
@@ -242,25 +254,28 @@ button {
 }
 
 .hero-overlay--compact .hero-overlay__chips span {
-  padding: 0.5rem 0.8rem;
-  font-size: 0.78rem;
+  padding: 0.44rem 0.72rem;
+  font-size: 0.74rem;
 }
 
+/* ── Chips, badges, buttons — sharp, utilitarian ───────── */
 .hero-overlay__chips span,
 .quality-badge span,
 .quick-jump__item,
 .planet-drawer__close {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(212, 168, 83, 0.04);
 }
 
 .hero-overlay__chips span {
-  padding: 0.58rem 0.95rem;
-  color: rgba(231, 238, 255, 0.82);
-  font-size: 0.86rem;
+  padding: 0.52rem 0.85rem;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
 }
 
+/* ── Chapter Rail ──────────────────────────────────────── */
 .chapter-rail {
   top: 50%;
   right: clamp(1rem, 3vw, 2rem);
@@ -268,7 +283,6 @@ button {
   gap: 0.7rem;
   transform: translateY(-50%);
   padding: 0.9rem;
-  border-radius: 1.5rem;
 }
 
 .chapter-rail__item {
@@ -278,55 +292,57 @@ button {
   padding: 0;
   border: 0;
   background: transparent;
-  color: rgba(217, 228, 255, 0.72);
+  color: var(--muted);
   cursor: pointer;
 }
 
+/* Dashes instead of dots */
 .chapter-rail__dot {
-  width: 0.72rem;
-  height: 0.72rem;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.08);
+  width: 1rem;
+  height: 2px;
+  border-radius: 0;
+  border: none;
+  background: rgba(212, 168, 83, 0.3);
   transition:
-    transform 180ms ease,
-    background-color 180ms ease,
-    border-color 180ms ease;
+    width 180ms ease,
+    background-color 180ms ease;
 }
 
 .chapter-rail__label {
-  font-size: 0.76rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .chapter-rail__item.is-active .chapter-rail__dot {
-  transform: scale(1.2);
-  border-color: rgba(255, 212, 161, 0.8);
-  background: linear-gradient(135deg, rgba(255, 212, 161, 0.86), rgba(139, 214, 255, 0.9));
+  width: 1.5rem;
+  background: var(--accent);
 }
 
 .chapter-rail__item.is-active .chapter-rail__label {
-  color: white;
+  color: var(--text);
 }
 
+/* ── Quality Badge ─────────────────────────────────────── */
 .quality-badge {
   top: clamp(1rem, 3vw, 2rem);
   right: clamp(1rem, 3vw, 2rem);
   display: flex;
   gap: 0.55rem;
-  padding: 0.8rem;
-  border-radius: 999px;
+  padding: 0.7rem;
 }
 
 .quality-badge span {
-  padding: 0.5rem 0.8rem;
-  color: rgba(232, 238, 255, 0.82);
-  font-size: 0.76rem;
+  padding: 0.44rem 0.72rem;
+  color: var(--data);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
+/* ── Quick Jump ────────────────────────────────────────── */
 .quick-jump {
   bottom: clamp(1rem, 3vw, 1.8rem);
   left: 50%;
@@ -334,17 +350,17 @@ button {
   flex-wrap: wrap;
   gap: 0.65rem;
   width: min(50rem, calc(100vw - 2rem));
-  padding: 0.85rem;
-  border-radius: 1.5rem;
+  padding: 0.75rem;
   transform: translateX(-50%);
 }
 
 .quick-jump__item {
-  padding: 0.68rem 1rem;
-  color: rgba(228, 236, 255, 0.88);
+  padding: 0.6rem 0.9rem;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.74rem;
   cursor: pointer;
   transition:
-    transform 180ms ease,
     border-color 180ms ease,
     background-color 180ms ease;
 }
@@ -352,22 +368,22 @@ button {
 .quick-jump__item:hover,
 .quick-jump__item:focus-visible,
 .planet-drawer__close:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+  background: rgba(212, 168, 83, 0.08);
 }
 
 .quick-jump__item.is-active {
-  border-color: rgba(255, 212, 161, 0.48);
-  background: linear-gradient(135deg, rgba(255, 204, 146, 0.22), rgba(108, 162, 255, 0.16));
+  border-color: var(--accent);
+  background: rgba(212, 168, 83, 0.12);
+  color: var(--text);
 }
 
+/* ── Planet Drawer ─────────────────────────────────────── */
 .planet-drawer {
   top: 1.2rem;
   right: 1.2rem;
   width: min(22rem, calc(100vw - 2rem));
   padding: 1.1rem;
-  border-radius: 1.85rem;
   opacity: 0;
   transform: translateX(42px);
   pointer-events: none;
@@ -380,7 +396,7 @@ button {
   width: 70%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(155, 216, 255, 0.28), rgba(155, 216, 255, 0) 72%);
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.15), rgba(212, 168, 83, 0) 72%);
   filter: blur(18px);
 }
 
@@ -388,8 +404,10 @@ button {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  padding: 0.55rem 0.9rem;
+  padding: 0.5rem 0.8rem;
   color: var(--text);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
   cursor: pointer;
 }
 
@@ -414,29 +432,31 @@ button {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.8rem;
+  gap: 0.7rem;
 }
 
 .planet-drawer__stats article {
   display: grid;
   gap: 0.28rem;
-  padding: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.15rem;
-  background: rgba(255, 255, 255, 0.04);
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(212, 168, 83, 0.03);
 }
 
 .planet-drawer__stats span,
 .planet-drawer__details span {
-  color: rgba(220, 230, 255, 0.64);
-  font-size: 0.76rem;
+  color: var(--data);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .planet-drawer__stats strong {
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   line-height: 1.45;
+  color: var(--text);
 }
 
 .planet-drawer__details {
@@ -446,6 +466,7 @@ button {
   margin-top: 0.9rem;
 }
 
+/* ── Story ──────────────────────────────────────────────── */
 .story-shell {
   position: relative;
   z-index: 3;
@@ -462,7 +483,6 @@ button {
 .story-card {
   width: min(29rem, calc(100vw - 2rem));
   padding: 1.25rem 1.25rem 1.4rem;
-  border-radius: 1.85rem;
   margin-right: clamp(0rem, 8vw, 7.5rem);
 }
 
@@ -500,13 +520,11 @@ button {
   line-height: 1.72;
 }
 
+/* ── Fallback View ─────────────────────────────────────── */
 .fallback-view {
   min-height: 100vh;
   padding: clamp(1rem, 4vw, 2rem);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(94, 126, 255, 0.2), transparent 24%),
-    radial-gradient(circle at 82% 18%, rgba(255, 173, 104, 0.14), transparent 22%),
-    linear-gradient(180deg, #040714 0%, #060d1b 42%, #040711 100%);
+  background: linear-gradient(180deg, #040714 0%, #060d1b 42%, #040711 100%);
 }
 
 .fallback-view__hero,
@@ -518,7 +536,6 @@ button {
 
 .fallback-view__hero {
   padding: clamp(1.3rem, 4vw, 2rem);
-  border-radius: 2rem;
 }
 
 .fallback-view h1 {
@@ -536,13 +553,12 @@ button {
 .fallback-view__chapter,
 .fallback-view__planet-card {
   padding: 1.1rem;
-  border-radius: 1.4rem;
 }
 
 .fallback-view__chapter h2,
 .fallback-view__planet-card h3 {
   margin: 0;
-  font-family: "Cormorant Garamond", "Georgia", serif;
+  font-family: "Libre Caslon Display", Georgia, serif;
   line-height: 0.96;
 }
 
@@ -560,13 +576,15 @@ button {
 
 .fallback-view__planet-card p {
   margin: 0;
-  color: var(--warm);
-  font-size: 0.78rem;
-  font-weight: 700;
+  color: var(--accent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
+/* ── Fallback ──────────────────────────────────────────── */
 @supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
   .hero-overlay__panel,
   .story-card,
@@ -581,6 +599,7 @@ button {
   }
 }
 
+/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .chapter-rail {
     display: none;
@@ -606,9 +625,7 @@ button {
   }
 
   .hero-overlay__panel {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
-      rgba(7, 12, 26, 0.78);
+    background: var(--bg-panel-strong);
   }
 
   .quality-badge {
