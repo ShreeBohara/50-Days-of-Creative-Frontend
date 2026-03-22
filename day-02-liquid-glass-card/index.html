@@ -9,23 +9,30 @@
       content="A liquid glass profile card with frosted layers, animated borders, and pointer-reactive tilt."
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="page-shell">
-      <div class="backdrop" aria-hidden="true">
-        <span class="blob blob-one"></span>
-        <span class="blob blob-two"></span>
-        <span class="blob blob-three"></span>
-      </div>
+      <!-- Decorative vertical watermark -->
+      <div class="watermark" aria-hidden="true">GLASS</div>
+
+      <!-- Decorative gold ring -->
+      <div class="gold-ring" aria-hidden="true"></div>
+
+      <!-- Corner label -->
+      <div class="corner-label" aria-hidden="true">02 / 50</div>
 
       <section class="card-stage" aria-label="Liquid glass profile card demo">
         <article class="glass-card" data-tilt-card>
           <div class="glass-card__border" aria-hidden="true"></div>
           <div class="glass-card__shine" aria-hidden="true"></div>
           <div class="glass-card__content">
-            <p class="eyebrow">Day 02 / Creative Frontend</p>
-
             <header class="profile-block">
               <div class="avatar" aria-hidden="true">SB</div>
 
@@ -57,12 +64,18 @@
               <a class="cta-button" href="https://github.com/ShreeBohara" target="_blank" rel="noreferrer">
                 Explore the build
               </a>
-
               <p class="footer-note">Hover or drag across the card to bend the glass.</p>
             </footer>
           </div>
         </article>
       </section>
+
+      <!-- Bottom attribution -->
+      <div class="bottom-line" aria-hidden="true">
+        <span>Liquid Glass</span>
+        <span class="separator"></span>
+        <span>Day Two</span>
+      </div>
     </main>
 
     <script src="./script.js"></script>
