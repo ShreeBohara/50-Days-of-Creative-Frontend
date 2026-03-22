@@ -1,43 +1,45 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");
+/* ── Brutalist ────────────────────────────────────────────── */
 
 :root {
   color-scheme: dark;
-  --bg-top: #04111f;
-  --bg-mid: #071b2d;
-  --bg-bottom: #02060d;
-  --panel-surface: rgba(7, 14, 25, 0.76);
-  --panel-border: rgba(135, 194, 255, 0.16);
-  --text-primary: #f5fbff;
-  --text-muted: rgba(220, 236, 255, 0.72);
-  --accent: #7cf6ff;
-  --accent-secondary: #ff5edb;
-  --input-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --border: #2a2a2a;
+  --text: #e8e8e8;
+  --text-dim: #666666;
+  --accent: #ff3d00;
+  --accent-dim: rgba(255, 61, 0, 0.15);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
+html, body {
   margin: 0;
   min-height: 100%;
 }
 
 body {
   overflow: hidden;
-  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
-  background:
-    radial-gradient(circle at top, rgba(77, 181, 255, 0.14), transparent 38%),
-    radial-gradient(circle at 85% 25%, rgba(255, 94, 219, 0.16), transparent 24%),
-    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 44%, var(--bg-bottom) 100%);
-  color: var(--text-primary);
+  font-family: "IBM Plex Mono", monospace;
+  background: var(--bg);
+  color: var(--text);
+  cursor: crosshair;
+  -webkit-font-smoothing: antialiased;
 }
 
-button,
-input {
-  font: inherit;
+/* Noise grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px;
 }
+
+button, input { font: inherit; }
 
 .app-shell {
   position: relative;
@@ -52,74 +54,129 @@ input {
   height: 100vh;
 }
 
-.ui-panel {
+/* ── Frame Marker (top-right) ────────────────────────────── */
+.frame-marker {
   position: fixed;
-  left: 50%;
-  bottom: 2rem;
-  z-index: 2;
-  width: min(30rem, calc(100vw - 2rem));
-  padding: 1.1rem 1.1rem 1.15rem;
-  border: 1px solid var(--panel-border);
-  border-radius: 1.5rem;
-  background: linear-gradient(180deg, rgba(10, 18, 31, 0.88), var(--panel-surface));
-  backdrop-filter: blur(18px);
-  box-shadow: var(--input-shadow);
-  transform: translateX(-50%);
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-.eyebrow {
-  margin: 0 0 0.45rem;
-  color: var(--accent);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+.frame-marker span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+}
+
+.frame-marker::before,
+.frame-marker::after {
+  content: "";
+  display: block;
+  background: var(--border);
+}
+
+.frame-marker::before {
+  width: 24px;
+  height: 1px;
+}
+
+.frame-marker::after {
+  width: 1px;
+  height: 24px;
+  position: absolute;
+  top: -12px;
+  right: 0;
+}
+
+/* ── Coordinate Readout ──────────────────────────────────── */
+.coord-readout {
+  position: fixed;
+  top: 3.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── UI Panel (bottom-left, brutalist) ───────────────────── */
+.ui-panel {
+  position: fixed;
+  left: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 10;
+  width: min(24rem, calc(100vw - 3rem));
+  padding: 1.2rem 1.4rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .ui-panel h1 {
-  margin: 0;
-  font-size: clamp(1.65rem, 3vw, 2.4rem);
+  margin: 0 0 1rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
   line-height: 1;
+  color: var(--text);
 }
 
-.ui-copy {
-  margin: 0.65rem 0 1rem;
-  max-width: 28rem;
-  color: var(--text-muted);
-  font-size: 0.96rem;
-  line-height: 1.5;
-}
-
-.word-form {
-  margin: 0;
-}
+/* ── Input ───────────────────────────────────────────────── */
+.word-form { margin: 0; }
 
 .word-input {
   width: 100%;
-  border: 1px solid rgba(124, 246, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(2, 8, 15, 0.84);
-  color: var(--text-primary);
-  padding: 0.95rem 1.1rem;
+  padding: 0.7rem 0;
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   outline: none;
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
+  caret-color: var(--accent);
+  transition: border-color 0.15s;
 }
 
 .word-input::placeholder {
-  color: rgba(216, 231, 255, 0.42);
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
 }
 
 .word-input:focus {
-  border-color: rgba(124, 246, 255, 0.42);
-  box-shadow:
-    0 0 0 1px rgba(124, 246, 255, 0.18),
-    0 18px 48px rgba(0, 0, 0, 0.28);
-  transform: translateY(-1px);
+  border-bottom-color: var(--accent);
 }
 
+/* Keystroke flash */
+.word-input.flash {
+  box-shadow: 0 2px 0 0 var(--accent), 0 0 12px var(--accent-dim);
+}
+
+/* ── Panel entrance animation ────────────────────────────── */
+.ui-panel {
+  animation: panel-in 0.4s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Utilities ───────────────────────────────────────────── */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -132,25 +189,15 @@ input {
   border: 0;
 }
 
+/* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
   .ui-panel {
+    left: 1rem;
     bottom: 1rem;
-    width: min(100vw - 1rem, 28rem);
-    padding: 1rem;
-    border-radius: 1.25rem;
+    width: min(100vw - 2rem, 22rem);
+    padding: 1rem 1.2rem;
   }
 
-  .eyebrow {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-  }
-
-  .ui-copy {
-    margin-bottom: 0.85rem;
-    font-size: 0.92rem;
-  }
-
-  .word-input {
-    padding: 0.88rem 1rem;
-  }
+  .frame-marker { top: 1rem; right: 1rem; }
+  .coord-readout { top: 2.8rem; right: 1rem; }
 }

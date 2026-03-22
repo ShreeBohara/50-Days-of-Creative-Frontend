@@ -34,6 +34,7 @@ const state = {
   pulseStrength: 0,
   flashStrength: 0,
   lastBeatTime: 0,
+  beatTimeout: 0,
 };
 
 const context = canvas?.getContext("2d");
@@ -54,14 +55,19 @@ function updatePlayToggleLabel() {
   }
 
   const hasFile = Boolean(audioElement?.src);
-  let nextLabel = hasFile ? "Play Upload" : "Play Demo";
+  let nextLabel = hasFile ? "PLAY UPLOAD" : "PLAY DEMO";
 
   if (state.isPlaying) {
-    nextLabel = state.activeMode === "demo" ? "Pause Demo" : "Pause Upload";
+    nextLabel = state.activeMode === "demo" ? "STOP DEMO" : "STOP";
   }
 
   playToggle.textContent = nextLabel;
   playToggle.setAttribute("aria-pressed", String(state.isPlaying));
+
+  const statusDot = document.querySelector("[data-status-dot]");
+  if (statusDot) {
+    statusDot.classList.toggle("active", state.isPlaying);
+  }
 }
 
 function revokeObjectUrl() {
@@ -492,9 +498,10 @@ function getAverageEnergy(frequencyData, startIndex, endIndex) {
 
 function getBarColor(index, intensity, alpha = 1) {
   const progress = index / Math.max(1, BIN_COUNT - 1);
-  const hue = 28 + (progress * 178);
-  const saturation = 88;
-  const lightness = 56 + (intensity * 16);
+  // Acid green → hot pink → yellow
+  const hue = 120 + (progress * 240);
+  const saturation = 100;
+  const lightness = 50 + (intensity * 18);
 
   return `hsla(${hue.toFixed(2)}, ${saturation}%, ${lightness.toFixed(2)}%, ${alpha})`;
 }
@@ -515,12 +522,12 @@ function drawOrb(centerX, centerY, radius, frequencyData) {
     radius
   );
 
-  gradient.addColorStop(0, `hsla(${36 + (lowEnergy * 10)}, 100%, ${76 + (lowEnergy * 8)}%, 0.95)`);
-  gradient.addColorStop(0.58, `hsla(${20 + (midEnergy * 32)}, 94%, ${62 + (midEnergy * 10)}%, 0.88)`);
-  gradient.addColorStop(1, "hsla(192, 88%, 58%, 0.35)");
+  gradient.addColorStop(0, `hsla(${120 + (lowEnergy * 20)}, 100%, ${60 + (lowEnergy * 14)}%, 0.95)`);
+  gradient.addColorStop(0.58, `hsla(${330 + (midEnergy * 30)}, 100%, ${50 + (midEnergy * 16)}%, 0.88)`);
+  gradient.addColorStop(1, "hsla(60, 100%, 50%, 0.3)");
 
   context.save();
-  context.shadowColor = "rgba(255, 160, 94, 0.52)";
+  context.shadowColor = "rgba(57, 255, 20, 0.5)";
   context.shadowBlur = radius * 0.9;
   context.beginPath();
   context.fillStyle = gradient;
@@ -582,9 +589,9 @@ function drawBackgroundFlash(centerX, centerY, minDimension) {
     minDimension * 0.82
   );
 
-  flashGradient.addColorStop(0, `hsla(35, 100%, 72%, ${0.045 + (state.flashStrength * 0.08)})`);
-  flashGradient.addColorStop(0.52, `hsla(198, 96%, 62%, ${0.024 + (state.flashStrength * 0.05)})`);
-  flashGradient.addColorStop(1, "hsla(230, 88%, 12%, 0)");
+  flashGradient.addColorStop(0, `hsla(120, 100%, 55%, ${0.03 + (state.flashStrength * 0.1)})`);
+  flashGradient.addColorStop(0.52, `hsla(330, 100%, 50%, ${0.02 + (state.flashStrength * 0.06)})`);
+  flashGradient.addColorStop(1, "hsla(0, 0%, 0%, 0)");
 
   context.fillStyle = flashGradient;
   context.fillRect(0, 0, state.width, state.height);
@@ -601,10 +608,17 @@ function updateBeatDetection(frequencyData, now) {
   const cooldownElapsed = now - state.lastBeatTime > 240;
   const detectedBeat = bassEnergy > baselineThreshold && cooldownElapsed;
 
+  const transportBar = document.querySelector("[data-transport-bar]");
+
   if (detectedBeat) {
     state.lastBeatTime = now;
     state.pulseStrength = 1;
     state.flashStrength = 1;
+    if (transportBar) {
+      transportBar.classList.add("beat");
+      clearTimeout(state.beatTimeout);
+      state.beatTimeout = setTimeout(() => transportBar.classList.remove("beat"), 150);
+    }
   } else {
     state.pulseStrength *= 0.91;
     state.flashStrength *= 0.9;
