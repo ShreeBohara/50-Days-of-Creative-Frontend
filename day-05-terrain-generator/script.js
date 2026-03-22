@@ -215,6 +215,64 @@ function initWater() {
   state.scene.add(state.water);
 }
 
+/* ── Terrain Rebuild ─────────────────────────────────────── */
+function rebuildTerrain() {
+  if (state.terrain) {
+    state.terrain.geometry.dispose();
+    state.scene.remove(state.terrain);
+  }
+
+  const geo = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, SEGMENTS, SEGMENTS);
+  geo.rotateX(-Math.PI / 2);
+
+  seedNoise(state.params.seed);
+  applyNoiseDisplacement(geo, state.params);
+  applyVertexColors(geo);
+
+  const mat = new THREE.MeshStandardMaterial({
+    flatShading: true,
+    vertexColors: true,
+  });
+
+  state.terrain = new THREE.Mesh(geo, mat);
+  state.scene.add(state.terrain);
+}
+
+/* ── Controls Binding ────────────────────────────────────── */
+function bindControls() {
+  const ids = ["amplitude", "frequency", "octaves", "waterLevel"];
+
+  ids.forEach((id) => {
+    const input = document.getElementById(`ctrl-${id}`);
+    const output = document.getElementById(`out-${id}`);
+    if (!input) return;
+
+    input.addEventListener("input", () => {
+      const val = parseFloat(input.value);
+      state.params[id] = val;
+      if (output) output.textContent = val;
+
+      if (id === "waterLevel" && state.water) {
+        state.water.position.y = val;
+      }
+    });
+  });
+
+  const seedInput = document.getElementById("ctrl-seed");
+  if (seedInput) {
+    seedInput.addEventListener("change", () => {
+      state.params.seed = seedInput.value || "alpine";
+    });
+  }
+
+  const regenBtn = document.getElementById("btn-regenerate");
+  if (regenBtn) {
+    regenBtn.addEventListener("click", () => {
+      rebuildTerrain();
+    });
+  }
+}
+
 /* ── Resize ──────────────────────────────────────────────── */
 function handleResize() {
   const w = window.innerWidth;
@@ -247,6 +305,7 @@ function init() {
   initLights();
   initTerrain();
   initWater();
+  bindControls();
 
   window.addEventListener("resize", handleResize);
   animate();
