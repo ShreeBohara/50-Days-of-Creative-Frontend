@@ -90,6 +90,7 @@ function initLights() {
 }
 
 /* ── Noise ───────────────────────────────────────────────── */
+/** Hash a string seed into a 32-bit integer for deterministic RNG. */
 function hashSeed(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) {
@@ -106,12 +107,14 @@ function seededRandom(seed) {
   };
 }
 
+/** Create a seeded 2D simplex noise function. */
 function seedNoise(seed) {
   const h = hashSeed(seed);
   const rng = seededRandom(Math.abs(h) || 1);
   state.noise2D = createNoise2D(rng);
 }
 
+/** Fractal Brownian Motion — layer multiple octaves of noise for natural terrain. */
 function fbm(x, z, params) {
   let value = 0;
   let amp = params.amplitude;
@@ -149,6 +152,7 @@ function biomeColor(t) {
   return BIOMES[BIOMES.length - 1].color.clone();
 }
 
+/** Map each vertex height to a biome color and write to geometry color attribute. */
 function applyVertexColors(geo) {
   const pos = geo.attributes.position;
   let minY = Infinity, maxY = -Infinity;
@@ -173,6 +177,7 @@ function applyVertexColors(geo) {
 }
 
 /* ── Terrain Mesh ────────────────────────────────────────── */
+/** Displace each vertex Y by fBM noise based on its XZ position. */
 function applyNoiseDisplacement(geo, params) {
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
@@ -221,6 +226,7 @@ function initWater() {
 }
 
 /* ── Terrain Rebuild ─────────────────────────────────────── */
+/** Destroy old terrain mesh and build a new one from current params. */
 function rebuildTerrain() {
   if (state.terrain) {
     state.terrain.geometry.dispose();
@@ -361,7 +367,7 @@ function init() {
 
   const loadingOverlay = document.getElementById("loading-overlay");
   if (loadingOverlay) {
-    requestAnimationFrame(() => loadingOverlay.classList.add("hidden"));
+    setTimeout(() => loadingOverlay.classList.add("hidden"), 100);
   }
 
   window.addEventListener("resize", handleResize);
