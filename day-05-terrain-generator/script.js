@@ -46,6 +46,7 @@ function initRenderer() {
 /* ── Scene ───────────────────────────────────────────────── */
 function initScene() {
   state.scene = new THREE.Scene();
+  state.scene.fog = new THREE.FogExp2(0x0a1628, 0.0025);
 }
 
 /* ── Camera ──────────────────────────────────────────────── */
@@ -306,6 +307,11 @@ function init() {
   initTerrain();
   initWater();
   bindControls();
+
+  const loadingOverlay = document.getElementById("loading-overlay");
+  if (loadingOverlay) {
+    requestAnimationFrame(() => loadingOverlay.classList.add("hidden"));
+  }
 
   window.addEventListener("resize", handleResize);
   animate();
