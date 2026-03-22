@@ -15,6 +15,7 @@ const state = {
   controls: null,
   clock: new THREE.Clock(),
   terrain: null,
+  water: null,
   noise2D: null,
   params: {
     seed: "alpine",
@@ -195,6 +196,25 @@ function initTerrain() {
   state.scene.add(state.terrain);
 }
 
+/* ── Water Plane ─────────────────────────────────────────── */
+function initWater() {
+  const geo = new THREE.PlaneGeometry(TERRAIN_SIZE * 1.2, TERRAIN_SIZE * 1.2, 1, 1);
+  geo.rotateX(-Math.PI / 2);
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x2d7ea8,
+    transparent: true,
+    opacity: 0.55,
+    metalness: 0.1,
+    roughness: 0.15,
+    side: THREE.DoubleSide,
+  });
+
+  state.water = new THREE.Mesh(geo, mat);
+  state.water.position.y = state.params.waterLevel;
+  state.scene.add(state.water);
+}
+
 /* ── Resize ──────────────────────────────────────────────── */
 function handleResize() {
   const w = window.innerWidth;
@@ -208,6 +228,12 @@ function handleResize() {
 /* ── Animation Loop ──────────────────────────────────────── */
 function animate() {
   requestAnimationFrame(animate);
+  const t = state.clock.getElapsedTime();
+
+  if (state.water) {
+    state.water.position.y = state.params.waterLevel + Math.sin(t * 0.8) * 0.15;
+  }
+
   state.controls.update();
   state.renderer.render(state.scene, state.camera);
 }
@@ -220,6 +246,7 @@ function init() {
   initControls();
   initLights();
   initTerrain();
+  initWater();
 
   window.addEventListener("resize", handleResize);
   animate();
