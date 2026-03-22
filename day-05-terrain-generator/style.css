@@ -26,3 +26,234 @@ body {
   height: 100%;
   display: block;
 }
+
+/* ── Hero Overlay ────────────────────────────────────────── */
+.hero-overlay {
+  position: fixed;
+  top: clamp(1.2rem, 4vw, 2.4rem);
+  left: clamp(1.2rem, 4vw, 2.4rem);
+  pointer-events: none;
+  z-index: 10;
+  max-width: 28rem;
+}
+
+.eyebrow {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(210, 180, 131, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.hero-overlay h1 {
+  font-family: "Syne", sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.05;
+  color: #f1f5f9;
+  text-shadow: 0 2px 30px rgba(10, 22, 40, 0.6);
+}
+
+.subtitle {
+  font-size: 0.92rem;
+  font-weight: 300;
+  color: rgba(226, 232, 240, 0.45);
+  margin-top: 0.6rem;
+  font-style: italic;
+}
+
+/* ── Control Panel ───────────────────────────────────────── */
+.control-panel {
+  position: fixed;
+  top: clamp(1.2rem, 4vw, 2.4rem);
+  right: clamp(1.2rem, 4vw, 2.4rem);
+  width: min(100% - 2.4rem, 18rem);
+  padding: 1.4rem 1.5rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.4rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+    rgba(7, 14, 31, 0.72);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  box-shadow:
+    0 1.4rem 3.6rem rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  z-index: 20;
+}
+
+.panel-title {
+  font-family: "Syne", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.5);
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Control Group ───────────────────────────────────────── */
+.control-group {
+  margin-bottom: 0.85rem;
+}
+
+.control-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.label-text {
+  font-size: 0.76rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.6);
+}
+
+.control-label output {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: rgba(212, 180, 131, 0.85);
+  font-variant-numeric: tabular-nums;
+  min-width: 3rem;
+  text-align: right;
+}
+
+/* ── Seed Input ──────────────────────────────────────────── */
+.seed-input {
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  margin-top: 0.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.seed-input:focus {
+  border-color: rgba(212, 180, 131, 0.4);
+  box-shadow: 0 0 0 3px rgba(212, 180, 131, 0.08);
+}
+
+/* ── Range Slider ────────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #f0dcc0, #d4b483);
+  border: 2px solid rgba(7, 14, 31, 0.6);
+  box-shadow:
+    0 0 8px rgba(212, 180, 131, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow:
+    0 0 14px rgba(212, 180, 131, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  transform: scale(1.15);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #f0dcc0, #d4b483);
+  border: 2px solid rgba(7, 14, 31, 0.6);
+  box-shadow:
+    0 0 8px rgba(212, 180, 131, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Panel Buttons ───────────────────────────────────────── */
+.panel-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.btn-regenerate {
+  flex: 1;
+  padding: 0.55rem 0;
+  border: none;
+  border-radius: 0.7rem;
+  background: linear-gradient(135deg, #d4b483, #a88b5e);
+  color: #0a1628;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-regenerate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(212, 180, 131, 0.3);
+}
+
+.btn-regenerate:active {
+  transform: translateY(0);
+}
+
+.btn-camera {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(226, 232, 240, 0.7);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-camera:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #e2e8f0;
+}

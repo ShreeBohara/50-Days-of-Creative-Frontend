@@ -29,6 +29,65 @@
   </head>
   <body>
     <canvas id="terrain-canvas"></canvas>
+
+    <!-- Hero overlay -->
+    <header class="hero-overlay">
+      <p class="eyebrow">Day 05 / Creative Frontend</p>
+      <h1>Procedural Terrain</h1>
+      <p class="subtitle">Simplex noise landscapes with biome coloring</p>
+    </header>
+
+    <!-- Control panel -->
+    <section class="control-panel" aria-label="Terrain parameters">
+      <h2 class="panel-title">Parameters</h2>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Seed</span>
+          <input type="text" id="ctrl-seed" value="alpine" class="seed-input" />
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Amplitude</span>
+          <output id="out-amplitude">45</output>
+        </label>
+        <input type="range" id="ctrl-amplitude" min="5" max="80" step="1" value="45" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Frequency</span>
+          <output id="out-frequency">0.012</output>
+        </label>
+        <input type="range" id="ctrl-frequency" min="0.002" max="0.04" step="0.001" value="0.012" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Octaves</span>
+          <output id="out-octaves">6</output>
+        </label>
+        <input type="range" id="ctrl-octaves" min="1" max="8" step="1" value="6" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          <span class="label-text">Water Level</span>
+          <output id="out-waterLevel">-4</output>
+        </label>
+        <input type="range" id="ctrl-waterLevel" min="-20" max="10" step="0.5" value="-4" />
+      </div>
+
+      <div class="panel-actions">
+        <button id="btn-regenerate" class="btn-regenerate" type="button">Regenerate</button>
+        <button id="btn-camera" class="btn-camera" type="button" aria-pressed="false">
+          Orbit
+        </button>
+      </div>
+    </section>
+
     <script type="module" src="./script.js"></script>
   </body>
 </html>
