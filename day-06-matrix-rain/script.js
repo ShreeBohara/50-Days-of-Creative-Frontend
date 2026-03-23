@@ -1,6 +1,8 @@
 "use strict";
 
-/* Day 06 — Matrix Rain with Hover Decode Effect */
+/* ================================================================
+   Day 06 — Matrix Rain with Hover Decode Effect
+   ================================================================ */
 
 /* ── Character pool ─────────────────────────────── */
 const KATAKANA = Array.from({ length: 96 }, (_, i) =>
@@ -8,361 +10,367 @@ const KATAKANA = Array.from({ length: 96 }, (_, i) =>
 );
 const LATIN = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const DIGITS = "0123456789".split("");
-const SYMBOLS = "!@#$%^&*()+-=[]{}|;:<>?".split("");
+const SYMBOLS = "!@#$%^&*+-=<>?".split("");
 const CHAR_POOL = [...KATAKANA, ...LATIN, ...DIGITS, ...SYMBOLS];
 
 function randomChar() {
   return CHAR_POOL[(Math.random() * CHAR_POOL.length) | 0];
 }
 
-/* ── Canvas setup ───────────────────────────────── */
+/* ── Canvas ─────────────────────────────────────── */
 const canvas = document.querySelector("[data-rain-canvas]");
 const ctx = canvas.getContext("2d");
 
-let CHAR_SIZE = 16;
-
+let CHAR_W = 16;
+let CHAR_H = 20;
 const MESSAGE = "THERE IS NO SPOON";
+let DECODE_RADIUS = 100;
+const DECODE_DURATION = 800;
+const RE_ENCRYPT_DELAY = 3000;
 
-let DECODE_RADIUS = CHAR_SIZE * 5;
-const DECODE_DURATION = 600;
-
+/* ── State ──────────────────────────────────────── */
 const state = {
-  width: 0,
-  height: 0,
-  numCols: 0,
-  numRows: 0,
-  columns: [],
-  messageSlots: [],
+  w: 0,
+  h: 0,
+  cols: 0,
+  rows: 0,
+  streams: [],
+  msgSlots: [],
   mouseX: -9999,
   mouseY: -9999,
-  mouseActive: false,
-  mouseLastMoveTime: 0,
-  lastFrameTime: 0,
+  lastMove: 0,
+  lastFrame: 0,
   allDecoded: false,
-  pulsePhase: 0,
-  frameId: 0,
+  pulse: 0,
 };
 
-function createColumn(x) {
-  const speed = 0.3 + Math.random() * 0.9;
-  const length = 8 + ((Math.random() * 20) | 0);
+/* ── Stream (a single falling column of chars) ──── */
+function createStream(col) {
+  const speed = 1 + Math.random() * 3;
+  const len = 6 + ((Math.random() * 25) | 0);
   return {
-    x,
-    dropY: -(Math.random() * 15),
+    col,
+    y: -(Math.random() * state.rows * CHAR_H) - CHAR_H * 5,
     speed,
-    length,
-    chars: Array.from({ length: 60 }, () => randomChar()),
-    lastMutate: 0,
+    len,
+    chars: Array.from({ length: len + 5 }, () => randomChar()),
+    mutateCD: 0,
   };
 }
 
-function initColumns() {
-  state.columns = [];
-  for (let i = 0; i < state.numCols; i++) {
-    state.columns.push(createColumn(i));
+/* Multiple streams per column for density */
+function initStreams() {
+  state.streams = [];
+  for (let c = 0; c < state.cols; c++) {
+    const count = 2 + ((Math.random() * 2) | 0);
+    for (let s = 0; s < count; s++) {
+      const stream = createStream(c);
+      stream.y -= s * (state.h / count + Math.random() * 100);
+      state.streams.push(stream);
+    }
   }
 }
 
-function computeMessageSlots() {
-  const startCol = Math.floor((state.numCols - MESSAGE.length) / 2);
-  const midRow = Math.floor(state.numRows / 2);
-
-  state.messageSlots = MESSAGE.split("").map((char, i) => ({
+function computeMessage() {
+  const startCol = Math.floor((state.cols - MESSAGE.length) / 2);
+  const midRow = Math.floor(state.rows / 2);
+  state.msgSlots = MESSAGE.split("").map((ch, i) => ({
     col: startCol + i,
     row: midRow,
-    targetChar: char,
-    decoded: char === " ",
-    decodeProgress: char === " " ? 1 : 0,
+    target: ch,
+    decoded: ch === " ",
+    progress: ch === " " ? 1 : 0,
     cycleChar: randomChar(),
-    cycleTimer: 0,
-    flashAlpha: 0,
+    cycleCD: 0,
+    flash: 0,
   }));
 }
 
-function resizeCanvas() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+/* ── Re-encrypt state ───────────────────────────── */
+let reEncQueue = [];
+let reEncActive = false;
 
+/* ── Resize ─────────────────────────────────────── */
+function resize() {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = innerWidth;
+  const h = innerHeight;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   canvas.style.width = w + "px";
   canvas.style.height = h + "px";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  /* Adapt char size for narrow viewports */
-  CHAR_SIZE = w < 600 ? 14 : 16;
-  DECODE_RADIUS = CHAR_SIZE * 5;
+  CHAR_W = w < 600 ? 12 : 15;
+  CHAR_H = CHAR_W * 1.3;
+  DECODE_RADIUS = CHAR_W * 6;
 
-  state.width = w;
-  state.height = h;
-  state.numCols = Math.ceil(w / CHAR_SIZE);
-  state.numRows = Math.ceil(h / CHAR_SIZE);
+  state.w = w;
+  state.h = h;
+  state.cols = Math.ceil(w / CHAR_W);
+  state.rows = Math.ceil(h / CHAR_H);
 
-  initColumns();
-  computeMessageSlots();
-
-  /* Reset re-encrypt state on resize */
-  reEncryptStarted = false;
-  reEncryptQueue = [];
+  initStreams();
+  computeMessage();
+  reEncActive = false;
+  reEncQueue = [];
 }
 
-let reEncryptQueue = [];
-let reEncryptStarted = false;
-
-resizeCanvas();
+resize();
 
 let resizeTimer = 0;
 const ro = new ResizeObserver(() => {
   cancelAnimationFrame(resizeTimer);
-  resizeTimer = requestAnimationFrame(() => resizeCanvas());
+  resizeTimer = requestAnimationFrame(resize);
 });
 ro.observe(document.documentElement);
 
-/* ── Mouse tracking ─────────────────────────────── */
+/* ── Input ──────────────────────────────────────── */
 canvas.addEventListener("pointermove", (e) => {
   state.mouseX = e.clientX;
   state.mouseY = e.clientY;
-  state.mouseActive = true;
-  state.mouseLastMoveTime = performance.now();
+  state.lastMove = performance.now();
 });
-
 canvas.addEventListener("pointerleave", () => {
-  state.mouseActive = false;
   state.mouseX = -9999;
   state.mouseY = -9999;
 });
 
-/* ── Decode logic ───────────────────────────────── */
-function updateDecode(now, dt) {
-  for (const slot of state.messageSlots) {
-    if (slot.targetChar === " ") continue;
+/* ── Message slot lookup ────────────────────────── */
+function slotAt(col, row) {
+  for (const s of state.msgSlots) {
+    if (s.col === col && s.row === row) return s;
+  }
+  return null;
+}
 
-    const cx = slot.col * CHAR_SIZE + CHAR_SIZE / 2;
-    const cy = slot.row * CHAR_SIZE + CHAR_SIZE / 2;
-    const dist = Math.hypot(state.mouseX - cx, state.mouseY - cy);
+/* ── Update ─────────────────────────────────────── */
+function update(now, dt) {
+  /* Advance streams */
+  for (const s of state.streams) {
+    s.y += s.speed;
 
-    if (dist < DECODE_RADIUS && !slot.decoded) {
-      slot.decodeProgress = Math.min(1, slot.decodeProgress + dt / DECODE_DURATION);
+    if (s.y - s.len * CHAR_H > state.h) {
+      s.y = -(Math.random() * state.h * 0.5) - CHAR_H * 5;
+      s.speed = 1 + Math.random() * 3;
+      s.len = 6 + ((Math.random() * 25) | 0);
+      s.chars = Array.from({ length: s.len + 5 }, () => randomChar());
+    }
 
-      /* Cycle chars — accelerate as progress grows */
-      const interval = 80 - slot.decodeProgress * 50;
-      slot.cycleTimer += dt;
-      if (slot.cycleTimer > interval) {
+    s.mutateCD -= dt;
+    if (s.mutateCD <= 0) {
+      const idx = (Math.random() * s.chars.length) | 0;
+      s.chars[idx] = randomChar();
+      s.mutateCD = 60 + Math.random() * 80;
+    }
+  }
+
+  /* Decode */
+  for (const slot of state.msgSlots) {
+    if (slot.target === " ") continue;
+
+    const cx = slot.col * CHAR_W + CHAR_W / 2;
+    const cy = slot.row * CHAR_H + CHAR_H / 2;
+    const d = Math.hypot(state.mouseX - cx, state.mouseY - cy);
+
+    if (d < DECODE_RADIUS && !slot.decoded && !reEncActive) {
+      const ramp = 1 - (d / DECODE_RADIUS);
+      slot.progress = Math.min(1, slot.progress + (dt / DECODE_DURATION) * (0.5 + ramp));
+
+      const interval = 90 - slot.progress * 60;
+      slot.cycleCD -= dt;
+      if (slot.cycleCD <= 0) {
         slot.cycleChar = randomChar();
-        slot.cycleTimer = 0;
+        slot.cycleCD = interval;
       }
 
-      if (slot.decodeProgress >= 1) {
+      if (slot.progress >= 1) {
         slot.decoded = true;
-        slot.cycleChar = slot.targetChar;
-        slot.flashAlpha = 0.4;
+        slot.cycleChar = slot.target;
+        slot.flash = 1;
       }
     }
   }
 
-  /* Check if all decoded */
-  state.allDecoded = state.messageSlots
-    .filter((s) => s.targetChar !== " ")
+  state.allDecoded = state.msgSlots
+    .filter((s) => s.target !== " ")
     .every((s) => s.decoded);
 
-  if (state.allDecoded) {
-    state.pulsePhase += dt * 0.004;
-  }
+  if (state.allDecoded) state.pulse += dt * 0.005;
 
-  /* Re-encrypt if mouse idle > 3s */
-  const hasDecoded = state.messageSlots.some(
-    (s) => s.targetChar !== " " && (s.decoded || s.decodeProgress > 0)
+  /* Re-encrypt check */
+  const hasAny = state.msgSlots.some(
+    (s) => s.target !== " " && (s.decoded || s.progress > 0)
   );
 
-  if (hasDecoded && now - state.mouseLastMoveTime > 3000) {
-    reEncrypt(now, dt);
-  }
-}
+  if (hasAny && now - state.lastMove > RE_ENCRYPT_DELAY) {
+    if (!reEncActive) {
+      reEncQueue = state.msgSlots
+        .filter((s) => s.target !== " " && (s.decoded || s.progress > 0))
+        .map((s) => ({ slot: s, delay: Math.random() * 500 }))
+        .sort((a, b) => a.delay - b.delay);
+      reEncActive = true;
+      state.allDecoded = false;
+      state.pulse = 0;
+    }
 
-/* ── Re-encrypt ─────────────────────────────────── */
-function reEncrypt(now, dt) {
-  if (!reEncryptStarted) {
-    /* Build randomized stagger queue */
-    const slots = state.messageSlots
-      .filter((s) => s.targetChar !== " " && (s.decoded || s.decodeProgress > 0));
-    reEncryptQueue = slots
-      .map((s) => ({ slot: s, delay: Math.random() * 400 }))
-      .sort((a, b) => a.delay - b.delay);
-    reEncryptStarted = true;
-    state.allDecoded = false;
-    state.pulsePhase = 0;
-  }
-
-  for (const item of reEncryptQueue) {
-    item.delay -= dt;
-    if (item.delay <= 0) {
-      const s = item.slot;
-      s.decodeProgress = Math.max(0, s.decodeProgress - dt / 300);
-      s.cycleTimer += dt;
-      if (s.cycleTimer > 40) {
-        s.cycleChar = randomChar();
-        s.cycleTimer = 0;
-      }
-      if (s.decodeProgress <= 0) {
-        s.decoded = false;
-        s.cycleChar = randomChar();
+    let allDone = true;
+    for (const item of reEncQueue) {
+      item.delay -= dt;
+      if (item.delay <= 0) {
+        const s = item.slot;
+        s.progress = Math.max(0, s.progress - dt / 400);
+        s.cycleCD -= dt;
+        if (s.cycleCD <= 0) {
+          s.cycleChar = randomChar();
+          s.cycleCD = 30;
+        }
+        if (s.progress <= 0) {
+          s.decoded = false;
+        } else {
+          allDone = false;
+        }
+      } else {
+        allDone = false;
       }
     }
-  }
 
-  /* Reset when all re-encrypted */
-  const allDone = reEncryptQueue.every((item) => item.slot.decodeProgress <= 0);
-  if (allDone) {
-    reEncryptStarted = false;
-    reEncryptQueue = [];
-  }
-}
-
-/* ── Update & Render ────────────────────────────── */
-function updateColumns(now) {
-  for (const col of state.columns) {
-    col.dropY += col.speed;
-
-    if (col.dropY - col.length > state.numRows) {
-      col.dropY = -(Math.random() * 20);
-      col.speed = 0.3 + Math.random() * 0.9;
-      col.length = 8 + ((Math.random() * 20) | 0);
-    }
-
-    if (now - col.lastMutate > 80 + Math.random() * 60) {
-      const idx = (Math.random() * col.chars.length) | 0;
-      col.chars[idx] = randomChar();
-      col.lastMutate = now;
+    if (allDone) {
+      reEncActive = false;
+      reEncQueue = [];
     }
   }
 }
 
-function getTrailColor(brightness) {
-  if (brightness > 0.95) return "#ffffff";
-  if (brightness > 0.85) return "#cfffcf";
-  if (brightness > 0.6) return "#00ff41";
-  if (brightness > 0.3) return "rgba(0, 204, 51, " + brightness.toFixed(2) + ")";
-  return "rgba(0, 59, 0, " + (brightness * 1.5).toFixed(2) + ")";
-}
-
-/* Build a set of message-slot grid keys for fast lookup */
-function buildMessageGrid() {
-  const grid = new Set();
-  for (const slot of state.messageSlots) {
-    grid.add(slot.col + "," + slot.row);
-  }
-  return grid;
-}
-
-function renderFrame(now) {
-  const dt = state.lastFrameTime ? now - state.lastFrameTime : 16;
-  state.lastFrameTime = now;
-
-  updateColumns(now);
-  updateDecode(now, dt);
+/* ── Render ──────────────────────────────────────── */
+function render(now) {
+  const { w, h, streams, msgSlots } = state;
 
   ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, state.width, state.height);
+  ctx.fillRect(0, 0, w, h);
 
-  ctx.font = CHAR_SIZE + "px 'Share Tech Mono', monospace";
+  ctx.font = `${CHAR_W}px 'Share Tech Mono', monospace`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
 
-  const msgGrid = buildMessageGrid();
+  /* Draw all streams */
+  for (const s of streams) {
+    const headY = s.y;
+    const tailY = s.y - s.len * CHAR_H;
 
-  /* Draw rain columns — skip message slot positions */
-  for (const col of state.columns) {
-    const headRow = col.dropY | 0;
+    for (let i = 0; i < s.len; i++) {
+      const cy = headY - i * CHAR_H;
+      if (cy < -CHAR_H || cy > h + CHAR_H) continue;
 
-    for (let row = headRow - col.length; row <= headRow; row++) {
-      if (row < 0 || row >= state.numRows) continue;
-      if (msgGrid.has(col.x + "," + row)) continue;
+      const row = Math.round(cy / CHAR_H);
+      const col = s.col;
 
-      const dist = col.dropY - row;
-      const brightness = 1.0 - dist / col.length;
+      /* Check if this cell is a message slot */
+      const slot = slotAt(col, row);
 
-      const x = col.x * CHAR_SIZE + CHAR_SIZE / 2;
-      const y = row * CHAR_SIZE + CHAR_SIZE / 2;
-      const ch = col.chars[((row % col.chars.length) + col.chars.length) % col.chars.length];
-
-      if (dist < 1) {
-        ctx.shadowColor = "#00ff41";
-        ctx.shadowBlur = 12;
-      } else {
-        ctx.shadowColor = "transparent";
-        ctx.shadowBlur = 0;
+      if (slot && (slot.decoded || slot.progress > 0)) {
+        /* Don't draw rain over actively decoding/decoded slots */
+        continue;
       }
 
-      ctx.fillStyle = getTrailColor(brightness);
-      ctx.fillText(ch, x, y);
-    }
-  }
+      const t = i / s.len;
+      const x = col * CHAR_W + CHAR_W / 2;
+      const ch = s.chars[i % s.chars.length];
 
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-
-  /* Draw message slots */
-  for (const slot of state.messageSlots) {
-    if (slot.targetChar === " ") continue;
-
-    const x = slot.col * CHAR_SIZE + CHAR_SIZE / 2;
-    const y = slot.row * CHAR_SIZE + CHAR_SIZE / 2;
-
-    if (slot.decoded) {
-      /* Glow effect for decoded characters */
-      const pulseGlow = state.allDecoded
-        ? 15 + Math.sin(state.pulsePhase) * 8
-        : 10;
-      ctx.shadowColor = "#00ff41";
-      ctx.shadowBlur = pulseGlow;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(slot.targetChar, x, y);
       ctx.shadowColor = "transparent";
       ctx.shadowBlur = 0;
-    } else if (slot.decodeProgress > 0) {
-      ctx.fillStyle = "#00ff41";
-      ctx.fillText(slot.cycleChar, x, y);
-    } else {
-      /* Show as normal rain char */
-      ctx.fillStyle = "rgba(0, 204, 51, 0.4)";
-      ctx.fillText(randomChar(), x, y);
-    }
 
-    /* Flash on lock-in */
-    if (slot.flashAlpha > 0) {
-      ctx.fillStyle = "rgba(255, 255, 255, " + slot.flashAlpha.toFixed(2) + ")";
-      ctx.fillRect(
-        slot.col * CHAR_SIZE, slot.row * CHAR_SIZE,
-        CHAR_SIZE, CHAR_SIZE
-      );
-      slot.flashAlpha = Math.max(0, slot.flashAlpha - dt * 0.003);
+      if (i === 0) {
+        /* Head — bright white with glow */
+        ctx.shadowColor = "#00ff41";
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = "#e0ffe0";
+        ctx.fillText(ch, x, cy);
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = "transparent";
+      } else if (i < 3) {
+        ctx.fillStyle = "#00ff41";
+        ctx.fillText(ch, x, cy);
+      } else {
+        const alpha = Math.max(0, 1 - t * 1.2);
+        if (alpha < 0.02) continue;
+        const g = Math.round(60 + 195 * (1 - t));
+        ctx.fillStyle = `rgba(0, ${g}, ${Math.round(g * 0.25)}, ${alpha.toFixed(2)})`;
+        ctx.fillText(ch, x, cy);
+      }
     }
   }
 
+  /* Draw message slots */
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
 
+  for (const slot of msgSlots) {
+    if (slot.target === " ") continue;
+
+    const x = slot.col * CHAR_W + CHAR_W / 2;
+    const y = slot.row * CHAR_H + CHAR_H / 2;
+
+    if (slot.decoded) {
+      const glow = state.allDecoded
+        ? 20 + Math.sin(state.pulse) * 10
+        : 14;
+      ctx.shadowColor = "#00ff41";
+      ctx.shadowBlur = glow;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(slot.target, x, y);
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = "transparent";
+    } else if (slot.progress > 0) {
+      const brightness = 0.3 + slot.progress * 0.7;
+      ctx.shadowColor = "#00ff41";
+      ctx.shadowBlur = slot.progress * 8;
+      ctx.fillStyle = `rgba(0, 255, 65, ${brightness.toFixed(2)})`;
+      ctx.fillText(slot.cycleChar, x, y);
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = "transparent";
+    }
+    /* When progress === 0: draw nothing — let rain pass through naturally */
+
+    /* Lock-in flash */
+    if (slot.flash > 0) {
+      ctx.fillStyle = `rgba(0, 255, 65, ${(slot.flash * 0.5).toFixed(2)})`;
+      const r = CHAR_W * (1 + slot.flash * 2);
+      const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
+      grd.addColorStop(0, `rgba(0, 255, 65, ${(slot.flash * 0.4).toFixed(2)})`);
+      grd.addColorStop(1, "transparent");
+      ctx.fillStyle = grd;
+      ctx.fillRect(x - r, y - r, r * 2, r * 2);
+      slot.flash = Math.max(0, slot.flash - dt * 0.004);
+    }
+  }
+
   /* Scanlines */
-  ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
-  for (let y = 0; y < state.height; y += 3) {
-    ctx.fillRect(0, y, state.width, 1);
+  ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+  for (let y = 0; y < h; y += 2) {
+    ctx.fillRect(0, y, w, 1);
   }
 
   /* Vignette */
-  const vg = ctx.createRadialGradient(
-    state.width / 2, state.height / 2, state.height * 0.3,
-    state.width / 2, state.height / 2, state.height * 0.85
-  );
+  const vg = ctx.createRadialGradient(w / 2, h / 2, h * 0.25, w / 2, h / 2, h * 0.9);
   vg.addColorStop(0, "transparent");
-  vg.addColorStop(1, "rgba(0, 0, 0, 0.65)");
+  vg.addColorStop(1, "rgba(0, 0, 0, 0.55)");
   ctx.fillStyle = vg;
-  ctx.fillRect(0, 0, state.width, state.height);
-
-  state.frameId = requestAnimationFrame(renderFrame);
+  ctx.fillRect(0, 0, w, h);
 }
 
-/* Kick off the loop */
-state.frameId = requestAnimationFrame(renderFrame);
+/* ── Loop ───────────────────────────────────────── */
+let dt = 0;
+
+function frame(now) {
+  dt = state.lastFrame ? now - state.lastFrame : 16;
+  if (dt > 100) dt = 16;
+  state.lastFrame = now;
+
+  update(now, dt);
+  render(now);
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
