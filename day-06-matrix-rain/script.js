@@ -154,6 +154,57 @@ function updateDecode(now, dt) {
   if (state.allDecoded) {
     state.pulsePhase += dt * 0.004;
   }
+
+  /* Re-encrypt if mouse idle > 3s */
+  const hasDecoded = state.messageSlots.some(
+    (s) => s.targetChar !== " " && (s.decoded || s.decodeProgress > 0)
+  );
+
+  if (hasDecoded && now - state.mouseLastMoveTime > 3000) {
+    reEncrypt(now, dt);
+  }
+}
+
+/* ── Re-encrypt ─────────────────────────────────── */
+let reEncryptQueue = [];
+let reEncryptStarted = false;
+
+function reEncrypt(now, dt) {
+  if (!reEncryptStarted) {
+    /* Build randomized stagger queue */
+    const slots = state.messageSlots
+      .filter((s) => s.targetChar !== " " && (s.decoded || s.decodeProgress > 0));
+    reEncryptQueue = slots
+      .map((s, i) => ({ slot: s, delay: Math.random() * 400 }))
+      .sort((a, b) => a.delay - b.delay);
+    reEncryptStarted = true;
+    state.allDecoded = false;
+    state.pulsePhase = 0;
+  }
+
+  for (const item of reEncryptQueue) {
+    item.delay -= dt;
+    if (item.delay <= 0) {
+      const s = item.slot;
+      s.decodeProgress = Math.max(0, s.decodeProgress - dt / 300);
+      s.cycleTimer += dt;
+      if (s.cycleTimer > 40) {
+        s.cycleChar = randomChar();
+        s.cycleTimer = 0;
+      }
+      if (s.decodeProgress <= 0) {
+        s.decoded = false;
+        s.cycleChar = randomChar();
+      }
+    }
+  }
+
+  /* Reset when all re-encrypted */
+  const allDone = reEncryptQueue.every((item) => item.slot.decodeProgress <= 0);
+  if (allDone) {
+    reEncryptStarted = false;
+    reEncryptQueue = [];
+  }
 }
 
 /* ── Update & Render ────────────────────────────── */
