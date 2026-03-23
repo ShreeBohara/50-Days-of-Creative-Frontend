@@ -38,6 +38,8 @@ const state = {
   mouseActive: false,
   mouseLastMoveTime: 0,
   lastFrameTime: 0,
+  allDecoded: false,
+  pulsePhase: 0,
 };
 
 function createColumn(x) {
@@ -143,6 +145,15 @@ function updateDecode(now, dt) {
       }
     }
   }
+
+  /* Check if all decoded */
+  state.allDecoded = state.messageSlots
+    .filter((s) => s.targetChar !== " ")
+    .every((s) => s.decoded);
+
+  if (state.allDecoded) {
+    state.pulsePhase += dt * 0.004;
+  }
 }
 
 /* ── Update & Render ────────────────────────────── */
@@ -238,8 +249,16 @@ function renderFrame(now) {
     const y = slot.row * CHAR_SIZE + CHAR_SIZE / 2;
 
     if (slot.decoded) {
+      /* Glow effect for decoded characters */
+      const pulseGlow = state.allDecoded
+        ? 15 + Math.sin(state.pulsePhase) * 8
+        : 10;
+      ctx.shadowColor = "#00ff41";
+      ctx.shadowBlur = pulseGlow;
       ctx.fillStyle = "#ffffff";
       ctx.fillText(slot.targetChar, x, y);
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
     } else if (slot.decodeProgress > 0) {
       ctx.fillStyle = "#00ff41";
       ctx.fillText(slot.cycleChar, x, y);
@@ -262,6 +281,22 @@ function renderFrame(now) {
 
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
+
+  /* Scanlines */
+  ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
+  for (let y = 0; y < state.height; y += 3) {
+    ctx.fillRect(0, y, state.width, 1);
+  }
+
+  /* Vignette */
+  const vg = ctx.createRadialGradient(
+    state.width / 2, state.height / 2, state.height * 0.3,
+    state.width / 2, state.height / 2, state.height * 0.85
+  );
+  vg.addColorStop(0, "transparent");
+  vg.addColorStop(1, "rgba(0, 0, 0, 0.65)");
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, state.width, state.height);
 
   requestAnimationFrame(renderFrame);
 }
