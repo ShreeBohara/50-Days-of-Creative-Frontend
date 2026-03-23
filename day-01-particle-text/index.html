@@ -5,18 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Day 01 | Particle Text Morphing</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="app-shell">
       <canvas class="particle-canvas" data-particle-canvas aria-hidden="true"></canvas>
 
+      <!-- Corner frame marker -->
+      <div class="frame-marker" aria-hidden="true"><span>01/50</span></div>
+
+      <!-- Coordinate readout -->
+      <div class="coord-readout" data-coord-readout aria-hidden="true">x: 0 y: 0</div>
+
+      <!-- Control panel -->
       <section class="ui-panel" aria-label="Particle text controls">
-        <p class="eyebrow">Day 01 / Creative Frontend</p>
-        <h1>Particle Text Morphing</h1>
-        <p class="ui-copy">
-          Type a word and watch it dissolve into a responsive field of particles.
-        </p>
+        <h1>Particle Text</h1>
 
         <form class="word-form" data-word-form>
           <label class="sr-only" for="word-input">Enter a word to morph on the canvas</label>
@@ -28,7 +37,7 @@
             maxlength="18"
             autocomplete="off"
             spellcheck="false"
-            placeholder="Enter a word"
+            placeholder="TYPE HERE_"
           />
         </form>
       </section>

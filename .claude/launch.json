@@ -1,0 +1,42 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gallery",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-l", "3006"],
+      "port": 3006
+    },
+    {
+      "name": "day-01",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "day-01-particle-text", "-l", "3001"],
+      "port": 3001
+    },
+    {
+      "name": "day-02",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "day-02-liquid-glass-card", "-l", "3002"],
+      "port": 3002
+    },
+    {
+      "name": "day-03",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "3003"],
+      "port": 3003,
+      "cwd": "day-03-solar-system"
+    },
+    {
+      "name": "day-04",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "day-04-audio-visualizer", "-l", "3004"],
+      "port": 3004
+    },
+    {
+      "name": "day-05",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "day-05-terrain-generator", "-l", "3005"],
+      "port": 3005
+    }
+  ]
+}

@@ -8,94 +8,98 @@
       name="description"
       content="A growing collection of bold frontend experiments built with static HTML, CSS, and JavaScript."
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Instrument+Serif:ital@1&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./site.css" />
   </head>
   <body>
     <main class="site-shell">
-      <section class="hero">
-        <p class="eyebrow">50 Days of Creative Frontend</p>
-        <h1>Daily interface experiments with motion, depth, and personality.</h1>
-        <p class="hero-copy">
-          Each day is a self-contained build exploring a different creative frontend technique,
-          from particle typography to liquid glass UI.
-        </p>
+      <header class="hero">
+        <h1>Daily interface experiments<br />with motion, depth,<br />and personality.</h1>
         <div class="hero-actions">
-          <a class="primary-link" href="https://github.com/ShreeBohara/50-Days-of-Creative-Frontend">
-            View repository
+          <a class="link-primary" href="https://github.com/ShreeBohara/50-Days-of-Creative-Frontend">
+            Repository
           </a>
-          <a class="secondary-link" href="./day-06-matrix-rain/">Jump to latest day</a>
+          <a class="link-secondary" href="./day-06-matrix-rain/">Latest day</a>
         </div>
-      </section>
+      </header>
 
       <section class="project-grid" aria-label="Project archive">
-        <article class="project-card">
-          <p class="project-day">Day 01</p>
+        <article class="project-card" data-day="01">
+          <span class="card-num">01</span>
           <h2>Particle Text Morphing</h2>
           <p>
-            A full-screen canvas experiment where words dissolve into particles and reform under
-            your cursor.
+            Full-screen canvas where words dissolve into particles and reform under your cursor.
           </p>
-          <div class="project-meta">
-            <span>Canvas API</span>
-            <span>Vanilla JS</span>
-          </div>
-          <a class="project-link" href="./day-01-particle-text/">Open demo</a>
+          <footer class="card-foot">
+            <span class="card-tech">Canvas API, Vanilla JS</span>
+            <a class="card-link" href="./day-01-particle-text/">View</a>
+          </footer>
         </article>
 
-        <article class="project-card">
-          <p class="project-day">Day 02</p>
+        <article class="project-card" data-day="02">
+          <span class="card-num">02</span>
           <h2>Liquid Glass Card</h2>
           <p>
-            A frosted profile card with 3D tilt, animated border energy, and pointer-driven
-            refraction.
+            Frosted profile card with 3D tilt, animated border energy, and pointer-driven refraction.
           </p>
-          <div class="project-meta">
-            <span>Backdrop Filter</span>
-            <span>CSS 3D</span>
-          </div>
-          <a class="project-link" href="./day-02-liquid-glass-card/">Open demo</a>
+          <footer class="card-foot">
+            <span class="card-tech">Backdrop Filter, CSS 3D</span>
+            <a class="card-link" href="./day-02-liquid-glass-card/">View</a>
+          </footer>
         </article>
 
-        <article class="project-card">
-          <p class="project-day">Day 03</p>
+        <article class="project-card" data-day="03">
+          <span class="card-num">03</span>
           <h2>Cinematic Solar System</h2>
           <p>
-            A premium React Three Fiber orbital journey with guided camera chapters, shader
-            planets, and editorial planet profiles.
+            React Three Fiber orbital journey with guided camera chapters, shader planets, and editorial profiles.
           </p>
-          <div class="project-meta">
-            <span>React Three Fiber</span>
-            <span>Cinematic Motion</span>
-          </div>
-          <a class="project-link" href="./day-03-solar-system/">Open demo</a>
+          <footer class="card-foot">
+            <span class="card-tech">React Three Fiber, GSAP</span>
+            <a class="card-link" href="./day-03-solar-system/">View</a>
+          </footer>
         </article>
 
-        <article class="project-card project-card--featured">
-          <p class="project-day">Day 04</p>
+        <article class="project-card" data-day="04">
+          <span class="card-num">04</span>
           <h2>Audio Visualizer Spectrum</h2>
           <p>
-            A circular audio spectrum with radial FFT bars, a beat-reactive center orb, and a
-            built-in synth demo when no file is loaded.
+            Circular audio spectrum with radial FFT bars, beat-reactive orb, and a built-in synth demo.
           </p>
-          <div class="project-meta">
-            <span>Web Audio API</span>
-            <span>Canvas Spectrum</span>
-          </div>
-          <a class="project-link" href="./day-04-audio-visualizer/">Open demo</a>
+          <footer class="card-foot">
+            <span class="card-tech">Web Audio API, Canvas</span>
+            <a class="card-link" href="./day-04-audio-visualizer/">View</a>
+          </footer>
         </article>
 
-        <article class="project-card project-card--featured">
-          <p class="project-day">Day 06</p>
+        <article class="project-card" data-day="05">
+          <span class="card-num">05</span>
+          <h2>Procedural Terrain Generator</h2>
+          <p>
+            3D terrain with simplex noise, height-based biome coloring, interactive controls, and cinematic camera.
+          </p>
+          <footer class="card-foot">
+            <span class="card-tech">Three.js, Simplex Noise</span>
+            <a class="card-link" href="./day-05-terrain-generator/">View</a>
+          </footer>
+        </article>
+
+        <article class="project-card" data-day="06">
+          <span class="card-num">06</span>
           <h2>Matrix Rain</h2>
           <p>
             Full-screen Matrix digital rain with a hover-activated decode effect that reveals
-            a hidden message letter by letter, complete with CRT scanlines and vignette.
+            a hidden message letter by letter.
           </p>
-          <div class="project-meta">
-            <span>Canvas API</span>
-            <span>Decode Effect</span>
-          </div>
-          <a class="project-link" href="./day-06-matrix-rain/">Open demo</a>
+          <footer class="card-foot">
+            <span class="card-tech">Canvas API, Decode Effect</span>
+            <a class="card-link" href="./day-06-matrix-rain/">View</a>
+          </footer>
         </article>
       </section>
     </main>

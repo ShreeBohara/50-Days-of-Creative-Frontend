@@ -34,9 +34,9 @@ export function SolarScene() {
 
   return (
     <>
-      <color attach="background" args={["#050816"]} />
-      <fog attach="fog" args={["#050816", 95, 240]} />
-      <ambientLight intensity={0.38} color="#8fb7ff" />
+      <color attach="background" args={["#000000"]} />
+      <fog attach="fog" args={["#000000", 140, 320]} />
+      <ambientLight intensity={0.32} color="#8fb7ff" />
       <directionalLight position={[50, 20, 30]} intensity={0.45} color="#8ecaff" />
       <NebulaField />
       <Starfield />
@@ -49,7 +49,7 @@ export function SolarScene() {
           scale={[120, 40, 120]}
           speed={0.2}
           color="#ffd7aa"
-          opacity={0.45}
+          opacity={0.35}
         />
       )}
       <CinematicCamera />
