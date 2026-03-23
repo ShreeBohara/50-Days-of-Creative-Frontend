@@ -1,0 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
+:root {
+  color-scheme: dark;
+
+  --bg: #000000;
+  --green-bright: #00ff41;
+  --green-mid: #00cc33;
+  --green-dim: #008f22;
+  --green-dark: #003b00;
+  --green-glow: #00ff41;
+  --text-primary: #00ff41;
+  --text-muted: rgba(0, 255, 65, 0.5);
+  --font-mono: "Share Tech Mono", "Courier New", monospace;
+}
