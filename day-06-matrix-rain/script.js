@@ -21,12 +21,15 @@ const ctx = canvas.getContext("2d");
 
 const CHAR_SIZE = 16;
 
+const MESSAGE = "THERE IS NO SPOON";
+
 const state = {
   width: 0,
   height: 0,
   numCols: 0,
   numRows: 0,
   columns: [],
+  messageSlots: [],
 };
 
 function createColumn(x) {
@@ -49,6 +52,23 @@ function initColumns() {
   }
 }
 
+function computeMessageSlots() {
+  const startCol = Math.floor((state.numCols - MESSAGE.length) / 2);
+  const midRow = Math.floor(state.numRows / 2);
+
+  state.messageSlots = MESSAGE.split("").map((char, i) => ({
+    col: startCol + i,
+    row: midRow,
+    targetChar: char,
+    decoded: char === " ",
+    decodeProgress: char === " " ? 1 : 0,
+    cycleChar: randomChar(),
+    cycleTimer: 0,
+    glowIntensity: 0,
+    flashAlpha: 0,
+  }));
+}
+
 function resizeCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = window.innerWidth;
@@ -66,6 +86,7 @@ function resizeCanvas() {
   state.numRows = Math.ceil(h / CHAR_SIZE);
 
   initColumns();
+  computeMessageSlots();
 }
 
 resizeCanvas();
