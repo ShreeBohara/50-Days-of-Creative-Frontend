@@ -92,6 +92,14 @@ function updateColumns(now) {
   }
 }
 
+function getTrailColor(brightness) {
+  if (brightness > 0.95) return "#ffffff";
+  if (brightness > 0.85) return "#cfffcf";
+  if (brightness > 0.6) return "#00ff41";
+  if (brightness > 0.3) return "rgba(0, 204, 51, " + brightness.toFixed(2) + ")";
+  return "rgba(0, 59, 0, " + (brightness * 1.5).toFixed(2) + ")";
+}
+
 function renderFrame(now) {
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, state.width, state.height);
@@ -99,6 +107,8 @@ function renderFrame(now) {
   ctx.font = CHAR_SIZE + "px 'Share Tech Mono', monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
 
   for (const col of state.columns) {
     const headRow = col.dropY | 0;
@@ -106,14 +116,30 @@ function renderFrame(now) {
     for (let row = headRow - col.length; row <= headRow; row++) {
       if (row < 0 || row >= state.numRows) continue;
 
+      const dist = col.dropY - row;
+      const brightness = 1.0 - dist / col.length;
+
       const x = col.x * CHAR_SIZE + CHAR_SIZE / 2;
       const y = row * CHAR_SIZE + CHAR_SIZE / 2;
       const ch = col.chars[((row % col.chars.length) + col.chars.length) % col.chars.length];
 
-      ctx.fillStyle = "#00ff41";
+      /* Head character gets a glow bloom */
+      if (dist < 1) {
+        ctx.shadowColor = "#00ff41";
+        ctx.shadowBlur = 12;
+      } else {
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.fillStyle = getTrailColor(brightness);
       ctx.fillText(ch, x, y);
     }
   }
+
+  /* Reset shadow state */
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
 
   requestAnimationFrame(renderFrame);
 }
