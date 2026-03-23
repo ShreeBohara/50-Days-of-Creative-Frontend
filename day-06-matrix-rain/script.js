@@ -107,6 +107,9 @@ function resizeCanvas() {
   reEncryptQueue = [];
 }
 
+let reEncryptQueue = [];
+let reEncryptStarted = false;
+
 resizeCanvas();
 
 let resizeTimer = 0;
@@ -178,9 +181,6 @@ function updateDecode(now, dt) {
 }
 
 /* ── Re-encrypt ─────────────────────────────────── */
-let reEncryptQueue = [];
-let reEncryptStarted = false;
-
 function reEncrypt(now, dt) {
   if (!reEncryptStarted) {
     /* Build randomized stagger queue */
