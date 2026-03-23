@@ -12,6 +12,7 @@ on:
       - "day-03-solar-system/**"
       - "day-04-audio-visualizer/**"
       - "day-05-terrain-generator/**"
+      - "day-06-matrix-rain/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -61,6 +62,7 @@ jobs:
           cp -R day-02-liquid-glass-card _site/
           cp -R day-04-audio-visualizer _site/
           cp -R day-05-terrain-generator _site/
+          cp -R day-06-matrix-rain _site/
           mkdir -p _site/day-03-solar-system
           cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
 
