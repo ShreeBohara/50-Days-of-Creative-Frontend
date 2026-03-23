@@ -19,11 +19,11 @@ function randomChar() {
 const canvas = document.querySelector("[data-rain-canvas]");
 const ctx = canvas.getContext("2d");
 
-const CHAR_SIZE = 16;
+let CHAR_SIZE = 16;
 
 const MESSAGE = "THERE IS NO SPOON";
 
-const DECODE_RADIUS = CHAR_SIZE * 5;
+let DECODE_RADIUS = CHAR_SIZE * 5;
 const DECODE_DURATION = 600;
 
 const state = {
@@ -90,6 +90,10 @@ function resizeCanvas() {
   canvas.style.height = h + "px";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+  /* Adapt char size for narrow viewports */
+  CHAR_SIZE = w < 600 ? 14 : 16;
+  DECODE_RADIUS = CHAR_SIZE * 5;
+
   state.width = w;
   state.height = h;
   state.numCols = Math.ceil(w / CHAR_SIZE);
@@ -97,6 +101,10 @@ function resizeCanvas() {
 
   initColumns();
   computeMessageSlots();
+
+  /* Reset re-encrypt state on resize */
+  reEncryptStarted = false;
+  reEncryptQueue = [];
 }
 
 resizeCanvas();
