@@ -60,6 +60,7 @@ export interface PlanetDefinition {
     baseB: string;
     accent: string;
     glow: string;
+    atmosphereColor: string;
   };
   pattern: PlanetPattern;
   hasRing?: boolean;
@@ -173,6 +174,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#534946",
       accent: "#d7c3b3",
       glow: "#ffbc85",
+      atmosphereColor: "#aaaaaa",
     },
     pattern: "rocky",
   },
@@ -202,6 +204,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#9d6848",
       accent: "#fff0cb",
       glow: "#ffd19a",
+      atmosphereColor: "#ffaa44",
     },
     pattern: "cloudy",
   },
@@ -231,6 +234,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#10318b",
       accent: "#8fe8ff",
       glow: "#8fd2ff",
+      atmosphereColor: "#4488ff",
     },
     pattern: "terrestrial",
   },
@@ -260,6 +264,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#6c271e",
       accent: "#ffbf8c",
       glow: "#ff9b6a",
+      atmosphereColor: "#ff8866",
     },
     pattern: "rocky",
   },
@@ -289,6 +294,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#8a573d",
       accent: "#fff0ce",
       glow: "#ffd497",
+      atmosphereColor: "#ffcc88",
     },
     pattern: "banded",
   },
@@ -318,6 +324,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#b18453",
       accent: "#fff0ca",
       glow: "#ffe1a3",
+      atmosphereColor: "#ffe8aa",
     },
     pattern: "banded",
     hasRing: true,
@@ -348,6 +355,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#3d8dad",
       accent: "#e5ffff",
       glow: "#9ee6ff",
+      atmosphereColor: "#88eeff",
     },
     pattern: "ice",
   },
@@ -377,6 +385,7 @@ export const planets: PlanetDefinition[] = [
       baseB: "#152f9b",
       accent: "#a9e2ff",
       glow: "#78b2ff",
+      atmosphereColor: "#5588ff",
     },
     pattern: "storm",
   },

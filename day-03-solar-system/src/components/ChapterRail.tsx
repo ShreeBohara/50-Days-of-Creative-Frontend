@@ -3,26 +3,22 @@ import { useSolarStore } from "../store/solarStore";
 
 export function ChapterRail() {
   const activeChapter = useSolarStore((state) => state.activeChapter);
+  const setActiveChapter = useSolarStore((state) => state.setActiveChapter);
   const setGuidedCameraActive = useSolarStore((state) => state.setGuidedCameraActive);
 
   return (
-    <nav className="chapter-rail" aria-label="Story chapters">
+    <nav className="chapter-rail" aria-label="Chapters">
       {chapters.map((chapter) => (
         <button
           key={chapter.id}
           type="button"
-          className={chapter.id === activeChapter ? "chapter-rail__item is-active" : "chapter-rail__item"}
+          className={chapter.id === activeChapter ? "chapter-rail__dot is-active" : "chapter-rail__dot"}
+          aria-label={chapter.id.replace("-", " ")}
           onClick={() => {
             setGuidedCameraActive(true);
-            document.getElementById(`chapter-${chapter.id}`)?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
+            setActiveChapter(chapter.id);
           }}
-        >
-          <span className="chapter-rail__dot"></span>
-          <span className="chapter-rail__label">{chapter.id.replace("-", " ")}</span>
-        </button>
+        />
       ))}
     </nav>
   );

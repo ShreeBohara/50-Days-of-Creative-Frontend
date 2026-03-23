@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { chaptersById, planetsById } from "../data/solarData";
+import { planetsById } from "../data/solarData";
 import { useSolarStore } from "../store/solarStore";
 
 export function PlanetDrawer() {
@@ -13,10 +13,7 @@ export function PlanetDrawer() {
   const planet = selectedPlanet ? planetsById[selectedPlanet] : null;
 
   useEffect(() => {
-    if (!drawerRef.current) {
-      return;
-    }
-
+    if (!drawerRef.current) return;
     gsap.to(drawerRef.current, {
       x: overlayOpen && planet ? 0 : 42,
       opacity: overlayOpen && planet ? 1 : 0,
@@ -27,14 +24,11 @@ export function PlanetDrawer() {
   }, [overlayOpen, planet]);
 
   if (!planet) {
-    return <aside ref={drawerRef} className="planet-drawer" aria-hidden="true"></aside>;
+    return <aside ref={drawerRef} className="planet-drawer" aria-hidden="true" />;
   }
-
-  const chapter = chaptersById[planet.chapter];
 
   return (
     <aside ref={drawerRef} className="planet-drawer" aria-hidden={!overlayOpen}>
-      <div className="planet-drawer__glow" aria-hidden="true"></div>
       <button
         type="button"
         className="planet-drawer__close"
@@ -42,13 +36,12 @@ export function PlanetDrawer() {
           setOverlayOpen(false);
           selectPlanet(null);
         }}
+        aria-label="Close"
       >
-        Close
+        ✕
       </button>
 
-      <p className="planet-drawer__eyebrow">{chapter.eyebrow}</p>
       <h2>{planet.name}</h2>
-      <p className="planet-drawer__subtitle">{planet.subtitle}</p>
 
       <div className="planet-drawer__stats">
         <article>
@@ -60,18 +53,9 @@ export function PlanetDrawer() {
           <strong>{planet.distance}</strong>
         </article>
         <article>
-          <span>Orbital track</span>
-          <strong>{planet.orbitLabel}</strong>
-        </article>
-        <article>
           <span>Moons</span>
           <strong>{planet.moons}</strong>
         </article>
-      </div>
-
-      <div className="planet-drawer__details">
-        <span>Day length: {planet.dayLength}</span>
-        <span>Year length: {planet.yearLength}</span>
       </div>
     </aside>
   );
