@@ -40,6 +40,7 @@ const state = {
   lastFrameTime: 0,
   allDecoded: false,
   pulsePhase: 0,
+  frameId: 0,
 };
 
 function createColumn(x) {
@@ -47,7 +48,7 @@ function createColumn(x) {
   const length = 8 + ((Math.random() * 20) | 0);
   return {
     x,
-    dropY: -(Math.random() * 40),
+    dropY: -(Math.random() * 15),
     speed,
     length,
     chars: Array.from({ length: 60 }, () => randomChar()),
@@ -74,7 +75,6 @@ function computeMessageSlots() {
     decodeProgress: char === " " ? 1 : 0,
     cycleChar: randomChar(),
     cycleTimer: 0,
-    glowIntensity: 0,
     flashAlpha: 0,
   }));
 }
@@ -109,7 +109,11 @@ function resizeCanvas() {
 
 resizeCanvas();
 
-const ro = new ResizeObserver(() => resizeCanvas());
+let resizeTimer = 0;
+const ro = new ResizeObserver(() => {
+  cancelAnimationFrame(resizeTimer);
+  resizeTimer = requestAnimationFrame(() => resizeCanvas());
+});
 ro.observe(document.documentElement);
 
 /* ── Mouse tracking ─────────────────────────────── */
@@ -183,7 +187,7 @@ function reEncrypt(now, dt) {
     const slots = state.messageSlots
       .filter((s) => s.targetChar !== " " && (s.decoded || s.decodeProgress > 0));
     reEncryptQueue = slots
-      .map((s, i) => ({ slot: s, delay: Math.random() * 400 }))
+      .map((s) => ({ slot: s, delay: Math.random() * 400 }))
       .sort((a, b) => a.delay - b.delay);
     reEncryptStarted = true;
     state.allDecoded = false;
@@ -357,7 +361,8 @@ function renderFrame(now) {
   ctx.fillStyle = vg;
   ctx.fillRect(0, 0, state.width, state.height);
 
-  requestAnimationFrame(renderFrame);
+  state.frameId = requestAnimationFrame(renderFrame);
 }
 
-requestAnimationFrame(renderFrame);
+/* Kick off the loop */
+state.frameId = requestAnimationFrame(renderFrame);
