@@ -495,17 +495,20 @@ function step() {
   /* 1. Advect velocity through itself */
   advect(velocity, velocity, velocity, simTexelSize, config.velocityDissipation);
 
-  /* 2. Pressure projection: divergence → clear pressure → Jacobi → gradient subtract */
+  /* 2. Pressure projection */
   computeDivergence();
   clearField(pressure, config.pressureDissipation);
   solvePressure();
   subtractGradient();
 
-  /* 3. Render velocity to screen (temporary debug) */
+  /* 3. Advect dye through velocity field */
+  advect(velocity, dye, dye, dyeTexelSize, config.dyeDissipation);
+
+  /* 4. Render dye color field to screen */
   const { program, uniforms } = programs.display;
   gl.useProgram(program);
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
+  gl.bindTexture(gl.TEXTURE_2D, dye.read.texture);
   gl.uniform1i(uniforms.uTexture, 0);
   blit(null);
 
