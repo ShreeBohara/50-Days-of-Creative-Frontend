@@ -9,12 +9,70 @@
       content="Real-time 2D fluid simulation with mouse-injected colored dye using GPU-accelerated Navier-Stokes on WebGL."
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="fluid-page">
       <canvas data-fluid-canvas aria-label="Interactive fluid simulation canvas"></canvas>
+
+      <section class="overlay" aria-label="Fluid simulation info and controls">
+        <header class="hero-copy" data-hero>
+          <p class="eyebrow">Day 07 / Creative Frontend</p>
+          <h1>Fluid Simulation</h1>
+          <p class="tagline">Drag to inject dye. Watch physics do the rest.</p>
+        </header>
+
+        <div class="control-bar" data-controls>
+          <div class="control-group">
+            <label class="slider-label" for="viscosity-slider">
+              <span>Viscosity</span>
+              <output data-viscosity-value>0.3</output>
+            </label>
+            <input
+              id="viscosity-slider"
+              type="range"
+              min="0"
+              max="100"
+              value="30"
+              data-viscosity
+              aria-label="Viscosity"
+            />
+          </div>
+
+          <div class="control-group">
+            <label class="slider-label" for="diffusion-slider">
+              <span>Diffusion</span>
+              <output data-diffusion-value>0.8</output>
+            </label>
+            <input
+              id="diffusion-slider"
+              type="range"
+              min="0"
+              max="100"
+              value="80"
+              data-diffusion
+              aria-label="Dye diffusion rate"
+            />
+          </div>
+
+          <div class="control-group control-group--buttons">
+            <button type="button" class="btn" data-clear aria-label="Clear simulation">
+              Clear
+            </button>
+            <button type="button" class="btn btn--accent" data-random-splats aria-label="Add random color splats">
+              Random Splats
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
+
     <script src="./script.js"></script>
   </body>
 </html>
