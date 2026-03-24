@@ -406,9 +406,92 @@ function subtractGradient() {
 }
 
 /* ═══════════════════════════════════════════
+   Splat — inject velocity or dye at a point
+   ═══════════════════════════════════════════ */
+function splat(target, x, y, dx, dy, color, radius) {
+  const { program, uniforms } = programs.splat;
+  gl.useProgram(program);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, target.read.texture);
+  gl.uniform1i(uniforms.uTarget, 0);
+
+  gl.uniform2f(uniforms.uPoint, x, y);
+  gl.uniform3f(uniforms.uColor, color[0], color[1], color[2]);
+  gl.uniform1f(uniforms.uRadius, radius);
+  gl.uniform1f(uniforms.uAspect, canvas.width / canvas.height);
+
+  blit(target.write);
+  target.swap();
+}
+
+/* ═══════════════════════════════════════════
+   Pointer / touch input
+   ═══════════════════════════════════════════ */
+const pointer = {
+  down: false,
+  x: 0, y: 0,
+  prevX: 0, prevY: 0,
+  dx: 0, dy: 0,
+  moved: false,
+};
+
+const splatQueue = [];
+
+canvas.addEventListener('pointerdown', (e) => {
+  pointer.down = true;
+  pointer.x = e.offsetX;
+  pointer.y = e.offsetY;
+  pointer.prevX = pointer.x;
+  pointer.prevY = pointer.y;
+  /* Hide hero text on first interaction */
+  if (hero) hero.classList.add('hidden');
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  pointer.prevX = pointer.x;
+  pointer.prevY = pointer.y;
+  pointer.x = e.offsetX;
+  pointer.y = e.offsetY;
+  pointer.dx = pointer.x - pointer.prevX;
+  pointer.dy = pointer.y - pointer.prevY;
+  pointer.moved = true;
+
+  if (pointer.down) {
+    splatQueue.push({
+      x: pointer.x / canvas.clientWidth,
+      y: 1.0 - pointer.y / canvas.clientHeight,
+      dx: pointer.dx,
+      dy: -pointer.dy,
+    });
+  }
+});
+
+window.addEventListener('pointerup', () => { pointer.down = false; });
+
+/* ═══════════════════════════════════════════
+   Process splats
+   ═══════════════════════════════════════════ */
+function processSplats() {
+  while (splatQueue.length > 0) {
+    const s = splatQueue.pop();
+    const force = config.splatForce;
+    splat(velocity, s.x, s.y, s.dx, s.dy,
+      [s.dx * force, s.dy * force, 0],
+      config.splatRadius / 100);
+    splat(dye, s.x, s.y, s.dx, s.dy,
+      [1.0, 1.0, 1.0],  /* white dye for now — color cycling comes later */
+      config.splatRadius / 100);
+  }
+}
+
+/* ═══════════════════════════════════════════
    Animation loop
    ═══════════════════════════════════════════ */
 function step() {
+  /* 0. Process queued mouse splats */
+  processSplats();
+
   /* 1. Advect velocity through itself */
   advect(velocity, velocity, velocity, simTexelSize, config.velocityDissipation);
 
