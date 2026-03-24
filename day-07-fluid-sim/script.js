@@ -157,6 +157,12 @@ in vec2 vUv;
 out vec4 fragColor;
 void main() {
   vec3 col = texture(uTexture, vUv).rgb;
+  /* Slight tone-mapping: boost brightness, subtle vignette */
+  col = pow(col, vec3(0.85));
+  float vig = 1.0 - 0.25 * dot(vUv - 0.5, vUv - 0.5);
+  col *= vig;
+  /* Deep background tint so empty areas aren't pure black */
+  col += vec3(0.012, 0.008, 0.035) * (1.0 - min(length(col), 1.0));
   fragColor = vec4(col, 1.0);
 }
 `;
@@ -470,17 +476,35 @@ canvas.addEventListener('pointermove', (e) => {
 window.addEventListener('pointerup', () => { pointer.down = false; });
 
 /* ═══════════════════════════════════════════
+   HSL → RGB conversion for dye color cycling
+   ═══════════════════════════════════════════ */
+function hslToRgb(h, s, l) {
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => {
+    const k = (n + h * 12) % 12;
+    return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+  };
+  return [f(0), f(8), f(4)];
+}
+
+function getTimeColor() {
+  const hue = (performance.now() * 0.0001) % 1.0;
+  return hslToRgb(hue, 1.0, 0.5);
+}
+
+/* ═══════════════════════════════════════════
    Process splats
    ═══════════════════════════════════════════ */
 function processSplats() {
   while (splatQueue.length > 0) {
     const s = splatQueue.pop();
     const force = config.splatForce;
+    const color = getTimeColor();
     splat(velocity, s.x, s.y, s.dx, s.dy,
       [s.dx * force, s.dy * force, 0],
       config.splatRadius / 100);
     splat(dye, s.x, s.y, s.dx, s.dy,
-      [1.0, 1.0, 1.0],  /* white dye for now — color cycling comes later */
+      [color[0] * 0.6, color[1] * 0.6, color[2] * 0.6],
       config.splatRadius / 100);
   }
 }
