@@ -512,6 +512,59 @@ function processSplats() {
 /* ═══════════════════════════════════════════
    Animation loop
    ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   Clear all fields
+   ═══════════════════════════════════════════ */
+function clearAll() {
+  clearField(velocity, 0);
+  clearField(pressure, 0);
+  clearField(dye, 0);
+}
+
+/* ═══════════════════════════════════════════
+   Random splats burst
+   ═══════════════════════════════════════════ */
+function randomSplats(count) {
+  for (let i = 0; i < count; i++) {
+    const x = Math.random();
+    const y = Math.random();
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 80 + Math.random() * 200;
+    const dx = Math.cos(angle) * speed;
+    const dy = Math.sin(angle) * speed;
+    const color = hslToRgb(Math.random(), 1.0, 0.5);
+    splat(velocity, x, y, 0, 0,
+      [dx, dy, 0],
+      config.splatRadius / 100);
+    splat(dye, x, y, 0, 0,
+      [color[0] * 0.5, color[1] * 0.5, color[2] * 0.5],
+      config.splatRadius / 100);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Wire up control panel
+   ═══════════════════════════════════════════ */
+viscositySlider.addEventListener('input', () => {
+  config.viscosity = viscositySlider.value / 100;
+  viscosityValue.textContent = config.viscosity.toFixed(1);
+});
+
+diffusionSlider.addEventListener('input', () => {
+  /* Map 0–100 to dissipation 0.95–1.0 (higher slider = more dye retention) */
+  config.dyeDissipation = 0.95 + (diffusionSlider.value / 100) * 0.05;
+  diffusionValue.textContent = (diffusionSlider.value / 100).toFixed(1);
+});
+
+clearBtn.addEventListener('click', clearAll);
+randomSplatsBtn.addEventListener('click', () => randomSplats(Math.floor(5 + Math.random() * 6)));
+
+/* Fire initial random splats so the canvas isn't empty */
+randomSplats(6);
+
+/* ═══════════════════════════════════════════
+   Animation loop
+   ═══════════════════════════════════════════ */
 function step() {
   /* 0. Process queued mouse splats */
   processSplats();
