@@ -332,13 +332,93 @@ function advect(velocityField, sourceField, targetField, texelSize, dissipation)
 }
 
 /* ═══════════════════════════════════════════
-   Animation loop (advection only for now)
+   Divergence
+   ═══════════════════════════════════════════ */
+function computeDivergence() {
+  const { program, uniforms } = programs.divergence;
+  gl.useProgram(program);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
+  gl.uniform1i(uniforms.uVelocity, 0);
+  gl.uniform2fv(uniforms.uTexelSize, simTexelSize);
+
+  blit(divergenceFBO);
+}
+
+/* ═══════════════════════════════════════════
+   Clear / dissipation pass
+   ═══════════════════════════════════════════ */
+function clearField(target, value) {
+  const { program, uniforms } = programs.clear;
+  gl.useProgram(program);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, target.read.texture);
+  gl.uniform1i(uniforms.uTexture, 0);
+  gl.uniform1f(uniforms.uValue, value);
+
+  blit(target.write);
+  target.swap();
+}
+
+/* ═══════════════════════════════════════════
+   Pressure solve (Jacobi iterations)
+   ═══════════════════════════════════════════ */
+function solvePressure() {
+  const { program, uniforms } = programs.jacobi;
+  gl.useProgram(program);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, divergenceFBO.texture);
+  gl.uniform1i(uniforms.uDivergence, 1);
+  gl.uniform2fv(uniforms.uTexelSize, simTexelSize);
+
+  for (let i = 0; i < JACOBI_ITERATIONS; i++) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
+    gl.uniform1i(uniforms.uPressure, 0);
+
+    blit(pressure.write);
+    pressure.swap();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Gradient subtraction
+   ═══════════════════════════════════════════ */
+function subtractGradient() {
+  const { program, uniforms } = programs.gradientSubtract;
+  gl.useProgram(program);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, pressure.read.texture);
+  gl.uniform1i(uniforms.uPressure, 0);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
+  gl.uniform1i(uniforms.uVelocity, 1);
+
+  gl.uniform2fv(uniforms.uTexelSize, simTexelSize);
+
+  blit(velocity.write);
+  velocity.swap();
+}
+
+/* ═══════════════════════════════════════════
+   Animation loop
    ═══════════════════════════════════════════ */
 function step() {
-  /* Advect velocity through itself */
+  /* 1. Advect velocity through itself */
   advect(velocity, velocity, velocity, simTexelSize, config.velocityDissipation);
 
-  /* Render velocity field to screen as debug vis (temporary) */
+  /* 2. Pressure projection: divergence → clear pressure → Jacobi → gradient subtract */
+  computeDivergence();
+  clearField(pressure, config.pressureDissipation);
+  solvePressure();
+  subtractGradient();
+
+  /* 3. Render velocity to screen (temporary debug) */
   const { program, uniforms } = programs.display;
   gl.useProgram(program);
   gl.activeTexture(gl.TEXTURE0);
