@@ -307,3 +307,46 @@ function blit(target) {
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   gl.bindVertexArray(null);
 }
+
+/* ═══════════════════════════════════════════
+   Advection step
+   ═══════════════════════════════════════════ */
+function advect(velocityField, sourceField, targetField, texelSize, dissipation) {
+  const { program, uniforms } = programs.advection;
+  gl.useProgram(program);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, velocityField.read.texture);
+  gl.uniform1i(uniforms.uVelocity, 0);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, sourceField.read.texture);
+  gl.uniform1i(uniforms.uSource, 1);
+
+  gl.uniform2fv(uniforms.uTexelSize, texelSize);
+  gl.uniform1f(uniforms.uDt, config.dt);
+  gl.uniform1f(uniforms.uDissipation, dissipation);
+
+  blit(targetField.write);
+  targetField.swap();
+}
+
+/* ═══════════════════════════════════════════
+   Animation loop (advection only for now)
+   ═══════════════════════════════════════════ */
+function step() {
+  /* Advect velocity through itself */
+  advect(velocity, velocity, velocity, simTexelSize, config.velocityDissipation);
+
+  /* Render velocity field to screen as debug vis (temporary) */
+  const { program, uniforms } = programs.display;
+  gl.useProgram(program);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, velocity.read.texture);
+  gl.uniform1i(uniforms.uTexture, 0);
+  blit(null);
+
+  requestAnimationFrame(step);
+}
+
+requestAnimationFrame(step);
