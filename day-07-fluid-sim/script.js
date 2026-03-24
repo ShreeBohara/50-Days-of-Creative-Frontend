@@ -44,10 +44,10 @@ const JACOBI_ITERATIONS = 20;
 
 const config = {
   viscosity: 0.3,
-  dyeDissipation: 0.985,
+  dyeDissipation: 0.997,
   velocityDissipation: 0.98,
   pressureDissipation: 0.8,
-  splatRadius: 0.3,
+  splatRadius: 0.25,
   splatForce: 6000,
   dt: 1 / 60,
 };
@@ -502,10 +502,10 @@ function processSplats() {
     const color = getTimeColor();
     splat(velocity, s.x, s.y, s.dx, s.dy,
       [s.dx * force, s.dy * force, 0],
-      config.splatRadius / 100);
+      config.splatRadius * config.splatRadius);
     splat(dye, s.x, s.y, s.dx, s.dy,
       [color[0] * 0.6, color[1] * 0.6, color[2] * 0.6],
-      config.splatRadius / 100);
+      config.splatRadius * config.splatRadius);
   }
 }
 
@@ -535,10 +535,10 @@ function randomSplats(count) {
     const color = hslToRgb(Math.random(), 1.0, 0.5);
     splat(velocity, x, y, 0, 0,
       [dx, dy, 0],
-      config.splatRadius / 100);
+      config.splatRadius * config.splatRadius);
     splat(dye, x, y, 0, 0,
       [color[0] * 0.5, color[1] * 0.5, color[2] * 0.5],
-      config.splatRadius / 100);
+      config.splatRadius * config.splatRadius);
   }
 }
 
@@ -551,8 +551,8 @@ viscositySlider.addEventListener('input', () => {
 });
 
 diffusionSlider.addEventListener('input', () => {
-  /* Map 0–100 to dissipation 0.95–1.0 (higher slider = more dye retention) */
-  config.dyeDissipation = 0.95 + (diffusionSlider.value / 100) * 0.05;
+  /* Map 0–100 to dissipation 0.985–1.0 (higher slider = more dye retention) */
+  config.dyeDissipation = 0.985 + (diffusionSlider.value / 100) * 0.015;
   diffusionValue.textContent = (diffusionSlider.value / 100).toFixed(1);
 });
 
@@ -578,8 +578,8 @@ function step() {
   solvePressure();
   subtractGradient();
 
-  /* 3. Advect dye through velocity field */
-  advect(velocity, dye, dye, dyeTexelSize, config.dyeDissipation);
+  /* 3. Advect dye through velocity field (use simTexelSize since velocity is on sim grid) */
+  advect(velocity, dye, dye, simTexelSize, config.dyeDissipation);
 
   /* 4. Render dye color field to screen */
   const { program, uniforms } = programs.display;
