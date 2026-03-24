@@ -563,6 +563,13 @@ randomSplatsBtn.addEventListener('click', () => randomSplats(Math.floor(5 + Math
 randomSplats(6);
 
 /* ═══════════════════════════════════════════
+   Responsive resize
+   ═══════════════════════════════════════════ */
+window.addEventListener('resize', () => {
+  resizeCanvas();
+});
+
+/* ═══════════════════════════════════════════
    Animation loop
    ═══════════════════════════════════════════ */
 function step() {
