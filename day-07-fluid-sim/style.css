@@ -1,0 +1,26 @@
+/* ── Day 07 · Fluid Simulation ── */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-deep: #030311;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #e8e6f0;
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --accent: #7b6ff0;
+  --accent-glow: rgba(123, 111, 240, 0.35);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
