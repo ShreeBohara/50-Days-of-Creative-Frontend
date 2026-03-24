@@ -463,14 +463,19 @@ canvas.addEventListener('pointermove', (e) => {
   pointer.dy = pointer.y - pointer.prevY;
   pointer.moved = true;
 
-  if (pointer.down) {
-    splatQueue.push({
-      x: pointer.x / canvas.clientWidth,
-      y: 1.0 - pointer.y / canvas.clientHeight,
-      dx: pointer.dx,
-      dy: -pointer.dy,
-    });
-  }
+  /* Skip tiny sub-pixel movements */
+  const dist = Math.sqrt(pointer.dx * pointer.dx + pointer.dy * pointer.dy);
+  if (dist < 0.5) return;
+
+  /* Click-drag = full strength, hover = gentle touch */
+  const strength = pointer.down ? 1.0 : 0.15;
+  splatQueue.push({
+    x: pointer.x / canvas.clientWidth,
+    y: 1.0 - pointer.y / canvas.clientHeight,
+    dx: pointer.dx,
+    dy: -pointer.dy,
+    strength,
+  });
 });
 
 window.addEventListener('pointerup', () => { pointer.down = false; });
@@ -498,14 +503,16 @@ function getTimeColor() {
 function processSplats() {
   while (splatQueue.length > 0) {
     const s = splatQueue.pop();
-    const force = config.splatForce;
+    const str = s.strength ?? 1.0;
+    const force = config.splatForce * str;
     const color = getTimeColor();
+    const radius = config.splatRadius * config.splatRadius * (0.5 + 0.5 * str);
     splat(velocity, s.x, s.y, s.dx, s.dy,
       [s.dx * force, s.dy * force, 0],
-      config.splatRadius * config.splatRadius);
+      radius);
     splat(dye, s.x, s.y, s.dx, s.dy,
-      [color[0] * 0.6, color[1] * 0.6, color[2] * 0.6],
-      config.splatRadius * config.splatRadius);
+      [color[0] * 0.6 * str, color[1] * 0.6 * str, color[2] * 0.6 * str],
+      radius);
   }
 }
 
