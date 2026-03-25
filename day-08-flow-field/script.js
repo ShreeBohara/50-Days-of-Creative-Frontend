@@ -83,3 +83,39 @@ function noise3D(x, y, z) {
     w
   );
 }
+
+/* ─── Configuration ─────────────────────────────── */
+
+const config = {
+  noiseScale: 0.005,
+  noiseSpeed: 0.0003,
+  cellSize: 20,
+  particleCount: 3000,
+  particleSpeed: 2,
+  trailAlpha: 0.03,
+};
+
+/* ─── Flow Field ────────────────────────────────── */
+
+let cols, rows;
+let flowField = [];
+
+function initFlowField() {
+  cols = Math.ceil(canvas.width / config.cellSize) + 1;
+  rows = Math.ceil(canvas.height / config.cellSize) + 1;
+  flowField = new Float32Array(cols * rows);
+  updateFlowField(0);
+}
+
+function updateFlowField(time) {
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = col * config.noiseScale * config.cellSize;
+      const y = row * config.noiseScale * config.cellSize;
+      const n = noise3D(x, y, time * config.noiseSpeed);
+      flowField[col + row * cols] = n * Math.PI * 2;
+    }
+  }
+}
+
+initFlowField();
