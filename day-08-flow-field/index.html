@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 08 | Flow Field</title>
+    <meta
+      name="description"
+      content="Perlin noise flow field generative art with particle trails and curated color palettes."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="flow-page">
+      <canvas data-canvas aria-label="Generative flow field canvas"></canvas>
+
+      <section class="overlay" aria-label="Flow field info and controls">
+        <header class="hero-copy" data-hero>
+          <p class="eyebrow">Day 08 / Creative Frontend</p>
+          <h1>Flow Field</h1>
+          <p class="tagline">Click anywhere. Watch noise become art.</p>
+        </header>
+
+        <div class="control-bar" data-controls>
+          <div class="control-group">
+            <label class="slider-label" for="noise-scale-slider">
+              <span>Noise Scale</span>
+              <output data-noise-scale-value>0.005</output>
+            </label>
+            <input
+              id="noise-scale-slider"
+              type="range"
+              min="1"
+              max="100"
+              value="50"
+              data-noise-scale
+              aria-label="Noise scale"
+            />
+          </div>
+
+          <div class="control-group">
+            <label class="slider-label" for="noise-speed-slider">
+              <span>Flow Speed</span>
+              <output data-noise-speed-value>0.3</output>
+            </label>
+            <input
+              id="noise-speed-slider"
+              type="range"
+              min="0"
+              max="100"
+              value="30"
+              data-noise-speed
+              aria-label="Noise evolution speed"
+            />
+          </div>
+
+          <div class="control-group">
+            <label class="slider-label" for="particle-count-slider">
+              <span>Particles</span>
+              <output data-particle-count-value>3000</output>
+            </label>
+            <input
+              id="particle-count-slider"
+              type="range"
+              min="500"
+              max="5000"
+              value="3000"
+              step="100"
+              data-particle-count
+              aria-label="Particle count"
+            />
+          </div>
+
+          <div class="control-group">
+            <label class="slider-label" for="palette-select">
+              <span>Palette</span>
+            </label>
+            <select id="palette-select" data-palette aria-label="Color palette">
+              <option value="ocean">Ocean</option>
+              <option value="sunset">Sunset</option>
+              <option value="neon">Neon</option>
+              <option value="monochrome">Monochrome</option>
+            </select>
+          </div>
+
+          <div class="control-group control-group--buttons">
+            <button type="button" class="btn" data-clear aria-label="Clear canvas">
+              Clear
+            </button>
+            <button type="button" class="btn btn--accent" data-save aria-label="Save as PNG">
+              Save PNG
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
