@@ -119,3 +119,100 @@ function updateFlowField(time) {
 }
 
 initFlowField();
+
+/* ─── Particle System ───────────────────────────── */
+
+let particles = [];
+
+function createParticle(x, y) {
+  const p = {
+    x: x ?? Math.random() * canvas.width,
+    y: y ?? Math.random() * canvas.height,
+    prevX: 0,
+    prevY: 0,
+    vx: 0,
+    vy: 0,
+    speed: 1 + Math.random() * config.particleSpeed,
+    color: 'rgba(255, 255, 255, 0.5)',
+    life: 0,
+    maxLife: 200 + Math.random() * 300,
+  };
+  p.prevX = p.x;
+  p.prevY = p.y;
+  return p;
+}
+
+function initParticles(count) {
+  particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push(createParticle());
+  }
+}
+
+function respawnParticle(p) {
+  p.x = Math.random() * canvas.width;
+  p.y = Math.random() * canvas.height;
+  p.prevX = p.x;
+  p.prevY = p.y;
+  p.vx = 0;
+  p.vy = 0;
+  p.life = 0;
+  p.maxLife = 200 + Math.random() * 300;
+}
+
+function updateParticle(p) {
+  p.prevX = p.x;
+  p.prevY = p.y;
+
+  const col = Math.floor(p.x / config.cellSize);
+  const row = Math.floor(p.y / config.cellSize);
+
+  if (col < 0 || col >= cols || row < 0 || row >= rows) {
+    respawnParticle(p);
+    return;
+  }
+
+  const angle = flowField[col + row * cols];
+  p.vx += Math.cos(angle) * 0.5;
+  p.vy += Math.sin(angle) * 0.5;
+
+  p.x += p.vx * p.speed;
+  p.y += p.vy * p.speed;
+
+  p.vx *= 0.98;
+  p.vy *= 0.98;
+
+  p.life++;
+
+  if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height || p.life > p.maxLife) {
+    respawnParticle(p);
+  }
+}
+
+/* ─── Animation Loop ────────────────────────────── */
+
+let animTime = 0;
+
+function animate() {
+  animTime++;
+  updateFlowField(animTime);
+
+  for (const p of particles) {
+    updateParticle(p);
+    ctx.beginPath();
+    ctx.moveTo(p.prevX, p.prevY);
+    ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+
+  requestAnimationFrame(animate);
+}
+
+/* ─── Init ──────────────────────────────────────── */
+
+ctx.fillStyle = 'rgb(5, 5, 16)';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+initParticles(config.particleCount);
+animate();
