@@ -267,6 +267,75 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+/* ─── Interactions ──────────────────────────────── */
+
+let heroVisible = true;
+
+function hideHero() {
+  if (!heroVisible) return;
+  heroVisible = false;
+  hero.classList.add('hidden');
+}
+
+/* Click to burst particles */
+canvas.addEventListener('click', (e) => {
+  hideHero();
+  const burstCount = 200;
+  for (let i = 0; i < burstCount; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = Math.random() * 50;
+    const p = createParticle(
+      e.clientX + Math.cos(angle) * radius,
+      e.clientY + Math.sin(angle) * radius
+    );
+    p.vx = Math.cos(angle) * (1 + Math.random() * 2);
+    p.vy = Math.sin(angle) * (1 + Math.random() * 2);
+    particles.push(p);
+  }
+  /* Trim excess particles */
+  if (particles.length > config.particleCount + 500) {
+    particles.splice(0, particles.length - config.particleCount);
+  }
+});
+
+/* Noise scale slider */
+noiseScaleSlider.addEventListener('input', () => {
+  config.noiseScale = 0.001 + (noiseScaleSlider.value / 100) * 0.009;
+  noiseScaleOutput.textContent = config.noiseScale.toFixed(4);
+});
+
+/* Noise speed slider */
+noiseSpeedSlider.addEventListener('input', () => {
+  config.noiseSpeed = (noiseSpeedSlider.value / 100) * 0.001;
+  noiseSpeedOutput.textContent = config.noiseSpeed.toFixed(4);
+});
+
+/* Particle count slider */
+particleCountSlider.addEventListener('input', () => {
+  const target = parseInt(particleCountSlider.value, 10);
+  config.particleCount = target;
+  particleCountOutput.textContent = target;
+  if (particles.length < target) {
+    while (particles.length < target) particles.push(createParticle());
+  } else if (particles.length > target) {
+    particles.length = target;
+  }
+});
+
+/* Palette dropdown */
+paletteSelect.addEventListener('change', () => {
+  currentPalette = paletteSelect.value;
+  recolorParticles();
+});
+
+/* Clear button */
+clearBtn.addEventListener('click', () => {
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = 'rgb(5, 5, 16)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  initParticles(config.particleCount);
+});
+
 /* ─── Init ──────────────────────────────────────── */
 
 ctx.fillStyle = 'rgb(5, 5, 16)';
