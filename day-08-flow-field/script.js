@@ -197,13 +197,22 @@ function animate() {
   animTime++;
   updateFlowField(animTime);
 
+  /* Fade existing trails */
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = `rgba(5, 5, 16, ${config.trailAlpha})`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  /* Draw particles with additive blending for glow */
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 0.8;
+
   for (const p of particles) {
     updateParticle(p);
     ctx.beginPath();
     ctx.moveTo(p.prevX, p.prevY);
     ctx.lineTo(p.x, p.y);
     ctx.strokeStyle = p.color;
-    ctx.lineWidth = 0.8;
     ctx.stroke();
   }
 
