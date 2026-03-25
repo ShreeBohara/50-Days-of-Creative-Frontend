@@ -336,6 +336,14 @@ clearBtn.addEventListener('click', () => {
   initParticles(config.particleCount);
 });
 
+/* Save as PNG */
+saveBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'flow-field.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
 /* ─── Init ──────────────────────────────────────── */
 
 ctx.fillStyle = 'rgb(5, 5, 16)';
