@@ -120,6 +120,54 @@ function updateFlowField(time) {
 
 initFlowField();
 
+/* ─── Color Palettes ────────────────────────────── */
+
+const PALETTES = {
+  ocean: [
+    'rgba(0, 180, 216, 0.5)',
+    'rgba(0, 119, 182, 0.5)',
+    'rgba(144, 224, 239, 0.4)',
+    'rgba(202, 240, 248, 0.35)',
+    'rgba(3, 4, 94, 0.6)',
+    'rgba(72, 202, 228, 0.45)',
+  ],
+  sunset: [
+    'rgba(255, 107, 107, 0.5)',
+    'rgba(255, 159, 28, 0.5)',
+    'rgba(214, 40, 118, 0.5)',
+    'rgba(255, 128, 8, 0.45)',
+    'rgba(176, 42, 55, 0.55)',
+    'rgba(255, 195, 113, 0.4)',
+  ],
+  neon: [
+    'rgba(255, 0, 110, 0.5)',
+    'rgba(0, 245, 212, 0.5)',
+    'rgba(184, 255, 0, 0.45)',
+    'rgba(148, 0, 255, 0.5)',
+    'rgba(255, 230, 0, 0.45)',
+    'rgba(0, 180, 255, 0.45)',
+  ],
+  monochrome: [
+    'rgba(255, 255, 255, 0.5)',
+    'rgba(200, 200, 210, 0.45)',
+    'rgba(160, 160, 175, 0.4)',
+    'rgba(120, 120, 140, 0.35)',
+    'rgba(230, 230, 240, 0.5)',
+    'rgba(180, 180, 195, 0.4)',
+  ],
+};
+
+let currentPalette = 'ocean';
+
+function randomColor() {
+  const pal = PALETTES[currentPalette];
+  return pal[Math.floor(Math.random() * pal.length)];
+}
+
+function recolorParticles() {
+  for (const p of particles) p.color = randomColor();
+}
+
 /* ─── Particle System ───────────────────────────── */
 
 let particles = [];
@@ -133,7 +181,7 @@ function createParticle(x, y) {
     vx: 0,
     vy: 0,
     speed: 1 + Math.random() * config.particleSpeed,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: randomColor(),
     life: 0,
     maxLife: 200 + Math.random() * 300,
   };
