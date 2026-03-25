@@ -344,6 +344,27 @@ saveBtn.addEventListener('click', () => {
   link.click();
 });
 
+/* ─── Resize Handling ───────────────────────────── */
+
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  initFlowField();
+
+  for (const p of particles) {
+    if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+      p.x = Math.random() * canvas.width;
+      p.y = Math.random() * canvas.height;
+      p.prevX = p.x;
+      p.prevY = p.y;
+      p.vx = 0;
+      p.vy = 0;
+    }
+  }
+
+  ctx.fillStyle = 'rgb(5, 5, 16)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+});
+
 /* ─── Init ──────────────────────────────────────── */
 
 ctx.fillStyle = 'rgb(5, 5, 16)';
