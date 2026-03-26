@@ -175,5 +175,27 @@ const scrollObserver = new IntersectionObserver(
 
 scrollObserver.observe(dom.sentinel);
 
+/* ═══════════════════════════════════════════
+   Hover Overlay Interactions
+   ═══════════════════════════════════════════ */
+
+/* Delegate click events on the masonry container */
+dom.masonry.addEventListener('click', (e) => {
+  /* Heart button */
+  const heartBtn = e.target.closest('[data-heart]');
+  if (heartBtn) {
+    e.stopPropagation();
+    heartBtn.classList.toggle('liked');
+    return;
+  }
+
+  /* Download button — let the <a> default handle it */
+  const dlBtn = e.target.closest('.download-btn');
+  if (dlBtn) {
+    e.stopPropagation();
+    return;
+  }
+});
+
 /* ── Initial Load ─────────────────────────── */
 fetchBatch();
