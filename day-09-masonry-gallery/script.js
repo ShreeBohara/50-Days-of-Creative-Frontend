@@ -280,5 +280,25 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') navigateLightbox(1);
 });
 
+/* ── Touch Swipe Support (Lightbox) ───────── */
+let touchStartX = 0;
+let touchStartY = 0;
+
+lightboxEls.wrap.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].clientX;
+  touchStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+
+lightboxEls.wrap.addEventListener('touchend', (e) => {
+  if (lightboxIndex < 0) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+
+  /* Only trigger if horizontal swipe dominates */
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    navigateLightbox(dx < 0 ? 1 : -1);
+  }
+}, { passive: true });
+
 /* ── Initial Load ─────────────────────────── */
 fetchBatch();

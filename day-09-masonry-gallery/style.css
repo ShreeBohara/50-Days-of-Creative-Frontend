@@ -547,3 +547,43 @@ img {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+/* ═══════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════ */
+
+/* Tablet — 3 columns */
+@media (max-width: 1199px) {
+  .masonry { columns: 3; }
+}
+
+/* Small tablet — 2 columns */
+@media (max-width: 767px) {
+  .masonry { columns: 2; column-gap: 12px; }
+
+  .gallery-main { padding: 12px clamp(0.75rem, 2vw, 1rem) 3rem; }
+
+  .card { margin-bottom: 12px; }
+
+  .header-center { display: none; }
+  .col-toggle { display: none; }
+
+  .site-header { height: 52px; }
+  .eyebrow { font-size: 0.58rem; }
+
+  /* Lightbox adjustments */
+  .lightbox-content { padding: 1rem; }
+  .lightbox-img { max-width: 96vw; max-height: 80vh; }
+  .lightbox-nav { width: 36px; height: 36px; }
+  .lightbox-prev { margin-right: 0.4rem; }
+  .lightbox-next { margin-left: 0.4rem; }
+  .lightbox-footer { padding: 0.4rem 1rem; gap: 1rem; }
+}
+
+/* Small phone — 1 column */
+@media (max-width: 479px) {
+  .masonry { columns: 1; }
+
+  .lightbox-nav { width: 30px; height: 30px; }
+  .lightbox-nav svg { width: 20px; height: 20px; }
+}
