@@ -129,5 +129,24 @@ async function fetchBatch() {
   }
 }
 
+/* ═══════════════════════════════════════════
+   Infinite Scroll — Intersection Observer
+   ═══════════════════════════════════════════ */
+
+const scrollObserver = new IntersectionObserver(
+  (entries) => {
+    if (entries[0].isIntersecting && !state.loading) {
+      fetchBatch();
+    }
+  },
+  {
+    root: null,
+    rootMargin: '0px 0px 600px 0px',
+    threshold: 0,
+  }
+);
+
+scrollObserver.observe(dom.sentinel);
+
 /* ── Initial Load ─────────────────────────── */
 fetchBatch();
