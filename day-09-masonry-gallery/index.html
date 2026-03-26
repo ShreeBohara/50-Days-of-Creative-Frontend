@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Infinite scroll masonry gallery with lightbox, powered by Intersection Observer and picsum.photos"
+    />
+    <meta name="theme-color" content="#0a0a0f" />
+    <title>Day 09 | Masonry Gallery</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="gallery-app" data-app>
+      <!-- Sticky header -->
+      <header class="site-header" data-header></header>
+
+      <!-- Main gallery area -->
+      <main class="gallery-main" data-gallery-main>
+        <div class="masonry" data-masonry></div>
+        <div class="scroll-sentinel" data-sentinel aria-hidden="true"></div>
+        <div class="loader" data-loader aria-label="Loading more images"></div>
+      </main>
+
+      <!-- Lightbox overlay -->
+      <div
+        class="lightbox"
+        data-lightbox
+        aria-hidden="true"
+        role="dialog"
+        aria-label="Image viewer"
+      ></div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
