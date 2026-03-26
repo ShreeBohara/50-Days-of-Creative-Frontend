@@ -207,6 +207,7 @@ img {
 
 /* ── Card ─────────────────────────────────── */
 .card {
+  --stagger: 0ms;
   break-inside: avoid;
   margin-bottom: 16px;
   border-radius: var(--radius-md);
@@ -215,11 +216,21 @@ img {
   box-shadow: var(--shadow-card);
   cursor: pointer;
   position: relative;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+
+  /* Entry animation — start hidden */
+  opacity: 0;
+  transform: translateY(28px) scale(0.96);
+}
+
+.card.in-view {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--stagger),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--stagger),
               box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.card:hover {
+.card.in-view:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: var(--shadow-hover);
 }

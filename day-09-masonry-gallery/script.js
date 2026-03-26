@@ -94,9 +94,36 @@ function createCard(img, index) {
   imgEl.addEventListener('load', () => card.classList.add('loaded'));
   imgEl.addEventListener('error', () => card.classList.add('loaded'));
 
+  /* Stagger delay for wave effect within each batch */
+  card.style.setProperty('--stagger', `${index * 60}ms`);
+
   dom.masonry.appendChild(card);
+
+  /* Observe for viewport entry animation */
+  entryObserver.observe(card);
+
   return card;
 }
+
+/* ═══════════════════════════════════════════
+   Viewport Entry Animations
+   ═══════════════════════════════════════════ */
+
+const entryObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        entryObserver.unobserve(entry.target);
+      }
+    });
+  },
+  {
+    root: null,
+    rootMargin: '0px 0px -40px 0px',
+    threshold: 0.05,
+  }
+);
 
 /** Fetch a batch of images from the picsum API */
 async function fetchBatch() {
