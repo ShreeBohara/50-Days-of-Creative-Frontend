@@ -300,5 +300,55 @@ lightboxEls.wrap.addEventListener('touchend', (e) => {
   }
 }, { passive: true });
 
+/* ═══════════════════════════════════════════
+   Column Toggle
+   ═══════════════════════════════════════════ */
+
+const colToggle = $('[data-col-toggle]');
+if (colToggle) {
+  colToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-col]');
+    if (!btn) return;
+    const count = parseInt(btn.dataset.col, 10);
+
+    /* Smooth visual transition */
+    dom.masonry.style.opacity = '0.6';
+    requestAnimationFrame(() => {
+      dom.masonry.style.columns = count;
+      requestAnimationFrame(() => {
+        dom.masonry.style.opacity = '1';
+      });
+    });
+
+    /* Update active button */
+    colToggle.querySelectorAll('.col-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+}
+
+/* ═══════════════════════════════════════════
+   Header Scroll Effects
+   ═══════════════════════════════════════════ */
+
+/* Shadow on scroll */
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      dom.header.classList.toggle('scrolled', window.scrollY > 10);
+      ticking = false;
+    });
+    ticking = true;
+  }
+}, { passive: true });
+
+/* Click title to scroll to top */
+const titleEl = $('[data-scroll-top]');
+if (titleEl) {
+  titleEl.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 /* ── Initial Load ─────────────────────────── */
 fetchBatch();

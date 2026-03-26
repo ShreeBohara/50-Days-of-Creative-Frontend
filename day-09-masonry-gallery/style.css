@@ -187,6 +187,7 @@ img {
 .masonry {
   columns: 4;
   column-gap: 16px;
+  transition: opacity 0.25s ease;
 }
 
 /* ── Scroll Sentinel ──────────────────────── */
