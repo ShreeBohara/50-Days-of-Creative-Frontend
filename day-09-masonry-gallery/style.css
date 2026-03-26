@@ -204,3 +204,172 @@ img {
 .loader.active {
   display: block;
 }
+
+/* ── Card ─────────────────────────────────── */
+.card {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ── Card Image Wrapper ───────────────────── */
+.card-image-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.card-image-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .card-image-wrap img {
+  transform: scale(1.04);
+}
+
+/* ── Skeleton Placeholder ─────────────────── */
+.skeleton {
+  position: absolute;
+  inset: 0;
+  background: var(--skeleton-base);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  z-index: 2;
+  transition: opacity 0.4s ease;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--skeleton-shine) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes shimmer {
+  to { transform: translateX(100%); }
+}
+
+.card.loaded .skeleton {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Card Overlay (hover) ─────────────────── */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.18) 45%,
+    transparent 100%
+  );
+  opacity: 0;
+  z-index: 3;
+  transition: opacity 0.3s ease;
+  border-radius: var(--radius-md);
+}
+
+.card:hover .card-overlay {
+  opacity: 1;
+}
+
+.card-overlay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-dim {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.03em;
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Action Buttons ───────────────────────── */
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.85);
+  transition: background 0.2s, transform 0.2s, color 0.2s;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.1);
+}
+
+.action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Loader Skeletons ─────────────────────── */
+.loader-skeleton {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.loader-bone {
+  width: 100%;
+  max-width: 200px;
+  height: 180px;
+  border-radius: var(--radius-md);
+  background: var(--skeleton-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.loader-bone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--skeleton-shine) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+  transform: translateX(-100%);
+}
