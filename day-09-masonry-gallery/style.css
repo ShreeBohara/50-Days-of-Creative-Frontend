@@ -83,3 +83,124 @@ img {
   display: block;
   max-width: 100%;
 }
+
+/* ── Sticky Header ────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  transition: box-shadow 0.3s ease;
+}
+
+.site-header.scrolled {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.header-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.image-counter {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* ── Column Toggle ────────────────────────── */
+.col-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+}
+
+.col-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  transition: color 0.2s, background 0.2s;
+}
+
+.col-btn:hover {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.col-btn.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* ── Gallery Main ─────────────────────────── */
+.gallery-main {
+  padding: 16px clamp(1rem, 3vw, 2rem) 4rem;
+}
+
+/* ── Masonry Grid ─────────────────────────── */
+.masonry {
+  columns: 4;
+  column-gap: 16px;
+}
+
+/* ── Scroll Sentinel ──────────────────────── */
+.scroll-sentinel {
+  height: 1px;
+}
+
+/* ── Loader ───────────────────────────────── */
+.loader {
+  display: none;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.loader.active {
+  display: block;
+}
