@@ -195,6 +195,89 @@ dom.masonry.addEventListener('click', (e) => {
     e.stopPropagation();
     return;
   }
+
+  /* Card click → open lightbox */
+  const card = e.target.closest('.card');
+  if (card) {
+    const idx = parseInt(card.dataset.index, 10);
+    if (!isNaN(idx)) openLightbox(idx);
+  }
+});
+
+/* ═══════════════════════════════════════════
+   Lightbox
+   ═══════════════════════════════════════════ */
+
+const lightboxEls = {
+  wrap:    $('[data-lightbox]'),
+  backdrop: $('[data-lightbox-backdrop]'),
+  img:     $('[data-lightbox-img]'),
+  close:   $('[data-lightbox-close]'),
+  prev:    $('[data-lightbox-prev]'),
+  next:    $('[data-lightbox-next]'),
+  author:  $('[data-lightbox-author]'),
+  counter: $('[data-lightbox-counter]'),
+};
+
+let lightboxIndex = -1;
+
+function openLightbox(index) {
+  lightboxIndex = index;
+  updateLightboxImage();
+  lightboxEls.wrap.classList.add('open');
+  lightboxEls.wrap.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightboxEls.wrap.classList.remove('open');
+  lightboxEls.wrap.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  lightboxIndex = -1;
+}
+
+function navigateLightbox(dir) {
+  if (state.images.length === 0) return;
+  lightboxIndex = (lightboxIndex + dir + state.images.length) % state.images.length;
+  updateLightboxImage();
+}
+
+function updateLightboxImage() {
+  const img = state.images[lightboxIndex];
+  if (!img) return;
+
+  /* Use a larger size for lightbox */
+  const lbWidth = Math.min(img.width, 1400);
+  const lbHeight = Math.round((img.height / img.width) * lbWidth);
+  lightboxEls.img.src = `${CONFIG.apiBase}/id/${img.id}/${lbWidth}/${lbHeight}`;
+  lightboxEls.img.alt = `Photo by ${img.author}`;
+  lightboxEls.author.textContent = img.author;
+  lightboxEls.counter.textContent = `${lightboxIndex + 1} / ${state.images.length}`;
+
+  /* Preload adjacent images */
+  [-1, 1].forEach((offset) => {
+    const adjIdx = (lightboxIndex + offset + state.images.length) % state.images.length;
+    const adj = state.images[adjIdx];
+    if (adj) {
+      const pre = new Image();
+      const pw = Math.min(adj.width, 1400);
+      const ph = Math.round((adj.height / adj.width) * pw);
+      pre.src = `${CONFIG.apiBase}/id/${adj.id}/${pw}/${ph}`;
+    }
+  });
+}
+
+/* Lightbox event listeners */
+lightboxEls.close.addEventListener('click', closeLightbox);
+lightboxEls.backdrop.addEventListener('click', closeLightbox);
+lightboxEls.prev.addEventListener('click', () => navigateLightbox(-1));
+lightboxEls.next.addEventListener('click', () => navigateLightbox(1));
+
+document.addEventListener('keydown', (e) => {
+  if (lightboxIndex < 0) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navigateLightbox(-1);
+  if (e.key === 'ArrowRight') navigateLightbox(1);
 });
 
 /* ── Initial Load ─────────────────────────── */
