@@ -399,5 +399,25 @@ searchClear.addEventListener('click', () => {
   searchInput.focus();
 });
 
+/* === Category Filter === */
+const catFilters = $('[data-category-filters]');
+const catBtns = $$('.cat-btn', catFilters);
+
+catFilters.addEventListener('click', (e) => {
+  const btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+
+  const cat = btn.dataset.cat;
+
+  if (cat === state.activeCategory && cat !== 'all') {
+    state.activeCategory = 'all';
+  } else {
+    state.activeCategory = cat;
+  }
+
+  catBtns.forEach(b => b.classList.toggle('active', b.dataset.cat === state.activeCategory));
+  updateFilters();
+});
+
 /* === Init === */
 renderTable();
