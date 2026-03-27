@@ -419,5 +419,50 @@ catFilters.addEventListener('click', (e) => {
   updateFilters();
 });
 
+/* === Temperature Slider === */
+const tempSlider = $('[data-temp-slider]');
+const tempDisplay = $('[data-temp-display]');
+const tempPresets = $$('[data-temp-preset]');
+
+function getStateClass(el, temp) {
+  if (el.melt == null && el.boil == null) return 'unknown';
+  if (el.melt != null && temp < el.melt) return 'solid';
+  if (el.boil != null && temp >= el.boil) return 'gas';
+  if (el.melt != null && el.boil != null) return 'liquid';
+  return 'unknown';
+}
+
+function updateTemperature(temp) {
+  state.temperature = temp;
+  tempDisplay.textContent = temp + ' K';
+  tempSlider.value = temp;
+
+  tempPresets.forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.tempPreset) === temp);
+  });
+
+  for (const el of ELEMENTS) {
+    const cell = cellMap.get(el.number);
+    if (!cell) continue;
+    let dot = cell.querySelector('.state-dot');
+    if (!dot) {
+      dot = document.createElement('span');
+      dot.className = 'state-dot';
+      cell.appendChild(dot);
+    }
+    dot.className = 'state-dot ' + getStateClass(el, temp);
+  }
+}
+
+tempSlider.addEventListener('input', () => {
+  updateTemperature(Number(tempSlider.value));
+});
+
+document.querySelector('.temp-presets').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-temp-preset]');
+  if (btn) updateTemperature(Number(btn.dataset.tempPreset));
+});
+
 /* === Init === */
 renderTable();
+updateTemperature(293);

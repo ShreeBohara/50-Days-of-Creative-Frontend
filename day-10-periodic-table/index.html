@@ -41,6 +41,18 @@
         </div>
       </header>
 
+      <!-- Temperature control -->
+      <div class="temp-control" data-temp-control>
+        <label class="temp-label">Temperature</label>
+        <input type="range" class="temp-slider" data-temp-slider min="100" max="6000" value="293" step="1" />
+        <span class="temp-display" data-temp-display>293 K</span>
+        <div class="temp-presets">
+          <button class="temp-preset" data-temp-preset="77">77 K</button>
+          <button class="temp-preset active" data-temp-preset="293">293 K</button>
+          <button class="temp-preset" data-temp-preset="5778">5778 K</button>
+        </div>
+      </div>
+
       <!-- Category filters -->
       <div class="category-filters" data-category-filters>
         <button class="cat-btn active" data-cat="all">All</button>

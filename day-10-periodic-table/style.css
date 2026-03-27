@@ -631,3 +631,131 @@ body {
 .cat-btn[data-cat="all"] {
   --btn-color: var(--text-primary);
 }
+
+/* === Temperature Control === */
+.temp-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.temp-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.temp-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 180px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #4a9ef5 0%, #a29bfe 25%, #fd9644 60%, #ff6b6b 100%);
+  outline: none;
+  cursor: pointer;
+}
+
+.temp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 8px rgba(162, 155, 254, 0.4);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.temp-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px rgba(162, 155, 254, 0.6);
+}
+
+.temp-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-deep);
+  box-shadow: 0 0 8px rgba(162, 155, 254, 0.4);
+  cursor: pointer;
+}
+
+.temp-display {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 60px;
+  text-align: center;
+}
+
+.temp-presets {
+  display: flex;
+  gap: 4px;
+}
+
+.temp-preset {
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.temp-preset:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.temp-preset.active {
+  color: var(--text-primary);
+  border-color: rgba(162, 155, 254, 0.4);
+  background: rgba(162, 155, 254, 0.1);
+}
+
+/* === State indicators on cells === */
+.element-cell .state-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.element-cell .state-dot.solid {
+  background: var(--text-primary);
+}
+
+.element-cell .state-dot.liquid {
+  background: var(--cat-color, #4a9ef5);
+  box-shadow: 0 0 4px var(--cat-color, #4a9ef5);
+}
+
+.element-cell .state-dot.gas {
+  background: transparent;
+  border: 1px solid var(--text-secondary);
+}
+
+.element-cell .state-dot.unknown {
+  width: 5px;
+  height: 1px;
+  border-radius: 0;
+  background: var(--text-muted);
+}
