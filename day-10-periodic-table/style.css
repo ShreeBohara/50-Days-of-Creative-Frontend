@@ -206,3 +206,67 @@ body {
   color: var(--text-muted);
   letter-spacing: 0.04em;
 }
+
+/* === Category Color Coding === */
+.element-cell[data-category="alkali-metal"] {
+  --cat-color: var(--cat-alkali-metal);
+  background: linear-gradient(135deg, rgba(232, 67, 147, 0.18), rgba(232, 67, 147, 0.06));
+  border-color: rgba(232, 67, 147, 0.25);
+}
+.element-cell[data-category="alkaline-earth"] {
+  --cat-color: var(--cat-alkaline-earth);
+  background: linear-gradient(135deg, rgba(253, 150, 68, 0.18), rgba(253, 150, 68, 0.06));
+  border-color: rgba(253, 150, 68, 0.25);
+}
+.element-cell[data-category="transition-metal"] {
+  --cat-color: var(--cat-transition-metal);
+  background: linear-gradient(135deg, rgba(74, 158, 245, 0.18), rgba(74, 158, 245, 0.06));
+  border-color: rgba(74, 158, 245, 0.25);
+}
+.element-cell[data-category="post-transition"] {
+  --cat-color: var(--cat-post-transition);
+  background: linear-gradient(135deg, rgba(38, 198, 218, 0.18), rgba(38, 198, 218, 0.06));
+  border-color: rgba(38, 198, 218, 0.25);
+}
+.element-cell[data-category="metalloid"] {
+  --cat-color: var(--cat-metalloid);
+  background: linear-gradient(135deg, rgba(46, 213, 115, 0.18), rgba(46, 213, 115, 0.06));
+  border-color: rgba(46, 213, 115, 0.25);
+}
+.element-cell[data-category="nonmetal"] {
+  --cat-color: var(--cat-nonmetal);
+  background: linear-gradient(135deg, rgba(162, 155, 254, 0.18), rgba(162, 155, 254, 0.06));
+  border-color: rgba(162, 155, 254, 0.25);
+}
+.element-cell[data-category="halogen"] {
+  --cat-color: var(--cat-halogen);
+  background: linear-gradient(135deg, rgba(254, 202, 87, 0.18), rgba(254, 202, 87, 0.06));
+  border-color: rgba(254, 202, 87, 0.25);
+}
+.element-cell[data-category="noble-gas"] {
+  --cat-color: var(--cat-noble-gas);
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.18), rgba(255, 107, 107, 0.06));
+  border-color: rgba(255, 107, 107, 0.25);
+}
+.element-cell[data-category="lanthanide"] {
+  --cat-color: var(--cat-lanthanide);
+  background: linear-gradient(135deg, rgba(243, 104, 224, 0.18), rgba(243, 104, 224, 0.06));
+  border-color: rgba(243, 104, 224, 0.25);
+}
+.element-cell[data-category="actinide"] {
+  --cat-color: var(--cat-actinide);
+  background: linear-gradient(135deg, rgba(255, 159, 243, 0.18), rgba(255, 159, 243, 0.06));
+  border-color: rgba(255, 159, 243, 0.25);
+}
+
+/* Category accent stripe */
+.element-cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--cat-color, transparent);
+  opacity: 0.6;
+}
