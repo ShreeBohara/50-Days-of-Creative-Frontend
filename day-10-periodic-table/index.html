@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Interactive periodic table with 118 elements, category colors, search, temperature slider, and detailed element modals"
+    />
+    <meta name="theme-color" content="#0a0a0f" />
+    <title>Day 10 | Periodic Table</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600&family=Oxanium:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app" data-app>
+      <!-- Controls header -->
+      <header class="controls" data-controls>
+        <div class="controls-left">
+          <p class="eyebrow">Day 10 / Creative Frontend</p>
+          <h1 class="title">Periodic Table</h1>
+        </div>
+        <div class="controls-right">
+          <!-- Search, filters, temperature — added in later commits -->
+        </div>
+      </header>
+
+      <!-- Table area -->
+      <main class="table-wrapper" data-table-wrapper>
+        <div class="periodic-table" data-table></div>
+      </main>
+
+      <!-- Modal overlay — added in commit 7 -->
+    </div>
+    <script src="./script.js"></script>
+  </body>
+</html>

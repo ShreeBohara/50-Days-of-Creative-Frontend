@@ -1,0 +1,131 @@
+/* === Reset & Base === */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Backgrounds */
+  --bg-deep: #0a0a0f;
+  --bg-surface: #111118;
+  --bg-elevated: #1a1a24;
+  --bg-glass: rgba(17, 17, 24, 0.75);
+
+  /* Text */
+  --text-primary: #f0eef6;
+  --text-secondary: rgba(240, 238, 246, 0.7);
+  --text-muted: rgba(240, 238, 246, 0.4);
+
+  /* Category colors */
+  --cat-alkali-metal: #e84393;
+  --cat-alkaline-earth: #fd9644;
+  --cat-transition-metal: #4a9ef5;
+  --cat-post-transition: #26c6da;
+  --cat-metalloid: #2ed573;
+  --cat-nonmetal: #a29bfe;
+  --cat-halogen: #feca57;
+  --cat-noble-gas: #ff6b6b;
+  --cat-lanthanide: #f368e0;
+  --cat-actinide: #ff9ff3;
+
+  /* Glass */
+  --glass-border: rgba(240, 238, 246, 0.08);
+  --glass-blur: 16px;
+
+  /* Sizing */
+  --cell-size: clamp(42px, 4vw, 64px);
+  --cell-gap: 3px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  /* Fonts */
+  --font-display: 'Oxanium', cursive;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+
+  color-scheme: dark;
+}
+
+html {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(74, 158, 245, 0.03) 0%, transparent 70%),
+    repeating-radial-gradient(
+      circle at 0 0,
+      transparent 0,
+      transparent 9px,
+      rgba(240, 238, 246, 0.012) 9px,
+      rgba(240, 238, 246, 0.012) 10px
+    ),
+    var(--bg-deep);
+}
+
+/* === App shell === */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* === Controls header === */
+.controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, var(--text-primary) 0%, rgba(162, 155, 254, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* === Table wrapper === */
+.table-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2rem;
+}
