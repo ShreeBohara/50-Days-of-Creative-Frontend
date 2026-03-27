@@ -263,5 +263,96 @@ dom.table.addEventListener('mouseleave', (e) => {
   if (cell) hideTooltip();
 }, true);
 
+/* === Modal === */
+const modal = {
+  overlay: $('[data-modal]'),
+  backdrop: $('[data-modal-backdrop]'),
+  card: $('[data-modal-card]'),
+  close: $('[data-modal-close]'),
+  accent: $('[data-modal-accent]'),
+  header: $('[data-modal-header]'),
+  body: $('[data-modal-body]'),
+};
+
+function openModal(number) {
+  const el = getElementData(number);
+  if (!el) return;
+
+  hideTooltip();
+  state.modalElement = el;
+  const catInfo = CATEGORIES[el.category] || { label: el.category };
+
+  modal.card.style.setProperty('--cat-color', `var(--cat-${el.category})`);
+  modal.accent.style.background = `var(--cat-${el.category})`;
+
+  modal.header.innerHTML = `
+    <div class="modal-symbol-block">${el.symbol}</div>
+    <div class="modal-title-group">
+      <div class="modal-element-name">${el.name}</div>
+      <div class="modal-element-sub">#${el.number} &middot; ${el.mass} u &middot; ${catInfo.label}</div>
+    </div>
+  `;
+
+  modal.body.innerHTML = `
+    <div class="modal-info-grid">
+      <div class="modal-info-item">
+        <div class="modal-info-label">Electron Config</div>
+        <div class="modal-info-value">${el.electronConfig}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Discovered By</div>
+        <div class="modal-info-value">${el.discoveredBy}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Year</div>
+        <div class="modal-info-value">${el.yearDiscovered ?? 'Ancient'}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Melting Point</div>
+        <div class="modal-info-value">${el.melt ? el.melt + ' K' : 'N/A'}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Boiling Point</div>
+        <div class="modal-info-value">${el.boil ? el.boil + ' K' : 'N/A'}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">State at ${state.temperature} K</div>
+        <div class="modal-info-value">${getStateName(el, state.temperature)}</div>
+      </div>
+    </div>
+    <div class="modal-fun-fact">${el.funFact}</div>
+  `;
+
+  modal.overlay.classList.add('open');
+  modal.overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.overlay.classList.remove('open');
+  modal.overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  state.modalElement = null;
+}
+
+function getStateName(el, temp) {
+  if (el.melt == null && el.boil == null) return 'Unknown';
+  if (el.melt != null && temp < el.melt) return 'Solid';
+  if (el.boil != null && temp >= el.boil) return 'Gas';
+  if (el.melt != null && el.boil != null) return 'Liquid';
+  return 'Unknown';
+}
+
+dom.table.addEventListener('click', (e) => {
+  const cell = e.target.closest('.element-cell');
+  if (cell) openModal(Number(cell.dataset.number));
+});
+
+modal.close.addEventListener('click', closeModal);
+modal.backdrop.addEventListener('click', closeModal);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.overlay.classList.contains('open')) closeModal();
+});
+
 /* === Init === */
 renderTable();

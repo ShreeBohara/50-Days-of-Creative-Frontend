@@ -36,7 +36,20 @@
         <div class="periodic-table" data-table></div>
       </main>
 
-      <!-- Modal overlay — added in commit 7 -->
+      <!-- Modal overlay -->
+      <div class="modal-overlay" data-modal aria-hidden="true">
+        <div class="modal-backdrop" data-modal-backdrop></div>
+        <div class="modal-card" data-modal-card>
+          <button class="modal-close" data-modal-close aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="4" y1="4" x2="16" y2="16"/><line x1="16" y1="4" x2="4" y2="16"/>
+            </svg>
+          </button>
+          <div class="modal-accent" data-modal-accent></div>
+          <div class="modal-header" data-modal-header></div>
+          <div class="modal-body" data-modal-body></div>
+        </div>
+      </div>
     </div>
     <script src="./script.js"></script>
   </body>

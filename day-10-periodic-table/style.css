@@ -361,3 +361,161 @@ body {
   border: 1px solid color-mix(in srgb, var(--cat-color, #888) 30%, transparent);
   background: color-mix(in srgb, var(--cat-color, #888) 8%, transparent);
 }
+
+/* === Modal === */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-card {
+  position: relative;
+  width: 90%;
+  max-width: 440px;
+  background: rgba(17, 17, 24, 0.95);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  transform: scale(0.92);
+  transition: transform 0.25s ease;
+}
+
+.modal-overlay.open .modal-card {
+  transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.modal-accent {
+  height: 4px;
+  background: var(--cat-color, var(--cat-transition-metal));
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 24px 0;
+}
+
+.modal-symbol-block {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border: 1px solid color-mix(in srgb, var(--cat-color, #888) 30%, transparent);
+  background: color-mix(in srgb, var(--cat-color, #888) 12%, transparent);
+}
+
+.modal-title-group {
+  flex: 1;
+}
+
+.modal-element-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-element-sub {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.modal-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.modal-info-item {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+}
+
+.modal-info-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.modal-info-value {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.modal-fun-fact {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--cat-color, #888) 6%, transparent);
+  border-left: 3px solid var(--cat-color, var(--cat-transition-metal));
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+}
