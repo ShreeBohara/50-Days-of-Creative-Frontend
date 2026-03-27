@@ -270,3 +270,94 @@ body {
   background: var(--cat-color, transparent);
   opacity: 0.6;
 }
+
+/* === Hover State === */
+.element-cell:hover {
+  transform: scale(1.25);
+  z-index: 10;
+  box-shadow:
+    0 0 16px rgba(0, 0, 0, 0.4),
+    0 0 24px color-mix(in srgb, var(--cat-color, #4a9ef5) 35%, transparent);
+}
+
+/* === Tooltip === */
+.tooltip {
+  position: fixed;
+  z-index: 100;
+  min-width: 200px;
+  max-width: 260px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(17, 17, 24, 0.92);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.tooltip-symbol {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--cat-color, var(--text-primary));
+}
+
+.tooltip-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tooltip-number {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.tooltip-row span:first-child {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tooltip-category {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--cat-color, var(--text-secondary));
+  border: 1px solid color-mix(in srgb, var(--cat-color, #888) 30%, transparent);
+  background: color-mix(in srgb, var(--cat-color, #888) 8%, transparent);
+}

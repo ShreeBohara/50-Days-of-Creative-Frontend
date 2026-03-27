@@ -198,5 +198,70 @@ function renderTable() {
   dom.table.appendChild(frag);
 }
 
+/* === Tooltip === */
+const tooltip = document.createElement('div');
+tooltip.className = 'tooltip';
+document.body.appendChild(tooltip);
+
+function getElementData(number) {
+  return ELEMENTS.find(e => e.number === number);
+}
+
+function showTooltip(cell, e) {
+  const num = Number(cell.dataset.number);
+  const el = getElementData(num);
+  if (!el) return;
+
+  const catInfo = CATEGORIES[el.category] || { label: el.category };
+  const catColor = `var(--cat-${el.category})`;
+
+  tooltip.style.setProperty('--cat-color', catColor);
+  tooltip.innerHTML = `
+    <div class="tooltip-header">
+      <span class="tooltip-symbol">${el.symbol}</span>
+      <span class="tooltip-name">${el.name}</span>
+      <span class="tooltip-number">#${el.number}</span>
+    </div>
+    <div class="tooltip-row"><span>Mass</span><span>${el.mass}</span></div>
+    <div class="tooltip-row"><span>Config</span><span>${el.electronConfig}</span></div>
+    <div class="tooltip-row"><span>Melt</span><span>${el.melt ? el.melt + ' K' : 'N/A'}</span></div>
+    <div class="tooltip-row"><span>Boil</span><span>${el.boil ? el.boil + ' K' : 'N/A'}</span></div>
+    <span class="tooltip-category">${catInfo.label}</span>
+  `;
+
+  positionTooltip(cell);
+  requestAnimationFrame(() => tooltip.classList.add('visible'));
+}
+
+function positionTooltip(cell) {
+  const rect = cell.getBoundingClientRect();
+  const tw = 240;
+  const th = tooltip.offsetHeight || 160;
+
+  let left = rect.left + rect.width / 2 - tw / 2;
+  let top = rect.top - th - 8;
+
+  if (top < 8) top = rect.bottom + 8;
+  if (left < 8) left = 8;
+  if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+dom.table.addEventListener('mouseenter', (e) => {
+  const cell = e.target.closest('.element-cell');
+  if (cell) showTooltip(cell, e);
+}, true);
+
+dom.table.addEventListener('mouseleave', (e) => {
+  const cell = e.target.closest('.element-cell');
+  if (cell) hideTooltip();
+}, true);
+
 /* === Init === */
 renderTable();
