@@ -184,6 +184,11 @@ function renderTable() {
     cell.style.gridColumn = el.col;
     cell.style.gridRow = el.row;
 
+    cell.setAttribute('tabindex', '0');
+    cell.setAttribute('role', 'button');
+    cell.setAttribute('aria-label', `${el.name}, ${el.symbol}, atomic number ${el.number}`);
+    cell.style.animationDelay = (el.number * 8) + 'ms';
+
     cell.innerHTML = `
       <span class="atomic-number">${el.number}</span>
       <span class="symbol">${el.symbol}</span>
@@ -461,6 +466,34 @@ tempSlider.addEventListener('input', () => {
 document.querySelector('.temp-presets').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-temp-preset]');
   if (btn) updateTemperature(Number(btn.dataset.tempPreset));
+});
+
+/* === Keyboard Navigation === */
+document.addEventListener('keydown', (e) => {
+  if (modal.overlay.classList.contains('open')) return;
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('element-cell')) return;
+
+  const num = Number(active.dataset.number);
+  const el = getElementData(num);
+  if (!el) return;
+
+  let targetRow = el.row;
+  let targetCol = el.col;
+
+  if (e.key === 'ArrowRight') targetCol++;
+  else if (e.key === 'ArrowLeft') targetCol--;
+  else if (e.key === 'ArrowDown') targetRow++;
+  else if (e.key === 'ArrowUp') targetRow--;
+  else if (e.key === 'Enter') { openModal(num); e.preventDefault(); return; }
+  else return;
+
+  e.preventDefault();
+  const target = ELEMENTS.find(x => x.row === targetRow && x.col === targetCol);
+  if (target) {
+    const targetCell = cellMap.get(target.number);
+    if (targetCell) targetCell.focus();
+  }
 });
 
 /* === Init === */

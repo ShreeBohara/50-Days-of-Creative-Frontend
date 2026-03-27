@@ -856,3 +856,32 @@ body {
     min-width: calc(18 * 40px + 17 * 3px);
   }
 }
+
+/* === Load Animation === */
+@keyframes cellFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.element-cell {
+  animation: cellFadeIn 0.4s ease both;
+}
+
+/* === Focus ring for keyboard nav === */
+.element-cell:focus-visible {
+  outline: 2px solid var(--cat-color, var(--cat-transition-metal));
+  outline-offset: 1px;
+  z-index: 5;
+}
+
+/* === Selection highlight === */
+::selection {
+  background: rgba(162, 155, 254, 0.3);
+  color: var(--text-primary);
+}
