@@ -354,5 +354,50 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modal.overlay.classList.contains('open')) closeModal();
 });
 
+/* === Search === */
+const searchInput = $('[data-search]');
+const searchClear = $('[data-search-clear]');
+
+function updateFilters() {
+  const q = state.searchQuery.toLowerCase();
+  const cat = state.activeCategory;
+
+  for (const el of ELEMENTS) {
+    const cell = cellMap.get(el.number);
+    if (!cell) continue;
+
+    const matchesSearch = !q ||
+      el.symbol.toLowerCase().includes(q) ||
+      el.name.toLowerCase().includes(q) ||
+      String(el.number).includes(q);
+
+    const matchesCat = cat === 'all' || el.category === cat;
+
+    if (matchesSearch && matchesCat) {
+      cell.classList.remove('dimmed');
+    } else {
+      cell.classList.add('dimmed');
+    }
+  }
+}
+
+let searchTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.searchQuery = searchInput.value.trim();
+    searchClear.hidden = !state.searchQuery;
+    updateFilters();
+  }, 100);
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  state.searchQuery = '';
+  searchClear.hidden = true;
+  updateFilters();
+  searchInput.focus();
+});
+
 /* === Init === */
 renderTable();

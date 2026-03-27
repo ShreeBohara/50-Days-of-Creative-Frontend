@@ -519,3 +519,77 @@ body {
   color: var(--text-secondary);
   font-style: italic;
 }
+
+/* === Search === */
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 220px;
+  padding: 8px 32px 8px 32px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 99px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, width 0.3s;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-color: rgba(162, 155, 254, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.search-clear {
+  position: absolute;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* === Dimmed / Matched states === */
+.element-cell.dimmed {
+  opacity: 0.08;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.element-cell.matched {
+  animation: matchPulse 0.3s ease;
+}
+
+@keyframes matchPulse {
+  0% { box-shadow: 0 0 0 0 rgba(162, 155, 254, 0.4); }
+  50% { box-shadow: 0 0 12px 2px rgba(162, 155, 254, 0.25); }
+  100% { box-shadow: none; }
+}
