@@ -167,3 +167,36 @@ const ELEMENTS = [
   { number: 117, symbol: 'Ts', name: 'Tennessine', mass: 294, category: 'halogen', row: 7, col: 17, melt: 723, boil: 883, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u2075', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 2010, funFact: 'Named after Tennessee; the second-newest element to be named.' },
   { number: 118, symbol: 'Og', name: 'Oganesson', mass: 294, category: 'noble-gas', row: 7, col: 18, melt: null, boil: 350, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u2076', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 2002, funFact: 'Named after Yuri Oganessian; predicted to be a solid noble gas due to relativistic effects.' },
 ];
+
+/* === Cell map for quick lookup === */
+const cellMap = new Map();
+
+/* === Render Table === */
+function renderTable() {
+  const frag = document.createDocumentFragment();
+
+  for (const el of ELEMENTS) {
+    const cell = document.createElement('div');
+    cell.className = 'element-cell';
+    cell.dataset.number = el.number;
+    cell.dataset.symbol = el.symbol;
+    cell.dataset.category = el.category;
+    cell.style.gridColumn = el.col;
+    cell.style.gridRow = el.row;
+
+    cell.innerHTML = `
+      <span class="atomic-number">${el.number}</span>
+      <span class="symbol">${el.symbol}</span>
+      <span class="name">${el.name}</span>
+      <span class="mass">${el.mass}</span>
+    `;
+
+    cellMap.set(el.number, cell);
+    frag.appendChild(cell);
+  }
+
+  dom.table.appendChild(frag);
+}
+
+/* === Init === */
+renderTable();
