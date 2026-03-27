@@ -1,0 +1,501 @@
+'use strict';
+
+/* === DOM References === */
+const $ = (s, p = document) => p.querySelector(s);
+const $$ = (s, p = document) => [...p.querySelectorAll(s)];
+
+const dom = {
+  app: $('[data-app]'),
+  table: $('[data-table]'),
+  tableWrapper: $('[data-table-wrapper]'),
+  controls: $('[data-controls]'),
+};
+
+/* === State === */
+const state = {
+  temperature: 293,
+  searchQuery: '',
+  activeCategory: 'all',
+  modalElement: null,
+};
+
+/* === Categories === */
+const CATEGORIES = {
+  'alkali-metal':      { label: 'Alkali Metals',       color: '#e84393' },
+  'alkaline-earth':    { label: 'Alkaline Earth Metals', color: '#fd9644' },
+  'transition-metal':  { label: 'Transition Metals',    color: '#4a9ef5' },
+  'post-transition':   { label: 'Post-Transition Metals', color: '#26c6da' },
+  'metalloid':         { label: 'Metalloids',           color: '#2ed573' },
+  'nonmetal':          { label: 'Nonmetals',            color: '#a29bfe' },
+  'halogen':           { label: 'Halogens',             color: '#feca57' },
+  'noble-gas':         { label: 'Noble Gases',          color: '#ff6b6b' },
+  'lanthanide':        { label: 'Lanthanides',          color: '#f368e0' },
+  'actinide':          { label: 'Actinides',            color: '#ff9ff3' },
+};
+
+/* === Element Data — all 118 elements === */
+const ELEMENTS = [
+  /* === Period 1 === */
+  { number: 1, symbol: 'H', name: 'Hydrogen', mass: 1.008, category: 'nonmetal', row: 1, col: 1, melt: 13.99, boil: 20.271, electronConfig: '1s\u00B9', discoveredBy: 'Henry Cavendish', yearDiscovered: 1766, funFact: 'Most abundant element in the universe, making up about 75% of all matter.' },
+  { number: 2, symbol: 'He', name: 'Helium', mass: 4.003, category: 'noble-gas', row: 1, col: 18, melt: null, boil: 4.222, electronConfig: '1s\u00B2', discoveredBy: 'Pierre Janssen', yearDiscovered: 1868, funFact: 'Second most abundant element in the universe; it was discovered on the Sun before Earth.' },
+
+  /* === Period 2 === */
+  { number: 3, symbol: 'Li', name: 'Lithium', mass: 6.941, category: 'alkali-metal', row: 2, col: 1, melt: 453.65, boil: 1603, electronConfig: '[He] 2s\u00B9', discoveredBy: 'Johan August Arfwedson', yearDiscovered: 1817, funFact: 'Lightest metal and least dense solid element.' },
+  { number: 4, symbol: 'Be', name: 'Beryllium', mass: 9.012, category: 'alkaline-earth', row: 2, col: 2, melt: 1560, boil: 2742, electronConfig: '[He] 2s\u00B2', discoveredBy: 'Louis Nicolas Vauquelin', yearDiscovered: 1798, funFact: 'Transparent to X-rays, so it\'s used in X-ray tube windows.' },
+  { number: 5, symbol: 'B', name: 'Boron', mass: 10.81, category: 'metalloid', row: 2, col: 13, melt: 2349, boil: 4200, electronConfig: '[He] 2s\u00B2 2p\u00B9', discoveredBy: 'Joseph Louis Gay-Lussac', yearDiscovered: 1808, funFact: 'Essential for plant growth but toxic to plants in excess.' },
+  { number: 6, symbol: 'C', name: 'Carbon', mass: 12.011, category: 'nonmetal', row: 2, col: 14, melt: 3823, boil: 4098, electronConfig: '[He] 2s\u00B2 2p\u00B2', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Forms more compounds than any other element — the basis of organic chemistry.' },
+  { number: 7, symbol: 'N', name: 'Nitrogen', mass: 14.007, category: 'nonmetal', row: 2, col: 15, melt: 63.15, boil: 77.355, electronConfig: '[He] 2s\u00B2 2p\u00B3', discoveredBy: 'Daniel Rutherford', yearDiscovered: 1772, funFact: 'Makes up 78% of Earth\'s atmosphere.' },
+  { number: 8, symbol: 'O', name: 'Oxygen', mass: 15.999, category: 'nonmetal', row: 2, col: 16, melt: 54.36, boil: 90.188, electronConfig: '[He] 2s\u00B2 2p\u2074', discoveredBy: 'Carl Wilhelm Scheele', yearDiscovered: 1771, funFact: 'Most abundant element in Earth\'s crust by mass.' },
+  { number: 9, symbol: 'F', name: 'Fluorine', mass: 18.998, category: 'halogen', row: 2, col: 17, melt: 53.48, boil: 85.03, electronConfig: '[He] 2s\u00B2 2p\u2075', discoveredBy: 'Henri Moissan', yearDiscovered: 1886, funFact: 'Most electronegative and reactive of all elements.' },
+  { number: 10, symbol: 'Ne', name: 'Neon', mass: 20.180, category: 'noble-gas', row: 2, col: 18, melt: 24.56, boil: 27.104, electronConfig: '[He] 2s\u00B2 2p\u2076', discoveredBy: 'William Ramsay', yearDiscovered: 1898, funFact: 'Produces a distinctive reddish-orange glow in discharge tubes — the classic "neon sign" color.' },
+
+  /* === Period 3 === */
+  { number: 11, symbol: 'Na', name: 'Sodium', mass: 22.990, category: 'alkali-metal', row: 3, col: 1, melt: 370.94, boil: 1156, electronConfig: '[Ne] 3s\u00B9', discoveredBy: 'Humphry Davy', yearDiscovered: 1807, funFact: 'Reacts violently with water and is soft enough to cut with a knife.' },
+  { number: 12, symbol: 'Mg', name: 'Magnesium', mass: 24.305, category: 'alkaline-earth', row: 3, col: 2, melt: 923, boil: 1363, electronConfig: '[Ne] 3s\u00B2', discoveredBy: 'Joseph Black', yearDiscovered: 1755, funFact: 'Burns with a brilliant white light, used in fireworks and flares.' },
+  { number: 13, symbol: 'Al', name: 'Aluminium', mass: 26.982, category: 'post-transition', row: 3, col: 13, melt: 933.47, boil: 2743, electronConfig: '[Ne] 3s\u00B2 3p\u00B9', discoveredBy: 'Hans Christian \u00D8rsted', yearDiscovered: 1825, funFact: 'Was once more valuable than gold before mass production was developed.' },
+  { number: 14, symbol: 'Si', name: 'Silicon', mass: 28.086, category: 'metalloid', row: 3, col: 14, melt: 1687, boil: 3538, electronConfig: '[Ne] 3s\u00B2 3p\u00B2', discoveredBy: 'J\u00F6ns Jacob Berzelius', yearDiscovered: 1824, funFact: 'Second most abundant element in Earth\'s crust; the backbone of modern electronics.' },
+  { number: 15, symbol: 'P', name: 'Phosphorus', mass: 30.974, category: 'nonmetal', row: 3, col: 15, melt: 317.3, boil: 553.7, electronConfig: '[Ne] 3s\u00B2 3p\u00B3', discoveredBy: 'Hennig Brand', yearDiscovered: 1669, funFact: 'Discovered by accident while trying to create the Philosopher\'s Stone from urine.' },
+  { number: 16, symbol: 'S', name: 'Sulfur', mass: 32.06, category: 'nonmetal', row: 3, col: 16, melt: 388.36, boil: 717.8, electronConfig: '[Ne] 3s\u00B2 3p\u2074', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Known since antiquity as "brimstone" and associated with volcanoes.' },
+  { number: 17, symbol: 'Cl', name: 'Chlorine', mass: 35.45, category: 'halogen', row: 3, col: 17, melt: 171.6, boil: 239.11, electronConfig: '[Ne] 3s\u00B2 3p\u2075', discoveredBy: 'Carl Wilhelm Scheele', yearDiscovered: 1774, funFact: 'Used to purify drinking water worldwide, saving millions of lives.' },
+  { number: 18, symbol: 'Ar', name: 'Argon', mass: 39.948, category: 'noble-gas', row: 3, col: 18, melt: 83.81, boil: 87.302, electronConfig: '[Ne] 3s\u00B2 3p\u2076', discoveredBy: 'Lord Rayleigh', yearDiscovered: 1894, funFact: 'Third most abundant gas in Earth\'s atmosphere at 0.93%.' },
+
+  /* === Period 4 === */
+  { number: 19, symbol: 'K', name: 'Potassium', mass: 39.098, category: 'alkali-metal', row: 4, col: 1, melt: 336.7, boil: 1032, electronConfig: '[Ar] 4s\u00B9', discoveredBy: 'Humphry Davy', yearDiscovered: 1807, funFact: 'Essential for nerve function; bananas are a famous source.' },
+  { number: 20, symbol: 'Ca', name: 'Calcium', mass: 40.078, category: 'alkaline-earth', row: 4, col: 2, melt: 1115, boil: 1757, electronConfig: '[Ar] 4s\u00B2', discoveredBy: 'Humphry Davy', yearDiscovered: 1808, funFact: 'Most abundant metal in the human body, crucial for bones and teeth.' },
+  { number: 21, symbol: 'Sc', name: 'Scandium', mass: 44.956, category: 'transition-metal', row: 4, col: 3, melt: 1814, boil: 3109, electronConfig: '[Ar] 3d\u00B9 4s\u00B2', discoveredBy: 'Lars Fredrik Nilson', yearDiscovered: 1879, funFact: 'Used in aerospace alloys and high-end bicycle frames.' },
+  { number: 22, symbol: 'Ti', name: 'Titanium', mass: 47.867, category: 'transition-metal', row: 4, col: 4, melt: 1941, boil: 3560, electronConfig: '[Ar] 3d\u00B2 4s\u00B2', discoveredBy: 'William Gregor', yearDiscovered: 1791, funFact: 'As strong as steel but 45% lighter; used in jet engines and medical implants.' },
+  { number: 23, symbol: 'V', name: 'Vanadium', mass: 50.942, category: 'transition-metal', row: 4, col: 5, melt: 2183, boil: 3680, electronConfig: '[Ar] 3d\u00B3 4s\u00B2', discoveredBy: 'Andr\u00E9s Manuel del R\u00EDo', yearDiscovered: 1801, funFact: 'Named after Vanadis, the Scandinavian goddess of beauty.' },
+  { number: 24, symbol: 'Cr', name: 'Chromium', mass: 51.996, category: 'transition-metal', row: 4, col: 6, melt: 2180, boil: 2944, electronConfig: '[Ar] 3d\u2075 4s\u00B9', discoveredBy: 'Louis Nicolas Vauquelin', yearDiscovered: 1797, funFact: 'Gives rubies their red color and emeralds their green color.' },
+  { number: 25, symbol: 'Mn', name: 'Manganese', mass: 54.938, category: 'transition-metal', row: 4, col: 7, melt: 1519, boil: 2334, electronConfig: '[Ar] 3d\u2075 4s\u00B2', discoveredBy: 'Johan Gottlieb Gahn', yearDiscovered: 1774, funFact: 'Essential for steel production and photosynthesis in plants.' },
+  { number: 26, symbol: 'Fe', name: 'Iron', mass: 55.845, category: 'transition-metal', row: 4, col: 8, melt: 1811, boil: 3134, electronConfig: '[Ar] 3d\u2076 4s\u00B2', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Most common element on Earth by mass; Earth\'s core is mostly iron.' },
+  { number: 27, symbol: 'Co', name: 'Cobalt', mass: 58.933, category: 'transition-metal', row: 4, col: 9, melt: 1768, boil: 3200, electronConfig: '[Ar] 3d\u2077 4s\u00B2', discoveredBy: 'Georg Brandt', yearDiscovered: 1735, funFact: 'Used to create the vivid blue pigment in glass and ceramics for thousands of years.' },
+  { number: 28, symbol: 'Ni', name: 'Nickel', mass: 58.693, category: 'transition-metal', row: 4, col: 10, melt: 1728, boil: 3003, electronConfig: '[Ar] 3d\u2078 4s\u00B2', discoveredBy: 'Axel Fredrik Cronstedt', yearDiscovered: 1751, funFact: 'US five-cent coins are actually 75% copper and only 25% nickel.' },
+  { number: 29, symbol: 'Cu', name: 'Copper', mass: 63.546, category: 'transition-metal', row: 4, col: 11, melt: 1357.77, boil: 2835, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B9', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'One of the few metals that is not silver or grey; it has a distinctive reddish-orange color.' },
+  { number: 30, symbol: 'Zn', name: 'Zinc', mass: 65.38, category: 'transition-metal', row: 4, col: 12, melt: 692.68, boil: 1180, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2', discoveredBy: 'Andreas Sigismund Marggraf', yearDiscovered: 1746, funFact: 'Essential trace element for human health; deficiency affects 2 billion people worldwide.' },
+  { number: 31, symbol: 'Ga', name: 'Gallium', mass: 69.723, category: 'post-transition', row: 4, col: 13, melt: 302.91, boil: 2673, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2 4p\u00B9', discoveredBy: 'Lecoq de Boisbaudran', yearDiscovered: 1875, funFact: 'Melts in your hand at just 29.76\u00B0C — slightly below body temperature.' },
+  { number: 32, symbol: 'Ge', name: 'Germanium', mass: 72.630, category: 'metalloid', row: 4, col: 14, melt: 1211.40, boil: 3106, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2 4p\u00B2', discoveredBy: 'Clemens Winkler', yearDiscovered: 1886, funFact: 'Its existence was predicted by Mendeleev 15 years before it was discovered.' },
+  { number: 33, symbol: 'As', name: 'Arsenic', mass: 74.922, category: 'metalloid', row: 4, col: 15, melt: null, boil: 887, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2 4p\u00B3', discoveredBy: 'Albertus Magnus', yearDiscovered: 1250, funFact: 'Known as the "king of poisons" and the "poison of kings" in history.' },
+  { number: 34, symbol: 'Se', name: 'Selenium', mass: 78.971, category: 'nonmetal', row: 4, col: 16, melt: 494, boil: 958, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2 4p\u2074', discoveredBy: 'J\u00F6ns Jacob Berzelius', yearDiscovered: 1817, funFact: 'Named after Selene, the Greek goddess of the Moon.' },
+  { number: 35, symbol: 'Br', name: 'Bromine', mass: 79.904, category: 'halogen', row: 4, col: 17, melt: 265.8, boil: 332, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2 4p\u2075', discoveredBy: 'Antoine J\u00E9r\u00F4me Balard', yearDiscovered: 1826, funFact: 'One of only two elements that are liquid at room temperature (with mercury).' },
+  { number: 36, symbol: 'Kr', name: 'Krypton', mass: 83.798, category: 'noble-gas', row: 4, col: 18, melt: 115.78, boil: 119.93, electronConfig: '[Ar] 3d\u00B9\u2070 4s\u00B2 4p\u2076', discoveredBy: 'William Ramsay', yearDiscovered: 1898, funFact: 'Superman\'s home planet Krypton was named after this element.' },
+
+  /* === Period 5 === */
+  { number: 37, symbol: 'Rb', name: 'Rubidium', mass: 85.468, category: 'alkali-metal', row: 5, col: 1, melt: 312.45, boil: 961, electronConfig: '[Kr] 5s\u00B9', discoveredBy: 'Robert Bunsen', yearDiscovered: 1861, funFact: 'Ignites spontaneously in air and reacts violently with water.' },
+  { number: 38, symbol: 'Sr', name: 'Strontium', mass: 87.62, category: 'alkaline-earth', row: 5, col: 2, melt: 1050, boil: 1650, electronConfig: '[Kr] 5s\u00B2', discoveredBy: 'William Cruickshank', yearDiscovered: 1790, funFact: 'Produces the brilliant red color in fireworks.' },
+  { number: 39, symbol: 'Y', name: 'Yttrium', mass: 88.906, category: 'transition-metal', row: 5, col: 3, melt: 1799, boil: 3203, electronConfig: '[Kr] 4d\u00B9 5s\u00B2', discoveredBy: 'Johan Gadolin', yearDiscovered: 1794, funFact: 'Used in LED lights and was key to making color television possible.' },
+  { number: 40, symbol: 'Zr', name: 'Zirconium', mass: 91.224, category: 'transition-metal', row: 5, col: 4, melt: 2128, boil: 4650, electronConfig: '[Kr] 4d\u00B2 5s\u00B2', discoveredBy: 'Martin Heinrich Klaproth', yearDiscovered: 1789, funFact: 'Highly resistant to corrosion; used as cladding for nuclear reactor fuel rods.' },
+  { number: 41, symbol: 'Nb', name: 'Niobium', mass: 92.906, category: 'transition-metal', row: 5, col: 5, melt: 2750, boil: 5017, electronConfig: '[Kr] 4d\u2074 5s\u00B9', discoveredBy: 'Charles Hatchett', yearDiscovered: 1801, funFact: 'Used in superconducting magnets in MRI machines and particle accelerators.' },
+  { number: 42, symbol: 'Mo', name: 'Molybdenum', mass: 95.95, category: 'transition-metal', row: 5, col: 6, melt: 2896, boil: 4912, electronConfig: '[Kr] 4d\u2075 5s\u00B9', discoveredBy: 'Carl Wilhelm Scheele', yearDiscovered: 1778, funFact: 'Essential trace element for nearly all life forms on Earth.' },
+  { number: 43, symbol: 'Tc', name: 'Technetium', mass: 98, category: 'transition-metal', row: 5, col: 7, melt: 2430, boil: 4538, electronConfig: '[Kr] 4d\u2075 5s\u00B2', discoveredBy: 'Emilio Segr\u00E8', yearDiscovered: 1937, funFact: 'First artificially produced element; all its isotopes are radioactive.' },
+  { number: 44, symbol: 'Ru', name: 'Ruthenium', mass: 101.07, category: 'transition-metal', row: 5, col: 8, melt: 2607, boil: 4423, electronConfig: '[Kr] 4d\u2077 5s\u00B9', discoveredBy: 'Karl Ernst Claus', yearDiscovered: 1844, funFact: 'One of the rarest elements on Earth; named after Russia (Ruthenia).' },
+  { number: 45, symbol: 'Rh', name: 'Rhodium', mass: 102.91, category: 'transition-metal', row: 5, col: 9, melt: 2237, boil: 3968, electronConfig: '[Kr] 4d\u2078 5s\u00B9', discoveredBy: 'William Hyde Wollaston', yearDiscovered: 1803, funFact: 'The most expensive precious metal, often more costly than gold or platinum.' },
+  { number: 46, symbol: 'Pd', name: 'Palladium', mass: 106.42, category: 'transition-metal', row: 5, col: 10, melt: 1828.05, boil: 3236, electronConfig: '[Kr] 4d\u00B9\u2070', discoveredBy: 'William Hyde Wollaston', yearDiscovered: 1803, funFact: 'Can absorb up to 900 times its own volume of hydrogen gas.' },
+  { number: 47, symbol: 'Ag', name: 'Silver', mass: 107.87, category: 'transition-metal', row: 5, col: 11, melt: 1234.93, boil: 2435, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B9', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Best electrical and thermal conductor of all elements.' },
+  { number: 48, symbol: 'Cd', name: 'Cadmium', mass: 112.41, category: 'transition-metal', row: 5, col: 12, melt: 594.22, boil: 1040, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2', discoveredBy: 'Karl Samuel Leberecht Hermann', yearDiscovered: 1817, funFact: 'Used in rechargeable NiCd batteries and brilliant yellow pigments.' },
+  { number: 49, symbol: 'In', name: 'Indium', mass: 114.82, category: 'post-transition', row: 5, col: 13, melt: 429.75, boil: 2345, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2 5p\u00B9', discoveredBy: 'Ferdinand Reich', yearDiscovered: 1863, funFact: 'Makes a high-pitched "cry" when bent, similar to tin cry.' },
+  { number: 50, symbol: 'Sn', name: 'Tin', mass: 118.71, category: 'post-transition', row: 5, col: 14, melt: 505.08, boil: 2875, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2 5p\u00B2', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Has more stable isotopes (10) than any other element.' },
+  { number: 51, symbol: 'Sb', name: 'Antimony', mass: 121.76, category: 'metalloid', row: 5, col: 15, melt: 903.78, boil: 1908, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2 5p\u00B3', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Ancient Egyptians used antimony compounds as eye makeup (kohl).' },
+  { number: 52, symbol: 'Te', name: 'Tellurium', mass: 127.60, category: 'metalloid', row: 5, col: 16, melt: 722.66, boil: 1261, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2 5p\u2074', discoveredBy: 'Franz-Joseph M\u00FCller von Reichenstein', yearDiscovered: 1783, funFact: 'Rarer than gold in Earth\'s crust; named after the Latin word for Earth.' },
+  { number: 53, symbol: 'I', name: 'Iodine', mass: 126.90, category: 'halogen', row: 5, col: 17, melt: 386.85, boil: 457.4, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2 5p\u2075', discoveredBy: 'Bernard Courtois', yearDiscovered: 1811, funFact: 'Essential for thyroid function; deficiency was once the leading cause of preventable brain damage.' },
+  { number: 54, symbol: 'Xe', name: 'Xenon', mass: 131.29, category: 'noble-gas', row: 5, col: 18, melt: 161.4, boil: 165.051, electronConfig: '[Kr] 4d\u00B9\u2070 5s\u00B2 5p\u2076', discoveredBy: 'William Ramsay', yearDiscovered: 1898, funFact: 'Used as a general anesthetic and in ion propulsion engines for spacecraft.' },
+
+  /* === Period 6 === */
+  { number: 55, symbol: 'Cs', name: 'Caesium', mass: 132.91, category: 'alkali-metal', row: 6, col: 1, melt: 301.7, boil: 944, electronConfig: '[Xe] 6s\u00B9', discoveredBy: 'Robert Bunsen', yearDiscovered: 1860, funFact: 'Most electropositive stable element; defines the second via atomic clocks.' },
+  { number: 56, symbol: 'Ba', name: 'Barium', mass: 137.33, category: 'alkaline-earth', row: 6, col: 2, melt: 1000, boil: 2118, electronConfig: '[Xe] 6s\u00B2', discoveredBy: 'Carl Wilhelm Scheele', yearDiscovered: 1772, funFact: 'Barium sulfate is drunk as a "barium meal" to make the gut visible on X-rays.' },
+  { number: 57, symbol: 'La', name: 'Lanthanum', mass: 138.91, category: 'lanthanide', row: 9, col: 3, melt: 1193, boil: 3737, electronConfig: '[Xe] 5d\u00B9 6s\u00B2', discoveredBy: 'Carl Gustaf Mosander', yearDiscovered: 1839, funFact: 'Its name means "to lie hidden" in Greek; it hid inside cerium ore for years.' },
+  { number: 58, symbol: 'Ce', name: 'Cerium', mass: 140.12, category: 'lanthanide', row: 9, col: 4, melt: 1068, boil: 3716, electronConfig: '[Xe] 4f\u00B9 5d\u00B9 6s\u00B2', discoveredBy: 'Martin Heinrich Klaproth', yearDiscovered: 1803, funFact: 'Most abundant rare earth element; used in self-cleaning ovens.' },
+  { number: 59, symbol: 'Pr', name: 'Praseodymium', mass: 140.91, category: 'lanthanide', row: 9, col: 5, melt: 1208, boil: 3403, electronConfig: '[Xe] 4f\u00B3 6s\u00B2', discoveredBy: 'Carl Auer von Welsbach', yearDiscovered: 1885, funFact: 'Gives glass a beautiful green color and is used in welder\'s goggles.' },
+  { number: 60, symbol: 'Nd', name: 'Neodymium', mass: 144.24, category: 'lanthanide', row: 9, col: 6, melt: 1297, boil: 3347, electronConfig: '[Xe] 4f\u2074 6s\u00B2', discoveredBy: 'Carl Auer von Welsbach', yearDiscovered: 1885, funFact: 'Makes the world\'s strongest permanent magnets, used in headphones and hard drives.' },
+  { number: 61, symbol: 'Pm', name: 'Promethium', mass: 145, category: 'lanthanide', row: 9, col: 7, melt: 1315, boil: 3273, electronConfig: '[Xe] 4f\u2075 6s\u00B2', discoveredBy: 'Chien Shiung Wu', yearDiscovered: 1945, funFact: 'Only radioactive rare earth element; named after Prometheus who stole fire from the gods.' },
+  { number: 62, symbol: 'Sm', name: 'Samarium', mass: 150.36, category: 'lanthanide', row: 9, col: 8, melt: 1345, boil: 2173, electronConfig: '[Xe] 4f\u2076 6s\u00B2', discoveredBy: 'Lecoq de Boisbaudran', yearDiscovered: 1879, funFact: 'Used in cancer treatment (Samarium-153) and in high-temperature magnets.' },
+  { number: 63, symbol: 'Eu', name: 'Europium', mass: 151.96, category: 'lanthanide', row: 9, col: 9, melt: 1099, boil: 1802, electronConfig: '[Xe] 4f\u2077 6s\u00B2', discoveredBy: 'Eug\u00E8ne-Anatole Demar\u00E7ay', yearDiscovered: 1901, funFact: 'Glows red under UV light; used in euro banknotes as an anti-counterfeiting measure.' },
+  { number: 64, symbol: 'Gd', name: 'Gadolinium', mass: 157.25, category: 'lanthanide', row: 9, col: 10, melt: 1585, boil: 3273, electronConfig: '[Xe] 4f\u2077 5d\u00B9 6s\u00B2', discoveredBy: 'Jean Charles Galissard de Marignac', yearDiscovered: 1880, funFact: 'Used as MRI contrast agent; has the highest neutron absorption of any element.' },
+  { number: 65, symbol: 'Tb', name: 'Terbium', mass: 158.93, category: 'lanthanide', row: 9, col: 11, melt: 1629, boil: 3396, electronConfig: '[Xe] 4f\u2079 6s\u00B2', discoveredBy: 'Carl Gustaf Mosander', yearDiscovered: 1843, funFact: 'Produces the green color in smartphones and flatscreen displays.' },
+  { number: 66, symbol: 'Dy', name: 'Dysprosium', mass: 162.50, category: 'lanthanide', row: 9, col: 12, melt: 1680, boil: 2840, electronConfig: '[Xe] 4f\u00B9\u2070 6s\u00B2', discoveredBy: 'Lecoq de Boisbaudran', yearDiscovered: 1886, funFact: 'Name means "hard to get" in Greek; essential for wind turbine magnets.' },
+  { number: 67, symbol: 'Ho', name: 'Holmium', mass: 164.93, category: 'lanthanide', row: 9, col: 13, melt: 1734, boil: 2873, electronConfig: '[Xe] 4f\u00B9\u00B9 6s\u00B2', discoveredBy: 'Jacques-Louis Soret', yearDiscovered: 1878, funFact: 'Has the highest magnetic moment of any naturally occurring element.' },
+  { number: 68, symbol: 'Er', name: 'Erbium', mass: 167.26, category: 'lanthanide', row: 9, col: 14, melt: 1802, boil: 3141, electronConfig: '[Xe] 4f\u00B9\u00B2 6s\u00B2', discoveredBy: 'Carl Gustaf Mosander', yearDiscovered: 1843, funFact: 'Gives pink color to glass; crucial for fiber optic signal amplifiers.' },
+  { number: 69, symbol: 'Tm', name: 'Thulium', mass: 168.93, category: 'lanthanide', row: 9, col: 15, melt: 1818, boil: 2223, electronConfig: '[Xe] 4f\u00B9\u00B3 6s\u00B2', discoveredBy: 'Per Teodor Cleve', yearDiscovered: 1879, funFact: 'Least abundant lanthanide; used in portable X-ray devices.' },
+  { number: 70, symbol: 'Yb', name: 'Ytterbium', mass: 173.05, category: 'lanthanide', row: 9, col: 16, melt: 1097, boil: 1469, electronConfig: '[Xe] 4f\u00B9\u2074 6s\u00B2', discoveredBy: 'Jean Charles Galissard de Marignac', yearDiscovered: 1878, funFact: 'Used in the world\'s most accurate atomic clocks.' },
+  { number: 71, symbol: 'Lu', name: 'Lutetium', mass: 174.97, category: 'lanthanide', row: 9, col: 17, melt: 1925, boil: 3675, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9 6s\u00B2', discoveredBy: 'Georges Urbain', yearDiscovered: 1907, funFact: 'Last and heaviest of the lanthanides; named after Lutetia (ancient name for Paris).' },
+  { number: 72, symbol: 'Hf', name: 'Hafnium', mass: 178.49, category: 'transition-metal', row: 6, col: 4, melt: 2506, boil: 4876, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B2 6s\u00B2', discoveredBy: 'Dirk Coster', yearDiscovered: 1923, funFact: 'Almost always found with zirconium; last stable element to be discovered.' },
+  { number: 73, symbol: 'Ta', name: 'Tantalum', mass: 180.95, category: 'transition-metal', row: 6, col: 5, melt: 3290, boil: 5731, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B3 6s\u00B2', discoveredBy: 'Anders Gustaf Ekeberg', yearDiscovered: 1802, funFact: 'Highly resistant to acid; used in capacitors in nearly every smartphone.' },
+  { number: 74, symbol: 'W', name: 'Tungsten', mass: 183.84, category: 'transition-metal', row: 6, col: 6, melt: 3695, boil: 5828, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u2074 6s\u00B2', discoveredBy: 'Carl Wilhelm Scheele', yearDiscovered: 1783, funFact: 'Highest melting point of all elements; used in incandescent light bulb filaments.' },
+  { number: 75, symbol: 'Re', name: 'Rhenium', mass: 186.21, category: 'transition-metal', row: 6, col: 7, melt: 3459, boil: 5869, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u2075 6s\u00B2', discoveredBy: 'Masataka Ogawa', yearDiscovered: 1925, funFact: 'Last stable element to be discovered in nature; named after the Rhine river.' },
+  { number: 76, symbol: 'Os', name: 'Osmium', mass: 190.23, category: 'transition-metal', row: 6, col: 8, melt: 3306, boil: 5285, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u2076 6s\u00B2', discoveredBy: 'Smithson Tennant', yearDiscovered: 1803, funFact: 'Densest naturally occurring element; its name means "smell" due to its pungent oxide.' },
+  { number: 77, symbol: 'Ir', name: 'Iridium', mass: 192.22, category: 'transition-metal', row: 6, col: 9, melt: 2719, boil: 4403, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u2077 6s\u00B2', discoveredBy: 'Smithson Tennant', yearDiscovered: 1803, funFact: 'Most corrosion-resistant metal; an iridium layer marks the asteroid that killed the dinosaurs.' },
+  { number: 78, symbol: 'Pt', name: 'Platinum', mass: 195.08, category: 'transition-metal', row: 6, col: 10, melt: 2041.4, boil: 4098, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u2079 6s\u00B9', discoveredBy: 'Antonio de Ulloa', yearDiscovered: 1735, funFact: 'Used in catalytic converters; about 40% of all platinum goes to automotive catalysts.' },
+  { number: 79, symbol: 'Au', name: 'Gold', mass: 196.97, category: 'transition-metal', row: 6, col: 11, melt: 1337.33, boil: 3129, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B9', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'All the gold ever mined would fit in about 3.5 Olympic swimming pools.' },
+  { number: 80, symbol: 'Hg', name: 'Mercury', mass: 200.59, category: 'transition-metal', row: 6, col: 12, melt: 234.32, boil: 629.88, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Only metal that is liquid at room temperature; named after the planet.' },
+  { number: 81, symbol: 'Tl', name: 'Thallium', mass: 204.38, category: 'post-transition', row: 6, col: 13, melt: 577, boil: 1746, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2 6p\u00B9', discoveredBy: 'William Crookes', yearDiscovered: 1861, funFact: 'Name means "green twig" from its bright green spectral line; historically used as rat poison.' },
+  { number: 82, symbol: 'Pb', name: 'Lead', mass: 207.2, category: 'post-transition', row: 6, col: 14, melt: 600.61, boil: 2022, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2 6p\u00B2', discoveredBy: 'Ancient', yearDiscovered: null, funFact: 'Romans used lead pipes for plumbing — the word "plumbing" comes from plumbum (Latin for lead).' },
+  { number: 83, symbol: 'Bi', name: 'Bismuth', mass: 208.98, category: 'post-transition', row: 6, col: 15, melt: 544.7, boil: 1837, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2 6p\u00B3', discoveredBy: 'Claude Fran\u00E7ois Geoffroy', yearDiscovered: 1753, funFact: 'Forms stunning rainbow-colored hopper crystals; main ingredient in Pepto-Bismol.' },
+  { number: 84, symbol: 'Po', name: 'Polonium', mass: 209, category: 'post-transition', row: 6, col: 16, melt: 527, boil: 1235, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2 6p\u2074', discoveredBy: 'Marie Curie', yearDiscovered: 1898, funFact: 'Named after Poland, Marie Curie\'s homeland; extremely rare and radioactive.' },
+  { number: 85, symbol: 'At', name: 'Astatine', mass: 210, category: 'halogen', row: 6, col: 17, melt: 575, boil: 610, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2 6p\u2075', discoveredBy: 'Dale R. Corson', yearDiscovered: 1940, funFact: 'Rarest naturally occurring element; at any time there\'s less than 30g on Earth.' },
+  { number: 86, symbol: 'Rn', name: 'Radon', mass: 222, category: 'noble-gas', row: 6, col: 18, melt: 202, boil: 211.5, electronConfig: '[Xe] 4f\u00B9\u2074 5d\u00B9\u2070 6s\u00B2 6p\u2076', discoveredBy: 'Friedrich Ernst Dorn', yearDiscovered: 1900, funFact: 'Radioactive gas that seeps from the ground; second leading cause of lung cancer after smoking.' },
+
+  /* === Period 7 === */
+  { number: 87, symbol: 'Fr', name: 'Francium', mass: 223, category: 'alkali-metal', row: 7, col: 1, melt: 300, boil: 950, electronConfig: '[Rn] 7s\u00B9', discoveredBy: 'Marguerite Perey', yearDiscovered: 1939, funFact: 'Most unstable of the first 101 elements; less than 30g exists on Earth at any time.' },
+  { number: 88, symbol: 'Ra', name: 'Radium', mass: 226, category: 'alkaline-earth', row: 7, col: 2, melt: 973, boil: 2010, electronConfig: '[Rn] 7s\u00B2', discoveredBy: 'Marie Curie', yearDiscovered: 1898, funFact: 'Glows blue in the dark; was once used in luminous watch dials before its danger was known.' },
+  { number: 89, symbol: 'Ac', name: 'Actinium', mass: 227, category: 'actinide', row: 10, col: 3, melt: 1500, boil: 3500, electronConfig: '[Rn] 6d\u00B9 7s\u00B2', discoveredBy: 'Friedrich Oskar Giesel', yearDiscovered: 1902, funFact: 'Glows blue in the dark due to its intense radioactivity exciting surrounding air.' },
+  { number: 90, symbol: 'Th', name: 'Thorium', mass: 232.04, category: 'actinide', row: 10, col: 4, melt: 2023, boil: 5061, electronConfig: '[Rn] 6d\u00B2 7s\u00B2', discoveredBy: 'J\u00F6ns Jacob Berzelius', yearDiscovered: 1829, funFact: 'Named after Thor, the Norse god of thunder; being explored as a nuclear fuel alternative.' },
+  { number: 91, symbol: 'Pa', name: 'Protactinium', mass: 231.04, category: 'actinide', row: 10, col: 5, melt: 1841, boil: 4300, electronConfig: '[Rn] 5f\u00B2 6d\u00B9 7s\u00B2', discoveredBy: 'Kasimir Fajans', yearDiscovered: 1913, funFact: 'One of the rarest and most expensive naturally occurring elements.' },
+  { number: 92, symbol: 'U', name: 'Uranium', mass: 238.03, category: 'actinide', row: 10, col: 6, melt: 1405.3, boil: 4404, electronConfig: '[Rn] 5f\u00B3 6d\u00B9 7s\u00B2', discoveredBy: 'Martin Heinrich Klaproth', yearDiscovered: 1789, funFact: 'Named after the planet Uranus; a golf-ball-sized sphere weighs about 1 kilogram.' },
+  { number: 93, symbol: 'Np', name: 'Neptunium', mass: 237, category: 'actinide', row: 10, col: 7, melt: 917, boil: 4175, electronConfig: '[Rn] 5f\u2074 6d\u00B9 7s\u00B2', discoveredBy: 'Edwin McMillan', yearDiscovered: 1940, funFact: 'First transuranium element discovered; named after Neptune, the next planet after Uranus.' },
+  { number: 94, symbol: 'Pu', name: 'Plutonium', mass: 244, category: 'actinide', row: 10, col: 8, melt: 912.5, boil: 3505, electronConfig: '[Rn] 5f\u2076 7s\u00B2', discoveredBy: 'Glenn T. Seaborg', yearDiscovered: 1940, funFact: 'Named after Pluto; used in nuclear weapons and to power space probes like Voyager.' },
+  { number: 95, symbol: 'Am', name: 'Americium', mass: 243, category: 'actinide', row: 10, col: 9, melt: 1449, boil: 2880, electronConfig: '[Rn] 5f\u2077 7s\u00B2', discoveredBy: 'Glenn T. Seaborg', yearDiscovered: 1944, funFact: 'Found in household smoke detectors; named after the Americas.' },
+  { number: 96, symbol: 'Cm', name: 'Curium', mass: 247, category: 'actinide', row: 10, col: 10, melt: 1613, boil: 3383, electronConfig: '[Rn] 5f\u2077 6d\u00B9 7s\u00B2', discoveredBy: 'Glenn T. Seaborg', yearDiscovered: 1944, funFact: 'Named after Marie and Pierre Curie; so radioactive it glows in the dark.' },
+  { number: 97, symbol: 'Bk', name: 'Berkelium', mass: 247, category: 'actinide', row: 10, col: 11, melt: 1259, boil: 2900, electronConfig: '[Rn] 5f\u2079 7s\u00B2', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1949, funFact: 'Named after Berkeley, California; only a few grams have ever been produced.' },
+  { number: 98, symbol: 'Cf', name: 'Californium', mass: 251, category: 'actinide', row: 10, col: 12, melt: 1173, boil: 1743, electronConfig: '[Rn] 5f\u00B9\u2070 7s\u00B2', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1950, funFact: 'Once the most expensive substance on Earth at $27 million per gram.' },
+  { number: 99, symbol: 'Es', name: 'Einsteinium', mass: 252, category: 'actinide', row: 10, col: 13, melt: 1133, boil: 1269, electronConfig: '[Rn] 5f\u00B9\u00B9 7s\u00B2', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1952, funFact: 'Discovered in debris of the first hydrogen bomb test; named after Albert Einstein.' },
+  { number: 100, symbol: 'Fm', name: 'Fermium', mass: 257, category: 'actinide', row: 10, col: 14, melt: 1800, boil: null, electronConfig: '[Rn] 5f\u00B9\u00B2 7s\u00B2', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1952, funFact: 'Also discovered in H-bomb debris; named after Enrico Fermi, father of the nuclear reactor.' },
+  { number: 101, symbol: 'Md', name: 'Mendelevium', mass: 258, category: 'actinide', row: 10, col: 15, melt: 1100, boil: null, electronConfig: '[Rn] 5f\u00B9\u00B3 7s\u00B2', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1955, funFact: 'Named after Dmitri Mendeleev, creator of the periodic table.' },
+  { number: 102, symbol: 'No', name: 'Nobelium', mass: 259, category: 'actinide', row: 10, col: 16, melt: 1100, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 7s\u00B2', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 1966, funFact: 'Named after Alfred Nobel, inventor of dynamite and founder of the Nobel Prizes.' },
+  { number: 103, symbol: 'Lr', name: 'Lawrencium', mass: 266, category: 'actinide', row: 10, col: 17, melt: 1900, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 7s\u00B2 7p\u00B9', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1961, funFact: 'Named after Ernest Lawrence, inventor of the cyclotron particle accelerator.' },
+  { number: 104, symbol: 'Rf', name: 'Rutherfordium', mass: 267, category: 'transition-metal', row: 7, col: 4, melt: 2400, boil: 5800, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B2 7s\u00B2', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 1964, funFact: 'Named after Ernest Rutherford, who discovered the atomic nucleus.' },
+  { number: 105, symbol: 'Db', name: 'Dubnium', mass: 268, category: 'transition-metal', row: 7, col: 5, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B3 7s\u00B2', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 1968, funFact: 'Named after Dubna, Russia, home of the Joint Institute for Nuclear Research.' },
+  { number: 106, symbol: 'Sg', name: 'Seaborgium', mass: 269, category: 'transition-metal', row: 7, col: 6, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u2074 7s\u00B2', discoveredBy: 'Lawrence Berkeley National Laboratory', yearDiscovered: 1974, funFact: 'Named after Glenn T. Seaborg while he was still alive — a controversial honor at the time.' },
+  { number: 107, symbol: 'Bh', name: 'Bohrium', mass: 270, category: 'transition-metal', row: 7, col: 7, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u2075 7s\u00B2', discoveredBy: 'Gesellschaft f\u00FCr Schwerionenforschung', yearDiscovered: 1981, funFact: 'Named after Niels Bohr; only a few atoms have ever been created.' },
+  { number: 108, symbol: 'Hs', name: 'Hassium', mass: 277, category: 'transition-metal', row: 7, col: 8, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u2076 7s\u00B2', discoveredBy: 'Gesellschaft f\u00FCr Schwerionenforschung', yearDiscovered: 1984, funFact: 'Named after the German state of Hesse; predicted to behave like osmium.' },
+  { number: 109, symbol: 'Mt', name: 'Meitnerium', mass: 278, category: 'transition-metal', row: 7, col: 9, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u2077 7s\u00B2', discoveredBy: 'Gesellschaft f\u00FCr Schwerionenforschung', yearDiscovered: 1982, funFact: 'Named after Lise Meitner, who co-discovered nuclear fission but was denied the Nobel Prize.' },
+  { number: 110, symbol: 'Ds', name: 'Darmstadtium', mass: 281, category: 'transition-metal', row: 7, col: 10, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u2079 7s\u00B9', discoveredBy: 'Gesellschaft f\u00FCr Schwerionenforschung', yearDiscovered: 1994, funFact: 'Named after Darmstadt, Germany where it was first synthesized.' },
+  { number: 111, symbol: 'Rg', name: 'Roentgenium', mass: 282, category: 'transition-metal', row: 7, col: 11, melt: null, boil: null, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B9', discoveredBy: 'Gesellschaft f\u00FCr Schwerionenforschung', yearDiscovered: 1994, funFact: 'Named after Wilhelm R\u00F6ntgen, discoverer of X-rays.' },
+  { number: 112, symbol: 'Cn', name: 'Copernicium', mass: 285, category: 'transition-metal', row: 7, col: 12, melt: null, boil: 3570, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2', discoveredBy: 'Gesellschaft f\u00FCr Schwerionenforschung', yearDiscovered: 1996, funFact: 'Named after Nicolaus Copernicus; predicted to be a gas at room temperature.' },
+  { number: 113, symbol: 'Nh', name: 'Nihonium', mass: 286, category: 'post-transition', row: 7, col: 13, melt: 700, boil: 1400, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u00B9', discoveredBy: 'RIKEN', yearDiscovered: 2003, funFact: 'First element discovered in Asia; named after Nihon, the Japanese word for Japan.' },
+  { number: 114, symbol: 'Fl', name: 'Flerovium', mass: 289, category: 'post-transition', row: 7, col: 14, melt: 200, boil: 380, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u00B2', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 1999, funFact: 'Named after Flerov Laboratory; may behave as a noble gas due to relativistic effects.' },
+  { number: 115, symbol: 'Mc', name: 'Moscovium', mass: 290, category: 'post-transition', row: 7, col: 15, melt: 670, boil: 1400, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u00B3', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 2003, funFact: 'Named after Moscow Oblast; exists for less than a second before decaying.' },
+  { number: 116, symbol: 'Lv', name: 'Livermorium', mass: 293, category: 'post-transition', row: 7, col: 16, melt: 709, boil: 1085, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u2074', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 2000, funFact: 'Named after Lawrence Livermore National Laboratory in California.' },
+  { number: 117, symbol: 'Ts', name: 'Tennessine', mass: 294, category: 'halogen', row: 7, col: 17, melt: 723, boil: 883, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u2075', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 2010, funFact: 'Named after Tennessee; the second-newest element to be named.' },
+  { number: 118, symbol: 'Og', name: 'Oganesson', mass: 294, category: 'noble-gas', row: 7, col: 18, melt: null, boil: 350, electronConfig: '[Rn] 5f\u00B9\u2074 6d\u00B9\u2070 7s\u00B2 7p\u2076', discoveredBy: 'Joint Institute for Nuclear Research', yearDiscovered: 2002, funFact: 'Named after Yuri Oganessian; predicted to be a solid noble gas due to relativistic effects.' },
+];
+
+/* === Cell map for quick lookup === */
+const cellMap = new Map();
+
+/* === Render Table === */
+function renderTable() {
+  const frag = document.createDocumentFragment();
+
+  for (const el of ELEMENTS) {
+    const cell = document.createElement('div');
+    cell.className = 'element-cell';
+    cell.dataset.number = el.number;
+    cell.dataset.symbol = el.symbol;
+    cell.dataset.category = el.category;
+    cell.style.gridColumn = el.col;
+    cell.style.gridRow = el.row;
+
+    cell.setAttribute('tabindex', '0');
+    cell.setAttribute('role', 'button');
+    cell.setAttribute('aria-label', `${el.name}, ${el.symbol}, atomic number ${el.number}`);
+    cell.style.animationDelay = (el.number * 8) + 'ms';
+
+    cell.innerHTML = `
+      <span class="atomic-number">${el.number}</span>
+      <span class="symbol">${el.symbol}</span>
+      <span class="name">${el.name}</span>
+      <span class="mass">${el.mass}</span>
+    `;
+
+    cellMap.set(el.number, cell);
+    frag.appendChild(cell);
+  }
+
+  dom.table.appendChild(frag);
+}
+
+/* === Tooltip === */
+const tooltip = document.createElement('div');
+tooltip.className = 'tooltip';
+document.body.appendChild(tooltip);
+
+function getElementData(number) {
+  return ELEMENTS.find(e => e.number === number);
+}
+
+function showTooltip(cell, e) {
+  const num = Number(cell.dataset.number);
+  const el = getElementData(num);
+  if (!el) return;
+
+  const catInfo = CATEGORIES[el.category] || { label: el.category };
+  const catColor = `var(--cat-${el.category})`;
+
+  tooltip.style.setProperty('--cat-color', catColor);
+  tooltip.innerHTML = `
+    <div class="tooltip-header">
+      <span class="tooltip-symbol">${el.symbol}</span>
+      <span class="tooltip-name">${el.name}</span>
+      <span class="tooltip-number">#${el.number}</span>
+    </div>
+    <div class="tooltip-row"><span>Mass</span><span>${el.mass}</span></div>
+    <div class="tooltip-row"><span>Config</span><span>${el.electronConfig}</span></div>
+    <div class="tooltip-row"><span>Melt</span><span>${el.melt ? el.melt + ' K' : 'N/A'}</span></div>
+    <div class="tooltip-row"><span>Boil</span><span>${el.boil ? el.boil + ' K' : 'N/A'}</span></div>
+    <span class="tooltip-category">${catInfo.label}</span>
+  `;
+
+  positionTooltip(cell);
+  requestAnimationFrame(() => tooltip.classList.add('visible'));
+}
+
+function positionTooltip(cell) {
+  const rect = cell.getBoundingClientRect();
+  const tw = 240;
+  const th = tooltip.offsetHeight || 160;
+
+  let left = rect.left + rect.width / 2 - tw / 2;
+  let top = rect.top - th - 8;
+
+  if (top < 8) top = rect.bottom + 8;
+  if (left < 8) left = 8;
+  if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+dom.table.addEventListener('mouseenter', (e) => {
+  const cell = e.target.closest('.element-cell');
+  if (cell) showTooltip(cell, e);
+}, true);
+
+dom.table.addEventListener('mouseleave', (e) => {
+  const cell = e.target.closest('.element-cell');
+  if (cell) hideTooltip();
+}, true);
+
+/* === Modal === */
+const modal = {
+  overlay: $('[data-modal]'),
+  backdrop: $('[data-modal-backdrop]'),
+  card: $('[data-modal-card]'),
+  close: $('[data-modal-close]'),
+  accent: $('[data-modal-accent]'),
+  header: $('[data-modal-header]'),
+  body: $('[data-modal-body]'),
+};
+
+function openModal(number) {
+  const el = getElementData(number);
+  if (!el) return;
+
+  hideTooltip();
+  state.modalElement = el;
+  const catInfo = CATEGORIES[el.category] || { label: el.category };
+
+  modal.card.style.setProperty('--cat-color', `var(--cat-${el.category})`);
+  modal.accent.style.background = `var(--cat-${el.category})`;
+
+  modal.header.innerHTML = `
+    <div class="modal-symbol-block">${el.symbol}</div>
+    <div class="modal-title-group">
+      <div class="modal-element-name">${el.name}</div>
+      <div class="modal-element-sub">#${el.number} &middot; ${el.mass} u &middot; ${catInfo.label}</div>
+    </div>
+  `;
+
+  modal.body.innerHTML = `
+    <div class="modal-info-grid">
+      <div class="modal-info-item">
+        <div class="modal-info-label">Electron Config</div>
+        <div class="modal-info-value">${el.electronConfig}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Discovered By</div>
+        <div class="modal-info-value">${el.discoveredBy}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Year</div>
+        <div class="modal-info-value">${el.yearDiscovered ?? 'Ancient'}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Melting Point</div>
+        <div class="modal-info-value">${el.melt ? el.melt + ' K' : 'N/A'}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">Boiling Point</div>
+        <div class="modal-info-value">${el.boil ? el.boil + ' K' : 'N/A'}</div>
+      </div>
+      <div class="modal-info-item">
+        <div class="modal-info-label">State at ${state.temperature} K</div>
+        <div class="modal-info-value">${getStateName(el, state.temperature)}</div>
+      </div>
+    </div>
+    <div class="modal-fun-fact">${el.funFact}</div>
+  `;
+
+  modal.overlay.classList.add('open');
+  modal.overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.overlay.classList.remove('open');
+  modal.overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  state.modalElement = null;
+}
+
+function getStateName(el, temp) {
+  if (el.melt == null && el.boil == null) return 'Unknown';
+  if (el.melt != null && temp < el.melt) return 'Solid';
+  if (el.boil != null && temp >= el.boil) return 'Gas';
+  if (el.melt != null && el.boil != null) return 'Liquid';
+  return 'Unknown';
+}
+
+dom.table.addEventListener('click', (e) => {
+  const cell = e.target.closest('.element-cell');
+  if (cell) openModal(Number(cell.dataset.number));
+});
+
+modal.close.addEventListener('click', closeModal);
+modal.backdrop.addEventListener('click', closeModal);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.overlay.classList.contains('open')) closeModal();
+});
+
+/* === Search === */
+const searchInput = $('[data-search]');
+const searchClear = $('[data-search-clear]');
+
+function updateFilters() {
+  const q = state.searchQuery.toLowerCase();
+  const cat = state.activeCategory;
+
+  for (const el of ELEMENTS) {
+    const cell = cellMap.get(el.number);
+    if (!cell) continue;
+
+    const matchesSearch = !q ||
+      el.symbol.toLowerCase().includes(q) ||
+      el.name.toLowerCase().includes(q) ||
+      String(el.number).includes(q);
+
+    const matchesCat = cat === 'all' || el.category === cat;
+
+    if (matchesSearch && matchesCat) {
+      cell.classList.remove('dimmed');
+    } else {
+      cell.classList.add('dimmed');
+    }
+  }
+}
+
+let searchTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.searchQuery = searchInput.value.trim();
+    searchClear.hidden = !state.searchQuery;
+    updateFilters();
+  }, 100);
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  state.searchQuery = '';
+  searchClear.hidden = true;
+  updateFilters();
+  searchInput.focus();
+});
+
+/* === Category Filter === */
+const catFilters = $('[data-category-filters]');
+const catBtns = $$('.cat-btn', catFilters);
+
+catFilters.addEventListener('click', (e) => {
+  const btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+
+  const cat = btn.dataset.cat;
+
+  if (cat === state.activeCategory && cat !== 'all') {
+    state.activeCategory = 'all';
+  } else {
+    state.activeCategory = cat;
+  }
+
+  catBtns.forEach(b => b.classList.toggle('active', b.dataset.cat === state.activeCategory));
+  updateFilters();
+});
+
+/* === Temperature Slider === */
+const tempSlider = $('[data-temp-slider]');
+const tempDisplay = $('[data-temp-display]');
+const tempPresets = $$('[data-temp-preset]');
+
+function getStateClass(el, temp) {
+  if (el.melt == null && el.boil == null) return 'unknown';
+  if (el.melt != null && temp < el.melt) return 'solid';
+  if (el.boil != null && temp >= el.boil) return 'gas';
+  if (el.melt != null && el.boil != null) return 'liquid';
+  return 'unknown';
+}
+
+function updateTemperature(temp) {
+  state.temperature = temp;
+  tempDisplay.textContent = temp + ' K';
+  tempSlider.value = temp;
+
+  tempPresets.forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.tempPreset) === temp);
+  });
+
+  for (const el of ELEMENTS) {
+    const cell = cellMap.get(el.number);
+    if (!cell) continue;
+    let dot = cell.querySelector('.state-dot');
+    if (!dot) {
+      dot = document.createElement('span');
+      dot.className = 'state-dot';
+      cell.appendChild(dot);
+    }
+    dot.className = 'state-dot ' + getStateClass(el, temp);
+  }
+}
+
+tempSlider.addEventListener('input', () => {
+  updateTemperature(Number(tempSlider.value));
+});
+
+document.querySelector('.temp-presets').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-temp-preset]');
+  if (btn) updateTemperature(Number(btn.dataset.tempPreset));
+});
+
+/* === Keyboard Navigation === */
+document.addEventListener('keydown', (e) => {
+  if (modal.overlay.classList.contains('open')) return;
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('element-cell')) return;
+
+  const num = Number(active.dataset.number);
+  const el = getElementData(num);
+  if (!el) return;
+
+  let targetRow = el.row;
+  let targetCol = el.col;
+
+  if (e.key === 'ArrowRight') targetCol++;
+  else if (e.key === 'ArrowLeft') targetCol--;
+  else if (e.key === 'ArrowDown') targetRow++;
+  else if (e.key === 'ArrowUp') targetRow--;
+  else if (e.key === 'Enter') { openModal(num); e.preventDefault(); return; }
+  else return;
+
+  e.preventDefault();
+  const target = ELEMENTS.find(x => x.row === targetRow && x.col === targetCol);
+  if (target) {
+    const targetCell = cellMap.get(target.number);
+    if (targetCell) targetCell.focus();
+  }
+});
+
+/* === Init === */
+renderTable();
+updateTemperature(293);
