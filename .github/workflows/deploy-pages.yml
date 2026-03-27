@@ -16,6 +16,7 @@ on:
       - "day-07-fluid-sim/**"
       - "day-08-flow-field/**"
       - "day-09-masonry-gallery/**"
+      - "day-10-periodic-table/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -69,6 +70,7 @@ jobs:
           cp -R day-07-fluid-sim _site/
           cp -R day-08-flow-field _site/
           cp -R day-09-masonry-gallery _site/
+          cp -R day-10-periodic-table _site/
           mkdir -p _site/day-03-solar-system
           cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
 
