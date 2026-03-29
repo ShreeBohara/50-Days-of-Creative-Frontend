@@ -343,3 +343,13 @@ body::after {
   color: var(--text-muted);
   margin-top: auto;
 }
+
+/* -- Card flip -- */
+
+.card__inner {
+  transition: transform 0.6s var(--ease-flip);
+}
+
+.card--flipped .card__inner {
+  transform: rotateY(180deg);
+}

@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function cycleCard(direction) {
     if (isAnimating || state !== 'stack') return;
     isAnimating = true;
+    unflipAll();
 
     const topIdx = cardOrder[0];
     const topCard = cards[topIdx];
@@ -93,6 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (Math.abs(dx) > 40) {
       cycleCard(dx > 0 ? -1 : 1);
+    } else if (Math.abs(dx) < 6 && elapsed < 300) {
+      /* Short tap = flip the top card */
+      flipTopCard();
     }
   }
 
@@ -100,6 +104,27 @@ document.addEventListener('DOMContentLoaded', () => {
   deck.addEventListener('mouseup', onPointerUp);
   deck.addEventListener('touchstart', onPointerDown, { passive: true });
   deck.addEventListener('touchend', onPointerUp, { passive: true });
+
+  /* ---- Card flip ---- */
+
+  function flipTopCard() {
+    if (isAnimating) return;
+    const topIdx = cardOrder[0];
+    const topCard = cards[topIdx];
+    toggleFlip(topCard);
+  }
+
+  function toggleFlip(card) {
+    card.classList.toggle('card--flipped');
+    card.dataset.flipped = card.classList.contains('card--flipped') ? 'true' : 'false';
+  }
+
+  function unflipAll() {
+    cards.forEach((card) => {
+      card.classList.remove('card--flipped');
+      card.dataset.flipped = 'false';
+    });
+  }
 
   /* ---- Fan & Stack buttons ---- */
 
