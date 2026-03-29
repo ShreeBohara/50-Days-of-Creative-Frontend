@@ -101,5 +101,60 @@ document.addEventListener('DOMContentLoaded', () => {
   deck.addEventListener('touchstart', onPointerDown, { passive: true });
   deck.addEventListener('touchend', onPointerUp, { passive: true });
 
+  /* ---- Fan & Stack buttons ---- */
+
+  const fanBtn = document.querySelector('[data-btn-fan]');
+  const stackBtn = document.querySelector('[data-btn-stack]');
+
+  function setActiveBtn(btn) {
+    document.querySelectorAll('.controls__btn').forEach((b) => b.classList.remove('controls__btn--active'));
+    if (btn) btn.classList.add('controls__btn--active');
+  }
+
+  function fanCards() {
+    if (isAnimating) return;
+    if (state === 'fan') { positionStack(); setActiveBtn(null); return; }
+    isAnimating = true;
+    state = 'fan';
+    setActiveBtn(fanBtn);
+
+    cards.forEach((card) => {
+      const pos = cardOrder.indexOf(+card.dataset.index);
+      const center = (total - 1) / 2;
+      const offset = pos - center;
+      const angle = offset * 7;
+      const tx = offset * 58;
+      const tz = 280 - Math.abs(offset) * 18;
+
+      card.style.transition = `transform 0.65s ${pos * 0.035}s var(--ease-spring), filter 0.4s ease`;
+      card.style.transform = `rotateY(${angle}deg) translateZ(${tz}px) translateX(${tx}px)`;
+      card.style.zIndex = total - Math.abs(Math.round(offset));
+      card.style.filter = 'brightness(1)';
+    });
+
+    setTimeout(() => { isAnimating = false; }, 650 + total * 35);
+  }
+
+  function stackCards() {
+    if (isAnimating) return;
+    isAnimating = true;
+    setActiveBtn(null);
+
+    cards.forEach((card) => {
+      const pos = cardOrder.indexOf(+card.dataset.index);
+      card.style.transition = `transform 0.6s ${pos * 0.03}s var(--ease-out-expo), filter 0.6s ease`;
+      card.style.transform = `translate3d(${pos * 2}px, ${pos * 2}px, ${-pos * 5}px)`;
+      card.style.zIndex = total - pos;
+      card.style.filter = `brightness(${1 - pos * 0.03})`;
+    });
+
+    setTimeout(() => { state = 'stack'; isAnimating = false; }, 600 + total * 30);
+  }
+
+  fanBtn.addEventListener('click', fanCards);
+  stackBtn.addEventListener('click', () => {
+    if (state !== 'stack') stackCards();
+  });
+
   positionStack();
 });
