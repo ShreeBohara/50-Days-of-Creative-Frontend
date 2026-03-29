@@ -382,3 +382,55 @@ body::after {
   letter-spacing: 0.03em;
   z-index: 2;
 }
+
+/* -- Responsive -- */
+
+@media (max-width: 768px) {
+  :root {
+    --card-w: 240px;
+    --card-h: 336px;
+  }
+
+  .deck-header { margin-top: 4vh; margin-bottom: 1.2rem; }
+  .deck-stage { height: 50vh; perspective: 1000px; }
+  .card__face { padding: 1.8rem 1.2rem; }
+  .card__title { font-size: 1.15rem; }
+  .card__text { font-size: 0.82rem; }
+  .card__icon { width: 42px; height: 42px; }
+  .controls { gap: 0.6rem; }
+  .controls__btn { padding: 0.5rem 1.3rem; font-size: 0.68rem; }
+  .card__back { padding: 2rem 1.5rem; padding-top: 2.8rem; }
+  .card__back-text { font-size: 0.8rem; }
+  .keyboard-hint { display: none; }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --card-w: 210px;
+    --card-h: 294px;
+  }
+
+  .deck-header h1 { font-size: 1.2rem; }
+  .deck-subtitle { font-size: 0.9rem; }
+  .deck-stage { perspective: 800px; height: 48vh; }
+  .card__face { padding: 1.5rem 1rem; }
+  .card__title { font-size: 1rem; }
+  .card__text { font-size: 0.78rem; }
+  .card__icon { width: 36px; height: 36px; margin-bottom: 0.8rem; }
+  .card__number { font-size: 0.6rem; margin-bottom: 0.5rem; }
+  .card__ornament { inset: 7px; }
+  .controls { flex-wrap: wrap; justify-content: center; }
+  .controls__btn { padding: 0.5rem 1rem; font-size: 0.65rem; min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card--top .card__inner,
+  .card--top.card--flipped .card__inner {
+    animation: none;
+  }
+
+  .card,
+  .card__inner {
+    transition-duration: 0.01ms !important;
+  }
+}

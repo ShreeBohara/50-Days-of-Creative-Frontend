@@ -144,13 +144,15 @@ document.addEventListener('DOMContentLoaded', () => {
     state = 'fan';
     setActiveBtn(fanBtn);
 
+    const spread = window.innerWidth < 768 ? 0.55 : 1;
+
     cards.forEach((card) => {
       const pos = cardOrder.indexOf(+card.dataset.index);
       const center = (total - 1) / 2;
       const offset = pos - center;
-      const angle = offset * 7;
-      const tx = offset * 58;
-      const tz = 280 - Math.abs(offset) * 18;
+      const angle = offset * 7 * spread;
+      const tx = offset * 58 * spread;
+      const tz = (280 - Math.abs(offset) * 18) * spread;
 
       card.style.transition = `transform 0.65s ${pos * 0.035}s var(--ease-spring), filter 0.4s ease`;
       card.style.transform = `rotateY(${angle}deg) translateZ(${tz}px) translateX(${tx}px)`;
