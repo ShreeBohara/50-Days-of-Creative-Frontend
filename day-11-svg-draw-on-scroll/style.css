@@ -289,3 +289,31 @@ body {
 .scroll-cue {
   z-index: 2;
 }
+
+/* ── Progress Indicator ──────────────────────────────── */
+.progress-track {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100vh;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.progress-fill {
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(
+    to bottom,
+    var(--accent-hero),
+    var(--accent-city),
+    var(--accent-mountains),
+    var(--accent-rocket),
+    var(--accent-circuit),
+    var(--accent-waves)
+  );
+  box-shadow: 0 0 8px var(--accent-hero), 0 0 16px var(--accent-hero);
+  transition: height 0.1s linear;
+  border-radius: 0 0 2px 2px;
+}

@@ -77,12 +77,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* ── Progress indicator ──────────────────────────────── */
+  const progressFill = document.querySelector('[data-progress-fill]');
+
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressFill.style.height = pct + '%';
+  }
+
+  /* ── Unified scroll handler ────────────────────────── */
   function onScroll() {
     if (!ticking) {
       ticking = true;
       requestAnimationFrame(() => {
         updateDrawAnimations();
         updateParallax();
+        updateProgress();
         ticking = false;
       });
     }
@@ -93,4 +105,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial call
   updateDrawAnimations();
   updateParallax();
+  updateProgress();
 });
