@@ -102,6 +102,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  /* ── Nav Dots ──────────────────────────────────────── */
+  const navDots = document.querySelectorAll('[data-nav-dot]');
+  const allScenes = document.querySelectorAll('[data-scene]');
+
+  // Click to scroll
+  navDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const target = document.querySelector(`[data-scene="${dot.dataset.navDot}"]`);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // IntersectionObserver to track active section
+  const navObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const sceneName = entry.target.dataset.scene;
+        navDots.forEach(d => d.classList.toggle('active', d.dataset.navDot === sceneName));
+      }
+    });
+  }, { threshold: 0.4 });
+
+  allScenes.forEach(scene => navObserver.observe(scene));
+
   // Initial call
   updateDrawAnimations();
   updateParallax();
