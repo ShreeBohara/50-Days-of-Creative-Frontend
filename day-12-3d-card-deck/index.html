@@ -19,7 +19,30 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div class="app" data-app></div>
+    <div class="app" data-app>
+
+      <!-- Corner label -->
+      <div class="corner-label" aria-hidden="true">12 / 50</div>
+
+      <!-- Header -->
+      <header class="deck-header">
+        <h1>Celestial Arcana</h1>
+        <p class="deck-subtitle">Ten cards of the cosmic order</p>
+      </header>
+
+      <!-- 3D Stage -->
+      <main class="deck-stage" data-deck-stage aria-label="3D card deck">
+        <div class="deck" data-deck></div>
+      </main>
+
+      <!-- Controls -->
+      <div class="controls" data-controls>
+        <button class="controls__btn" data-btn-fan type="button">Fan</button>
+        <button class="controls__btn" data-btn-stack type="button">Stack</button>
+        <button class="controls__btn" data-btn-shuffle type="button">Shuffle</button>
+      </div>
+
+    </div>
     <script src="./script.js"></script>
   </body>
 </html>

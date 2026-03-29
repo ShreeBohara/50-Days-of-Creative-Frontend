@@ -49,4 +49,126 @@ body {
 .app {
   position: relative;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* -- Grain overlay + vignette -- */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.55));
+}
+
+/* -- Corner label -- */
+
+.corner-label {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.8rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  opacity: 0.5;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+/* -- Header -- */
+
+.deck-header {
+  text-align: center;
+  margin-top: 6vh;
+  margin-bottom: 2rem;
+  z-index: 2;
+}
+
+.deck-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 40px rgba(201, 169, 110, 0.25);
+}
+
+.deck-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  letter-spacing: 0.04em;
+}
+
+/* -- 3D Stage -- */
+
+.deck-stage {
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 55vh;
+  width: 100%;
+  z-index: 2;
+}
+
+.deck {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  transform-style: preserve-3d;
+}
+
+/* -- Controls -- */
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  z-index: 2;
+}
+
+.controls__btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.65rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.controls__btn:hover {
+  background: rgba(201, 169, 110, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 0 24px rgba(201, 169, 110, 0.12);
+}
+
+.controls__btn--active {
+  background: rgba(201, 169, 110, 0.14);
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(201, 169, 110, 0.18);
 }
