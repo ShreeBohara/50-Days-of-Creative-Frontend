@@ -162,32 +162,6 @@ body {
   max-width: 28ch;
 }
 
-/* ── Scroll Cue ──────────────────────────────────────── */
-.scroll-cue {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.4;
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.scroll-dot {
-  animation: scrollBounce 1.8s ease-in-out infinite;
-}
-
-@keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(6px); opacity: 0.3; }
-}
-
 /* ── Parallax ────────────────────────────────────────── */
 [data-speed] {
   will-change: transform;
@@ -289,7 +263,13 @@ body {
 /* SVG glow effect */
 .scene-svg svg {
   filter: drop-shadow(0 0 8px var(--scene-glow, transparent));
-  transition: filter 0.6s ease;
+  transition: filter 0.6s ease, transform 0.6s var(--ease-out-cubic);
+}
+
+.scene-svg:hover svg {
+  filter: drop-shadow(0 0 16px var(--scene-glow, transparent))
+         drop-shadow(0 0 32px var(--scene-glow, transparent));
+  transform: scale(1.02);
 }
 
 /* ── Gradient Transitions Between Sections ───────────── */
@@ -331,7 +311,7 @@ body {
   z-index: 2;
 }
 
-.scroll-cue {
+.scroll-arrow {
   z-index: 2;
 }
 
