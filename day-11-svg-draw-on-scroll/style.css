@@ -13,6 +13,27 @@
 
   --bg-hero: #0c1220;
   --accent-hero: #c8a46e;
+  --glow-hero: #c8a46e44;
+
+  --bg-city: #1a1020;
+  --accent-city: #f0a050;
+  --glow-city: #f0a05044;
+
+  --bg-mountains: #0a1a12;
+  --accent-mountains: #4ecdc4;
+  --glow-mountains: #4ecdc444;
+
+  --bg-rocket: #120a1e;
+  --accent-rocket: #7c5cfc;
+  --glow-rocket: #7c5cfc44;
+
+  --bg-circuit: #0a1518;
+  --accent-circuit: #00d4aa;
+  --glow-circuit: #00d4aa44;
+
+  --bg-waves: #1a0a10;
+  --accent-waves: #ff6b8a;
+  --glow-waves: #ff6b8a44;
 
   --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -160,4 +181,106 @@ body {
   width: 100%;
   height: auto;
   max-height: 60vh;
+}
+
+/* ── Section Colors ──────────────────────────────────── */
+[data-scene="hero"] {
+  background: var(--bg-hero);
+  color: #e8e4df;
+}
+
+[data-scene="city"] {
+  background: var(--bg-city);
+  --scene-accent: var(--accent-city);
+  --scene-glow: var(--glow-city);
+}
+
+[data-scene="mountains"] {
+  background: var(--bg-mountains);
+  --scene-accent: var(--accent-mountains);
+  --scene-glow: var(--glow-mountains);
+}
+
+[data-scene="rocket"] {
+  background: var(--bg-rocket);
+  --scene-accent: var(--accent-rocket);
+  --scene-glow: var(--glow-rocket);
+}
+
+[data-scene="circuit"] {
+  background: var(--bg-circuit);
+  --scene-accent: var(--accent-circuit);
+  --scene-glow: var(--glow-circuit);
+}
+
+[data-scene="waves"] {
+  background: var(--bg-waves);
+  --scene-accent: var(--accent-waves);
+  --scene-glow: var(--glow-waves);
+}
+
+/* Accent color on scene titles */
+.scene:not(.scene--hero) .scene-title {
+  color: var(--scene-accent);
+}
+
+.scene:not(.scene--hero) .scene-label {
+  color: var(--scene-accent);
+  opacity: 0.12;
+}
+
+/* SVG stroke color per section */
+[data-scene="city"] .scene-svg svg { stroke: var(--accent-city); }
+[data-scene="mountains"] .scene-svg svg { stroke: var(--accent-mountains); }
+[data-scene="rocket"] .scene-svg svg { stroke: var(--accent-rocket); }
+[data-scene="circuit"] .scene-svg svg { stroke: var(--accent-circuit); }
+[data-scene="waves"] .scene-svg svg { stroke: var(--accent-waves); }
+
+/* SVG glow effect */
+.scene-svg svg {
+  filter: drop-shadow(0 0 8px var(--scene-glow, transparent));
+  transition: filter 0.6s ease;
+}
+
+/* ── Gradient Transitions Between Sections ───────────── */
+.scene::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30vh;
+  background: linear-gradient(to bottom, transparent, var(--next-bg, transparent));
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-scene="hero"]::after { --next-bg: var(--bg-city); }
+[data-scene="city"]::after { --next-bg: var(--bg-mountains); }
+[data-scene="mountains"]::after { --next-bg: var(--bg-rocket); }
+[data-scene="rocket"]::after { --next-bg: var(--bg-circuit); }
+[data-scene="circuit"]::after { --next-bg: var(--bg-waves); }
+[data-scene="waves"]::after { display: none; }
+
+/* ── Grain Overlay ───────────────────────────────────── */
+.app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+/* ── Scene Inner z-index above gradient ──────────────── */
+.scene-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.scroll-cue {
+  z-index: 2;
 }
