@@ -40,8 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Parallax elements ────────────────────────────────── */
   const parallaxEls = document.querySelectorAll('[data-speed]');
+  const isMobile = () => window.innerWidth <= 600;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function updateParallax() {
+    if (isMobile() || prefersReducedMotion) return;
     const vh = window.innerHeight;
     parallaxEls.forEach(el => {
       const rect = el.getBoundingClientRect();
