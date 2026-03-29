@@ -156,5 +156,53 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state !== 'stack') stackCards();
   });
 
+  /* ---- Shuffle ---- */
+
+  const shuffleBtn = document.querySelector('[data-btn-shuffle]');
+
+  function shuffleCards() {
+    if (isAnimating) return;
+    isAnimating = true;
+    state = 'shuffle';
+    setActiveBtn(shuffleBtn);
+
+    /* Phase 1: scatter */
+    cards.forEach((card, i) => {
+      const rx = (Math.random() - 0.5) * 700;
+      const ry = (Math.random() - 0.5) * 500;
+      const rz = (Math.random() - 0.5) * 300;
+      const ra = (Math.random() - 0.5) * 60;
+      card.style.transition = `transform 0.55s ${i * 0.025}s var(--ease-shuffle), filter 0.3s ease`;
+      card.style.transform = `translate3d(${rx}px, ${ry}px, ${rz}px) rotate(${ra}deg)`;
+      card.style.zIndex = Math.floor(Math.random() * total);
+      card.style.filter = 'brightness(1)';
+    });
+
+    /* Phase 2: Fisher-Yates shuffle */
+    setTimeout(() => {
+      for (let i = cardOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cardOrder[i], cardOrder[j]] = [cardOrder[j], cardOrder[i]];
+      }
+
+      /* Phase 3: re-collect into stack */
+      cards.forEach((card) => {
+        const pos = cardOrder.indexOf(+card.dataset.index);
+        card.style.transition = `transform 0.6s ${pos * 0.045}s var(--ease-spring), filter 0.6s ease`;
+        card.style.transform = `translate3d(${pos * 2}px, ${pos * 2}px, ${-pos * 5}px)`;
+        card.style.zIndex = total - pos;
+        card.style.filter = `brightness(${1 - pos * 0.03})`;
+      });
+
+      setTimeout(() => {
+        state = 'stack';
+        isAnimating = false;
+        setActiveBtn(null);
+      }, 650 + total * 45);
+    }, 600);
+  }
+
+  shuffleBtn.addEventListener('click', shuffleCards);
+
   positionStack();
 });
