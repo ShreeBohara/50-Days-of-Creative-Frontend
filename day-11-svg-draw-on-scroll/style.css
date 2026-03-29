@@ -35,3 +35,129 @@ body {
 .app {
   position: relative;
 }
+
+/* ── Sections ────────────────────────────────────────── */
+.scene {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scene-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 4rem;
+  align-items: center;
+  width: min(90%, 1280px);
+  padding: 6rem 0;
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.scene--hero {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.scene--hero .scene-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2rem;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(4rem, 12vw, 10rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--accent-hero);
+}
+
+.scene-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  opacity: 0.6;
+  max-width: 28ch;
+}
+
+/* ── Scroll Cue ──────────────────────────────────────── */
+.scroll-cue {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.4;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.scroll-dot {
+  animation: scrollBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(6px); opacity: 0.3; }
+}
+
+/* ── Scene Text ──────────────────────────────────────── */
+.scene-label {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 6vw, 5rem);
+  opacity: 0.08;
+  line-height: 1;
+  margin-bottom: -0.5rem;
+}
+
+.scene-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.scene-desc {
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  opacity: 0.65;
+  max-width: 36ch;
+  line-height: 1.7;
+}
+
+/* ── Scene SVG Container ─────────────────────────────── */
+.scene-svg {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-svg svg {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+}
