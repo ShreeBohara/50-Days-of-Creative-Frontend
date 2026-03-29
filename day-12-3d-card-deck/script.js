@@ -51,7 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* After animation, snap departed card to bottom */
+    let settled = false;
     const onDone = () => {
+      if (settled) return;
+      settled = true;
+
       topCard.style.transition = 'none';
       cardOrder = [...remaining, topIdx];
       const bottomPos = total - 1;
@@ -68,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     topCard.addEventListener('transitionend', onDone, { once: true });
-    setTimeout(onDone, 800); // fallback
+    setTimeout(onDone, 800);
   }
 
   /* ---- Drag / swipe to cycle ---- */

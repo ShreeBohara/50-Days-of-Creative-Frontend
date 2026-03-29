@@ -37,6 +37,18 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "day-05-terrain-generator", "-l", "3005"],
       "port": 3005
+    },
+    {
+      "name": "day-09",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "day-09-masonry-gallery", "-l", "3009"],
+      "port": 3009
+    },
+    {
+      "name": "day-12",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "day-12-3d-card-deck", "-l", "3012"],
+      "port": 3012
     }
   ]
 }
