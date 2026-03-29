@@ -49,7 +49,49 @@
             <p class="scene-desc">Steel and glass rise from the horizon — a metropolis sketched in light, where every tower tells a story of ambition reaching upward.</p>
           </div>
           <div class="scene-svg" data-scene-svg="city">
-            <!-- SVG will be added in commit 3 -->
+            <svg viewBox="0 0 800 500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Ground line -->
+              <path data-draw data-delay="0" stroke-width="2" d="M0 420 H800"/>
+              <!-- Tower 1 - tall narrow -->
+              <path data-draw data-delay="0.1" stroke-width="1.8" d="M80 420 V180 H120 V420"/>
+              <path data-draw data-delay="0.15" stroke-width="1.2" d="M90 180 V140 H110 V180"/>
+              <path data-draw data-delay="0.2" stroke-width="1" d="M97 140 V110 H103 V140"/>
+              <!-- Tower 1 windows -->
+              <path data-draw data-delay="0.25" stroke-width="0.8" d="M90 200 h10 M90 220 h10 M90 240 h10 M90 260 h10 M90 280 h10 M90 300 h10 M90 320 h10 M90 340 h10 M90 360 h10 M90 380 h10 M90 400 h10 M105 200 h10 M105 220 h10 M105 240 h10 M105 260 h10 M105 280 h10 M105 300 h10 M105 320 h10 M105 340 h10 M105 360 h10 M105 380 h10 M105 400 h10"/>
+              <!-- Tower 2 - wide office -->
+              <path data-draw data-delay="0.1" stroke-width="1.8" d="M150 420 V230 H260 V420"/>
+              <path data-draw data-delay="0.15" stroke-width="1.2" d="M160 230 H250 V250 H160Z"/>
+              <!-- Tower 2 windows grid -->
+              <path data-draw data-delay="0.3" stroke-width="0.7" d="M165 265 h20 v15 h-20z M195 265 h20 v15 h-20z M225 265 h20 v15 h-20z M165 295 h20 v15 h-20z M195 295 h20 v15 h-20z M225 295 h20 v15 h-20z M165 325 h20 v15 h-20z M195 325 h20 v15 h-20z M225 325 h20 v15 h-20z M165 355 h20 v15 h-20z M195 355 h20 v15 h-20z M225 355 h20 v15 h-20z M165 385 h20 v15 h-20z M195 385 h20 v15 h-20z M225 385 h20 v15 h-20z"/>
+              <!-- Tower 3 - skyscraper -->
+              <path data-draw data-delay="0.05" stroke-width="2" d="M300 420 V120 H380 V420"/>
+              <path data-draw data-delay="0.12" stroke-width="1.5" d="M320 120 V80 H360 V120"/>
+              <path data-draw data-delay="0.18" stroke-width="1" d="M335 80 V50 H345 V80"/>
+              <!-- Antenna -->
+              <path data-draw data-delay="0.22" stroke-width="1.2" d="M340 50 V20"/>
+              <path data-draw data-delay="0.24" stroke-width="0.8" d="M330 35 H350"/>
+              <!-- Tower 3 windows -->
+              <path data-draw data-delay="0.35" stroke-width="0.7" d="M310 140 h15 M310 165 h15 M310 190 h15 M310 215 h15 M310 240 h15 M310 265 h15 M310 290 h15 M310 315 h15 M310 340 h15 M310 365 h15 M310 390 h15 M340 140 h15 M340 165 h15 M340 190 h15 M340 215 h15 M340 240 h15 M340 265 h15 M340 290 h15 M340 315 h15 M340 340 h15 M340 365 h15 M340 390 h15 M365 140 h10 M365 165 h10 M365 190 h10 M365 215 h10 M365 240 h10 M365 265 h10 M365 290 h10 M365 315 h10 M365 340 h10 M365 365 h10 M365 390 h10"/>
+              <!-- Bridge -->
+              <path data-draw data-delay="0.15" stroke-width="1.8" d="M410 420 V350 Q460 280 510 350 V420"/>
+              <path data-draw data-delay="0.2" stroke-width="1" d="M410 350 H510 M430 350 V310 M460 350 V285 M490 350 V310"/>
+              <!-- Suspension cables -->
+              <path data-draw data-delay="0.28" stroke-width="0.6" d="M460 285 L430 310 M460 285 L490 310 M460 285 L415 340 M460 285 L505 340"/>
+              <!-- Tower 4 - dome building -->
+              <path data-draw data-delay="0.1" stroke-width="1.8" d="M540 420 V300 H640 V420"/>
+              <path data-draw data-delay="0.16" stroke-width="1.5" d="M540 300 Q590 220 640 300"/>
+              <path data-draw data-delay="0.3" stroke-width="0.8" d="M555 320 h20 v18 h-20z M605 320 h20 v18 h-20z M555 355 h20 v18 h-20z M605 355 h20 v18 h-20z M575 390 h30 v30 h-30z"/>
+              <!-- Crane -->
+              <path data-draw data-delay="0.08" stroke-width="1.5" d="M700 420 V100"/>
+              <path data-draw data-delay="0.14" stroke-width="1.3" d="M700 100 H780"/>
+              <path data-draw data-delay="0.18" stroke-width="0.8" d="M700 100 L660 130 M700 130 H660 M780 100 V130 M780 120 L760 120 V180"/>
+              <path data-draw data-delay="0.22" stroke-width="0.6" d="M700 100 L700 130 M710 420 V200 M690 420 V200 M690 200 H710 M690 250 H710 M690 300 H710 M690 350 H710 M690 400 H710"/>
+              <!-- Moon -->
+              <path data-draw data-delay="0.4" stroke-width="1.2" d="M680 60 A25 25 0 1 0 680 59.99"/>
+              <path data-draw data-delay="0.45" stroke-width="0.8" d="M690 50 A15 15 0 0 1 670 70"/>
+              <!-- Stars -->
+              <path data-draw data-delay="0.5" stroke-width="0.8" d="M50 60 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z M180 40 l1.5 4.5 4.5 1.5 -4.5 1.5 -1.5 4.5 -1.5 -4.5 -4.5 -1.5 4.5 -1.5z M480 50 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z M620 30 l1.5 4.5 4.5 1.5 -4.5 1.5 -1.5 4.5 -1.5 -4.5 -4.5 -1.5 4.5 -1.5z"/>
+            </svg>
           </div>
         </div>
       </section>
@@ -63,6 +105,41 @@
             <p class="scene-desc">Ancient peaks carve the sky — ridgelines folding into valleys where rivers thread through silence and stone.</p>
           </div>
           <div class="scene-svg" data-scene-svg="mountains">
+            <svg viewBox="0 0 800 500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Far mountains (background) -->
+              <path data-draw data-delay="0" stroke-width="1.2" d="M0 380 L60 280 L110 320 L180 240 L230 290 L300 200 L370 260 L420 180 L480 250 L540 210 L600 270 L660 220 L720 280 L780 240 L800 260 V500 H0Z"/>
+              <!-- Mid mountains -->
+              <path data-draw data-delay="0.1" stroke-width="1.8" d="M0 420 L80 320 L140 360 L220 260 L280 310 L340 230 L400 290 L440 250 L500 320 L560 280 L620 340 L700 290 L760 340 L800 310 V500 H0Z"/>
+              <!-- Main peak left -->
+              <path data-draw data-delay="0.15" stroke-width="2.2" d="M50 450 L200 160 L350 450"/>
+              <!-- Snow cap left -->
+              <path data-draw data-delay="0.25" stroke-width="1.5" d="M155 230 L200 160 L245 230 L230 240 L215 225 L200 245 L185 225 L170 240Z"/>
+              <!-- Main peak right -->
+              <path data-draw data-delay="0.15" stroke-width="2.2" d="M380 450 L550 120 L720 450"/>
+              <!-- Snow cap right -->
+              <path data-draw data-delay="0.25" stroke-width="1.5" d="M495 210 L550 120 L605 210 L585 225 L565 205 L550 230 L535 205 L515 225Z"/>
+              <!-- Pine trees left cluster -->
+              <path data-draw data-delay="0.3" stroke-width="1.2" d="M30 450 V420 M20 440 L30 425 L40 440 M15 450 L30 430 L45 450"/>
+              <path data-draw data-delay="0.32" stroke-width="1.2" d="M65 450 V415 M55 440 L65 422 L75 440 M50 450 L65 425 L80 450"/>
+              <path data-draw data-delay="0.34" stroke-width="1.2" d="M100 450 V425 M92 445 L100 430 L108 445 M87 450 L100 432 L113 450"/>
+              <!-- Pine trees right cluster -->
+              <path data-draw data-delay="0.3" stroke-width="1.2" d="M650 450 V415 M640 440 L650 420 L660 440 M635 450 L650 425 L665 450"/>
+              <path data-draw data-delay="0.32" stroke-width="1.2" d="M690 450 V425 M682 445 L690 430 L698 445 M677 450 L690 432 L703 450"/>
+              <path data-draw data-delay="0.34" stroke-width="1.2" d="M730 450 V420 M720 442 L730 425 L740 442 M715 450 L730 428 L745 450"/>
+              <!-- River -->
+              <path data-draw data-delay="0.2" stroke-width="1.5" d="M350 450 Q370 430 390 440 Q410 450 430 435 Q450 420 470 435 Q490 450 510 430 Q530 410 550 425"/>
+              <path data-draw data-delay="0.22" stroke-width="1" d="M360 460 Q380 445 400 455 Q420 465 440 448 Q460 432 480 448"/>
+              <!-- Clouds -->
+              <path data-draw data-delay="0.4" stroke-width="0.8" d="M100 100 Q120 80 150 90 Q165 70 190 85 Q210 75 220 95 Q235 90 240 100"/>
+              <path data-draw data-delay="0.42" stroke-width="0.8" d="M550 70 Q570 55 595 65 Q610 50 630 60 Q645 55 655 70"/>
+              <path data-draw data-delay="0.44" stroke-width="0.7" d="M350 90 Q365 78 380 85 Q392 75 405 85 Q415 80 420 90"/>
+              <!-- Birds -->
+              <path data-draw data-delay="0.48" stroke-width="0.8" d="M300 130 Q305 120 310 130 M315 125 Q320 115 325 125"/>
+              <path data-draw data-delay="0.5" stroke-width="0.8" d="M460 100 Q465 90 470 100 M475 95 Q480 85 485 95 M490 100 Q495 90 500 100"/>
+              <!-- Sun rays -->
+              <path data-draw data-delay="0.45" stroke-width="1" d="M750 50 A20 20 0 1 0 750 49.99"/>
+              <path data-draw data-delay="0.48" stroke-width="0.6" d="M750 20 V10 M775 30 L782 23 M780 55 L790 55 M775 75 L782 82 M750 85 V95 M725 75 L718 82 M720 55 L710 55 M725 30 L718 23"/>
+            </svg>
           </div>
         </div>
       </section>
@@ -76,6 +153,59 @@
             <p class="scene-desc">Ignition. A pillar of fire lifts metal and dreams past the atmosphere — into the black canvas where stars are waiting.</p>
           </div>
           <div class="scene-svg" data-scene-svg="rocket">
+            <svg viewBox="0 0 800 500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Launch pad -->
+              <path data-draw data-delay="0" stroke-width="2" d="M300 480 H500"/>
+              <path data-draw data-delay="0.02" stroke-width="1.5" d="M330 480 V460 H470 V480"/>
+              <path data-draw data-delay="0.04" stroke-width="1.2" d="M350 460 V450 H450 V460"/>
+              <!-- Support structure -->
+              <path data-draw data-delay="0.06" stroke-width="1" d="M360 450 V380 M440 450 V380 M360 430 H440 M360 410 H440 M360 390 H440"/>
+              <path data-draw data-delay="0.08" stroke-width="0.8" d="M360 450 L440 390 M440 450 L360 390 M360 430 L440 390 M440 430 L360 390"/>
+              <!-- Rocket body -->
+              <path data-draw data-delay="0.1" stroke-width="2.2" d="M380 380 V160 Q400 60 420 160 V380"/>
+              <!-- Nose cone detail -->
+              <path data-draw data-delay="0.15" stroke-width="1.2" d="M388 200 V160 Q400 90 412 160 V200"/>
+              <!-- Body stripes -->
+              <path data-draw data-delay="0.2" stroke-width="1" d="M380 220 H420 M380 240 H420 M380 320 H420 M380 340 H420"/>
+              <!-- Window -->
+              <path data-draw data-delay="0.22" stroke-width="1.5" d="M400 270 m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0"/>
+              <path data-draw data-delay="0.24" stroke-width="0.8" d="M400 270 m-8 0 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0"/>
+              <!-- Left fin -->
+              <path data-draw data-delay="0.18" stroke-width="1.8" d="M380 360 L340 400 L340 420 L380 390"/>
+              <path data-draw data-delay="0.2" stroke-width="1" d="M340 400 L355 395 M340 410 L365 398"/>
+              <!-- Right fin -->
+              <path data-draw data-delay="0.18" stroke-width="1.8" d="M420 360 L460 400 L460 420 L420 390"/>
+              <path data-draw data-delay="0.2" stroke-width="1" d="M460 400 L445 395 M460 410 L435 398"/>
+              <!-- Center fin -->
+              <path data-draw data-delay="0.19" stroke-width="1.5" d="M395 370 V400 H405 V370"/>
+              <!-- Exhaust flames -->
+              <path data-draw data-delay="0.3" stroke-width="1.8" d="M385 390 Q380 430 390 450 Q395 460 400 480"/>
+              <path data-draw data-delay="0.32" stroke-width="1.8" d="M415 390 Q420 430 410 450 Q405 460 400 480"/>
+              <path data-draw data-delay="0.34" stroke-width="1.2" d="M392 395 Q388 425 395 445 Q398 455 400 470"/>
+              <path data-draw data-delay="0.36" stroke-width="1.2" d="M408 395 Q412 425 405 445 Q402 455 400 470"/>
+              <!-- Smoke clouds -->
+              <path data-draw data-delay="0.38" stroke-width="1" d="M340 460 Q320 450 300 460 Q280 470 260 455 Q240 445 220 460"/>
+              <path data-draw data-delay="0.4" stroke-width="1" d="M460 460 Q480 450 500 460 Q520 470 540 455 Q560 445 580 460"/>
+              <path data-draw data-delay="0.42" stroke-width="0.8" d="M320 475 Q300 465 280 475 Q260 485 240 470"/>
+              <path data-draw data-delay="0.42" stroke-width="0.8" d="M480 475 Q500 465 520 475 Q540 485 560 470"/>
+              <!-- Planet -->
+              <path data-draw data-delay="0.45" stroke-width="1.5" d="M680 120 A40 40 0 1 0 680 119.99"/>
+              <path data-draw data-delay="0.47" stroke-width="1" d="M635 120 Q680 100 725 120"/>
+              <path data-draw data-delay="0.48" stroke-width="0.8" d="M630 130 Q680 145 730 130"/>
+              <!-- Ring -->
+              <path data-draw data-delay="0.46" stroke-width="1.2" d="M620 120 Q680 85 740 120 Q680 140 620 120"/>
+              <!-- Stars scattered -->
+              <path data-draw data-delay="0.5" stroke-width="0.8" d="M100 80 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"/>
+              <path data-draw data-delay="0.52" stroke-width="0.8" d="M200 150 l1.5 4.5 4.5 1.5 -4.5 1.5 -1.5 4.5 -1.5 -4.5 -4.5 -1.5 4.5 -1.5z"/>
+              <path data-draw data-delay="0.54" stroke-width="0.8" d="M150 300 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z"/>
+              <path data-draw data-delay="0.5" stroke-width="0.8" d="M620 250 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"/>
+              <path data-draw data-delay="0.52" stroke-width="0.7" d="M720 300 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z"/>
+              <path data-draw data-delay="0.54" stroke-width="0.7" d="M560 60 l1.5 4.5 4.5 1.5 -4.5 1.5 -1.5 4.5 -1.5 -4.5 -4.5 -1.5 4.5 -1.5z"/>
+              <path data-draw data-delay="0.53" stroke-width="0.6" d="M80 200 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z"/>
+              <path data-draw data-delay="0.55" stroke-width="0.6" d="M750 400 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z"/>
+              <!-- Trajectory arc -->
+              <path data-draw data-delay="0.35" stroke-width="0.6" stroke-dasharray="4 6" d="M400 60 Q500 30 600 50 Q700 70 720 120"/>
+            </svg>
           </div>
         </div>
       </section>
@@ -89,6 +219,61 @@
             <p class="scene-desc">Where biology meets silicon — synapses firing along copper traces, thought rendered as current through endless pathways.</p>
           </div>
           <div class="scene-svg" data-scene-svg="circuit">
+            <svg viewBox="0 0 800 500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Brain outline - left hemisphere -->
+              <path data-draw data-delay="0" stroke-width="2" d="M400 100 Q340 100 310 130 Q270 160 260 210 Q250 260 270 310 Q280 340 300 360 Q330 390 370 400 Q390 405 400 400"/>
+              <!-- Brain outline - right hemisphere -->
+              <path data-draw data-delay="0" stroke-width="2" d="M400 100 Q460 100 490 130 Q530 160 540 210 Q550 260 530 310 Q520 340 500 360 Q470 390 430 400 Q410 405 400 400"/>
+              <!-- Brain folds - left -->
+              <path data-draw data-delay="0.1" stroke-width="1.2" d="M400 120 Q360 140 340 180 Q330 200 340 220"/>
+              <path data-draw data-delay="0.12" stroke-width="1.2" d="M400 160 Q370 180 360 210 Q355 230 370 250"/>
+              <path data-draw data-delay="0.14" stroke-width="1.2" d="M400 210 Q380 230 370 260 Q365 280 380 300"/>
+              <path data-draw data-delay="0.16" stroke-width="1.2" d="M340 220 Q310 250 300 280 Q295 300 310 320"/>
+              <path data-draw data-delay="0.18" stroke-width="1" d="M280 250 Q270 270 275 290"/>
+              <!-- Brain folds - right -->
+              <path data-draw data-delay="0.1" stroke-width="1.2" d="M400 120 Q440 140 460 180 Q470 200 460 220"/>
+              <path data-draw data-delay="0.12" stroke-width="1.2" d="M400 160 Q430 180 440 210 Q445 230 430 250"/>
+              <path data-draw data-delay="0.14" stroke-width="1.2" d="M400 210 Q420 230 430 260 Q435 280 420 300"/>
+              <path data-draw data-delay="0.16" stroke-width="1.2" d="M460 220 Q490 250 500 280 Q505 300 490 320"/>
+              <path data-draw data-delay="0.18" stroke-width="1" d="M520 250 Q530 270 525 290"/>
+              <!-- Brain stem -->
+              <path data-draw data-delay="0.08" stroke-width="1.8" d="M390 400 Q385 430 390 460 M410 400 Q415 430 410 460"/>
+              <path data-draw data-delay="0.09" stroke-width="1.2" d="M390 460 Q395 475 410 460"/>
+              <!-- Circuit traces - left side -->
+              <path data-draw data-delay="0.25" stroke-width="1" d="M260 210 H160 V180 H100"/>
+              <path data-draw data-delay="0.27" stroke-width="1" d="M270 270 H180 V310 H80"/>
+              <path data-draw data-delay="0.29" stroke-width="1" d="M300 360 H220 V390 H120"/>
+              <path data-draw data-delay="0.31" stroke-width="1" d="M310 150 H200 V120 H110"/>
+              <path data-draw data-delay="0.33" stroke-width="1" d="M280 320 L200 320 V350 H140"/>
+              <!-- Circuit traces - right side -->
+              <path data-draw data-delay="0.25" stroke-width="1" d="M540 210 H640 V180 H700"/>
+              <path data-draw data-delay="0.27" stroke-width="1" d="M530 270 H620 V310 H720"/>
+              <path data-draw data-delay="0.29" stroke-width="1" d="M500 360 H580 V390 H680"/>
+              <path data-draw data-delay="0.31" stroke-width="1" d="M490 150 H600 V120 H690"/>
+              <path data-draw data-delay="0.33" stroke-width="1" d="M520 320 L600 320 V350 H660"/>
+              <!-- Circuit nodes - left (small circles) -->
+              <path data-draw data-delay="0.35" stroke-width="1.2" d="M100 180 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.36" stroke-width="1.2" d="M80 310 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.37" stroke-width="1.2" d="M120 390 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.38" stroke-width="1.2" d="M110 120 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.39" stroke-width="1.2" d="M140 350 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0"/>
+              <!-- Circuit nodes - right -->
+              <path data-draw data-delay="0.35" stroke-width="1.2" d="M700 180 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.36" stroke-width="1.2" d="M720 310 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.37" stroke-width="1.2" d="M680 390 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.38" stroke-width="1.2" d="M690 120 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"/>
+              <path data-draw data-delay="0.39" stroke-width="1.2" d="M660 350 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0"/>
+              <!-- Data stream dots -->
+              <path data-draw data-delay="0.42" stroke-width="0.6" stroke-dasharray="2 8" d="M100 180 H40 M80 310 H20 M120 390 H50 M110 120 H50"/>
+              <path data-draw data-delay="0.42" stroke-width="0.6" stroke-dasharray="2 8" d="M700 180 H760 M720 310 H780 M680 390 H750 M690 120 H750"/>
+              <!-- Pulse rings around brain -->
+              <path data-draw data-delay="0.45" stroke-width="0.5" d="M400 250 m-100 0 a100 100 0 1 0 200 0 a100 100 0 1 0 -200 0"/>
+              <path data-draw data-delay="0.48" stroke-width="0.4" d="M400 250 m-140 0 a140 140 0 1 0 280 0 a140 140 0 1 0 -280 0"/>
+              <path data-draw data-delay="0.5" stroke-width="0.3" d="M400 250 m-180 0 a180 180 0 1 0 360 0 a180 180 0 1 0 -360 0"/>
+              <!-- Small IC chip symbols -->
+              <path data-draw data-delay="0.4" stroke-width="0.8" d="M155 175 h12 v12 h-12z M155 180 h-5 M167 180 h5 M160 175 v-5 M160 187 v5"/>
+              <path data-draw data-delay="0.4" stroke-width="0.8" d="M635 175 h12 v12 h-12z M635 180 h-5 M647 180 h5 M640 175 v-5 M640 187 v5"/>
+            </svg>
           </div>
         </div>
       </section>
@@ -102,6 +287,47 @@
             <p class="scene-desc">The deep exhales — swells rolling shoreward in endless rhythm, each crest a fleeting sculpture of motion and gravity.</p>
           </div>
           <div class="scene-svg" data-scene-svg="waves">
+            <svg viewBox="0 0 800 500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Wave layer 1 (top, gentle) -->
+              <path data-draw data-delay="0" stroke-width="1.8" d="M0 160 Q50 130 100 160 Q150 190 200 160 Q250 130 300 160 Q350 190 400 160 Q450 130 500 160 Q550 190 600 160 Q650 130 700 160 Q750 190 800 160"/>
+              <!-- Wave layer 2 -->
+              <path data-draw data-delay="0.08" stroke-width="2" d="M0 210 Q60 170 120 210 Q180 250 240 210 Q300 170 360 210 Q420 250 480 210 Q540 170 600 210 Q660 250 720 210 Q780 170 800 190"/>
+              <!-- Wave layer 3 (main, bold) -->
+              <path data-draw data-delay="0.15" stroke-width="2.5" d="M0 270 Q70 220 140 270 Q210 320 280 270 Q350 220 420 270 Q490 320 560 270 Q630 220 700 270 Q770 320 800 290"/>
+              <!-- Wave layer 4 -->
+              <path data-draw data-delay="0.2" stroke-width="2" d="M0 330 Q55 295 110 330 Q165 365 220 330 Q275 295 330 330 Q385 365 440 330 Q495 295 550 330 Q605 365 660 330 Q715 295 770 330 Q800 350 800 350"/>
+              <!-- Wave layer 5 (bottom, heavy) -->
+              <path data-draw data-delay="0.25" stroke-width="1.5" d="M0 390 Q45 365 90 390 Q135 415 180 390 Q225 365 270 390 Q315 415 360 390 Q405 365 450 390 Q495 415 540 390 Q585 365 630 390 Q675 415 720 390 Q765 365 800 390"/>
+              <!-- Foam/spray on wave 3 -->
+              <path data-draw data-delay="0.3" stroke-width="1" d="M130 265 Q135 255 145 260 M270 265 Q275 255 285 260 M410 265 Q415 255 425 260 M550 265 Q555 255 565 260 M690 265 Q695 255 705 260"/>
+              <!-- Concentric ripples - left -->
+              <path data-draw data-delay="0.35" stroke-width="0.8" d="M150 430 m-15 0 a15 8 0 1 0 30 0 a15 8 0 1 0 -30 0"/>
+              <path data-draw data-delay="0.37" stroke-width="0.6" d="M150 430 m-28 0 a28 14 0 1 0 56 0 a28 14 0 1 0 -56 0"/>
+              <path data-draw data-delay="0.39" stroke-width="0.4" d="M150 430 m-42 0 a42 20 0 1 0 84 0 a42 20 0 1 0 -84 0"/>
+              <!-- Concentric ripples - right -->
+              <path data-draw data-delay="0.35" stroke-width="0.8" d="M620 440 m-15 0 a15 8 0 1 0 30 0 a15 8 0 1 0 -30 0"/>
+              <path data-draw data-delay="0.37" stroke-width="0.6" d="M620 440 m-28 0 a28 14 0 1 0 56 0 a28 14 0 1 0 -56 0"/>
+              <path data-draw data-delay="0.39" stroke-width="0.4" d="M620 440 m-42 0 a42 20 0 1 0 84 0 a42 20 0 1 0 -84 0"/>
+              <!-- Floating particles / bubbles -->
+              <path data-draw data-delay="0.4" stroke-width="0.8" d="M200 300 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0"/>
+              <path data-draw data-delay="0.41" stroke-width="0.7" d="M350 350 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0"/>
+              <path data-draw data-delay="0.42" stroke-width="0.6" d="M500 310 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0"/>
+              <path data-draw data-delay="0.43" stroke-width="0.8" d="M650 350 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0"/>
+              <path data-draw data-delay="0.44" stroke-width="0.5" d="M100 340 m-2.5 0 a2.5 2.5 0 1 0 5 0 a2.5 2.5 0 1 0 -5 0"/>
+              <path data-draw data-delay="0.45" stroke-width="0.5" d="M750 290 m-2.5 0 a2.5 2.5 0 1 0 5 0 a2.5 2.5 0 1 0 -5 0"/>
+              <path data-draw data-delay="0.46" stroke-width="0.6" d="M430 380 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0"/>
+              <!-- Moon reflection on water -->
+              <path data-draw data-delay="0.48" stroke-width="1.2" d="M400 60 A30 30 0 1 0 400 59.99"/>
+              <path data-draw data-delay="0.49" stroke-width="0.8" d="M410 50 A18 18 0 0 1 390 75"/>
+              <!-- Moon reflection shimmer -->
+              <path data-draw data-delay="0.5" stroke-width="0.6" d="M395 110 V125 M400 115 V135 M405 110 V125"/>
+              <path data-draw data-delay="0.52" stroke-width="0.5" d="M397 140 V150 M400 142 V155 M403 140 V150"/>
+              <!-- Horizon line hint -->
+              <path data-draw data-delay="0.05" stroke-width="0.5" d="M0 130 H800"/>
+              <!-- Distant birds -->
+              <path data-draw data-delay="0.5" stroke-width="0.7" d="M250 80 Q255 72 260 80 M265 76 Q270 68 275 76"/>
+              <path data-draw data-delay="0.52" stroke-width="0.7" d="M550 95 Q555 87 560 95 M565 91 Q570 83 575 91 M580 95 Q585 87 590 95"/>
+            </svg>
           </div>
         </div>
       </section>
