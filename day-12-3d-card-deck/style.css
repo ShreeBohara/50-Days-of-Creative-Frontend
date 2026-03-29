@@ -383,6 +383,47 @@ body::after {
   transform: rotateY(180deg);
 }
 
+/* -- Fan focus state -- */
+
+.card--fan-focus {
+  filter: brightness(1.08) !important;
+}
+
+.card--fan-focus .card__front {
+  box-shadow:
+    0 8px 50px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(201, 169, 110, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.card--fan-focus .card__ornament {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* -- Card hover in fan -- */
+
+.card:hover .card__front {
+  box-shadow:
+    0 6px 40px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(201, 169, 110, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* -- Card indicator -- */
+
+.card-indicator {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.6;
+  text-align: center;
+  margin-top: 0.8rem;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
 /* -- Keyboard hint -- */
 
 .keyboard-hint {
@@ -390,8 +431,8 @@ body::after {
   font-size: 0.78rem;
   color: var(--text-muted);
   text-align: center;
-  margin-top: 1.2rem;
-  opacity: 0.5;
+  margin-top: 0.6rem;
+  opacity: 0.35;
   letter-spacing: 0.03em;
   z-index: 2;
 }
