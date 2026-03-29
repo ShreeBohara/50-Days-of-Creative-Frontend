@@ -32,6 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
     pathDataMap.set(scene, pathEntries);
   });
 
+  /* ── Parallax elements ────────────────────────────────── */
+  const parallaxEls = document.querySelectorAll('[data-speed]');
+
+  function updateParallax() {
+    const vh = window.innerHeight;
+    parallaxEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const offset = (center - vh / 2) * parseFloat(el.dataset.speed);
+      el.style.transform = `translateY(${offset}px)`;
+    });
+  }
+
   /* ── Scroll-driven draw ──────────────────────────────── */
   let ticking = false;
 
@@ -69,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ticking = true;
       requestAnimationFrame(() => {
         updateDrawAnimations();
+        updateParallax();
         ticking = false;
       });
     }
@@ -78,4 +92,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial call
   updateDrawAnimations();
+  updateParallax();
 });

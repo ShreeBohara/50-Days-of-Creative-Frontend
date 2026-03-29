@@ -143,6 +143,11 @@ body {
   50% { transform: translateY(6px); opacity: 0.3; }
 }
 
+/* ── Parallax ────────────────────────────────────────── */
+[data-speed] {
+  will-change: transform;
+}
+
 /* ── Scene Text ──────────────────────────────────────── */
 .scene-label {
   display: block;
