@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       requestAnimationFrame(() => {
         topCard.style.transition = 'transform 0.8s var(--ease-out-expo), filter 0.8s ease';
         isAnimating = false;
+        updateFloat();
       });
     };
 
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.filter = `brightness(${1 - pos * 0.03})`;
     });
 
-    setTimeout(() => { state = 'stack'; isAnimating = false; }, 600 + total * 30);
+    setTimeout(() => { state = 'stack'; isAnimating = false; updateFloat(); }, 600 + total * 30);
   }
 
   fanBtn.addEventListener('click', fanCards);
@@ -223,11 +224,47 @@ document.addEventListener('DOMContentLoaded', () => {
         state = 'stack';
         isAnimating = false;
         setActiveBtn(null);
+        updateFloat();
       }, 650 + total * 45);
     }, 600);
   }
 
   shuffleBtn.addEventListener('click', shuffleCards);
+
+  /* ---- Keyboard support ---- */
+
+  document.addEventListener('keydown', (e) => {
+    if (isAnimating) return;
+    switch (e.key) {
+      case 'ArrowRight': cycleCard(1); break;
+      case 'ArrowLeft': cycleCard(-1); break;
+      case ' ':
+      case 'Enter':
+        e.preventDefault();
+        if (state === 'stack') flipTopCard();
+        break;
+      case 'Escape':
+        unflipAll();
+        if (state !== 'stack') stackCards();
+        break;
+    }
+  });
+
+  /* ---- Floating animation on top card ---- */
+
+  function updateFloat() {
+    cards.forEach((card) => {
+      const isTop = cardOrder.indexOf(+card.dataset.index) === 0;
+      card.classList.toggle('card--top', isTop && state === 'stack');
+    });
+  }
+
+  /* Patch positionStack to also set float */
+  const _positionStack = positionStack;
+  positionStack = function () {
+    _positionStack();
+    updateFloat();
+  };
 
   positionStack();
 });
