@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return 1 - Math.pow(1 - t, 3);
   }
 
+  /* ── Hero letter path lengths ─────────────────────────── */
+  document.querySelectorAll('.hero-letter').forEach(letter => {
+    const len = letter.getTotalLength();
+    letter.style.setProperty('--len', len);
+  });
+
   /* ── Gather all drawable paths ───────────────────────── */
   const scenes = document.querySelectorAll('.scene:not(.scene--hero)');
   const pathDataMap = new Map();
