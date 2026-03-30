@@ -249,3 +249,78 @@ body {
   border-color: var(--cyan);
   box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
 }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .title-overlay {
+    top: 1.2rem;
+    left: 1.4rem;
+  }
+
+  .title-overlay h1 {
+    font-size: 1.5rem;
+  }
+
+  .corner-label {
+    top: 1rem;
+    right: 1.2rem;
+  }
+
+  .info-panel {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    transform: none;
+    border-radius: 16px 16px 0 0;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+
+  .info-panel.hidden {
+    transform: translateY(20px);
+  }
+
+  .sequence-bar {
+    bottom: 5rem;
+    gap: 2px;
+    padding: 5px 8px;
+    max-width: 90vw;
+    overflow-x: auto;
+  }
+
+  .seq-dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+  }
+
+  .controls-bar {
+    bottom: 1.2rem;
+  }
+
+  .ctrl-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-overlay h1 {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.6rem;
+  }
+}
+
+/* ── Reduced Motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .info-panel,
+  .ctrl-btn,
+  .seq-dot {
+    transition: none;
+  }
+}
