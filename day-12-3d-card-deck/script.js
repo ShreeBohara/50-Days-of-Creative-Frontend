@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const topIdx = cardOrder[0];
     const card = cards[topIdx];
     const title = card.querySelector('.card__title')?.textContent || '';
-    indicator.textContent = `${cardOrder.indexOf(topIdx) + 1} / ${total} — ${title}`;
+    indicator.textContent = `${topIdx + 1} / ${total} — ${title}`;
   }
 
   /* ---- Stack positioning ---- */
@@ -143,8 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function toggleFlip(card) {
+    const wasFlipped = card.classList.contains('card--flipped');
     card.classList.toggle('card--flipped');
-    card.dataset.flipped = card.classList.contains('card--flipped') ? 'true' : 'false';
+    card.dataset.flipped = (!wasFlipped).toString();
+    /* Pause float animation while flipped — animation breaks preserve-3d */
+    if (!wasFlipped) {
+      card.classList.remove('card--top');
+    } else if (cardOrder.indexOf(+card.dataset.index) === 0 && state === 'stack') {
+      card.classList.add('card--top');
+    }
   }
 
   function unflipAll() {

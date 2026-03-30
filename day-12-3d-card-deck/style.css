@@ -370,17 +370,12 @@ body::after {
 /* -- Floating animation -- */
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -8px; }
 }
 
-.card--top .card__inner {
+.card--top {
   animation: float 3s ease-in-out infinite;
-}
-
-.card--top.card--flipped .card__inner {
-  animation: float 3s ease-in-out infinite;
-  transform: rotateY(180deg);
 }
 
 /* -- Fan focus state -- */
