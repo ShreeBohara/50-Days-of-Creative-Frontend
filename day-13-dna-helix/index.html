@@ -38,6 +38,32 @@
       <p class="subtitle">Click a base pair to inspect &middot; Scroll to zoom</p>
     </header>
 
+    <!-- Info Panel -->
+    <aside id="info-panel" class="info-panel hidden">
+      <button id="info-close" class="info-close" aria-label="Close">&times;</button>
+      <div class="info-header">
+        <span class="info-badge" id="info-badge">A — T</span>
+        <span class="info-pos" id="info-pos">Position #1</span>
+      </div>
+      <div class="info-body">
+        <div class="info-row">
+          <span class="info-label">Strand 1</span>
+          <span class="info-value" id="info-nuc1">Adenine (A)</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Strand 2</span>
+          <span class="info-value" id="info-nuc2">Thymine (T)</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Bond</span>
+          <span class="info-value" id="info-bond">Hydrogen (2)</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sequence Bar -->
+    <div id="sequence-bar" class="sequence-bar"></div>
+
     <!-- Controls -->
     <div class="controls-bar">
       <button id="btn-rotate" class="ctrl-btn active" title="Toggle rotation">

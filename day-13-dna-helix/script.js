@@ -213,6 +213,120 @@ for (let i = 0; i < NUM_PAIRS; i++) {
   helixGroup.add(sphere2);
 }
 
+/* ── Raycasting & Click Interaction ──────────────────────── */
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let pointerDown = new THREE.Vector2();
+let selectedPairIndex = -1;
+
+const infoPanel = document.getElementById("info-panel");
+const infoBadge = document.getElementById("info-badge");
+const infoPos = document.getElementById("info-pos");
+const infoNuc1 = document.getElementById("info-nuc1");
+const infoNuc2 = document.getElementById("info-nuc2");
+const infoBond = document.getElementById("info-bond");
+const infoClose = document.getElementById("info-close");
+const sequenceBar = document.getElementById("sequence-bar");
+
+/* Build sequence bar dots */
+for (let i = 0; i < NUM_PAIRS; i++) {
+  const dot = document.createElement("div");
+  dot.className = "seq-dot";
+  const pair = sequence[i];
+  const col = NUC_COLORS[pair[0]];
+  dot.style.color = `#${col.getHexString()}`;
+  dot.style.background = `#${col.getHexString()}`;
+  dot.dataset.index = i;
+  dot.addEventListener("click", () => selectPair(i));
+  sequenceBar.appendChild(dot);
+}
+
+function highlightPair(index) {
+  /* Reset previous */
+  unhighlightAll();
+
+  if (index < 0 || index >= NUM_PAIRS) return;
+
+  /* Highlight connector */
+  const conn = connectors[index];
+  conn.material.emissiveIntensity = 0.8;
+
+  /* Highlight nucleotide spheres */
+  const s1 = nucleotides[index * 2];
+  const s2 = nucleotides[index * 2 + 1];
+  s1.material.emissiveIntensity = 0.7;
+  s2.material.emissiveIntensity = 0.7;
+  s1.scale.setScalar(1.4);
+  s2.scale.setScalar(1.4);
+
+  /* Sequence bar */
+  const dots = sequenceBar.querySelectorAll(".seq-dot");
+  dots.forEach((d, i) => d.classList.toggle("active", i === index));
+}
+
+function unhighlightAll() {
+  connectors.forEach((c) => { c.material.emissiveIntensity = 0.1; });
+  nucleotides.forEach((s) => {
+    s.material.emissiveIntensity = 0.15;
+    s.scale.setScalar(1);
+  });
+  const dots = sequenceBar.querySelectorAll(".seq-dot");
+  dots.forEach((d) => d.classList.remove("active"));
+}
+
+function selectPair(index) {
+  if (index === selectedPairIndex) {
+    deselectPair();
+    return;
+  }
+  selectedPairIndex = index;
+  highlightPair(index);
+
+  const pair = sequence[index];
+  const nuc1 = pair[0];
+  const nuc2 = pair[1];
+  const bonds = (nuc1 === "G" || nuc1 === "C") ? 3 : 2;
+
+  infoBadge.textContent = `${nuc1} — ${nuc2}`;
+  infoPos.textContent = `Position #${index + 1}`;
+  infoNuc1.textContent = `${NUC_NAMES[nuc1]} (${nuc1})`;
+  infoNuc2.textContent = `${NUC_NAMES[nuc2]} (${nuc2})`;
+  infoBond.textContent = `Hydrogen (${bonds})`;
+
+  infoPanel.classList.remove("hidden");
+}
+
+function deselectPair() {
+  selectedPairIndex = -1;
+  unhighlightAll();
+  infoPanel.classList.add("hidden");
+}
+
+infoClose.addEventListener("click", deselectPair);
+
+/* Pointer events for raycasting */
+canvas.addEventListener("pointerdown", (e) => {
+  pointerDown.set(e.clientX, e.clientY);
+});
+
+canvas.addEventListener("pointerup", (e) => {
+  const dx = e.clientX - pointerDown.x;
+  const dy = e.clientY - pointerDown.y;
+  if (Math.sqrt(dx * dx + dy * dy) > 5) return; /* was a drag */
+
+  pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(nucleotides);
+
+  if (hits.length > 0) {
+    selectPair(hits[0].object.userData.pairIndex);
+  } else {
+    deselectPair();
+  }
+});
+
 /* ── Auto-Rotation ──────────────────────────────────────── */
 let autoRotate = true;
 let isInteracting = false;
