@@ -104,6 +104,49 @@ const backbone1 = createBackboneTube(curve1);
 const backbone2 = createBackboneTube(curve2);
 helixGroup.add(backbone1, backbone2);
 
+/* ── Base-Pair Sequence ─────────────────────────────────── */
+const PAIR_TYPES = ["AT", "TA", "GC", "CG"];
+const sequence = [];
+for (let i = 0; i < NUM_PAIRS; i++) {
+  sequence.push(PAIR_TYPES[Math.floor(Math.random() * 4)]);
+}
+
+/* ── Base-Pair Connectors ───────────────────────────────── */
+const connectorGeo = new THREE.CylinderGeometry(0.06, 0.06, 1, 8);
+const connectorMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  roughness: 0.5,
+  metalness: 0.2,
+});
+
+const connectors = [];
+
+for (let i = 0; i < NUM_PAIRS; i++) {
+  const t = (i + 0.5) / NUM_PAIRS;
+  const p1 = getHelixPoint(t, 0);
+  const p2 = getHelixPoint(t, Math.PI);
+
+  const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+  const dir = new THREE.Vector3().subVectors(p2, p1);
+  const len = dir.length();
+
+  const cyl = new THREE.Mesh(connectorGeo, connectorMat.clone());
+  cyl.position.copy(mid);
+  cyl.scale.y = len;
+  cyl.lookAt(p2);
+  cyl.rotateX(Math.PI / 2);
+
+  cyl.userData = {
+    pairIndex: i,
+    pairType: sequence[i],
+    strand1Pos: p1.clone(),
+    strand2Pos: p2.clone(),
+  };
+
+  connectors.push(cyl);
+  helixGroup.add(cyl);
+}
+
 /* ── Animation Loop ─────────────────────────────────────── */
 function animate() {
   requestAnimationFrame(animate);
