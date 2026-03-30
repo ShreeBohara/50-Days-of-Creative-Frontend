@@ -1,0 +1,86 @@
+/* ── Day 13 · Interactive DNA Helix ──────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+:root {
+  --bg: #050510;
+  --cyan: #00d4ff;
+  --cyan-dim: rgba(0, 212, 255, 0.3);
+  --text: #e8edf3;
+  --text-muted: rgba(232, 237, 243, 0.45);
+  --glass: rgba(10, 18, 40, 0.65);
+  --glass-border: rgba(0, 212, 255, 0.12);
+  --a-color: #4a9eff;
+  --t-color: #ffd54f;
+  --g-color: #ff5252;
+  --c-color: #69f0ae;
+}
+
+body {
+  font-family: "Syne", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Canvas ─────────────────────────────────────────────── */
+#dna-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Corner Label ───────────────────────────────────────── */
+.corner-label {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.8rem;
+  font-family: "Space Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ── Title Overlay ──────────────────────────────────────── */
+.title-overlay {
+  position: fixed;
+  top: 2rem;
+  left: 2.4rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: "Space Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 0.6rem;
+}
+
+.title-overlay h1 {
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.subtitle {
+  font-family: "Space Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.8rem;
+  letter-spacing: 0.04em;
+}

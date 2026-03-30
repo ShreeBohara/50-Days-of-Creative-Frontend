@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 13 | Interactive DNA Helix</title>
+    <meta
+      name="description"
+      content="A 3D double helix DNA strand with click-to-inspect base pairs, unwind/rewind morphing, and bioluminescent glow."
+    />
+    <meta name="theme-color" content="#050510" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="dna-canvas"></canvas>
+
+    <div class="corner-label">13 / 50</div>
+
+    <header class="title-overlay">
+      <p class="eyebrow">Day 13 / Creative Frontend</p>
+      <h1>Interactive<br />DNA Helix</h1>
+      <p class="subtitle">Click a base pair to inspect &middot; Scroll to zoom</p>
+    </header>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
