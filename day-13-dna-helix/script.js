@@ -213,9 +213,27 @@ for (let i = 0; i < NUM_PAIRS; i++) {
   helixGroup.add(sphere2);
 }
 
+/* ── Auto-Rotation ──────────────────────────────────────── */
+let autoRotate = true;
+let isInteracting = false;
+
+controls.addEventListener("start", () => { isInteracting = true; });
+controls.addEventListener("end", () => { isInteracting = false; });
+
+const btnRotate = document.getElementById("btn-rotate");
+btnRotate.addEventListener("click", () => {
+  autoRotate = !autoRotate;
+  btnRotate.classList.toggle("active", autoRotate);
+});
+
 /* ── Animation Loop ─────────────────────────────────────── */
 function animate() {
   requestAnimationFrame(animate);
+
+  if (autoRotate && !isInteracting) {
+    helixGroup.rotation.y += 0.003;
+  }
+
   controls.update();
   renderer.render(scene, camera);
 }
