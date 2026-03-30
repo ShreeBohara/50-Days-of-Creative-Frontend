@@ -327,6 +327,98 @@ canvas.addEventListener("pointerup", (e) => {
   }
 });
 
+/* ── Unwind / Rewind Morph ──────────────────────────────── */
+let morphT = 0;        /* 0 = helix, 1 = flat ladder */
+let morphTarget = 0;
+let isMorphing = false;
+const MORPH_DURATION = 2000;
+let morphStart = 0;
+let morphFrom = 0;
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/* Flat ladder positions: straight vertical columns, horizontal rungs */
+const LADDER_SPACING = HELIX_HEIGHT / NUM_PAIRS;
+const LADDER_X = HELIX_RADIUS;
+
+function getFlatPoint(t, strand) {
+  const y = t * HELIX_HEIGHT;
+  const x = strand === 0 ? -LADDER_X : LADDER_X;
+  return new THREE.Vector3(x, y, 0);
+}
+
+function getLerpedPoint(t, phaseOffset, morphAmount) {
+  const helixPt = getHelixPoint(t, phaseOffset);
+  const strand = phaseOffset === 0 ? 0 : 1;
+  const flatPt = getFlatPoint(t, strand);
+  return new THREE.Vector3().lerpVectors(helixPt, flatPt, morphAmount);
+}
+
+function rebuildBackbones(morphAmount) {
+  /* Strand 1 */
+  const pts1 = [];
+  for (let i = 0; i <= CURVE_SEGMENTS; i++) {
+    const t = i / CURVE_SEGMENTS;
+    pts1.push(getLerpedPoint(t, 0, morphAmount));
+  }
+  const c1 = new THREE.CatmullRomCurve3(pts1);
+  backbone1.geometry.dispose();
+  backbone1.geometry = new THREE.TubeGeometry(c1, 200, 0.12, 8, false);
+
+  /* Strand 2 */
+  const pts2 = [];
+  for (let i = 0; i <= CURVE_SEGMENTS; i++) {
+    const t = i / CURVE_SEGMENTS;
+    pts2.push(getLerpedPoint(t, Math.PI, morphAmount));
+  }
+  const c2 = new THREE.CatmullRomCurve3(pts2);
+  backbone2.geometry.dispose();
+  backbone2.geometry = new THREE.TubeGeometry(c2, 200, 0.12, 8, false);
+}
+
+function updateMorphPositions(morphAmount) {
+  rebuildBackbones(morphAmount);
+
+  for (let i = 0; i < NUM_PAIRS; i++) {
+    const t = (i + 0.5) / NUM_PAIRS;
+    const p1 = getLerpedPoint(t, 0, morphAmount);
+    const p2 = getLerpedPoint(t, Math.PI, morphAmount);
+
+    /* Nucleotide spheres */
+    nucleotides[i * 2].position.copy(p1);
+    nucleotides[i * 2 + 1].position.copy(p2);
+
+    /* Connector */
+    const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+    const dir = new THREE.Vector3().subVectors(p2, p1);
+    const len = dir.length();
+
+    const cyl = connectors[i];
+    cyl.position.copy(mid);
+    cyl.scale.y = len;
+    cyl.quaternion.identity();
+    cyl.lookAt(p2);
+    cyl.rotateX(Math.PI / 2);
+  }
+}
+
+const btnUnwind = document.getElementById("btn-unwind");
+const btnRewind = document.getElementById("btn-rewind");
+
+function startMorph(target) {
+  if (isMorphing) return;
+  if (morphT === target) return;
+  isMorphing = true;
+  morphTarget = target;
+  morphFrom = morphT;
+  morphStart = performance.now();
+}
+
+btnUnwind.addEventListener("click", () => startMorph(1));
+btnRewind.addEventListener("click", () => startMorph(0));
+
 /* ── Auto-Rotation ──────────────────────────────────────── */
 let autoRotate = true;
 let isInteracting = false;
@@ -343,6 +435,22 @@ btnRotate.addEventListener("click", () => {
 /* ── Animation Loop ─────────────────────────────────────── */
 function animate() {
   requestAnimationFrame(animate);
+
+  /* Morph animation */
+  if (isMorphing) {
+    const elapsed = performance.now() - morphStart;
+    const raw = Math.min(elapsed / MORPH_DURATION, 1);
+    const eased = easeInOutCubic(raw);
+    morphT = morphFrom + (morphTarget - morphFrom) * eased;
+    updateMorphPositions(morphT);
+
+    if (raw >= 1) {
+      isMorphing = false;
+      morphT = morphTarget;
+      btnUnwind.classList.toggle("active", morphT === 1);
+      btnRewind.classList.toggle("active", morphT === 0 && morphTarget === 0);
+    }
+  }
 
   if (autoRotate && !isInteracting) {
     helixGroup.rotation.y += 0.003;
