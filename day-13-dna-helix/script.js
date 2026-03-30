@@ -51,6 +51,59 @@ const dirLight2 = new THREE.DirectionalLight(0xff6644, 0.35);
 dirLight2.position.set(-6, -4, -5);
 scene.add(dirLight2);
 
+/* ── Helix Constants ─────────────────────────────────────── */
+const NUM_PAIRS = 36;
+const HELIX_RADIUS = 2.0;
+const HELIX_HEIGHT = 24;
+const HELIX_TURNS = 3.4;
+const CURVE_SEGMENTS = 360;
+
+/* ── Helix Group ────────────────────────────────────────── */
+const helixGroup = new THREE.Group();
+scene.add(helixGroup);
+
+/* ── Backbone Geometry Helpers ───────────────────────────── */
+function getHelixPoint(t, phaseOffset) {
+  const angle = t * Math.PI * 2 * HELIX_TURNS + phaseOffset;
+  const x = Math.cos(angle) * HELIX_RADIUS;
+  const y = t * HELIX_HEIGHT;
+  const z = Math.sin(angle) * HELIX_RADIUS;
+  return new THREE.Vector3(x, y, z);
+}
+
+function buildBackboneCurve(phaseOffset) {
+  const points = [];
+  for (let i = 0; i <= CURVE_SEGMENTS; i++) {
+    const t = i / CURVE_SEGMENTS;
+    points.push(getHelixPoint(t, phaseOffset));
+  }
+  return new THREE.CatmullRomCurve3(points);
+}
+
+const backboneMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0x00d4ff,
+  emissive: 0x00d4ff,
+  emissiveIntensity: 0.25,
+  roughness: 0.3,
+  metalness: 0.1,
+  transparent: true,
+  opacity: 0.75,
+  transmission: 0.15,
+});
+
+function createBackboneTube(curve) {
+  const geo = new THREE.TubeGeometry(curve, 200, 0.12, 8, false);
+  const mesh = new THREE.Mesh(geo, backboneMaterial);
+  return mesh;
+}
+
+const curve1 = buildBackboneCurve(0);
+const curve2 = buildBackboneCurve(Math.PI);
+
+const backbone1 = createBackboneTube(curve1);
+const backbone2 = createBackboneTube(curve2);
+helixGroup.add(backbone1, backbone2);
+
 /* ── Animation Loop ─────────────────────────────────────── */
 function animate() {
   requestAnimationFrame(animate);
