@@ -111,26 +111,53 @@ for (let i = 0; i < NUM_PAIRS; i++) {
   sequence.push(PAIR_TYPES[Math.floor(Math.random() * 4)]);
 }
 
-/* ── Base-Pair Connectors ───────────────────────────────── */
+/* ── Nucleotide Colors ──────────────────────────────────── */
+const NUC_COLORS = {
+  A: new THREE.Color(0x4a9eff),
+  T: new THREE.Color(0xffd54f),
+  G: new THREE.Color(0xff5252),
+  C: new THREE.Color(0x69f0ae),
+};
+
+const NUC_NAMES = {
+  A: "Adenine",
+  T: "Thymine",
+  G: "Guanine",
+  C: "Cytosine",
+};
+
+/* ── Base-Pair Connectors + Nucleotide Spheres ──────────── */
 const connectorGeo = new THREE.CylinderGeometry(0.06, 0.06, 1, 8);
-const connectorMat = new THREE.MeshStandardMaterial({
-  color: 0xffffff,
-  roughness: 0.5,
-  metalness: 0.2,
-});
+const sphereGeo = new THREE.SphereGeometry(0.22, 16, 12);
 
 const connectors = [];
+const nucleotides = [];
 
 for (let i = 0; i < NUM_PAIRS; i++) {
   const t = (i + 0.5) / NUM_PAIRS;
   const p1 = getHelixPoint(t, 0);
   const p2 = getHelixPoint(t, Math.PI);
 
+  const pair = sequence[i];
+  const nuc1 = pair[0];
+  const nuc2 = pair[1];
+  const col1 = NUC_COLORS[nuc1];
+  const col2 = NUC_COLORS[nuc2];
+
   const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
   const dir = new THREE.Vector3().subVectors(p2, p1);
   const len = dir.length();
 
-  const cyl = new THREE.Mesh(connectorGeo, connectorMat.clone());
+  const connectorColor = new THREE.Color().lerpColors(col1, col2, 0.5);
+  const connMat = new THREE.MeshStandardMaterial({
+    color: connectorColor,
+    emissive: connectorColor,
+    emissiveIntensity: 0.1,
+    roughness: 0.5,
+    metalness: 0.2,
+  });
+
+  const cyl = new THREE.Mesh(connectorGeo, connMat);
   cyl.position.copy(mid);
   cyl.scale.y = len;
   cyl.lookAt(p2);
@@ -138,13 +165,52 @@ for (let i = 0; i < NUM_PAIRS; i++) {
 
   cyl.userData = {
     pairIndex: i,
-    pairType: sequence[i],
+    pairType: pair,
     strand1Pos: p1.clone(),
     strand2Pos: p2.clone(),
   };
 
   connectors.push(cyl);
   helixGroup.add(cyl);
+
+  /* Nucleotide spheres at each endpoint */
+  const mat1 = new THREE.MeshStandardMaterial({
+    color: col1,
+    emissive: col1,
+    emissiveIntensity: 0.15,
+    roughness: 0.35,
+    metalness: 0.1,
+  });
+  const sphere1 = new THREE.Mesh(sphereGeo, mat1);
+  sphere1.position.copy(p1);
+  sphere1.userData = {
+    pairIndex: i,
+    pairType: pair,
+    nucleotide: nuc1,
+    strand1Pos: p1.clone(),
+    strand2Pos: p2.clone(),
+  };
+  nucleotides.push(sphere1);
+  helixGroup.add(sphere1);
+
+  const mat2 = new THREE.MeshStandardMaterial({
+    color: col2,
+    emissive: col2,
+    emissiveIntensity: 0.15,
+    roughness: 0.35,
+    metalness: 0.1,
+  });
+  const sphere2 = new THREE.Mesh(sphereGeo, mat2);
+  sphere2.position.copy(p2);
+  sphere2.userData = {
+    pairIndex: i,
+    pairType: pair,
+    nucleotide: nuc2,
+    strand1Pos: p1.clone(),
+    strand2Pos: p2.clone(),
+  };
+  nucleotides.push(sphere2);
+  helixGroup.add(sphere2);
 }
 
 /* ── Animation Loop ─────────────────────────────────────── */
