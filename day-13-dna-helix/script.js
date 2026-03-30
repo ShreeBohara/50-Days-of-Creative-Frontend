@@ -3,6 +3,9 @@
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
 /* ── Renderer ───────────────────────────────────────────── */
 const canvas = document.getElementById("dna-canvas");
@@ -524,13 +527,28 @@ function animate(time) {
   }
 
   controls.update();
-  renderer.render(scene, camera);
+  composer.render();
 }
 animate();
 
+/* ── Post-Processing (Bloom) ────────────────────────────── */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.8,   /* strength */
+  0.4,   /* radius */
+  0.85   /* threshold */
+);
+composer.addPass(bloomPass);
+
 /* ── Resize ─────────────────────────────────────────────── */
 window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  camera.aspect = w / h;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(w, h);
+  composer.setSize(w, h);
 });
