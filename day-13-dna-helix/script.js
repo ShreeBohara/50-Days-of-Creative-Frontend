@@ -432,9 +432,76 @@ btnRotate.addEventListener("click", () => {
   btnRotate.classList.toggle("active", autoRotate);
 });
 
+/* ── Ambient Particles ──────────────────────────────────── */
+const PARTICLE_COUNT = 400;
+const PARTICLE_BOUNDS = 35;
+
+/* Canvas-generated soft glow sprite */
+function makeParticleSprite() {
+  const size = 64;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d");
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, "rgba(0, 212, 255, 0.6)");
+  grad.addColorStop(0.4, "rgba(0, 212, 255, 0.15)");
+  grad.addColorStop(1, "rgba(0, 212, 255, 0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  return new THREE.CanvasTexture(c);
+}
+
+const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+const particleSpeeds = new Float32Array(PARTICLE_COUNT);
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  const r = 15 + Math.random() * 25;
+  particlePositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+  particlePositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+  particlePositions[i * 3 + 2] = r * Math.cos(phi);
+  particleSpeeds[i] = 0.002 + Math.random() * 0.006;
+}
+
+const particleGeo = new THREE.BufferGeometry();
+particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+
+const particleMat = new THREE.PointsMaterial({
+  map: makeParticleSprite(),
+  size: 0.6,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  opacity: 0.7,
+});
+
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+function updateParticles(time) {
+  const pos = particleGeo.attributes.position.array;
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const idx = i * 3;
+    pos[idx + 1] += particleSpeeds[i];
+
+    /* Wrap vertically */
+    if (pos[idx + 1] > PARTICLE_BOUNDS) {
+      pos[idx + 1] = -PARTICLE_BOUNDS;
+    }
+  }
+  particleGeo.attributes.position.needsUpdate = true;
+
+  /* Breathing size oscillation */
+  particleMat.size = 0.5 + 0.15 * Math.sin(time * 0.001);
+}
+
 /* ── Animation Loop ─────────────────────────────────────── */
-function animate() {
+function animate(time) {
   requestAnimationFrame(animate);
+
+  /* Particles */
+  updateParticles(time || 0);
 
   /* Morph animation */
   if (isMorphing) {
