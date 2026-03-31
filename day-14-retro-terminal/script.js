@@ -236,3 +236,123 @@ CMD_INPUT.addEventListener('keydown', async e => {
     CMD_INPUT.focus();
   }
 });
+
+/* ── Commands Implementation ─────────────────────────────── */
+
+// ── help ──────────────────────────────────────────────────
+registerCommand('help', async () => {
+  const cmds = [
+    ['help',           'Show this help message'],
+    ['about',          'Who am I — background & bio'],
+    ['skills',         'Tech skills with ASCII progress bars'],
+    ['projects',       'Featured projects I have shipped'],
+    ['contact',        'How to reach me'],
+    ['whoami',         'Current user info'],
+    ['clear',          'Clear the terminal'],
+    ['theme [color]',  'Switch color theme: green | amber | blue | white'],
+    ['matrix',         'Easter egg — you\'ll see'],
+  ];
+
+  await printLine('Available commands:', 'line--heading', SPEED_FAST);
+  await printBlank();
+  for (const [name, desc] of cmds) {
+    const padded = name.padEnd(22, ' ');
+    await printLine(`  ${padded}${desc}`, '', SPEED_FAST);
+  }
+});
+
+// ── about ─────────────────────────────────────────────────
+registerCommand('about', async () => {
+  await printLine('// ABOUT ME', 'line--heading', SPEED_FAST);
+  await printBlank();
+  await printLine("Hi — I'm a creative frontend developer obsessed with", '', SPEED_NORMAL);
+  await printLine('interfaces that feel alive. I build things that live', '', SPEED_NORMAL);
+  await printLine("at the edge of design and engineering: motion, depth,", '', SPEED_NORMAL);
+  await printLine('interaction, and personality baked into every pixel.', '', SPEED_NORMAL);
+  await printBlank();
+  await printLine('Currently building 50 days of creative frontend experiments.', 'line--dim', SPEED_NORMAL);
+  await printLine('Each day: one idea, one afternoon, shipped.', 'line--dim', SPEED_NORMAL);
+});
+
+// ── whoami ────────────────────────────────────────────────
+registerCommand('whoami', async () => {
+  await printLine('guest@portfolio.exe — Day 14 / 50', '', SPEED_NORMAL);
+  await printLine('Role: Creative Frontend Developer', 'line--dim', SPEED_FAST);
+});
+
+// ── skills ────────────────────────────────────────────────
+function buildBar(pct) {
+  const total = 10;
+  const filled = Math.round(pct / 10);
+  return '[' + '█'.repeat(filled) + '░'.repeat(total - filled) + ']  ' + pct + '%';
+}
+
+registerCommand('skills', async () => {
+  const skills = [
+    ['JavaScript',  92],
+    ['CSS / Design', 90],
+    ['React',       82],
+    ['TypeScript',  78],
+    ['Node.js',     72],
+    ['Three.js',    68],
+    ['WebGL / GLSL',58],
+    ['Figma',       75],
+  ];
+
+  await printLine('// SKILLS', 'line--heading', SPEED_FAST);
+  await printBlank();
+  for (const [name, pct] of skills) {
+    const label = name.padEnd(16, ' ');
+    await printLine(`  ${label}${buildBar(pct)}`, '', SPEED_FAST);
+  }
+});
+
+// ── projects ──────────────────────────────────────────────
+registerCommand('projects', async () => {
+  const projects = [
+    {
+      name: '50 Days of Creative Frontend',
+      tech: 'Vanilla JS, Canvas, WebGL, Three.js, React',
+      desc: 'A daily creative frontend challenge — one experiment per day for 50 days.',
+      link: 'github.com/ShreeBohara/50-Days-of-Creative-Frontend',
+    },
+    {
+      name: 'Fluid Simulation',
+      tech: 'WebGL 2, GLSL, Navier-Stokes',
+      desc: 'GPU-accelerated fluid dynamics entirely in a browser WebGL2 fragment shader.',
+      link: 'day-07-fluid-simulation',
+    },
+    {
+      name: 'Cinematic Solar System',
+      tech: 'React, Three.js, React Three Fiber',
+      desc: 'Orbital 3D solar system with guided camera chapters and shader planets.',
+      link: 'day-03-solar-system',
+    },
+  ];
+
+  await printLine('// PROJECTS', 'line--heading', SPEED_FAST);
+
+  for (const { name, tech, desc, link } of projects) {
+    await printBlank();
+    await printLine(`  ► ${name}`, '', SPEED_FAST);
+    await printLine(`    Tech:  ${tech}`, 'line--dim', SPEED_FAST);
+    await printLine(`    About: ${desc}`, 'line--dim', SPEED_FAST);
+    await printLine(`    URL:   ${link}`, 'line--dim', SPEED_FAST);
+  }
+});
+
+// ── contact ───────────────────────────────────────────────
+registerCommand('contact', async () => {
+  await printLine('// CONTACT', 'line--heading', SPEED_FAST);
+  await printBlank();
+  await printLine('  GitHub   →  github.com/ShreeBohara', '', SPEED_FAST);
+  await printLine('  Email    →  shree@example.com', '', SPEED_FAST);
+  await printLine('  LinkedIn →  linkedin.com/in/shreebohara', '', SPEED_FAST);
+  await printBlank();
+  await printLine("  Open to interesting projects & collaborations.", 'line--dim', SPEED_FAST);
+});
+
+// ── clear ─────────────────────────────────────────────────
+registerCommand('clear', async () => {
+  OUTPUT.innerHTML = '';
+});
