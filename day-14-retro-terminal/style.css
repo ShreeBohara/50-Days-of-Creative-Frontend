@@ -34,6 +34,8 @@ body {
   font-size: var(--fs-base);
   line-height: 1.5;
   overflow: hidden;
+  /* Subtle green tint on the body background for ambient phosphor bleed */
+  background-image: radial-gradient(ellipse at 50% 60%, #001a00 0%, #000000 70%);
 }
 
 /* ── 3. CRT Screen Wrapper ───────────────────────────────── */
@@ -143,6 +145,7 @@ body {
   gap: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--clr-border) transparent;
+  scroll-behavior: smooth;
 }
 
 .output::-webkit-scrollbar       { width: 6px; }
