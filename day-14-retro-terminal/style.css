@@ -1,0 +1,37 @@
+/* =============================================================
+   Day 14 — Retro Terminal Portfolio
+   style.css
+   ============================================================= */
+
+/* ── 1. Custom Properties ─────────────────────────────────── */
+:root {
+  --clr-bg:       #000000;
+  --clr-text:     #00ff41;
+  --clr-dim:      #006620;
+  --clr-glow:     #00ff41;
+  --clr-error:    #ff3333;
+  --clr-warn:     #ffb000;
+  --clr-header:   #001a00;
+  --clr-border:   #003300;
+
+  --font-mono: 'VT323', 'Courier New', monospace;
+
+  --fs-base:   20px;
+  --fs-header: 14px;
+  --fs-corner: 13px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── 2. Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  overflow: hidden;
+}
