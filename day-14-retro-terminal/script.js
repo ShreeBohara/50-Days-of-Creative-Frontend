@@ -190,3 +190,49 @@ async function runBootSequence() {
 }
 
 document.addEventListener('DOMContentLoaded', runBootSequence);
+
+/* ── Command Parser ──────────────────────────────────────── */
+
+// Registry: cmd name → async handler function
+const COMMANDS = {};
+
+/** Register a command handler */
+function registerCommand(name, handler) {
+  COMMANDS[name] = handler;
+}
+
+/** Parse and dispatch a raw input string */
+async function parseCommand(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return;
+
+  // Echo the typed command back in dim style
+  await printLine('> ' + trimmed, 'line--cmd');
+
+  const parts = trimmed.split(/\s+/);
+  const cmd   = parts[0].toLowerCase();
+  const args  = parts.slice(1);
+
+  if (COMMANDS[cmd]) {
+    await COMMANDS[cmd](args);
+  } else {
+    await printLine(`bash: ${cmd}: command not found`, 'line--error', SPEED_FAST);
+    await printLine("Type 'help' to see available commands.", 'line--dim', SPEED_FAST);
+  }
+
+  await printBlank();
+}
+
+/* ── Input Listener ──────────────────────────────────────── */
+
+CMD_INPUT.addEventListener('keydown', async e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const val = CMD_INPUT.value;
+    CMD_INPUT.value = '';
+    CMD_INPUT.disabled = true;
+    await parseCommand(val);
+    CMD_INPUT.disabled = false;
+    CMD_INPUT.focus();
+  }
+});
