@@ -225,15 +225,49 @@ async function parseCommand(raw) {
 
 /* ── Input Listener ──────────────────────────────────────── */
 
+// Command history state
+const cmdHistory  = [];
+let   historyIdx  = -1;   // -1 = not browsing
+let   savedDraft  = '';   // preserves current draft when browsing up
+
 CMD_INPUT.addEventListener('keydown', async e => {
   if (e.key === 'Enter') {
     e.preventDefault();
     const val = CMD_INPUT.value;
     CMD_INPUT.value = '';
+    historyIdx = -1;
+    savedDraft = '';
+    // Push to history (skip blanks and duplicates of last entry)
+    if (val.trim() && val.trim() !== cmdHistory[0]) {
+      cmdHistory.unshift(val.trim());
+      if (cmdHistory.length > 100) cmdHistory.pop();
+    }
     CMD_INPUT.disabled = true;
     await parseCommand(val);
     CMD_INPUT.disabled = false;
     CMD_INPUT.focus();
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (cmdHistory.length === 0) return;
+    if (historyIdx === -1) savedDraft = CMD_INPUT.value; // save current draft
+    historyIdx = Math.min(historyIdx + 1, cmdHistory.length - 1);
+    CMD_INPUT.value = cmdHistory[historyIdx];
+    // Move caret to end
+    requestAnimationFrame(() => {
+      CMD_INPUT.selectionStart = CMD_INPUT.selectionEnd = CMD_INPUT.value.length;
+    });
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (historyIdx === -1) return;
+    historyIdx--;
+    CMD_INPUT.value = historyIdx === -1 ? savedDraft : cmdHistory[historyIdx];
+    requestAnimationFrame(() => {
+      CMD_INPUT.selectionStart = CMD_INPUT.selectionEnd = CMD_INPUT.value.length;
+    });
   }
 });
 
