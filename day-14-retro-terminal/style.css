@@ -226,3 +226,78 @@ body {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
 }
+
+/* ── 10. CRT Effects ─────────────────────────────────────── */
+
+/* Scanlines overlay */
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Vignette overlay */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+/* Phosphor glow on the whole terminal */
+.terminal {
+  text-shadow: 0 0 6px var(--clr-glow), 0 0 2px rgba(0, 255, 65, 0.4);
+  box-shadow:
+    0 0 0 1px var(--clr-border),
+    0 0 20px rgba(0, 255, 65, 0.08),
+    inset 0 0 40px rgba(0, 0, 0, 0.5);
+  animation: flicker 8s step-end infinite;
+}
+
+/* Subtle CRT phosphor screen flicker */
+@keyframes flicker {
+  0%   { opacity: 1; }
+  2%   { opacity: 0.97; }
+  4%   { opacity: 1; }
+  60%  { opacity: 1; }
+  62%  { opacity: 0.98; }
+  63%  { opacity: 1; }
+  80%  { opacity: 1; }
+  81%  { opacity: 0.97; }
+  82%  { opacity: 1; }
+}
+
+/* Glow on individual text lines */
+.line,
+.prompt,
+.cmd-input {
+  text-shadow: 0 0 5px var(--clr-glow);
+}
+
+/* Slightly warmer glow on header */
+.terminal-header {
+  text-shadow: 0 0 4px rgba(0, 255, 65, 0.3);
+}
+
+/* Reduced motion: disable flicker and glow animation */
+@media (prefers-reduced-motion: reduce) {
+  .terminal { animation: none; }
+  .cursor-block { animation: none; }
+}
