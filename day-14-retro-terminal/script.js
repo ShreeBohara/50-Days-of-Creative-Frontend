@@ -390,3 +390,39 @@ registerCommand('contact', async () => {
 registerCommand('clear', async () => {
   OUTPUT.innerHTML = '';
 });
+
+/* ── Theme Switching ─────────────────────────────────────── */
+
+const THEMES = {
+  green: { text: '#00ff41', glow: '#00ff41', dim: '#006620', border: '#003300', header: '#001a00' },
+  amber: { text: '#ffb000', glow: '#ffb000', dim: '#7a5400', border: '#3d2900', header: '#1a1000' },
+  blue:  { text: '#00d4ff', glow: '#00d4ff', dim: '#005566', border: '#003344', header: '#001922' },
+  white: { text: '#e8e8e8', glow: '#ffffff', dim: '#777777', border: '#333333', header: '#111111' },
+};
+
+function applyTheme(name) {
+  const t = THEMES[name];
+  if (!t) return false;
+  const root = document.documentElement;
+  root.style.setProperty('--clr-text',   t.text);
+  root.style.setProperty('--clr-glow',   t.glow);
+  root.style.setProperty('--clr-dim',    t.dim);
+  root.style.setProperty('--clr-border', t.border);
+  root.style.setProperty('--clr-header', t.header);
+  return true;
+}
+
+registerCommand('theme', async ([color]) => {
+  if (!color) {
+    await printLine('Usage: theme [green|amber|blue|white]', 'line--warn', SPEED_FAST);
+    await printLine(`Available: ${Object.keys(THEMES).join(' | ')}`, 'line--dim', SPEED_FAST);
+    return;
+  }
+  const name = color.toLowerCase();
+  if (applyTheme(name)) {
+    await printLine(`Theme set to: ${name}`, '', SPEED_FAST);
+  } else {
+    await printLine(`Unknown theme: "${name}"`, 'line--error', SPEED_FAST);
+    await printLine(`Available: ${Object.keys(THEMES).join(' | ')}`, 'line--dim', SPEED_FAST);
+  }
+});
