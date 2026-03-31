@@ -1,0 +1,362 @@
+/* =============================================================
+   Day 14 — Retro Terminal Portfolio
+   style.css
+   ============================================================= */
+
+/* ── 1. Custom Properties ─────────────────────────────────── */
+:root {
+  --clr-bg:       #000000;
+  --clr-text:     #00ff41;
+  --clr-dim:      #006620;
+  --clr-glow:     #00ff41;
+  --clr-error:    #ff3333;
+  --clr-warn:     #ffb000;
+  --clr-header:   #001a00;
+  --clr-border:   #003300;
+
+  --font-mono: 'VT323', 'Courier New', monospace;
+
+  --fs-base:   20px;
+  --fs-header: 14px;
+  --fs-corner: 13px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── 2. Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  overflow: hidden;
+  /* Subtle green tint on the body background for ambient phosphor bleed */
+  background-image: radial-gradient(ellipse at 50% 60%, #001a00 0%, #000000 70%);
+}
+
+/* ── 3. CRT Screen Wrapper ───────────────────────────────── */
+.screen {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  border-radius: 6px;
+}
+
+/* ── 4. App Shell ─────────────────────────────────────────── */
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ── 5. Corner Label ──────────────────────────────────────── */
+.corner-label {
+  position: fixed;
+  top: 16px;
+  left: 20px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-corner);
+  color: var(--clr-dim);
+  letter-spacing: 0.1em;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* ── 6. Terminal Container ────────────────────────────────── */
+.terminal {
+  width: 100%;
+  max-width: 900px;
+  height: calc(100vh - 40px);
+  max-height: 680px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--clr-border);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── 7. Terminal Header (Window Chrome) ───────────────────── */
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--clr-header);
+  border-bottom: 1px solid var(--clr-border);
+  flex-shrink: 0;
+  font-size: var(--fs-header);
+  font-family: var(--font-mono);
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.dot--red    { background: #ff5f57; }
+.dot--yellow { background: #febc2e; }
+.dot--green  { background: #28c840; }
+
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  color: var(--clr-dim);
+  font-size: var(--fs-header);
+  letter-spacing: 0.08em;
+}
+
+.mute-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--clr-dim);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.mute-btn:hover { color: var(--clr-text); }
+
+/* ── 8. Output Area ───────────────────────────────────────── */
+.output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--clr-border) transparent;
+  scroll-behavior: smooth;
+}
+
+.output::-webkit-scrollbar       { width: 6px; }
+.output::-webkit-scrollbar-track { background: transparent; }
+.output::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 3px; }
+
+/* Output line types */
+.line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  min-height: 1.6em;
+}
+.line--dim     { color: var(--clr-dim); }
+.line--error   { color: var(--clr-error); }
+.line--warn    { color: var(--clr-warn); }
+.line--cmd     { color: var(--clr-text); opacity: 0.6; }
+.line--blank   { min-height: 0.8em; }
+.line--ascii   {
+  white-space: pre;
+  line-height: 1.2;
+  font-size: 0.85em;
+  color: var(--clr-text);
+}
+.line--heading {
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+/* ── 9. Input Row ─────────────────────────────────────────── */
+.input-line {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px 14px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--clr-border);
+  gap: 0;
+}
+
+.prompt {
+  color: var(--clr-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.cmd-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--clr-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  caret-color: transparent; /* we use our own cursor */
+  padding: 0;
+  line-height: 1.5;
+}
+
+.cmd-input::placeholder { color: transparent; }
+.cmd-input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Blinking block cursor */
+.cursor-block {
+  display: inline-block;
+  width: 10px;
+  height: 1.1em;
+  background: var(--clr-text);
+  vertical-align: middle;
+  margin-left: 1px;
+  animation: blink 1.1s step-end infinite;
+}
+
+.cmd-input:disabled ~ .cursor-block {
+  opacity: 0.3;
+  animation: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── 10. CRT Effects ─────────────────────────────────────── */
+
+/* Scanlines overlay */
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Vignette overlay */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+/* Phosphor glow on the whole terminal */
+.terminal {
+  text-shadow: 0 0 6px var(--clr-glow), 0 0 2px rgba(0, 255, 65, 0.4);
+  box-shadow:
+    0 0 0 1px var(--clr-border),
+    0 0 20px rgba(0, 255, 65, 0.08),
+    inset 0 0 40px rgba(0, 0, 0, 0.5);
+  animation: flicker 8s step-end infinite;
+}
+
+/* Subtle CRT phosphor screen flicker */
+@keyframes flicker {
+  0%   { opacity: 1; }
+  2%   { opacity: 0.97; }
+  4%   { opacity: 1; }
+  60%  { opacity: 1; }
+  62%  { opacity: 0.98; }
+  63%  { opacity: 1; }
+  80%  { opacity: 1; }
+  81%  { opacity: 0.97; }
+  82%  { opacity: 1; }
+}
+
+/* Glow on individual text lines */
+.line,
+.prompt,
+.cmd-input {
+  text-shadow: 0 0 5px var(--clr-glow);
+}
+
+/* Slightly warmer glow on header */
+.terminal-header {
+  text-shadow: 0 0 4px rgba(0, 255, 65, 0.3);
+}
+
+/* Reduced motion: disable flicker and glow animation */
+@media (prefers-reduced-motion: reduce) {
+  .terminal { animation: none; }
+  .cursor-block { animation: none; }
+}
+
+/* ── 11. Responsive ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --fs-base:   clamp(16px, 3.5vw, 20px);
+    --fs-header: 12px;
+  }
+
+  .app {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .terminal {
+    height: calc(100dvh - 20px);
+    max-height: none;
+    border-radius: 4px;
+  }
+
+  .output {
+    padding: 12px 14px 6px;
+  }
+
+  .input-line {
+    padding: 6px 14px 10px;
+  }
+
+  /* Tap anywhere on terminal to focus input (mobile keyboards) */
+  .terminal {
+    cursor: text;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --fs-base:   clamp(14px, 4vw, 18px);
+  }
+
+  .terminal-header {
+    padding: 6px 10px;
+  }
+
+  .terminal-title {
+    font-size: 11px;
+  }
+
+  .line--ascii {
+    font-size: clamp(7px, 1.8vw, 11px);
+    letter-spacing: -0.02em;
+  }
+
+  .corner-label {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Day 14 — Retro CRT Terminal Portfolio. Type commands to explore." />
+    <meta name="theme-color" content="#000000" />
+    <title>Day 14 | Retro Terminal</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="screen" aria-hidden="true">
+      <!-- CRT overlay effects rendered via CSS -->
+    </div>
+
+    <div class="app" data-app>
+      <div class="corner-label" aria-hidden="true">14 / 50</div>
+
+      <div class="terminal" data-terminal role="main" aria-label="Retro terminal portfolio">
+        <!-- Window chrome -->
+        <div class="terminal-header" aria-hidden="true">
+          <div class="terminal-dots">
+            <span class="dot dot--red"></span>
+            <span class="dot dot--yellow"></span>
+            <span class="dot dot--green"></span>
+          </div>
+          <span class="terminal-title">PORTFOLIO.EXE — v1.0.0</span>
+          <button class="mute-btn" data-mute-btn type="button" aria-label="Toggle sound" title="Toggle sound">
+            <span data-mute-icon>♪</span>
+          </button>
+        </div>
+
+        <!-- Output area -->
+        <div class="output" data-output aria-live="polite" aria-label="Terminal output"></div>
+
+        <!-- Input row -->
+        <div class="input-line" data-input-line>
+          <span class="prompt" aria-hidden="true">&gt;&nbsp;</span>
+          <input
+            class="cmd-input"
+            data-cmd-input
+            type="text"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="Terminal command input"
+            placeholder=""
+            disabled
+          />
+          <span class="cursor-block" data-cursor aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Matrix easter egg canvas (injected by JS) -->
+
+    <script src="./script.js"></script>
+  </body>
+</html>
