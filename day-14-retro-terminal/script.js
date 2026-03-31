@@ -122,6 +122,19 @@ function printRaw(html, className = '') {
 }
 
 /**
+ * Append a pre-formatted ASCII block using textContent so white-space:pre
+ * handles newlines natively — avoids the <br> + white-space:pre overlap bug.
+ */
+function printAscii(text, className = 'line--ascii') {
+  const el = document.createElement('div');
+  el.className = 'line' + (className ? ' ' + className : '');
+  el.textContent = text;
+  OUTPUT.appendChild(el);
+  scrollToBottom();
+  return Promise.resolve();
+}
+
+/**
  * Print a blank spacer line.
  */
 function printBlank() {
@@ -164,8 +177,8 @@ const BOOT_MESSAGES = [
 async function runBootSequence() {
   CMD_INPUT.disabled = true;
 
-  // Print ASCII logo instantly
-  await printRaw(ASCII_LOGO.replace(/\n/g, '<br>'), 'line--ascii');
+  // Print ASCII logo instantly — use textContent so white-space:pre handles \n natively
+  await printAscii(ASCII_LOGO);
   await sleep(300);
 
   // Print subtitle
