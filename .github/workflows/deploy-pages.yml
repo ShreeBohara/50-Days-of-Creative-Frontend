@@ -20,6 +20,7 @@ on:
       - "day-11-svg-draw-on-scroll/**"
       - "day-12-3d-card-deck/**"
       - "day-13-dna-helix/**"
+      - "day-14-retro-terminal/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -77,6 +78,7 @@ jobs:
           cp -R day-11-svg-draw-on-scroll _site/
           cp -R day-12-3d-card-deck _site/
           cp -R day-13-dna-helix _site/
+          cp -R day-14-retro-terminal _site/
           mkdir -p _site/day-03-solar-system
           cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
 
