@@ -499,6 +499,18 @@ function updateParticles(time) {
   particleMat.size = 0.5 + 0.15 * Math.sin(time * 0.001);
 }
 
+/* ── Post-Processing (Bloom) ────────────────────────────── */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.8,   /* strength */
+  0.4,   /* radius */
+  0.85   /* threshold */
+);
+composer.addPass(bloomPass);
+
 /* ── Animation Loop ─────────────────────────────────────── */
 function animate(time) {
   requestAnimationFrame(animate);
@@ -530,18 +542,6 @@ function animate(time) {
   composer.render();
 }
 animate();
-
-/* ── Post-Processing (Bloom) ────────────────────────────── */
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-
-const bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.8,   /* strength */
-  0.4,   /* radius */
-  0.85   /* threshold */
-);
-composer.addPass(bloomPass);
 
 /* ── Resize ─────────────────────────────────────────────── */
 window.addEventListener("resize", () => {
