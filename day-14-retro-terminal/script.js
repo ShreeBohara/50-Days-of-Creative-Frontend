@@ -426,3 +426,78 @@ registerCommand('theme', async ([color]) => {
     await printLine(`Available: ${Object.keys(THEMES).join(' | ')}`, 'line--dim', SPEED_FAST);
   }
 });
+
+/* ── Matrix Easter Egg ───────────────────────────────────── */
+
+registerCommand('matrix', async () => {
+  await printLine('Initializing MATRIX protocol...', 'line--dim', SPEED_FAST);
+  await sleep(400);
+  runMatrixRain(3200);
+});
+
+function runMatrixRain(durationMs = 3200) {
+  // Build canvas overlay
+  const canvas = document.createElement('canvas');
+  canvas.id = 'matrix-canvas';
+  canvas.style.cssText = `
+    position: fixed; inset: 0; z-index: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  `;
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  const CHARS = 'ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+  const FONT_SIZE = 16;
+  let cols, drops, raf;
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cols  = Math.floor(canvas.width / FONT_SIZE);
+    drops = new Array(cols).fill(1);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Fade in
+  requestAnimationFrame(() => { canvas.style.opacity = '1'; });
+
+  function draw() {
+    // Semi-transparent black bg to create fade trail
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = `${FONT_SIZE}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+      // Head char is bright white, body is green
+      if (drops[i] * FONT_SIZE < canvas.height * 0.15) {
+        ctx.fillStyle = '#ffffff';
+      } else {
+        const brightness = Math.random() * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(0, 255, 65, ${brightness})`;
+      }
+      ctx.fillText(char, i * FONT_SIZE, drops[i] * FONT_SIZE);
+
+      if (drops[i] * FONT_SIZE > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+    raf = requestAnimationFrame(draw);
+  }
+  draw();
+
+  // Fade out and clean up
+  setTimeout(() => {
+    canvas.style.opacity = '0';
+    setTimeout(() => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+      canvas.remove();
+    }, 500);
+  }, durationMs);
+}
