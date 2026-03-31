@@ -134,3 +134,59 @@ function scrollToBottom() {
 function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
+
+/* ── Boot Sequence ───────────────────────────────────────── */
+
+const ASCII_LOGO = `
+ ██████╗  ██████╗ ██████╗ ████████╗
+ ██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝
+ ██████╔╝██║   ██║██████╔╝   ██║
+ ██╔═══╝ ██║   ██║██╔══██╗   ██║
+ ██║     ╚██████╔╝██║  ██║   ██║
+ ╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝
+`.trim();
+
+const BOOT_MESSAGES = [
+  { text: 'BIOS v2.4.1 — POST complete. Memory check: 640K OK', cls: 'line--dim' },
+  { text: 'Loading kernel modules.................... done', cls: 'line--dim' },
+  { text: 'Mounting filesystem........................ done', cls: 'line--dim' },
+  { text: 'Initializing display driver................ done', cls: 'line--dim' },
+  { text: '' },
+  { text: 'Starting PORTFOLIO.EXE...', cls: '' },
+];
+
+async function runBootSequence() {
+  CMD_INPUT.disabled = true;
+
+  // Print ASCII logo instantly
+  await printRaw(ASCII_LOGO.replace(/\n/g, '<br>'), 'line--ascii');
+  await sleep(300);
+
+  // Print subtitle
+  await printLine('[ Retro Terminal Portfolio — Interactive CLI ]', 'line--dim', SPEED_FAST);
+  await printBlank();
+  await sleep(200);
+
+  // Print boot messages
+  for (const { text, cls = '' } of BOOT_MESSAGES) {
+    if (text === '') {
+      await printBlank();
+      await sleep(100);
+    } else {
+      await printLine(text, cls, SPEED_FAST);
+      await sleep(prefersReducedMotion ? 0 : 80);
+    }
+  }
+
+  await sleep(300);
+  await printLine('System initialized.', '', SPEED_NORMAL);
+  await printBlank();
+  await printLine("Type 'help' to see available commands.", 'line--dim', SPEED_NORMAL);
+  await printBlank();
+
+  // Enable input
+  CMD_INPUT.disabled = false;
+  CMD_INPUT.focus();
+}
+
+document.addEventListener('DOMContentLoaded', runBootSequence);
