@@ -45,10 +45,10 @@
       "port": 3009
     },
     {
-      "name": "day-12",
+      "name": "day-14",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "day-12-3d-card-deck", "-l", "3012"],
-      "port": 3012
+      "runtimeArgs": ["serve", "day-14-retro-terminal", "-l", "3014"],
+      "port": 3014
     }
   ]
 }
