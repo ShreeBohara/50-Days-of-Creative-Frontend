@@ -22,3 +22,64 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 12 | 3D Card Deck | Ten Celestial Arcana cards in 3D perspective — fan, shuffle, flip, and cycle with cinematic CSS transitions. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-12-3d-card-deck/) | [day-12-3d-card-deck](./day-12-3d-card-deck/) |
 | 13 | Interactive DNA Helix | 3D double helix with color-coded base pairs, click-to-inspect info panel, unwind/rewind morphing, and bloom glow. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-13-dna-helix/) | [day-13-dna-helix](./day-13-dna-helix/) |
 | 14 | Retro Terminal Portfolio | Full-screen CRT terminal with phosphor glow, scan lines, boot sequence, and interactive portfolio commands. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-14-retro-terminal/) | [day-14-retro-terminal](./day-14-retro-terminal/) |
+
+## Adding a New Day
+
+Every new day requires updates in **4 places**. Missing any one of them will cause a 404 on the live site.
+
+### 1. Create the day folder
+
+```
+day-NN-project-name/
+  index.html
+  style.css
+  script.js
+  favicon.svg
+  README.md
+```
+
+### 2. Add the card to `index.html` (gallery index)
+
+```html
+<article class="project-card" data-day="NN">
+  <span class="card-num">NN</span>
+  <h2>Project Title</h2>
+  <p>Short description.</p>
+  <footer class="card-foot">
+    <span class="card-tech">Tech A, Tech B</span>
+    <a class="card-link" href="./day-NN-project-name/">View</a>
+  </footer>
+</article>
+```
+
+Also update the **"Latest day"** link in the hero:
+
+```html
+<a class="link-secondary" href="./day-NN-project-name/">Latest day</a>
+```
+
+### 3. ⚠️ Update the deploy workflow (easy to forget — causes 404)
+
+The file `.github/workflows/deploy-pages.yml` hardcodes every day in two spots.
+**Both must be updated** or the folder will never be copied into the deployed site.
+
+**A. Add to the `paths:` trigger** (so a push to the day folder kicks off a deploy):
+
+```yaml
+- "day-NN-project-name/**"
+```
+
+**B. Add to the `Stage static site bundle` step** (so the folder is actually included):
+
+```bash
+cp -R day-NN-project-name _site/
+```
+
+> **Why does the deploy say "success" even when a day is missing?**
+> The workflow succeeds because it copies only the folders it knows about. If a new day isn't listed, it silently skips it — the build succeeds, but the URL 404s.
+
+### 4. Add a row to this `README.md`
+
+```markdown
+| NN | Project Title | Description. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-NN-project-name/) | [day-NN-project-name](./day-NN-project-name/) |
+```
