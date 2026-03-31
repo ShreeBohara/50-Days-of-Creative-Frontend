@@ -51,6 +51,12 @@ MUTE_BTN.addEventListener('click', () => {
   MUTE_BTN.title = muted ? 'Unmute' : 'Mute';
 });
 
+// Tap/click on terminal body focuses the input (mobile keyboard)
+$('[data-terminal]').addEventListener('click', e => {
+  if (e.target === MUTE_BTN || MUTE_BTN.contains(e.target)) return;
+  if (!CMD_INPUT.disabled) CMD_INPUT.focus();
+});
+
 /* ── Typing Engine ───────────────────────────────────────── */
 
 /**

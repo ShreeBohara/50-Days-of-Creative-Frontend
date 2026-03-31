@@ -301,3 +301,59 @@ body {
   .terminal { animation: none; }
   .cursor-block { animation: none; }
 }
+
+/* ── 11. Responsive ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --fs-base:   clamp(16px, 3.5vw, 20px);
+    --fs-header: 12px;
+  }
+
+  .app {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .terminal {
+    height: calc(100dvh - 20px);
+    max-height: none;
+    border-radius: 4px;
+  }
+
+  .output {
+    padding: 12px 14px 6px;
+  }
+
+  .input-line {
+    padding: 6px 14px 10px;
+  }
+
+  /* Tap anywhere on terminal to focus input (mobile keyboards) */
+  .terminal {
+    cursor: text;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --fs-base:   clamp(14px, 4vw, 18px);
+  }
+
+  .terminal-header {
+    padding: 6px 10px;
+  }
+
+  .terminal-title {
+    font-size: 11px;
+  }
+
+  .line--ascii {
+    font-size: clamp(7px, 1.8vw, 11px);
+    letter-spacing: -0.02em;
+  }
+
+  .corner-label {
+    font-size: 11px;
+  }
+}
