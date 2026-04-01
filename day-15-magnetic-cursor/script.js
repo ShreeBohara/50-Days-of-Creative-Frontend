@@ -66,12 +66,21 @@ function resizeCanvas() {
   context.setTransform(viewport.dpr, 0, 0, viewport.dpr, 0, 0);
   context.clearRect(0, 0, viewport.width, viewport.height);
 
-  attractor.x = viewport.width * 0.5;
-  attractor.y = viewport.height * 0.5;
-  pointer.x = attractor.x;
-  pointer.y = attractor.y;
+  const fallbackX = viewport.width * 0.5;
+  const fallbackY = viewport.height * 0.5;
+  const pointerX = pointer.hasInteracted ? clamp(pointer.x, 0, viewport.width) : fallbackX;
+  const pointerY = pointer.hasInteracted ? clamp(pointer.y, 0, viewport.height) : fallbackY;
+
+  attractor.x = pointerX;
+  attractor.y = pointerY;
+  pointer.x = pointerX;
+  pointer.y = pointerY;
   pointer.lastX = pointer.x;
   pointer.lastY = pointer.y;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function createCircles() {
@@ -297,6 +306,21 @@ function updateCircles(deltaTime, time) {
     circle.vy = (circle.vy + (forceY / circle.mass) * frameFactor) * circle.damping;
     circle.x += circle.vx * frameFactor;
     circle.y += circle.vy * frameFactor;
+
+    const minX = circle.radius;
+    const maxX = viewport.width - circle.radius;
+    const minY = circle.radius;
+    const maxY = viewport.height - circle.radius;
+
+    if (circle.x < minX || circle.x > maxX) {
+      circle.x = clamp(circle.x, minX, maxX);
+      circle.vx *= -0.42;
+    }
+
+    if (circle.y < minY || circle.y > maxY) {
+      circle.y = clamp(circle.y, minY, maxY);
+      circle.vy *= -0.42;
+    }
   }
 }
 

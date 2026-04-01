@@ -35,6 +35,7 @@ body {
   color: var(--text);
   font-family: "Sora", "Segoe UI", sans-serif;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .app-shell {
@@ -48,13 +49,14 @@ body {
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
 }
 
 .hud {
   position: fixed;
-  inset: 1.25rem auto auto 1.25rem;
+  inset: calc(1rem + env(safe-area-inset-top)) auto auto calc(1rem + env(safe-area-inset-left));
   z-index: 2;
-  width: min(24rem, calc(100vw - 2.5rem));
+  width: min(24rem, calc(100vw - 2rem - env(safe-area-inset-left) - env(safe-area-inset-right)));
   padding: 1.25rem;
   border: 1px solid var(--panel-border);
   border-radius: 1.5rem;
@@ -175,9 +177,31 @@ body {
 
 @media (max-width: 720px) {
   .hud {
-    inset: auto 1rem 1rem 1rem;
+    inset:
+      auto
+      calc(1rem + env(safe-area-inset-right))
+      calc(1rem + env(safe-area-inset-bottom))
+      calc(1rem + env(safe-area-inset-left));
     width: auto;
     padding: 1rem;
     border-radius: 1.25rem;
+  }
+
+  .hud h1 {
+    font-size: clamp(1.75rem, 10vw, 2.35rem);
+  }
+
+  .hud__lede {
+    font-size: 0.92rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .toggle {
+    padding: 1rem 1rem;
+  }
+
+  .hud__hint {
+    font-size: 0.78rem;
   }
 }
