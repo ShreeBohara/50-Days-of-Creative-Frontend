@@ -22,6 +22,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 12 | 3D Card Deck | Ten Celestial Arcana cards in 3D perspective — fan, shuffle, flip, and cycle with cinematic CSS transitions. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-12-3d-card-deck/) | [day-12-3d-card-deck](./day-12-3d-card-deck/) |
 | 13 | Interactive DNA Helix | 3D double helix with color-coded base pairs, click-to-inspect info panel, unwind/rewind morphing, and bloom glow. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-13-dna-helix/) | [day-13-dna-helix](./day-13-dna-helix/) |
 | 14 | Retro Terminal Portfolio | Full-screen CRT terminal with phosphor glow, scan lines, boot sequence, and interactive portfolio commands. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-14-retro-terminal/) | [day-14-retro-terminal](./day-14-retro-terminal/) |
+| 15 | Magnetic Cursor Trail | Spring-driven cursor trail with glowing pastel particles, idle orbiting, click explosions, and an afterimage toggle. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-15-magnetic-cursor/) | [day-15-magnetic-cursor](./day-15-magnetic-cursor/) |
 
 ## Adding a New Day
 

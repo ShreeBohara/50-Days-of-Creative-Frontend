@@ -1,9 +1,11 @@
 'use strict';
 
+/* DOM and drawing context */
 const canvas = document.querySelector('[data-scene]');
 const trailToggle = document.querySelector('[data-trail-toggle]');
 const context = canvas.getContext('2d');
 
+/* Runtime state */
 const viewport = {
   width: 0,
   height: 0,
@@ -40,6 +42,7 @@ let lastFrameTime = 0;
 let pendingClickTimer = 0;
 let scatterUntil = 0;
 
+/* Small color helper so particles can share alpha-tuned palette values. */
 function hexToRgba(hex, alpha = 1) {
   const normalized = hex.replace('#', '');
   const value = normalized.length === 3
@@ -81,6 +84,10 @@ function resizeCanvas() {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function isUIEventTarget(target) {
+  return target instanceof Element && Boolean(target.closest('.hud'));
 }
 
 function createCircles() {
@@ -288,6 +295,10 @@ function updateCircles(deltaTime, time) {
   const frameFactor = Math.min(deltaTime * 60, 1.6);
   const scattering = performance.now() < scatterUntil;
   const shouldOrbit = pointer.idle || !pointer.hasInteracted || !pointer.active;
+  const pointerSpeed = Math.hypot(pointer.vx, pointer.vy);
+  const velocityBias = !shouldOrbit && !scattering ? clamp(pointerSpeed * 42, 0, 110) : 0;
+  const velocityX = pointerSpeed ? (pointer.vx / pointerSpeed) * velocityBias : 0;
+  const velocityY = pointerSpeed ? (pointer.vy / pointerSpeed) * velocityBias : 0;
 
   for (let index = 0; index < circles.length; index += 1) {
     const circle = circles[index];
@@ -297,8 +308,9 @@ function updateCircles(deltaTime, time) {
     const orbitAngle = time * orbitSpeed + circle.phase;
     const leaderX = scattering ? circle.scatterX : leader.x;
     const leaderY = scattering ? circle.scatterY : leader.y;
-    const targetX = leaderX + Math.cos(orbitAngle) * orbitRadius;
-    const targetY = leaderY + Math.sin(orbitAngle * 1.2) * orbitRadius * 0.65;
+    const dragWeight = index / Math.max(circles.length - 1, 1);
+    const targetX = leaderX + Math.cos(orbitAngle) * orbitRadius - velocityX * dragWeight;
+    const targetY = leaderY + Math.sin(orbitAngle * 1.2) * orbitRadius * 0.65 - velocityY * dragWeight;
     const forceX = (targetX - circle.x) * circle.spring;
     const forceY = (targetY - circle.y) * circle.spring;
 
@@ -346,12 +358,20 @@ window.addEventListener('pointerup', () => {
   pointer.down = false;
 });
 window.addEventListener('click', event => {
+  if (isUIEventTarget(event.target)) {
+    return;
+  }
+
   window.clearTimeout(pendingClickTimer);
   pendingClickTimer = window.setTimeout(() => {
     explodeFrom(event.clientX, event.clientY, 1);
   }, 220);
 });
 window.addEventListener('dblclick', event => {
+  if (isUIEventTarget(event.target)) {
+    return;
+  }
+
   window.clearTimeout(pendingClickTimer);
   assignScatterTargets();
   scatterUntil = performance.now() + 1200;
