@@ -35,6 +35,19 @@ const pointer = {
 
 let lastFrameTime = 0;
 
+function hexToRgba(hex, alpha = 1) {
+  const normalized = hex.replace('#', '');
+  const value = normalized.length === 3
+    ? normalized.split('').map(channel => channel + channel).join('')
+    : normalized;
+
+  const red = parseInt(value.slice(0, 2), 16);
+  const green = parseInt(value.slice(2, 4), 16);
+  const blue = parseInt(value.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
 function resizeCanvas() {
   viewport.width = window.innerWidth;
   viewport.height = window.innerHeight;
@@ -58,6 +71,7 @@ function resizeCanvas() {
 
 function createCircles() {
   circles.length = 0;
+  const palette = ['#9FE8FF', '#FF9EEC', '#FFD58F', '#A7FFBF', '#9AA9FF', '#7FD8FF'];
 
   for (let index = 0; index < circleCount; index += 1) {
     const progress = index / Math.max(circleCount - 1, 1);
@@ -73,8 +87,8 @@ function createCircles() {
       damping: 0.8 + progress * 0.15,
       alpha: 0.15 + (1 - progress) * 0.7,
       phase: Math.random() * Math.PI * 2,
-      blur: 8 + (1 - progress) * 24,
-      color: `rgba(255, 255, 255, ${0.18 + (1 - progress) * 0.3})`,
+      blur: 14 + (1 - progress) * 30,
+      colorHex: palette[index % palette.length],
       x: Math.random() * viewport.width,
       y: Math.random() * viewport.height,
       vx: 0,
@@ -85,16 +99,62 @@ function createCircles() {
 
 function drawBackground() {
   context.clearRect(0, 0, viewport.width, viewport.height);
-  context.fillStyle = '#070b16';
+  const wash = context.createLinearGradient(0, 0, viewport.width, viewport.height);
+  wash.addColorStop(0, '#050816');
+  wash.addColorStop(0.55, '#0A132A');
+  wash.addColorStop(1, '#091A36');
+  context.fillStyle = wash;
+  context.fillRect(0, 0, viewport.width, viewport.height);
+
+  const warmBloom = context.createRadialGradient(
+    viewport.width * 0.18,
+    viewport.height * 0.22,
+    0,
+    viewport.width * 0.18,
+    viewport.height * 0.22,
+    viewport.width * 0.38
+  );
+  warmBloom.addColorStop(0, 'rgba(159, 232, 255, 0.18)');
+  warmBloom.addColorStop(1, 'rgba(159, 232, 255, 0)');
+  context.fillStyle = warmBloom;
+  context.fillRect(0, 0, viewport.width, viewport.height);
+
+  const coolBloom = context.createRadialGradient(
+    viewport.width * 0.78,
+    viewport.height * 0.18,
+    0,
+    viewport.width * 0.78,
+    viewport.height * 0.18,
+    viewport.width * 0.3
+  );
+  coolBloom.addColorStop(0, 'rgba(255, 158, 236, 0.18)');
+  coolBloom.addColorStop(1, 'rgba(255, 158, 236, 0)');
+  context.fillStyle = coolBloom;
   context.fillRect(0, 0, viewport.width, viewport.height);
 }
 
 function drawCircles() {
   for (const circle of circles) {
+    const fill = context.createRadialGradient(
+      circle.x - circle.radius * 0.35,
+      circle.y - circle.radius * 0.35,
+      circle.radius * 0.15,
+      circle.x,
+      circle.y,
+      circle.radius
+    );
+    fill.addColorStop(0, hexToRgba(circle.colorHex, Math.min(circle.alpha + 0.18, 0.95)));
+    fill.addColorStop(1, hexToRgba(circle.colorHex, 0.16));
+
+    context.save();
+    context.globalCompositeOperation = 'lighter';
+    context.shadowBlur = circle.blur;
+    context.shadowColor = hexToRgba(circle.colorHex, 0.75);
+    context.fillStyle = fill;
     context.beginPath();
-    context.fillStyle = circle.color;
     context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
     context.fill();
+    context.restore();
   }
 }
 
