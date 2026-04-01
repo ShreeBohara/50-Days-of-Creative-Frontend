@@ -194,14 +194,20 @@ function updateAttractor(deltaTime) {
   pointer.idle = performance.now() - pointer.lastMoveTime > 140;
 }
 
-function updateCircles(deltaTime) {
+function updateCircles(deltaTime, time) {
   const frameFactor = Math.min(deltaTime * 60, 1.6);
+  const shouldOrbit = pointer.idle || !pointer.hasInteracted || !pointer.active;
 
   for (let index = 0; index < circles.length; index += 1) {
     const circle = circles[index];
     const leader = index === 0 ? attractor : circles[index - 1];
-    const forceX = (leader.x - circle.x) * circle.spring;
-    const forceY = (leader.y - circle.y) * circle.spring;
+    const orbitRadius = shouldOrbit ? 4 + index * 0.9 : 0;
+    const orbitSpeed = 0.75 + (circle.spring * 12);
+    const orbitAngle = time * orbitSpeed + circle.phase;
+    const targetX = leader.x + Math.cos(orbitAngle) * orbitRadius;
+    const targetY = leader.y + Math.sin(orbitAngle * 1.2) * orbitRadius * 0.65;
+    const forceX = (targetX - circle.x) * circle.spring;
+    const forceY = (targetY - circle.y) * circle.spring;
 
     circle.vx = (circle.vx + (forceX / circle.mass) * frameFactor) * circle.damping;
     circle.vy = (circle.vy + (forceY / circle.mass) * frameFactor) * circle.damping;
@@ -213,9 +219,10 @@ function updateCircles(deltaTime) {
 function render(timestamp = 0) {
   const deltaTime = lastFrameTime ? Math.min((timestamp - lastFrameTime) / 1000, 0.033) : 1 / 60;
   lastFrameTime = timestamp;
+  const time = timestamp * 0.001;
 
   updateAttractor(deltaTime);
-  updateCircles(deltaTime);
+  updateCircles(deltaTime, time);
   drawBackground();
   drawCircles();
   requestAnimationFrame(render);
