@@ -162,6 +162,34 @@ function drawCircles() {
   }
 }
 
+function drawConnections() {
+  for (let index = 1; index < circles.length; index += 1) {
+    const previous = circles[index - 1];
+    const current = circles[index];
+    const distance = Math.hypot(current.x - previous.x, current.y - previous.y);
+    const maxDistance = 180;
+
+    if (distance > maxDistance) {
+      continue;
+    }
+
+    const alpha = (1 - distance / maxDistance) * 0.38;
+    const gradient = context.createLinearGradient(previous.x, previous.y, current.x, current.y);
+    gradient.addColorStop(0, hexToRgba(previous.colorHex, alpha));
+    gradient.addColorStop(1, hexToRgba(current.colorHex, alpha));
+
+    context.save();
+    context.globalCompositeOperation = 'screen';
+    context.lineWidth = Math.max(0.9, previous.radius * 0.08);
+    context.strokeStyle = gradient;
+    context.beginPath();
+    context.moveTo(previous.x, previous.y);
+    context.lineTo(current.x, current.y);
+    context.stroke();
+    context.restore();
+  }
+}
+
 function updatePointerState(event) {
   const time = performance.now();
   const x = event.clientX;
@@ -265,6 +293,7 @@ function render(timestamp = 0) {
   updateAttractor(deltaTime);
   updateCircles(deltaTime, time);
   drawBackground();
+  drawConnections();
   drawCircles();
   requestAnimationFrame(render);
 }
