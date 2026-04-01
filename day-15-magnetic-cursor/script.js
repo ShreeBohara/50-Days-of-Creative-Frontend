@@ -14,7 +14,23 @@ const circles = [];
 const circleCount = 25;
 const attractor = {
   x: 0,
-  y: 0
+  y: 0,
+  vx: 0,
+  vy: 0
+};
+const pointer = {
+  x: 0,
+  y: 0,
+  vx: 0,
+  vy: 0,
+  lastX: 0,
+  lastY: 0,
+  lastTime: 0,
+  lastMoveTime: 0,
+  active: false,
+  down: false,
+  hasInteracted: false,
+  idle: true
 };
 
 let lastFrameTime = 0;
@@ -34,6 +50,10 @@ function resizeCanvas() {
 
   attractor.x = viewport.width * 0.5;
   attractor.y = viewport.height * 0.5;
+  pointer.x = attractor.x;
+  pointer.y = attractor.y;
+  pointer.lastX = pointer.x;
+  pointer.lastY = pointer.y;
 }
 
 function createCircles() {
@@ -78,6 +98,42 @@ function drawCircles() {
   }
 }
 
+function updatePointerState(event) {
+  const time = performance.now();
+  const x = event.clientX;
+  const y = event.clientY;
+  const elapsed = Math.max(time - pointer.lastTime, 16);
+
+  pointer.vx = (x - pointer.lastX) / elapsed;
+  pointer.vy = (y - pointer.lastY) / elapsed;
+  pointer.x = x;
+  pointer.y = y;
+  pointer.lastX = x;
+  pointer.lastY = y;
+  pointer.lastTime = time;
+  pointer.lastMoveTime = time;
+  pointer.active = true;
+  pointer.hasInteracted = true;
+  pointer.idle = false;
+}
+
+function updateAttractor(deltaTime) {
+  const centerX = viewport.width * 0.5;
+  const centerY = viewport.height * 0.5;
+  const targetX = pointer.active ? pointer.x : centerX;
+  const targetY = pointer.active ? pointer.y : centerY;
+  const easing = Math.min(deltaTime * 12, 1);
+
+  attractor.vx += (targetX - attractor.x) * 0.18 * easing;
+  attractor.vy += (targetY - attractor.y) * 0.18 * easing;
+  attractor.vx *= 0.76;
+  attractor.vy *= 0.76;
+  attractor.x += attractor.vx;
+  attractor.y += attractor.vy;
+
+  pointer.idle = performance.now() - pointer.lastMoveTime > 140;
+}
+
 function updateCircles(deltaTime) {
   const frameFactor = Math.min(deltaTime * 60, 1.6);
 
@@ -98,11 +154,29 @@ function render(timestamp = 0) {
   const deltaTime = lastFrameTime ? Math.min((timestamp - lastFrameTime) / 1000, 0.033) : 1 / 60;
   lastFrameTime = timestamp;
 
+  updateAttractor(deltaTime);
   updateCircles(deltaTime);
   drawBackground();
   drawCircles();
   requestAnimationFrame(render);
 }
+
+window.addEventListener('pointermove', updatePointerState);
+window.addEventListener('pointerdown', event => {
+  pointer.down = true;
+  updatePointerState(event);
+});
+window.addEventListener('pointerup', () => {
+  pointer.down = false;
+});
+window.addEventListener('pointerleave', () => {
+  pointer.active = false;
+  pointer.down = false;
+});
+window.addEventListener('blur', () => {
+  pointer.active = false;
+  pointer.down = false;
+});
 
 window.addEventListener('resize', resizeCanvas);
 trailToggle.checked = false;
