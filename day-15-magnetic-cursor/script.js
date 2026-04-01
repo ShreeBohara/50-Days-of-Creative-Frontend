@@ -34,6 +34,8 @@ const pointer = {
 };
 
 let lastFrameTime = 0;
+let pendingClickTimer = 0;
+let scatterUntil = 0;
 
 function hexToRgba(hex, alpha = 1) {
   const normalized = hex.replace('#', '');
@@ -91,6 +93,8 @@ function createCircles() {
       colorHex: palette[index % palette.length],
       x: Math.random() * viewport.width,
       y: Math.random() * viewport.height,
+      scatterX: viewport.width * 0.5,
+      scatterY: viewport.height * 0.5,
       vx: 0,
       vy: 0
     });
@@ -194,8 +198,43 @@ function updateAttractor(deltaTime) {
   pointer.idle = performance.now() - pointer.lastMoveTime > 140;
 }
 
+function explodeFrom(x, y, strength = 1) {
+  for (const circle of circles) {
+    const dx = circle.x - x;
+    const dy = circle.y - y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const falloff = Math.max(0.35, 1 - Math.min(distance / 340, 0.78));
+    const impulse = (14 + circle.radius * 0.55) * strength * falloff;
+
+    circle.vx += (dx / distance) * impulse;
+    circle.vy += (dy / distance) * impulse;
+  }
+}
+
+function assignScatterTargets() {
+  for (const circle of circles) {
+    const edge = Math.floor(Math.random() * 4);
+    const margin = 40 + circle.radius;
+
+    if (edge === 0) {
+      circle.scatterX = -margin;
+      circle.scatterY = Math.random() * viewport.height;
+    } else if (edge === 1) {
+      circle.scatterX = viewport.width + margin;
+      circle.scatterY = Math.random() * viewport.height;
+    } else if (edge === 2) {
+      circle.scatterX = Math.random() * viewport.width;
+      circle.scatterY = -margin;
+    } else {
+      circle.scatterX = Math.random() * viewport.width;
+      circle.scatterY = viewport.height + margin;
+    }
+  }
+}
+
 function updateCircles(deltaTime, time) {
   const frameFactor = Math.min(deltaTime * 60, 1.6);
+  const scattering = performance.now() < scatterUntil;
   const shouldOrbit = pointer.idle || !pointer.hasInteracted || !pointer.active;
 
   for (let index = 0; index < circles.length; index += 1) {
@@ -204,8 +243,10 @@ function updateCircles(deltaTime, time) {
     const orbitRadius = shouldOrbit ? 4 + index * 0.9 : 0;
     const orbitSpeed = 0.75 + (circle.spring * 12);
     const orbitAngle = time * orbitSpeed + circle.phase;
-    const targetX = leader.x + Math.cos(orbitAngle) * orbitRadius;
-    const targetY = leader.y + Math.sin(orbitAngle * 1.2) * orbitRadius * 0.65;
+    const leaderX = scattering ? circle.scatterX : leader.x;
+    const leaderY = scattering ? circle.scatterY : leader.y;
+    const targetX = leaderX + Math.cos(orbitAngle) * orbitRadius;
+    const targetY = leaderY + Math.sin(orbitAngle * 1.2) * orbitRadius * 0.65;
     const forceX = (targetX - circle.x) * circle.spring;
     const forceY = (targetY - circle.y) * circle.spring;
 
@@ -235,6 +276,18 @@ window.addEventListener('pointerdown', event => {
 });
 window.addEventListener('pointerup', () => {
   pointer.down = false;
+});
+window.addEventListener('click', event => {
+  window.clearTimeout(pendingClickTimer);
+  pendingClickTimer = window.setTimeout(() => {
+    explodeFrom(event.clientX, event.clientY, 1);
+  }, 220);
+});
+window.addEventListener('dblclick', event => {
+  window.clearTimeout(pendingClickTimer);
+  assignScatterTargets();
+  scatterUntil = performance.now() + 1200;
+  explodeFrom(event.clientX, event.clientY, 1.45);
 });
 window.addEventListener('pointerleave', () => {
   pointer.active = false;
