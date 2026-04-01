@@ -12,6 +12,12 @@ const viewport = {
 
 const circles = [];
 const circleCount = 25;
+const attractor = {
+  x: 0,
+  y: 0
+};
+
+let lastFrameTime = 0;
 
 function resizeCanvas() {
   viewport.width = window.innerWidth;
@@ -25,13 +31,13 @@ function resizeCanvas() {
 
   context.setTransform(viewport.dpr, 0, 0, viewport.dpr, 0, 0);
   context.clearRect(0, 0, viewport.width, viewport.height);
+
+  attractor.x = viewport.width * 0.5;
+  attractor.y = viewport.height * 0.5;
 }
 
 function createCircles() {
   circles.length = 0;
-
-  const centerX = viewport.width * 0.5;
-  const centerY = viewport.height * 0.5;
 
   for (let index = 0; index < circleCount; index += 1) {
     const progress = index / Math.max(circleCount - 1, 1);
@@ -49,8 +55,8 @@ function createCircles() {
       phase: Math.random() * Math.PI * 2,
       blur: 8 + (1 - progress) * 24,
       color: `rgba(255, 255, 255, ${0.18 + (1 - progress) * 0.3})`,
-      x: centerX + Math.cos(angle) * spread,
-      y: centerY + Math.sin(angle) * spread,
+      x: Math.random() * viewport.width,
+      y: Math.random() * viewport.height,
       vx: 0,
       vy: 0
     });
@@ -72,7 +78,27 @@ function drawCircles() {
   }
 }
 
-function render() {
+function updateCircles(deltaTime) {
+  const frameFactor = Math.min(deltaTime * 60, 1.6);
+
+  for (let index = 0; index < circles.length; index += 1) {
+    const circle = circles[index];
+    const leader = index === 0 ? attractor : circles[index - 1];
+    const forceX = (leader.x - circle.x) * circle.spring;
+    const forceY = (leader.y - circle.y) * circle.spring;
+
+    circle.vx = (circle.vx + (forceX / circle.mass) * frameFactor) * circle.damping;
+    circle.vy = (circle.vy + (forceY / circle.mass) * frameFactor) * circle.damping;
+    circle.x += circle.vx * frameFactor;
+    circle.y += circle.vy * frameFactor;
+  }
+}
+
+function render(timestamp = 0) {
+  const deltaTime = lastFrameTime ? Math.min((timestamp - lastFrameTime) / 1000, 0.033) : 1 / 60;
+  lastFrameTime = timestamp;
+
+  updateCircles(deltaTime);
   drawBackground();
   drawCircles();
   requestAnimationFrame(render);
