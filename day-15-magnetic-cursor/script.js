@@ -12,6 +12,9 @@ const viewport = {
 
 const circles = [];
 const circleCount = 25;
+const state = {
+  trailMode: false
+};
 const attractor = {
   x: 0,
   y: 0,
@@ -102,11 +105,22 @@ function createCircles() {
 }
 
 function drawBackground() {
-  context.clearRect(0, 0, viewport.width, viewport.height);
+  if (state.trailMode) {
+    context.save();
+    context.globalCompositeOperation = 'source-over';
+    context.fillStyle = 'rgba(5, 8, 22, 0.14)';
+    context.fillRect(0, 0, viewport.width, viewport.height);
+    context.restore();
+  } else {
+    context.clearRect(0, 0, viewport.width, viewport.height);
+  }
+
   const wash = context.createLinearGradient(0, 0, viewport.width, viewport.height);
   wash.addColorStop(0, '#050816');
   wash.addColorStop(0.55, '#0A132A');
   wash.addColorStop(1, '#091A36');
+  context.save();
+  context.globalAlpha = state.trailMode ? 0.24 : 1;
   context.fillStyle = wash;
   context.fillRect(0, 0, viewport.width, viewport.height);
 
@@ -118,7 +132,7 @@ function drawBackground() {
     viewport.height * 0.22,
     viewport.width * 0.38
   );
-  warmBloom.addColorStop(0, 'rgba(159, 232, 255, 0.18)');
+  warmBloom.addColorStop(0, `rgba(159, 232, 255, ${state.trailMode ? 0.08 : 0.18})`);
   warmBloom.addColorStop(1, 'rgba(159, 232, 255, 0)');
   context.fillStyle = warmBloom;
   context.fillRect(0, 0, viewport.width, viewport.height);
@@ -131,10 +145,11 @@ function drawBackground() {
     viewport.height * 0.18,
     viewport.width * 0.3
   );
-  coolBloom.addColorStop(0, 'rgba(255, 158, 236, 0.18)');
+  coolBloom.addColorStop(0, `rgba(255, 158, 236, ${state.trailMode ? 0.08 : 0.18})`);
   coolBloom.addColorStop(1, 'rgba(255, 158, 236, 0)');
   context.fillStyle = coolBloom;
   context.fillRect(0, 0, viewport.width, viewport.height);
+  context.restore();
 }
 
 function drawCircles() {
@@ -329,6 +344,9 @@ window.addEventListener('blur', () => {
 
 window.addEventListener('resize', resizeCanvas);
 trailToggle.checked = false;
+trailToggle.addEventListener('change', event => {
+  state.trailMode = event.currentTarget.checked;
+});
 resizeCanvas();
 createCircles();
 render();
