@@ -9,6 +9,12 @@
     />
     <meta name="theme-color" content="#08111f" />
     <title>Day 16 | Sorting Algorithm Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -22,27 +28,39 @@
       </section>
 
       <section class="control-rail" aria-label="Sorting controls">
-        <button type="button" data-generate>Generate New Array</button>
-        <button type="button" data-sort>Sort</button>
-        <label>
-          <span>Step Mode</span>
-          <input type="checkbox" data-step-mode />
-        </label>
-        <button type="button" data-step>Step</button>
-        <label>
-          <span>Mute</span>
-          <input type="checkbox" data-mute />
-        </label>
-        <label>
-          <span>Speed</span>
-          <input type="range" min="1" max="100" value="32" data-speed />
-          <output data-speed-output>32x</output>
-        </label>
-        <label>
-          <span>Array Size</span>
-          <input type="range" min="20" max="200" value="96" data-size />
-          <output data-size-output>96</output>
-        </label>
+        <div class="control-rail__cluster control-rail__cluster--buttons">
+          <button class="control-button control-button--ghost" type="button" data-generate>Generate New Array</button>
+          <button class="control-button control-button--primary" type="button" data-sort>Sort</button>
+          <button class="control-button control-button--ghost" type="button" data-step>Step</button>
+        </div>
+
+        <div class="control-rail__cluster control-rail__cluster--toggles">
+          <label class="toggle-card">
+            <span>Step Mode</span>
+            <input type="checkbox" data-step-mode />
+            <span class="toggle-card__ui" aria-hidden="true"></span>
+          </label>
+
+          <label class="toggle-card">
+            <span>Mute</span>
+            <input type="checkbox" data-mute />
+            <span class="toggle-card__ui" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="control-rail__cluster control-rail__cluster--ranges">
+          <label class="range-card">
+            <span>Speed</span>
+            <input type="range" min="1" max="100" value="32" data-speed />
+            <output data-speed-output>32x</output>
+          </label>
+
+          <label class="range-card">
+            <span>Array Size</span>
+            <input type="range" min="20" max="200" value="96" data-size />
+            <output data-size-output>96</output>
+          </label>
+        </div>
       </section>
 
       <section class="panel-grid" aria-label="Side-by-side sorting comparison">
@@ -59,19 +77,19 @@
           </header>
 
           <section class="sort-panel__stats" aria-label="Bubble sort statistics">
-            <div>
+            <div class="stat-card">
               <span>Comparisons</span>
               <strong data-stat="comparisons-left">0</strong>
             </div>
-            <div>
+            <div class="stat-card">
               <span>Writes</span>
               <strong data-stat="writes-left">0</strong>
             </div>
-            <div>
+            <div class="stat-card">
               <span>Elapsed</span>
               <strong data-stat="elapsed-left">0 ms</strong>
             </div>
-            <div>
+            <div class="stat-card">
               <span>Status</span>
               <strong data-stat="status-left">Ready</strong>
             </div>
@@ -98,19 +116,19 @@
           </header>
 
           <section class="sort-panel__stats" aria-label="Quick sort statistics">
-            <div>
+            <div class="stat-card">
               <span>Comparisons</span>
               <strong data-stat="comparisons-right">0</strong>
             </div>
-            <div>
+            <div class="stat-card">
               <span>Writes</span>
               <strong data-stat="writes-right">0</strong>
             </div>
-            <div>
+            <div class="stat-card">
               <span>Elapsed</span>
               <strong data-stat="elapsed-right">0 ms</strong>
             </div>
-            <div>
+            <div class="stat-card">
               <span>Status</span>
               <strong data-stat="status-right">Ready</strong>
             </div>
