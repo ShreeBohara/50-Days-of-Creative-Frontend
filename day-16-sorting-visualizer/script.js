@@ -523,16 +523,16 @@ async function runPanel(panel) {
   }
 }
 
-async function runSinglePanelDemo() {
-  const panel = state.panels.left;
+async function runSideBySideDemo() {
+  const panels = Object.values(state.panels);
 
-  if (panel.running || state.panels.right.running) {
+  if (anyPanelRunning()) {
     return;
   }
 
-  preparePanelForRun(panel);
+  panels.forEach(preparePanelForRun);
   updateControlState();
-  await runPanel(panel);
+  await Promise.all(panels.map((panel) => runPanel(panel)));
   updateControlState();
 }
 
@@ -623,7 +623,7 @@ function initialize() {
   updateControlState();
   dom.generateButton.addEventListener('click', handleGenerateClick);
   dom.sortButton.addEventListener('click', () => {
-    void runSinglePanelDemo();
+    void runSideBySideDemo();
   });
   dom.algorithms.left.addEventListener('change', (event) => {
     handleAlgorithmChange('left', event.target.value);
