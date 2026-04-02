@@ -54,6 +54,7 @@ const state = {
   speed: 32,
   mute: false,
   stepMode: false,
+  stepToken: 0,
   baseArray: [],
   audioContext: null,
   masterGain: null,
@@ -78,7 +79,8 @@ function createPanelState(side, algorithm) {
     startedAt: 0,
     barElements: [],
     transientIndices: [],
-    sortedIndices: new Set()
+    sortedIndices: new Set(),
+    lastStepToken: 0
   };
 }
 
@@ -523,7 +525,7 @@ function applyOperation(panel, operation) {
 }
 
 function sortDelay() {
-  return Math.max(4, Math.round(280 / state.speed));
+  return state.stepMode ? 0 : Math.max(4, Math.round(280 / state.speed));
 }
 
 function sleep(duration) {
@@ -544,11 +546,38 @@ function preparePanelForRun(panel) {
   panel.startedAt = performance.now();
   panel.sortedIndices = new Set();
   panel.transientIndices = [];
+  panel.lastStepToken = state.stepToken;
   updatePanelView(panel);
+}
+
+async function waitForStep(panel) {
+  panel.status = 'Awaiting Step';
+  renderStats(panel);
+
+  while (state.stepMode && panel.lastStepToken >= state.stepToken) {
+    if (!panel.running) {
+      return false;
+    }
+
+    await sleep(16);
+  }
+
+  panel.lastStepToken = state.stepToken;
+  panel.status = 'Sorting';
+  renderStats(panel);
+  return true;
 }
 
 async function runPanel(panel) {
   while (panel.running && panel.generator) {
+    if (state.stepMode) {
+      const canAdvance = await waitForStep(panel);
+
+      if (!canAdvance) {
+        return;
+      }
+    }
+
     const { value, done } = await panel.generator.next();
 
     if (done) {
@@ -579,6 +608,7 @@ async function runSideBySideDemo() {
   }
 
   await ensureAudioReady();
+  state.stepToken = 0;
   panels.forEach(preparePanelForRun);
   updateControlState();
   await Promise.all(panels.map((panel) => runPanel(panel)));
@@ -595,7 +625,7 @@ function updateControlState() {
   dom.generateButton.disabled = running;
   dom.sortButton.disabled = running;
   dom.sizeSlider.disabled = running;
-  dom.stepButton.disabled = running || !state.stepMode;
+  dom.stepButton.disabled = !running || !state.stepMode;
   dom.algorithms.left.disabled = running;
   dom.algorithms.right.disabled = running;
 }
@@ -653,6 +683,14 @@ function handleMuteToggle(checked) {
   syncControls();
 }
 
+function handleStepClick() {
+  if (!state.stepMode || !anyPanelRunning()) {
+    return;
+  }
+
+  state.stepToken += 1;
+}
+
 function syncControls() {
   dom.speedSlider.value = String(state.speed);
   dom.speedOutput.value = `${state.speed}x`;
@@ -689,6 +727,7 @@ function initialize() {
   dom.stepModeToggle.addEventListener('change', (event) => {
     handleStepModeToggle(event.target.checked);
   });
+  dom.stepButton.addEventListener('click', handleStepClick);
   dom.muteToggle.addEventListener('change', (event) => {
     handleMuteToggle(event.target.checked);
   });
