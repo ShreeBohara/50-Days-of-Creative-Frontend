@@ -69,7 +69,12 @@ function createPanelState(side, algorithm) {
     comparisons: 0,
     writes: 0,
     elapsedMs: 0,
-    status: 'Ready'
+    status: 'Ready',
+    generator: null,
+    running: false,
+    done: false,
+    startedAt: 0,
+    barElements: []
   };
 }
 
@@ -369,11 +374,15 @@ function renderBars(panel) {
   const container = dom.panels[panel.side];
   const fragment = document.createDocumentFragment();
   const maxValue = panel.values.length || 1;
+  const bars = [];
 
   for (const [index, value] of panel.values.entries()) {
-    fragment.appendChild(createBar(value, maxValue, index));
+    const bar = createBar(value, maxValue, index);
+    bars.push(bar);
+    fragment.appendChild(bar);
   }
 
+  panel.barElements = bars;
   container.replaceChildren(fragment);
 }
 
@@ -389,6 +398,92 @@ function renderStats(panel) {
 function updatePanelView(panel) {
   renderStats(panel);
   renderBars(panel);
+}
+
+function setBarValue(panel, index, value) {
+  const bar = panel.barElements[index];
+  const maxValue = panel.values.length || 1;
+  panel.values[index] = value;
+
+  if (!bar) {
+    return;
+  }
+
+  bar.style.setProperty('--value', ((value / maxValue) * 100).toFixed(3));
+}
+
+function applyOperation(panel, operation) {
+  if (operation.type === 'compare') {
+    panel.comparisons += 1;
+    return;
+  }
+
+  if (operation.type === 'swap') {
+    panel.writes += 1;
+    operation.indices.forEach((index, position) => {
+      setBarValue(panel, index, operation.values[position]);
+    });
+    return;
+  }
+
+  if (operation.type === 'overwrite') {
+    panel.writes += 1;
+    setBarValue(panel, operation.indices[0], operation.values[0]);
+  }
+}
+
+function sortDelay() {
+  return Math.max(4, Math.round(280 / state.speed));
+}
+
+function sleep(duration) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, duration);
+  });
+}
+
+function preparePanelForRun(panel) {
+  panel.values = [...state.baseArray];
+  panel.comparisons = 0;
+  panel.writes = 0;
+  panel.elapsedMs = 0;
+  panel.status = 'Sorting';
+  panel.generator = SORTERS[panel.algorithm](panel.values);
+  panel.running = true;
+  panel.done = false;
+  panel.startedAt = performance.now();
+  updatePanelView(panel);
+}
+
+async function runPanel(panel) {
+  while (panel.running && panel.generator) {
+    const { value, done } = await panel.generator.next();
+
+    if (done) {
+      panel.running = false;
+      panel.done = true;
+      panel.elapsedMs = performance.now() - panel.startedAt;
+      panel.status = 'Complete';
+      renderStats(panel);
+      return;
+    }
+
+    applyOperation(panel, value);
+    panel.elapsedMs = performance.now() - panel.startedAt;
+    renderStats(panel);
+    await sleep(sortDelay());
+  }
+}
+
+async function runSinglePanelDemo() {
+  const panel = state.panels.left;
+
+  if (panel.running) {
+    return;
+  }
+
+  preparePanelForRun(panel);
+  await runPanel(panel);
 }
 
 function syncControls() {
@@ -407,6 +502,9 @@ function initialize() {
   syncControls();
   state.baseArray = createBaseArray(state.arraySize);
   cloneBaseArrayToPanels();
+  dom.sortButton.addEventListener('click', () => {
+    void runSinglePanelDemo();
+  });
 }
 
 initialize();
