@@ -13,7 +13,117 @@
   </head>
   <body>
     <main class="app-shell">
-      <div id="app-root"></div>
+      <section class="hero-panel" aria-label="Sorting visualizer introduction">
+        <p class="hero-panel__eyebrow">Day 16 / 50</p>
+        <h1>Sorting Algorithm Visualizer</h1>
+        <p class="hero-panel__lede">
+          Compare two algorithms on the same dataset and watch every comparison, swap, and finish state unfold in real time.
+        </p>
+      </section>
+
+      <section class="control-rail" aria-label="Sorting controls">
+        <button type="button" data-generate>Generate New Array</button>
+        <button type="button" data-sort>Sort</button>
+        <label>
+          <span>Step Mode</span>
+          <input type="checkbox" data-step-mode />
+        </label>
+        <button type="button" data-step>Step</button>
+        <label>
+          <span>Mute</span>
+          <input type="checkbox" data-mute />
+        </label>
+        <label>
+          <span>Speed</span>
+          <input type="range" min="1" max="100" value="32" data-speed />
+          <output data-speed-output>32x</output>
+        </label>
+        <label>
+          <span>Array Size</span>
+          <input type="range" min="20" max="200" value="96" data-size />
+          <output data-size-output>96</output>
+        </label>
+      </section>
+
+      <section class="panel-grid" aria-label="Side-by-side sorting comparison">
+        <article class="sort-panel" data-panel="left" aria-labelledby="panel-left-title">
+          <header class="sort-panel__header">
+            <div>
+              <p class="sort-panel__label">Comparison Lab A</p>
+              <h2 id="panel-left-title">Bubble Sort</h2>
+            </div>
+            <label>
+              <span>Algorithm</span>
+              <select data-algorithm="left"></select>
+            </label>
+          </header>
+
+          <section class="sort-panel__stats" aria-label="Bubble sort statistics">
+            <div>
+              <span>Comparisons</span>
+              <strong data-stat="comparisons-left">0</strong>
+            </div>
+            <div>
+              <span>Writes</span>
+              <strong data-stat="writes-left">0</strong>
+            </div>
+            <div>
+              <span>Elapsed</span>
+              <strong data-stat="elapsed-left">0 ms</strong>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong data-stat="status-left">Ready</strong>
+            </div>
+          </section>
+
+          <div
+            class="sort-panel__bars"
+            data-bars="left"
+            role="img"
+            aria-label="Left sorting algorithm bars"
+          ></div>
+        </article>
+
+        <article class="sort-panel" data-panel="right" aria-labelledby="panel-right-title">
+          <header class="sort-panel__header">
+            <div>
+              <p class="sort-panel__label">Comparison Lab B</p>
+              <h2 id="panel-right-title">Quick Sort</h2>
+            </div>
+            <label>
+              <span>Algorithm</span>
+              <select data-algorithm="right"></select>
+            </label>
+          </header>
+
+          <section class="sort-panel__stats" aria-label="Quick sort statistics">
+            <div>
+              <span>Comparisons</span>
+              <strong data-stat="comparisons-right">0</strong>
+            </div>
+            <div>
+              <span>Writes</span>
+              <strong data-stat="writes-right">0</strong>
+            </div>
+            <div>
+              <span>Elapsed</span>
+              <strong data-stat="elapsed-right">0 ms</strong>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong data-stat="status-right">Ready</strong>
+            </div>
+          </section>
+
+          <div
+            class="sort-panel__bars"
+            data-bars="right"
+            role="img"
+            aria-label="Right sorting algorithm bars"
+          ></div>
+        </article>
+      </section>
     </main>
 
     <script src="./script.js"></script>
