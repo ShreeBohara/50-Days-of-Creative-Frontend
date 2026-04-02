@@ -73,6 +73,16 @@ function createPanelState(side, algorithm) {
   };
 }
 
+/* Every sorter emits the same operation shape so the runner can stay generic. */
+const SORTERS = {
+  bubble: bubbleSort,
+  quick: quickSort,
+  merge: mergeSort,
+  heap: heapSort,
+  insertion: insertionSort,
+  selection: selectionSort
+};
+
 function populateAlgorithmSelects() {
   for (const panel of Object.values(state.panels)) {
     const select = dom.algorithms[panel.side];
@@ -89,6 +99,239 @@ function populateAlgorithmSelects() {
 
 function algorithmLabel(value) {
   return ALGORITHM_OPTIONS.find((option) => option.value === value)?.label || value;
+}
+
+function sortedOperation(indices) {
+  const normalized = [...indices].sort((left, right) => left - right);
+  return {
+    type: 'sorted',
+    indices: normalized,
+    sortedIndices: normalized
+  };
+}
+
+async function* bubbleSort(source) {
+  const values = [...source];
+  const settled = new Set();
+
+  for (let end = values.length - 1; end > 0; end -= 1) {
+    for (let index = 0; index < end; index += 1) {
+      yield { type: 'compare', indices: [index, index + 1] };
+
+      if (values[index] > values[index + 1]) {
+        [values[index], values[index + 1]] = [values[index + 1], values[index]];
+        yield { type: 'swap', indices: [index, index + 1], values: [values[index], values[index + 1]] };
+      }
+    }
+
+    settled.add(end);
+    yield sortedOperation(settled);
+  }
+
+  settled.add(0);
+  yield sortedOperation(settled);
+}
+
+async function* insertionSort(source) {
+  const values = [...source];
+
+  for (let index = 1; index < values.length; index += 1) {
+    const current = values[index];
+    let position = index - 1;
+
+    while (position >= 0) {
+      yield { type: 'compare', indices: [position, position + 1] };
+
+      if (values[position] <= current) {
+        break;
+      }
+
+      values[position + 1] = values[position];
+      yield { type: 'overwrite', indices: [position + 1], values: [values[position + 1]] };
+      position -= 1;
+    }
+
+    values[position + 1] = current;
+    yield { type: 'overwrite', indices: [position + 1], values: [current] };
+  }
+
+  yield sortedOperation(values.map((_, index) => index));
+}
+
+async function* selectionSort(source) {
+  const values = [...source];
+  const settled = new Set();
+
+  for (let index = 0; index < values.length; index += 1) {
+    let minIndex = index;
+
+    for (let candidate = index + 1; candidate < values.length; candidate += 1) {
+      yield { type: 'compare', indices: [minIndex, candidate] };
+
+      if (values[candidate] < values[minIndex]) {
+        minIndex = candidate;
+      }
+    }
+
+    if (minIndex !== index) {
+      [values[index], values[minIndex]] = [values[minIndex], values[index]];
+      yield { type: 'swap', indices: [index, minIndex], values: [values[index], values[minIndex]] };
+    }
+
+    settled.add(index);
+    yield sortedOperation(settled);
+  }
+}
+
+async function* heapify(values, length, root) {
+  let largest = root;
+  const left = (root * 2) + 1;
+  const right = left + 1;
+
+  if (left < length) {
+    yield { type: 'compare', indices: [largest, left] };
+    if (values[left] > values[largest]) {
+      largest = left;
+    }
+  }
+
+  if (right < length) {
+    yield { type: 'compare', indices: [largest, right] };
+    if (values[right] > values[largest]) {
+      largest = right;
+    }
+  }
+
+  if (largest !== root) {
+    [values[root], values[largest]] = [values[largest], values[root]];
+    yield { type: 'swap', indices: [root, largest], values: [values[root], values[largest]] };
+    yield* heapify(values, length, largest);
+  }
+}
+
+async function* heapSort(source) {
+  const values = [...source];
+  const settled = new Set();
+
+  for (let index = Math.floor(values.length / 2) - 1; index >= 0; index -= 1) {
+    yield* heapify(values, values.length, index);
+  }
+
+  for (let end = values.length - 1; end > 0; end -= 1) {
+    [values[0], values[end]] = [values[end], values[0]];
+    yield { type: 'swap', indices: [0, end], values: [values[0], values[end]] };
+    settled.add(end);
+    yield sortedOperation(settled);
+    yield* heapify(values, end, 0);
+  }
+
+  settled.add(0);
+  yield sortedOperation(settled);
+}
+
+async function* partition(values, low, high) {
+  const pivot = values[high];
+  let split = low - 1;
+
+  for (let cursor = low; cursor < high; cursor += 1) {
+    yield { type: 'compare', indices: [cursor, high] };
+
+    if (values[cursor] < pivot) {
+      split += 1;
+
+      if (split !== cursor) {
+        [values[split], values[cursor]] = [values[cursor], values[split]];
+        yield { type: 'swap', indices: [split, cursor], values: [values[split], values[cursor]] };
+      }
+    }
+  }
+
+  split += 1;
+
+  if (split !== high) {
+    [values[split], values[high]] = [values[high], values[split]];
+    yield { type: 'swap', indices: [split, high], values: [values[split], values[high]] };
+  }
+
+  return split;
+}
+
+async function* quickSortRange(values, low, high) {
+  if (low > high) {
+    return;
+  }
+
+  if (low === high) {
+    yield sortedOperation([low]);
+    return;
+  }
+
+  const pivotIndex = yield* partition(values, low, high);
+  yield sortedOperation([pivotIndex]);
+  yield* quickSortRange(values, low, pivotIndex - 1);
+  yield* quickSortRange(values, pivotIndex + 1, high);
+}
+
+async function* quickSort(source) {
+  const values = [...source];
+  yield* quickSortRange(values, 0, values.length - 1);
+  yield sortedOperation(values.map((_, index) => index));
+}
+
+async function* mergeRange(values, start, mid, end) {
+  const left = values.slice(start, mid + 1);
+  const right = values.slice(mid + 1, end + 1);
+  let leftIndex = 0;
+  let rightIndex = 0;
+  let target = start;
+
+  while (leftIndex < left.length && rightIndex < right.length) {
+    const leftValue = left[leftIndex];
+    const rightValue = right[rightIndex];
+    yield { type: 'compare', indices: [start + leftIndex, (mid + 1) + rightIndex] };
+
+    if (leftValue <= rightValue) {
+      values[target] = leftValue;
+      leftIndex += 1;
+    } else {
+      values[target] = rightValue;
+      rightIndex += 1;
+    }
+
+    yield { type: 'overwrite', indices: [target], values: [values[target]] };
+    target += 1;
+  }
+
+  while (leftIndex < left.length) {
+    values[target] = left[leftIndex];
+    leftIndex += 1;
+    yield { type: 'overwrite', indices: [target], values: [values[target]] };
+    target += 1;
+  }
+
+  while (rightIndex < right.length) {
+    values[target] = right[rightIndex];
+    rightIndex += 1;
+    yield { type: 'overwrite', indices: [target], values: [values[target]] };
+    target += 1;
+  }
+}
+
+async function* mergeSortRange(values, start, end) {
+  if (start >= end) {
+    return;
+  }
+
+  const mid = Math.floor((start + end) / 2);
+  yield* mergeSortRange(values, start, mid);
+  yield* mergeSortRange(values, mid + 1, end);
+  yield* mergeRange(values, start, mid, end);
+}
+
+async function* mergeSort(source) {
+  const values = [...source];
+  yield* mergeSortRange(values, 0, values.length - 1);
+  yield sortedOperation(values.map((_, index) => index));
 }
 
 function createBaseArray(size) {
