@@ -74,7 +74,9 @@ function createPanelState(side, algorithm) {
     running: false,
     done: false,
     startedAt: 0,
-    barElements: []
+    barElements: [],
+    transientIndices: [],
+    sortedIndices: new Set()
   };
 }
 
@@ -357,6 +359,8 @@ function cloneBaseArrayToPanels() {
     panel.writes = 0;
     panel.elapsedMs = 0;
     panel.status = 'Ready';
+    panel.sortedIndices = new Set();
+    panel.transientIndices = [];
     updatePanelView(panel);
   }
 }
@@ -412,6 +416,44 @@ function setBarValue(panel, index, value) {
   bar.style.setProperty('--value', ((value / maxValue) * 100).toFixed(3));
 }
 
+function clearTransientStates(panel) {
+  for (const index of panel.transientIndices) {
+    const bar = panel.barElements[index];
+    bar?.classList.remove('is-compare', 'is-swap');
+  }
+
+  panel.transientIndices = [];
+}
+
+function applySortedState(panel) {
+  for (const index of panel.sortedIndices) {
+    panel.barElements[index]?.classList.add('is-sorted');
+  }
+}
+
+function setOperationState(panel, operation) {
+  clearTransientStates(panel);
+
+  if (operation.type === 'compare') {
+    panel.transientIndices = [...operation.indices];
+    for (const index of panel.transientIndices) {
+      panel.barElements[index]?.classList.add('is-compare');
+    }
+  }
+
+  if (operation.type === 'swap' || operation.type === 'overwrite') {
+    panel.transientIndices = [...operation.indices];
+    for (const index of panel.transientIndices) {
+      panel.barElements[index]?.classList.add('is-swap');
+    }
+  }
+
+  if (operation.sortedIndices?.length) {
+    panel.sortedIndices = new Set([...panel.sortedIndices, ...operation.sortedIndices]);
+    applySortedState(panel);
+  }
+}
+
 function applyOperation(panel, operation) {
   if (operation.type === 'compare') {
     panel.comparisons += 1;
@@ -452,6 +494,8 @@ function preparePanelForRun(panel) {
   panel.running = true;
   panel.done = false;
   panel.startedAt = performance.now();
+  panel.sortedIndices = new Set();
+  panel.transientIndices = [];
   updatePanelView(panel);
 }
 
@@ -464,14 +508,18 @@ async function runPanel(panel) {
       panel.done = true;
       panel.elapsedMs = performance.now() - panel.startedAt;
       panel.status = 'Complete';
+      clearTransientStates(panel);
+      applySortedState(panel);
       renderStats(panel);
       return;
     }
 
+    setOperationState(panel, value);
     applyOperation(panel, value);
     panel.elapsedMs = performance.now() - panel.startedAt;
     renderStats(panel);
     await sleep(sortDelay());
+    clearTransientStates(panel);
   }
 }
 
