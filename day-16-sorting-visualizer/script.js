@@ -114,6 +114,7 @@ function algorithmLabel(value) {
 
 async function ensureAudioReady() {
   if (!state.audioContext) {
+    /* Lazy-create audio so browsers see it as user initiated. */
     const AudioCtor = window.AudioContext || window.webkitAudioContext;
 
     if (!AudioCtor) {
@@ -391,6 +392,7 @@ async function* mergeSort(source) {
 }
 
 function createBaseArray(size) {
+  /* Shuffle a clean 1..N range so both panels start from identical, well-spaced values. */
   const values = Array.from({ length: size }, (_, index) => index + 1);
 
   for (let index = values.length - 1; index > 0; index -= 1) {
@@ -551,6 +553,7 @@ function preparePanelForRun(panel) {
 }
 
 async function waitForStep(panel) {
+  /* One global step token lets both panels advance together on each button press. */
   panel.status = 'Awaiting Step';
   renderStats(panel);
 
@@ -562,7 +565,7 @@ async function waitForStep(panel) {
     await sleep(16);
   }
 
-  panel.lastStepToken = state.stepToken;
+  panel.lastStepToken += 1;
   panel.status = 'Sorting';
   renderStats(panel);
   return true;

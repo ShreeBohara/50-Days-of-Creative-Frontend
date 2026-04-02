@@ -15,10 +15,12 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="app-shell">
+      <!-- Intro -->
       <section class="hero-panel" aria-label="Sorting visualizer introduction">
         <p class="hero-panel__eyebrow">Day 16 / 50</p>
         <h1>Sorting Algorithm Visualizer</h1>
@@ -27,6 +29,7 @@
         </p>
       </section>
 
+      <!-- Global controls -->
       <section class="control-rail" aria-label="Sorting controls">
         <div class="control-rail__cluster control-rail__cluster--buttons">
           <button class="control-button control-button--ghost" type="button" data-generate>Generate New Array</button>
@@ -63,6 +66,7 @@
         </div>
       </section>
 
+      <!-- Comparison panels -->
       <section class="panel-grid" aria-label="Side-by-side sorting comparison">
         <article class="sort-panel" data-panel="left" aria-labelledby="panel-left-title">
           <header class="sort-panel__header">
@@ -142,6 +146,8 @@
           ></div>
         </article>
       </section>
+
+      <noscript class="no-script">This experiment needs JavaScript enabled to animate the sorting algorithms.</noscript>
     </main>
 
     <script src="./script.js"></script>

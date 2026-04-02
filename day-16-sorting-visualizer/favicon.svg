@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Sorting visualizer favicon">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1730" />
+      <stop offset="100%" stop-color="#06101d" />
+    </linearGradient>
+    <linearGradient id="bar-a" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8ef4ff" />
+      <stop offset="100%" stop-color="#396dff" />
+    </linearGradient>
+    <linearGradient id="bar-b" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd479" />
+      <stop offset="100%" stop-color="#ff6b72" />
+    </linearGradient>
+    <linearGradient id="bar-c" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c1ffd6" />
+      <stop offset="100%" stop-color="#57e091" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="url(#bg)" />
+  <rect x="22" y="68" width="14" height="34" rx="7" fill="url(#bar-b)" />
+  <rect x="43" y="44" width="14" height="58" rx="7" fill="url(#bar-a)" />
+  <rect x="64" y="28" width="14" height="74" rx="7" fill="url(#bar-c)" />
+  <rect x="85" y="52" width="14" height="50" rx="7" fill="url(#bar-a)" />
+</svg>

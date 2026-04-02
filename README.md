@@ -23,6 +23,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 13 | Interactive DNA Helix | 3D double helix with color-coded base pairs, click-to-inspect info panel, unwind/rewind morphing, and bloom glow. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-13-dna-helix/) | [day-13-dna-helix](./day-13-dna-helix/) |
 | 14 | Retro Terminal Portfolio | Full-screen CRT terminal with phosphor glow, scan lines, boot sequence, and interactive portfolio commands. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-14-retro-terminal/) | [day-14-retro-terminal](./day-14-retro-terminal/) |
 | 15 | Magnetic Cursor Trail | Spring-driven cursor trail with glowing pastel particles, idle orbiting, click explosions, and an afterimage toggle. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-15-magnetic-cursor/) | [day-15-magnetic-cursor](./day-15-magnetic-cursor/) |
+| 16 | Sorting Algorithm Visualizer | Side-by-side sorting labs with animated bars, step mode, live stats, and pitch-mapped comparison tones. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-16-sorting-visualizer/) | [day-16-sorting-visualizer](./day-16-sorting-visualizer/) |
 
 ## Adding a New Day
 

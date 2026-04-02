@@ -22,6 +22,7 @@ on:
       - "day-13-dna-helix/**"
       - "day-14-retro-terminal/**"
       - "day-15-magnetic-cursor/**"
+      - "day-16-sorting-visualizer/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -81,6 +82,7 @@ jobs:
           cp -R day-13-dna-helix _site/
           cp -R day-14-retro-terminal _site/
           cp -R day-15-magnetic-cursor _site/
+          cp -R day-16-sorting-visualizer _site/
           mkdir -p _site/day-03-solar-system
           cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
 

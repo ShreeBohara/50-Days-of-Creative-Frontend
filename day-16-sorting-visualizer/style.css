@@ -120,6 +120,7 @@ body::before {
   line-height: 1.65;
 }
 
+/* Control rail */
 .control-rail {
   display: flex;
   align-items: stretch;
@@ -269,6 +270,7 @@ body::before {
   font-weight: 700;
 }
 
+/* Comparison panels */
 .panel-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -341,6 +343,7 @@ body::before {
   font-size: 1.1rem;
 }
 
+/* Bar field */
 .sort-panel__bars {
   display: flex;
   align-items: flex-end;
@@ -407,6 +410,15 @@ body::before {
   box-shadow:
     0 0 26px rgba(127, 240, 164, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.no-script {
+  margin: 1rem 0 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  background: rgba(9, 16, 30, 0.72);
+  color: var(--text-soft);
 }
 
 @media (max-width: 1180px) {
