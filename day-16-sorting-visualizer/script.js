@@ -55,6 +55,8 @@ const state = {
   mute: false,
   stepMode: false,
   baseArray: [],
+  audioContext: null,
+  masterGain: null,
   panels: {
     left: createPanelState('left', 'bubble'),
     right: createPanelState('right', 'quick')
@@ -106,6 +108,51 @@ function populateAlgorithmSelects() {
 
 function algorithmLabel(value) {
   return ALGORITHM_OPTIONS.find((option) => option.value === value)?.label || value;
+}
+
+async function ensureAudioReady() {
+  if (!state.audioContext) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioCtor) {
+      return;
+    }
+
+    state.audioContext = new AudioCtor();
+    state.masterGain = state.audioContext.createGain();
+    state.masterGain.gain.value = 0.022;
+    state.masterGain.connect(state.audioContext.destination);
+  }
+
+  if (state.audioContext.state === 'suspended') {
+    await state.audioContext.resume();
+  }
+}
+
+function playComparisonTone(panel, indices) {
+  if (state.mute || !state.audioContext || !state.masterGain) {
+    return;
+  }
+
+  const maxValue = panel.values.length || 1;
+  const [leftIndex, rightIndex = leftIndex] = indices;
+  const average = (panel.values[leftIndex] + panel.values[rightIndex]) / 2;
+  const normalized = average / maxValue;
+  const oscillator = state.audioContext.createOscillator();
+  const gainNode = state.audioContext.createGain();
+  const now = state.audioContext.currentTime;
+
+  oscillator.type = 'triangle';
+  oscillator.frequency.setValueAtTime(180 + (normalized * 620), now);
+
+  gainNode.gain.setValueAtTime(0.0001, now);
+  gainNode.gain.exponentialRampToValueAtTime(0.055, now + 0.008);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(state.masterGain);
+  oscillator.start(now);
+  oscillator.stop(now + 0.065);
 }
 
 function sortedOperation(indices) {
@@ -457,6 +504,7 @@ function setOperationState(panel, operation) {
 function applyOperation(panel, operation) {
   if (operation.type === 'compare') {
     panel.comparisons += 1;
+    playComparisonTone(panel, operation.indices);
     return;
   }
 
@@ -530,6 +578,7 @@ async function runSideBySideDemo() {
     return;
   }
 
+  await ensureAudioReady();
   panels.forEach(preparePanelForRun);
   updateControlState();
   await Promise.all(panels.map((panel) => runPanel(panel)));
