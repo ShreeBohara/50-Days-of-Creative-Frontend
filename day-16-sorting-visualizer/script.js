@@ -26,13 +26,13 @@ const dom = {
   stats: {
     left: {
       comparisons: document.querySelector('[data-stat="comparisons-left"]'),
-      writes: document.querySelector('[data-stat="writes-left"]'),
+      swaps: document.querySelector('[data-stat="swaps-left"]'),
       elapsed: document.querySelector('[data-stat="elapsed-left"]'),
       status: document.querySelector('[data-stat="status-left"]')
     },
     right: {
       comparisons: document.querySelector('[data-stat="comparisons-right"]'),
-      writes: document.querySelector('[data-stat="writes-right"]'),
+      swaps: document.querySelector('[data-stat="swaps-right"]'),
       elapsed: document.querySelector('[data-stat="elapsed-right"]'),
       status: document.querySelector('[data-stat="status-right"]')
     }
@@ -67,7 +67,7 @@ function createPanelState(side, algorithm) {
     algorithm,
     values: [],
     comparisons: 0,
-    writes: 0,
+    swaps: 0,
     elapsedMs: 0,
     status: 'Ready',
     generator: null,
@@ -356,7 +356,7 @@ function cloneBaseArrayToPanels() {
   for (const panel of Object.values(state.panels)) {
     panel.values = [...state.baseArray];
     panel.comparisons = 0;
-    panel.writes = 0;
+    panel.swaps = 0;
     panel.elapsedMs = 0;
     panel.status = 'Ready';
     panel.sortedIndices = new Set();
@@ -393,7 +393,7 @@ function renderBars(panel) {
 function renderStats(panel) {
   const stats = dom.stats[panel.side];
   stats.comparisons.textContent = panel.comparisons.toLocaleString();
-  stats.writes.textContent = panel.writes.toLocaleString();
+  stats.swaps.textContent = panel.swaps.toLocaleString();
   stats.elapsed.textContent = `${Math.round(panel.elapsedMs)} ms`;
   stats.status.textContent = panel.status;
   dom.titles[panel.side].textContent = algorithmLabel(panel.algorithm);
@@ -461,7 +461,7 @@ function applyOperation(panel, operation) {
   }
 
   if (operation.type === 'swap') {
-    panel.writes += 1;
+    panel.swaps += 1;
     operation.indices.forEach((index, position) => {
       setBarValue(panel, index, operation.values[position]);
     });
@@ -469,7 +469,7 @@ function applyOperation(panel, operation) {
   }
 
   if (operation.type === 'overwrite') {
-    panel.writes += 1;
+    panel.swaps += 1;
     setBarValue(panel, operation.indices[0], operation.values[0]);
   }
 }
@@ -487,7 +487,7 @@ function sleep(duration) {
 function preparePanelForRun(panel) {
   panel.values = [...state.baseArray];
   panel.comparisons = 0;
-  panel.writes = 0;
+  panel.swaps = 0;
   panel.elapsedMs = 0;
   panel.status = 'Sorting';
   panel.generator = SORTERS[panel.algorithm](panel.values);
@@ -526,12 +526,82 @@ async function runPanel(panel) {
 async function runSinglePanelDemo() {
   const panel = state.panels.left;
 
-  if (panel.running) {
+  if (panel.running || state.panels.right.running) {
     return;
   }
 
   preparePanelForRun(panel);
+  updateControlState();
   await runPanel(panel);
+  updateControlState();
+}
+
+function anyPanelRunning() {
+  return Object.values(state.panels).some((panel) => panel.running);
+}
+
+function updateControlState() {
+  const running = anyPanelRunning();
+
+  dom.generateButton.disabled = running;
+  dom.sortButton.disabled = running;
+  dom.sizeSlider.disabled = running;
+  dom.stepButton.disabled = running || !state.stepMode;
+  dom.algorithms.left.disabled = running;
+  dom.algorithms.right.disabled = running;
+}
+
+function regenerateBaseArray() {
+  state.baseArray = createBaseArray(state.arraySize);
+  cloneBaseArrayToPanels();
+}
+
+function handleGenerateClick() {
+  if (anyPanelRunning()) {
+    return;
+  }
+
+  regenerateBaseArray();
+}
+
+function handleAlgorithmChange(side, value) {
+  const panel = state.panels[side];
+
+  if (anyPanelRunning()) {
+    dom.algorithms[side].value = panel.algorithm;
+    return;
+  }
+
+  panel.algorithm = value;
+  panel.status = 'Ready';
+  renderStats(panel);
+}
+
+function handleSpeedInput(value) {
+  state.speed = Number(value);
+  syncControls();
+}
+
+function handleSizeInput(value) {
+  if (anyPanelRunning()) {
+    syncControls();
+    return;
+  }
+
+  state.arraySize = Number(value);
+  syncControls();
+  regenerateBaseArray();
+}
+
+function handleStepModeToggle(checked) {
+  state.stepMode = checked;
+  syncControls();
+  updateControlState();
+}
+
+function handleMuteToggle(checked) {
+  state.mute = checked;
+  syncControls();
 }
 
 function syncControls() {
@@ -550,8 +620,28 @@ function initialize() {
   syncControls();
   state.baseArray = createBaseArray(state.arraySize);
   cloneBaseArrayToPanels();
+  updateControlState();
+  dom.generateButton.addEventListener('click', handleGenerateClick);
   dom.sortButton.addEventListener('click', () => {
     void runSinglePanelDemo();
+  });
+  dom.algorithms.left.addEventListener('change', (event) => {
+    handleAlgorithmChange('left', event.target.value);
+  });
+  dom.algorithms.right.addEventListener('change', (event) => {
+    handleAlgorithmChange('right', event.target.value);
+  });
+  dom.speedSlider.addEventListener('input', (event) => {
+    handleSpeedInput(event.target.value);
+  });
+  dom.sizeSlider.addEventListener('input', (event) => {
+    handleSizeInput(event.target.value);
+  });
+  dom.stepModeToggle.addEventListener('change', (event) => {
+    handleStepModeToggle(event.target.checked);
+  });
+  dom.muteToggle.addEventListener('change', (event) => {
+    handleMuteToggle(event.target.checked);
   });
 }
 

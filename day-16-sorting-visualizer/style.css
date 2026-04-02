@@ -173,6 +173,13 @@ body::before {
   border-color: rgba(255, 255, 255, 0.24);
 }
 
+.control-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .control-button--ghost {
   background: rgba(255, 255, 255, 0.05);
 }
