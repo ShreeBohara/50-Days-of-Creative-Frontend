@@ -32,6 +32,53 @@
         <canvas id="city-canvas"></canvas>
       </section>
 
+      <nav class="toolbar" aria-label="Tile palette">
+        <div class="toolbar__tiles">
+          <button class="tool-btn active" data-tile="grass" aria-label="Grass">
+            <span class="tool-preview tool-preview--grass"></span>
+            <span class="tool-label">Grass</span>
+          </button>
+          <button class="tool-btn" data-tile="road" aria-label="Road">
+            <span class="tool-preview tool-preview--road"></span>
+            <span class="tool-label">Road</span>
+          </button>
+          <button class="tool-btn" data-tile="water" aria-label="Water">
+            <span class="tool-preview tool-preview--water"></span>
+            <span class="tool-label">Water</span>
+          </button>
+          <button class="tool-btn" data-tile="park" aria-label="Park">
+            <span class="tool-preview tool-preview--park"></span>
+            <span class="tool-label">Park</span>
+          </button>
+          <button class="tool-btn" data-tile="tree" aria-label="Tree">
+            <span class="tool-preview tool-preview--tree"></span>
+            <span class="tool-label">Tree</span>
+          </button>
+          <button class="tool-btn" data-tile="building-small" aria-label="Small building">
+            <span class="tool-preview tool-preview--building-small"></span>
+            <span class="tool-label">Small</span>
+          </button>
+          <button class="tool-btn" data-tile="building-tall" aria-label="Tall building">
+            <span class="tool-preview tool-preview--building-tall"></span>
+            <span class="tool-label">Tall</span>
+          </button>
+          <button class="tool-btn" data-tile="building-skyscraper" aria-label="Skyscraper">
+            <span class="tool-preview tool-preview--building-skyscraper"></span>
+            <span class="tool-label">Tower</span>
+          </button>
+        </div>
+
+        <div class="toolbar__divider"></div>
+
+        <div class="toolbar__actions">
+          <button class="action-btn" data-action="clear">Clear All</button>
+          <button class="action-btn" data-action="random">Random City</button>
+          <button class="action-btn action-btn--icon" data-action="daynight" aria-label="Toggle day/night">
+            <span class="daynight-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+      </nav>
+
       <noscript class="no-script">This experiment needs JavaScript enabled.</noscript>
     </main>
 

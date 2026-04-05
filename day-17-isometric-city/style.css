@@ -1,1 +1,253 @@
 /* Day 17 — Isometric City Builder */
+
+:root {
+  color-scheme: dark;
+  --bg: #0b1120;
+  --bg-2: #111b2e;
+  --panel: rgba(12, 20, 38, 0.78);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --panel-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --text: #eef2f8;
+  --text-soft: rgba(230, 236, 248, 0.6);
+  --accent: #7ecbe6;
+  --accent-2: #b8a4f0;
+
+  /* tile preview colors */
+  --tile-grass: #a8d5a2;
+  --tile-road: #c4bfb6;
+  --tile-water: #7ec8e3;
+  --tile-park: #c5e8a0;
+  --tile-tree: #6dbf67;
+  --tile-bld-s: #f0e4d7;
+  --tile-bld-t: #e0d4f5;
+  --tile-bld-sk: #d4e7fa;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(126, 203, 230, 0.12), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(184, 164, 240, 0.1), transparent 24%),
+    radial-gradient(circle at 50% 85%, rgba(126, 203, 230, 0.08), transparent 30%),
+    linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 100%);
+  color: var(--text);
+  font-family: "Urbanist", "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 4.5rem 4.5rem;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.6), transparent 88%);
+  opacity: 0.4;
+}
+
+/* ── Shell ───────────────────────────────────────────── */
+
+.app-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+/* ── Hero ────────────────────────────────────────────── */
+
+.hero-panel {
+  text-align: center;
+  padding: 1.4rem 1.5rem 0.8rem;
+  flex-shrink: 0;
+}
+
+.hero-panel__eyebrow {
+  font-family: "Azeret Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.hero-panel h1 {
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.hero-panel__lede {
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+}
+
+/* ── Canvas ──────────────────────────────────────────── */
+
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+#city-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* ── Toolbar ─────────────────────────────────────────── */
+
+.toolbar {
+  position: fixed;
+  bottom: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: var(--panel);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--panel-border);
+  border-radius: 1rem;
+  box-shadow: var(--panel-shadow);
+  z-index: 50;
+}
+
+.toolbar__tiles {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.toolbar__divider {
+  width: 1px;
+  height: 2.2rem;
+  background: var(--panel-border);
+  margin: 0 0.3rem;
+}
+
+.toolbar__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+/* ── Tool buttons ────────────────────────────────────── */
+
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.45rem 0.5rem 0.35rem;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.22s, transform 0.15s;
+  color: var(--text);
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.tool-btn.active {
+  border-color: var(--accent);
+  background: rgba(126, 203, 230, 0.1);
+  box-shadow: 0 0 12px rgba(126, 203, 230, 0.2);
+}
+
+.tool-preview {
+  width: 26px;
+  height: 26px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  border-radius: 2px;
+}
+
+.tool-preview--grass { background: var(--tile-grass); }
+.tool-preview--road { background: var(--tile-road); }
+.tool-preview--water { background: var(--tile-water); }
+.tool-preview--park { background: var(--tile-park); }
+.tool-preview--tree { background: var(--tile-tree); }
+.tool-preview--building-small { background: var(--tile-bld-s); }
+.tool-preview--building-tall { background: var(--tile-bld-t); }
+.tool-preview--building-skyscraper { background: var(--tile-bld-sk); }
+
+.tool-label {
+  font-family: "Azeret Mono", monospace;
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+  text-transform: uppercase;
+}
+
+/* ── Action buttons ──────────────────────────────────── */
+
+.action-btn {
+  padding: 0.5rem 0.9rem;
+  font-family: "Azeret Mono", monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.action-btn--icon {
+  padding: 0.5rem 0.65rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.daynight-icon::before {
+  content: "\2600";
+}
+
+.daynight-icon.night::before {
+  content: "\263E";
+}
+
+/* ── Noscript ────────────────────────────────────────── */
+
+.no-script {
+  display: block;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
