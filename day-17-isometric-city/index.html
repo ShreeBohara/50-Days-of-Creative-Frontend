@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Day 17 — Isometric City Builder with day/night cycle, minimap, and procedural generation."
+    />
+    <meta name="theme-color" content="#0b1120" />
+    <title>Day 17 | Isometric City Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Azeret+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel" aria-label="Isometric city builder introduction">
+        <p class="hero-panel__eyebrow">Day 17 / 50</p>
+        <h1>Isometric City Builder</h1>
+        <p class="hero-panel__lede">
+          Place buildings, roads, and parks on a charming isometric grid. Toggle day and night to watch your city glow.
+        </p>
+      </section>
+
+      <section class="canvas-wrap">
+        <canvas id="city-canvas"></canvas>
+      </section>
+
+      <noscript class="no-script">This experiment needs JavaScript enabled.</noscript>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
