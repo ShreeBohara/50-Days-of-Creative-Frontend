@@ -89,6 +89,96 @@
     ctx.fill();
   }
 
+  function drawIsometricBox(x, y, unitH, top, left, right) {
+    const hw = TILE_W / 2;
+    const hh = TILE_H / 2;
+    const lift = unitH * UNIT_H;
+
+    /* left face */
+    ctx.beginPath();
+    ctx.moveTo(x - hw, y);
+    ctx.lineTo(x, y + hh);
+    ctx.lineTo(x, y + hh - lift);
+    ctx.lineTo(x - hw, y - lift);
+    ctx.closePath();
+    ctx.fillStyle = left;
+    ctx.fill();
+
+    /* right face */
+    ctx.beginPath();
+    ctx.moveTo(x + hw, y);
+    ctx.lineTo(x, y + hh);
+    ctx.lineTo(x, y + hh - lift);
+    ctx.lineTo(x + hw, y - lift);
+    ctx.closePath();
+    ctx.fillStyle = right;
+    ctx.fill();
+
+    /* top face (lifted) */
+    ctx.beginPath();
+    ctx.moveTo(x, y - hh - lift);
+    ctx.lineTo(x + hw, y - lift);
+    ctx.lineTo(x, y + hh - lift);
+    ctx.lineTo(x - hw, y - lift);
+    ctx.closePath();
+    ctx.fillStyle = top;
+    ctx.fill();
+  }
+
+  function drawTree(x, y) {
+    const hw = TILE_W / 2;
+    const hh = TILE_H / 2;
+
+    /* trunk — small brown box */
+    const trunkH = 10;
+    ctx.beginPath();
+    ctx.moveTo(x - 4, y);
+    ctx.lineTo(x, y + 3);
+    ctx.lineTo(x, y + 3 - trunkH);
+    ctx.lineTo(x - 4, y - trunkH);
+    ctx.closePath();
+    ctx.fillStyle = "#9e7b5a";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(x + 4, y);
+    ctx.lineTo(x, y + 3);
+    ctx.lineTo(x, y + 3 - trunkH);
+    ctx.lineTo(x + 4, y - trunkH);
+    ctx.closePath();
+    ctx.fillStyle = "#b08968";
+    ctx.fill();
+
+    /* canopy — ellipse */
+    ctx.beginPath();
+    ctx.ellipse(x, y - 18, 12, 10, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#6dbf67";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(x, y - 20, 10, 8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "#82d47c";
+    ctx.fill();
+  }
+
+  function drawShadow(x, y, unitH) {
+    if (unitH <= 0) return;
+    const hw = TILE_W / 2;
+    const hh = TILE_H / 2;
+    const off = unitH * 4;
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    ctx.beginPath();
+    ctx.moveTo(x + off, y - hh + off);
+    ctx.lineTo(x + hw + off, y + off);
+    ctx.lineTo(x + off, y + hh + off);
+    ctx.lineTo(x - hw + off, y + off);
+    ctx.closePath();
+    ctx.fillStyle = "#000";
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawBackground() {
     const grad = ctx.createLinearGradient(0, 0, 0, H);
     grad.addColorStop(0, "#0b1120");
@@ -100,22 +190,37 @@
   function drawGrid() {
     for (let row = 0; row < GRID; row++) {
       for (let col = 0; col < GRID; col++) {
-        const tile = TILES[grid[row][col]];
+        const type = grid[row][col];
+        const tile = TILES[type];
         const { x, y } = gridToScreen(col, row);
-        drawDiamond(x, y, tile.top);
 
-        /* subtle grid lines */
-        const hw = TILE_W / 2;
-        const hh = TILE_H / 2;
-        ctx.beginPath();
-        ctx.moveTo(x, y - hh);
-        ctx.lineTo(x + hw, y);
-        ctx.lineTo(x, y + hh);
-        ctx.lineTo(x - hw, y);
-        ctx.closePath();
-        ctx.strokeStyle = "rgba(255,255,255,0.06)";
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
+        if (tile.h > 0) {
+          drawShadow(x, y, tile.h);
+        }
+
+        if (type === "tree") {
+          drawDiamond(x, y, TILES.grass.top);
+          drawTree(x, y);
+        } else if (tile.h > 0) {
+          drawIsometricBox(x, y, tile.h, tile.top, tile.left, tile.right);
+        } else {
+          drawDiamond(x, y, tile.top);
+        }
+
+        /* subtle grid lines for flat tiles */
+        if (tile.h === 0) {
+          const hw = TILE_W / 2;
+          const hh = TILE_H / 2;
+          ctx.beginPath();
+          ctx.moveTo(x, y - hh);
+          ctx.lineTo(x + hw, y);
+          ctx.lineTo(x, y + hh);
+          ctx.lineTo(x - hw, y);
+          ctx.closePath();
+          ctx.strokeStyle = "rgba(255,255,255,0.06)";
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
 
         /* hover highlight */
         if (col === hoverCol && row === hoverRow) {
