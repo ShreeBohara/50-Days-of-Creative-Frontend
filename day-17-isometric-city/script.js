@@ -348,6 +348,51 @@
     }
   }
 
+  /* ── Minimap ──────────────────────────────────────────── */
+
+  function drawMinimap() {
+    const size = 120;
+    const pad = 16;
+    const cellSize = size / GRID;
+    const mx = pad;
+    const my = H - size - pad - 70; /* above toolbar */
+
+    ctx.save();
+
+    /* glass panel */
+    ctx.fillStyle = "rgba(8, 14, 28, 0.7)";
+    ctx.strokeStyle = "rgba(255,255,255,0.1)";
+    ctx.lineWidth = 1;
+    const r = 8;
+    ctx.beginPath();
+    ctx.roundRect(mx - 6, my - 20, size + 12, size + 30, r);
+    ctx.fill();
+    ctx.stroke();
+
+    /* label */
+    ctx.font = "500 9px 'Azeret Mono', monospace";
+    ctx.fillStyle = "rgba(126,203,230,0.7)";
+    ctx.fillText("MAP", mx, my - 6);
+
+    /* cells */
+    for (let row = 0; row < GRID; row++) {
+      for (let col = 0; col < GRID; col++) {
+        const tile = TILES[grid[row][col]];
+        ctx.fillStyle = tintNight(tile.top, nightLerp);
+        ctx.fillRect(mx + col * cellSize, my + row * cellSize, cellSize - 0.5, cellSize - 0.5);
+      }
+    }
+
+    /* hover indicator */
+    if (hoverCol >= 0 && hoverRow >= 0) {
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(mx + hoverCol * cellSize, my + hoverRow * cellSize, cellSize, cellSize);
+    }
+
+    ctx.restore();
+  }
+
   /* ── Render loop ──────────────────────────────────────── */
 
   let lastTime = 0;
@@ -365,6 +410,7 @@
 
     drawBackground();
     drawGrid();
+    drawMinimap();
     requestAnimationFrame(render);
   }
 
