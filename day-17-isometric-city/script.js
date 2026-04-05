@@ -529,6 +529,38 @@
   document.querySelector('[data-action="clear"]').addEventListener("click", clearAll);
   document.querySelector('[data-action="random"]').addEventListener("click", generateRandomCity);
 
+  /* ── Touch support ─────────────────────────────────────── */
+
+  let touchStartTime = 0;
+
+  canvas.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    touchStartTime = Date.now();
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const g = screenToGrid(t.clientX - rect.left, t.clientY - rect.top);
+    hoverCol = g.col;
+    hoverRow = g.row;
+  }, { passive: false });
+
+  canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const g = screenToGrid(t.clientX - rect.left, t.clientY - rect.top);
+    hoverCol = g.col;
+    hoverRow = g.row;
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    if (Date.now() - touchStartTime < 300 && hoverCol >= 0 && hoverRow >= 0) {
+      grid[hoverRow][hoverCol] = selectedTile;
+    }
+    hoverCol = -1;
+    hoverRow = -1;
+  }, { passive: false });
+
   /* ── Keyboard shortcuts ───────────────────────────────── */
 
   const TILE_KEYS = ["grass", "road", "water", "park", "tree", "building-small", "building-tall", "building-skyscraper"];
