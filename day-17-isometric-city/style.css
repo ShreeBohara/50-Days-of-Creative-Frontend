@@ -181,20 +181,56 @@ body::before {
 }
 
 .tool-preview {
+  position: relative;
   width: 26px;
   height: 26px;
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  border-radius: 2px;
 }
+
+/* elevated previews for buildings — show a tiny box */
+.tool-preview--building-small,
+.tool-preview--building-tall,
+.tool-preview--building-skyscraper {
+  clip-path: none;
+  width: 26px;
+  height: 26px;
+  background: none;
+}
+
+.tool-preview--building-small::before,
+.tool-preview--building-tall::before,
+.tool-preview--building-skyscraper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.tool-preview--building-small::before { background: var(--tile-bld-s); }
+.tool-preview--building-tall::before { background: var(--tile-bld-t); }
+.tool-preview--building-skyscraper::before { background: var(--tile-bld-sk); }
 
 .tool-preview--grass { background: var(--tile-grass); }
 .tool-preview--road { background: var(--tile-road); }
-.tool-preview--water { background: var(--tile-water); }
+.tool-preview--water {
+  background: var(--tile-water);
+  animation: waterShimmer 2s ease-in-out infinite;
+}
 .tool-preview--park { background: var(--tile-park); }
 .tool-preview--tree { background: var(--tile-tree); }
-.tool-preview--building-small { background: var(--tile-bld-s); }
-.tool-preview--building-tall { background: var(--tile-bld-t); }
-.tool-preview--building-skyscraper { background: var(--tile-bld-sk); }
+
+@keyframes waterShimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.tool-btn .tool-kbd {
+  font-family: "Azeret Mono", monospace;
+  font-size: 0.48rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0;
+}
 
 .tool-label {
   font-family: "Azeret Mono", monospace;

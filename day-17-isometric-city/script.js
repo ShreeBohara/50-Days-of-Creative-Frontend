@@ -529,6 +529,18 @@
   document.querySelector('[data-action="clear"]').addEventListener("click", clearAll);
   document.querySelector('[data-action="random"]').addEventListener("click", generateRandomCity);
 
+  /* ── Keyboard shortcuts ───────────────────────────────── */
+
+  const TILE_KEYS = ["grass", "road", "water", "park", "tree", "building-small", "building-tall", "building-skyscraper"];
+
+  document.addEventListener("keydown", (e) => {
+    const n = parseInt(e.key);
+    if (n >= 1 && n <= 8) {
+      selectedTile = TILE_KEYS[n - 1];
+      toolBtns.forEach((b) => b.classList.toggle("active", b.dataset.tile === selectedTile));
+    }
+  });
+
   /* ── Init ─────────────────────────────────────────────── */
 
   resize();
