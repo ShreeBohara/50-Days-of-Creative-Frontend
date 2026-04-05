@@ -459,6 +459,76 @@
     daynightIcon.classList.toggle("night", nightTarget === 1);
   });
 
+  function clearAll() {
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        grid[r][c] = "grass";
+  }
+
+  function generateRandomCity() {
+    clearAll();
+
+    /* water cluster */
+    const wx = 2 + Math.floor(Math.random() * 6);
+    const wy = 2 + Math.floor(Math.random() * 6);
+    for (let i = 0; i < 6; i++) {
+      const dx = wx + Math.floor(Math.random() * 3) - 1;
+      const dy = wy + Math.floor(Math.random() * 3) - 1;
+      if (dx >= 0 && dx < GRID && dy >= 0 && dy < GRID) grid[dy][dx] = "water";
+    }
+
+    /* roads — horizontal & vertical streets */
+    const hRoads = [];
+    const vRoads = [];
+    for (let i = 0; i < 3; i++) {
+      hRoads.push(3 + i * Math.floor(GRID / 3.5) + Math.floor(Math.random() * 2));
+      vRoads.push(3 + i * Math.floor(GRID / 3.5) + Math.floor(Math.random() * 2));
+    }
+    for (const r of hRoads)
+      for (let c = 0; c < GRID; c++)
+        if (r < GRID && grid[r][c] !== "water") grid[r][c] = "road";
+    for (const c of vRoads)
+      for (let r = 0; r < GRID; r++)
+        if (c < GRID && grid[r][c] !== "water") grid[r][c] = "road";
+
+    /* buildings near roads */
+    const center = GRID / 2;
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        if (grid[r][c] !== "grass") continue;
+        const nearRoad =
+          (r > 0 && grid[r - 1][c] === "road") ||
+          (r < GRID - 1 && grid[r + 1][c] === "road") ||
+          (c > 0 && grid[r][c - 1] === "road") ||
+          (c < GRID - 1 && grid[r][c + 1] === "road");
+        if (!nearRoad || Math.random() > 0.6) continue;
+
+        const dist = Math.sqrt((r - center) ** 2 + (c - center) ** 2);
+        const norm = dist / center;
+        if (norm < 0.35 && Math.random() < 0.5) grid[r][c] = "building-skyscraper";
+        else if (norm < 0.6 && Math.random() < 0.6) grid[r][c] = "building-tall";
+        else grid[r][c] = "building-small";
+      }
+    }
+
+    /* parks */
+    for (let i = 0; i < 5; i++) {
+      const pr = Math.floor(Math.random() * GRID);
+      const pc = Math.floor(Math.random() * GRID);
+      if (grid[pr][pc] === "grass") grid[pr][pc] = "park";
+    }
+
+    /* trees */
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        if (grid[r][c] === "grass" && Math.random() < 0.18) grid[r][c] = "tree";
+      }
+    }
+  }
+
+  document.querySelector('[data-action="clear"]').addEventListener("click", clearAll);
+  document.querySelector('[data-action="random"]').addEventListener("click", generateRandomCity);
+
   /* ── Init ─────────────────────────────────────────────── */
 
   resize();
