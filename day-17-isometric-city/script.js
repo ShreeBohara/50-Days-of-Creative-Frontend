@@ -31,6 +31,9 @@
   let hoverCol = -1;
   let hoverRow = -1;
   let selectedTile = "grass";
+  let nightTarget = 0;
+  let nightLerp = 0;
+  let stars = [];
 
   /* ── Canvas setup ─────────────────────────────────────── */
 
@@ -72,6 +75,42 @@
     const row = Math.floor((sy / (TILE_H / 2) - sx / (TILE_W / 2)) / 2);
     if (col < 0 || col >= GRID || row < 0 || row >= GRID) return { col: -1, row: -1 };
     return { col, row };
+  }
+
+  /* ── Color utilities ──────────────────────────────────── */
+
+  function hexToRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+  }
+
+  function tintNight(hex, t) {
+    if (t <= 0) return hex;
+    const [r, g, b] = hexToRgb(hex);
+    const nr = Math.round(r * (1 - t * 0.6) + 15 * t);
+    const ng = Math.round(g * (1 - t * 0.6) + 20 * t);
+    const nb = Math.round(b * (1 - t * 0.55) + 50 * t);
+    return rgbToHex(
+      Math.max(0, Math.min(255, nr)),
+      Math.max(0, Math.min(255, ng)),
+      Math.max(0, Math.min(255, nb))
+    );
+  }
+
+  function generateStars() {
+    stars = [];
+    for (let i = 0; i < 120; i++) {
+      stars.push({
+        x: Math.random(),
+        y: Math.random() * 0.6,
+        r: Math.random() * 1.2 + 0.3,
+        a: Math.random() * 0.6 + 0.3,
+      });
+    }
   }
 
   /* ── Drawing ──────────────────────────────────────────── */
@@ -137,7 +176,7 @@
     ctx.lineTo(x, y + 3 - trunkH);
     ctx.lineTo(x - 4, y - trunkH);
     ctx.closePath();
-    ctx.fillStyle = "#9e7b5a";
+    ctx.fillStyle = tintNight("#9e7b5a", nightLerp);
     ctx.fill();
 
     ctx.beginPath();
@@ -146,19 +185,67 @@
     ctx.lineTo(x, y + 3 - trunkH);
     ctx.lineTo(x + 4, y - trunkH);
     ctx.closePath();
-    ctx.fillStyle = "#b08968";
+    ctx.fillStyle = tintNight("#b08968", nightLerp);
     ctx.fill();
 
     /* canopy — ellipse */
     ctx.beginPath();
     ctx.ellipse(x, y - 18, 12, 10, 0, 0, Math.PI * 2);
-    ctx.fillStyle = "#6dbf67";
+    ctx.fillStyle = tintNight("#6dbf67", nightLerp);
     ctx.fill();
 
     ctx.beginPath();
     ctx.ellipse(x, y - 20, 10, 8, 0, 0, Math.PI * 2);
-    ctx.fillStyle = "#82d47c";
+    ctx.fillStyle = tintNight("#82d47c", nightLerp);
     ctx.fill();
+  }
+
+  function drawWindows(x, y, unitH) {
+    if (nightLerp < 0.15) return;
+    const hw = TILE_W / 2;
+    const hh = TILE_H / 2;
+    const lift = unitH * UNIT_H;
+    const alpha = Math.min(1, (nightLerp - 0.15) / 0.5);
+    const winW = 4;
+    const winH = 3;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    /* windows on left face */
+    const rows = Math.max(1, unitH);
+    for (let r = 0; r < rows; r++) {
+      const baseY = y - r * UNIT_H - 6;
+      for (let w = 0; w < 2; w++) {
+        const frac = (w + 1) / 3;
+        const wx = x - hw * (1 - frac) + frac * 0;
+        const wy = baseY - hh * frac + hh * (1 - frac);
+
+        /* glow */
+        ctx.fillStyle = `rgba(255,216,115,0.3)`;
+        ctx.fillRect(wx - winW / 2 - 1, wy - winH / 2 - 1, winW + 2, winH + 2);
+        /* window */
+        ctx.fillStyle = "#ffd873";
+        ctx.fillRect(wx - winW / 2, wy - winH / 2, winW, winH);
+      }
+    }
+
+    /* windows on right face */
+    for (let r = 0; r < rows; r++) {
+      const baseY = y - r * UNIT_H - 6;
+      for (let w = 0; w < 2; w++) {
+        const frac = (w + 1) / 3;
+        const wx = x + hw * frac;
+        const wy = baseY + hh * frac - hh;
+
+        ctx.fillStyle = `rgba(255,216,115,0.3)`;
+        ctx.fillRect(wx - winW / 2 - 1, wy - winH / 2 - 1, winW + 2, winH + 2);
+        ctx.fillStyle = "#ffd873";
+        ctx.fillRect(wx - winW / 2, wy - winH / 2, winW, winH);
+      }
+    }
+
+    ctx.restore();
   }
 
   function drawShadow(x, y, unitH) {
@@ -180,11 +267,36 @@
   }
 
   function drawBackground() {
+    const dayTop = [11, 17, 32];
+    const dayBot = [17, 27, 46];
+    const nightTop = [4, 6, 16];
+    const nightBot = [6, 10, 22];
+    const t = nightLerp;
+    const topR = Math.round(dayTop[0] * (1 - t) + nightTop[0] * t);
+    const topG = Math.round(dayTop[1] * (1 - t) + nightTop[1] * t);
+    const topB = Math.round(dayTop[2] * (1 - t) + nightTop[2] * t);
+    const botR = Math.round(dayBot[0] * (1 - t) + nightBot[0] * t);
+    const botG = Math.round(dayBot[1] * (1 - t) + nightBot[1] * t);
+    const botB = Math.round(dayBot[2] * (1 - t) + nightBot[2] * t);
+
     const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, "#0b1120");
-    grad.addColorStop(1, "#111b2e");
+    grad.addColorStop(0, rgbToHex(topR, topG, topB));
+    grad.addColorStop(1, rgbToHex(botR, botG, botB));
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
+
+    /* stars at night */
+    if (t > 0.1) {
+      ctx.save();
+      ctx.globalAlpha = (t - 0.1) / 0.9;
+      for (const s of stars) {
+        ctx.beginPath();
+        ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,240,${s.a})`;
+        ctx.fill();
+      }
+      ctx.restore();
+    }
   }
 
   function drawGrid() {
@@ -198,13 +310,19 @@
           drawShadow(x, y, tile.h);
         }
 
+        const nt = nightLerp;
+        const tt = tintNight(tile.top, nt);
+        const tl = tintNight(tile.left, nt);
+        const tr = tintNight(tile.right, nt);
+
         if (type === "tree") {
-          drawDiamond(x, y, TILES.grass.top);
+          drawDiamond(x, y, tintNight(TILES.grass.top, nt));
           drawTree(x, y);
         } else if (tile.h > 0) {
-          drawIsometricBox(x, y, tile.h, tile.top, tile.left, tile.right);
+          drawIsometricBox(x, y, tile.h, tt, tl, tr);
+          if (tile.win) drawWindows(x, y, tile.h);
         } else {
-          drawDiamond(x, y, tile.top);
+          drawDiamond(x, y, tt);
         }
 
         /* subtle grid lines for flat tiles */
@@ -232,7 +350,19 @@
 
   /* ── Render loop ──────────────────────────────────────── */
 
-  function render() {
+  let lastTime = 0;
+
+  function render(ts) {
+    const dt = Math.min((ts - lastTime) / 1000, 0.1);
+    lastTime = ts;
+
+    /* animate day/night */
+    if (nightLerp !== nightTarget) {
+      const speed = 2.5;
+      if (nightLerp < nightTarget) nightLerp = Math.min(nightTarget, nightLerp + dt * speed);
+      else nightLerp = Math.max(nightTarget, nightLerp - dt * speed);
+    }
+
     drawBackground();
     drawGrid();
     requestAnimationFrame(render);
@@ -268,6 +398,7 @@
   /* ── Toolbar ─────────────────────────────────────────── */
 
   const toolBtns = document.querySelectorAll(".tool-btn");
+  const daynightIcon = document.querySelector(".daynight-icon");
 
   toolBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -277,9 +408,15 @@
     });
   });
 
+  document.querySelector('[data-action="daynight"]').addEventListener("click", () => {
+    nightTarget = nightTarget === 0 ? 1 : 0;
+    daynightIcon.classList.toggle("night", nightTarget === 1);
+  });
+
   /* ── Init ─────────────────────────────────────────────── */
 
   resize();
+  generateStars();
   window.addEventListener("resize", resize);
   requestAnimationFrame(render);
 })();
