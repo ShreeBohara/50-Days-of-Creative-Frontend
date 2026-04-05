@@ -147,6 +147,31 @@
     hoverRow = -1;
   });
 
+  canvas.addEventListener("click", () => {
+    if (hoverCol >= 0 && hoverRow >= 0) {
+      grid[hoverRow][hoverCol] = selectedTile;
+    }
+  });
+
+  canvas.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    if (hoverCol >= 0 && hoverRow >= 0) {
+      grid[hoverRow][hoverCol] = "grass";
+    }
+  });
+
+  /* ── Toolbar ─────────────────────────────────────────── */
+
+  const toolBtns = document.querySelectorAll(".tool-btn");
+
+  toolBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      toolBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedTile = btn.dataset.tile;
+    });
+  });
+
   /* ── Init ─────────────────────────────────────────────── */
 
   resize();
