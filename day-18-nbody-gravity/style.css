@@ -1,0 +1,19 @@
+/* Day 18 — Gravitational N-Body Simulation */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #050816;
+  color: #f5f7ff;
+  font-family: "Segoe UI", sans-serif;
+}
