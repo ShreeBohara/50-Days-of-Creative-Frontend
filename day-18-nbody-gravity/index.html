@@ -9,11 +9,66 @@
     />
     <meta name="theme-color" content="#050816" />
     <title>Day 18 | Gravitational N-Body Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Azeret+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <noscript>This experiment needs JavaScript enabled.</noscript>
+    <main class="app-shell">
+      <canvas id="gravity-canvas" aria-label="Gravitational body simulation"></canvas>
+
+      <header class="hero-panel" aria-label="Simulation introduction">
+        <p class="hero-panel__eyebrow">Day 18 / 50</p>
+        <h1>Gravitational N-Body Simulation</h1>
+        <p class="hero-panel__lede">
+          Hold to create mass, release to drop it into the field, and watch gravity carve unstable beauty into orbit.
+        </p>
+      </header>
+
+      <aside class="control-dock" aria-label="Simulation controls">
+        <section class="control-group">
+          <div class="control-labels">
+            <label for="time-scale">Time scale</label>
+            <output id="time-scale-value" for="time-scale">1.0x</output>
+          </div>
+          <input id="time-scale" type="range" min="0.1" max="5" step="0.1" value="1" />
+        </section>
+
+        <section class="toggle-row" aria-label="Display toggles">
+          <label class="toggle">
+            <input id="trail-toggle" type="checkbox" checked />
+            <span>Trails</span>
+          </label>
+          <label class="toggle">
+            <input id="grid-toggle" type="checkbox" checked />
+            <span>Grid warp</span>
+          </label>
+        </section>
+
+        <section class="action-row" aria-label="Simulation actions">
+          <button id="clear-button" type="button">Clear</button>
+          <button id="starter-button" type="button">Starter</button>
+          <button id="solar-button" type="button">Solar System</button>
+          <button id="binary-button" type="button">Binary Star</button>
+        </section>
+      </aside>
+
+      <footer class="status-bar" aria-label="Simulation status">
+        <p class="status-copy">Hold anywhere on the field to create a body. Massive bodies bend the grid and swallow smaller ones on contact.</p>
+        <div class="status-metrics">
+          <span id="body-count">Bodies: 0</span>
+          <span id="total-mass">Mass: 0</span>
+        </div>
+      </footer>
+
+      <noscript class="no-script">This experiment needs JavaScript enabled.</noscript>
+    </main>
+
     <script src="./script.js"></script>
   </body>
 </html>

@@ -9,11 +9,114 @@
 html,
 body {
   margin: 0;
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
   background: #050816;
   color: #f5f7ff;
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+}
+
+#gravity-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hero-panel,
+.control-dock,
+.status-bar,
+.no-script {
+  position: absolute;
+  z-index: 2;
+}
+
+.hero-panel {
+  top: 1.25rem;
+  left: 1.25rem;
+  width: min(28rem, calc(100vw - 2.5rem));
+}
+
+.control-dock {
+  top: 1.25rem;
+  right: 1.25rem;
+  width: min(24rem, calc(100vw - 2.5rem));
+  display: grid;
+  gap: 1rem;
+}
+
+.status-bar {
+  left: 1.25rem;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hero-panel__eyebrow,
+.control-labels label,
+.toggle span,
+.action-row button,
+.status-metrics span {
+  font-family: "Azeret Mono", monospace;
+}
+
+.hero-panel h1,
+.hero-panel__lede,
+.control-labels,
+.status-copy,
+.status-metrics {
+  margin: 0;
+}
+
+.control-group,
+.toggle-row,
+.action-row {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.control-labels,
+.toggle-row,
+.action-row,
+.status-metrics {
+  display: flex;
+  align-items: center;
+}
+
+.control-labels,
+.status-bar,
+.status-metrics {
+  justify-content: space-between;
+}
+
+.toggle-row,
+.action-row,
+.status-metrics {
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.no-script {
+  left: 1.25rem;
+  bottom: 6.5rem;
 }
