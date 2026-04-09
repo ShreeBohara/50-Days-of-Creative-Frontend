@@ -206,14 +206,39 @@
     }
   }
 
-  function stepSimulation(dt) {
+  function velocityVerletStep(dt) {
     computeAccelerations(state.bodies);
 
-    for (const body of state.bodies) {
-      body.vx += body.ax * dt;
-      body.vy += body.ay * dt;
-      body.x += body.vx * dt;
-      body.y += body.vy * dt;
+    const previousAcceleration = state.bodies.map((body) => ({
+      ax: body.ax,
+      ay: body.ay,
+    }));
+
+    for (let i = 0; i < state.bodies.length; i += 1) {
+      const body = state.bodies[i];
+      const prev = previousAcceleration[i];
+      body.x += (body.vx * dt) + (0.5 * prev.ax * dt * dt);
+      body.y += (body.vy * dt) + (0.5 * prev.ay * dt * dt);
+    }
+
+    computeAccelerations(state.bodies);
+
+    for (let i = 0; i < state.bodies.length; i += 1) {
+      const body = state.bodies[i];
+      const prev = previousAcceleration[i];
+      body.vx += 0.5 * (prev.ax + body.ax) * dt;
+      body.vy += 0.5 * (prev.ay + body.ay) * dt;
+    }
+  }
+
+  function stepSimulation(dt) {
+    if (state.bodies.length < 2) return;
+
+    const substeps = Math.max(1, Math.ceil(dt / 0.012));
+    const stepDt = dt / substeps;
+
+    for (let i = 0; i < substeps; i += 1) {
+      velocityVerletStep(stepDt);
     }
   }
 
