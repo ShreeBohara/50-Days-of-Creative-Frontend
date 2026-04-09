@@ -19,6 +19,7 @@
     centerY: 0,
     lastTime: performance.now(),
     timeScale: 1,
+    gridEnabled: true,
     spawn: {
       active: false,
       pointerId: null,
@@ -189,6 +190,56 @@
       ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+
+  function warpPoint(x, y) {
+    let offsetX = 0;
+    let offsetY = 0;
+
+    for (const body of state.bodies) {
+      const dx = body.x - x;
+      const dy = body.y - y;
+      const distance = Math.hypot(dx, dy) || 1;
+      const strength = Math.min(26, (body.mass * 180) / ((distance * distance) + 2400));
+      offsetX += (dx / distance) * strength;
+      offsetY += (dy / distance) * strength;
+    }
+
+    return { x: x + offsetX, y: y + offsetY };
+  }
+
+  function drawWarpedGrid() {
+    if (!state.gridEnabled) return;
+
+    const spacing = Math.max(60, Math.min(94, Math.round(state.width / 18)));
+
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(121, 149, 255, 0.14)";
+
+    for (let y = -spacing; y <= state.height + spacing; y += spacing) {
+      ctx.beginPath();
+      for (let x = -spacing; x <= state.width + spacing; x += spacing / 2) {
+        const point = warpPoint(x, y);
+        if (x === -spacing) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = "rgba(126, 216, 255, 0.08)";
+
+    for (let x = -spacing; x <= state.width + spacing; x += spacing) {
+      ctx.beginPath();
+      for (let y = -spacing; y <= state.height + spacing; y += spacing / 2) {
+        const point = warpPoint(x, y);
+        if (y === -spacing) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.restore();
   }
 
   function drawBodies() {
@@ -390,6 +441,7 @@
     }
 
     drawBackground(time);
+    drawWarpedGrid();
     drawTrails();
     drawBodies();
     drawSpawnIndicator(time);
