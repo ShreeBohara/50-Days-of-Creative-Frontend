@@ -31,10 +31,11 @@
   const PHYSICS = {
     gravity: 3200,
     softening: 18,
+    trailLimit: 200,
   };
 
   class Body {
-    constructor({ x, y, vx = 0, vy = 0, mass = 24 }) {
+    constructor({ x, y, vx = 0, vy = 0, mass = 24, trail = [] }) {
       this.x = x;
       this.y = y;
       this.vx = vx;
@@ -42,7 +43,7 @@
       this.mass = mass;
       this.ax = 0;
       this.ay = 0;
-      this.trail = [];
+      this.trail = trail;
       this.syncVisuals();
     }
 
@@ -73,6 +74,17 @@
       );
       context.fill();
       context.restore();
+    }
+
+    recordTrail() {
+      const lastPoint = this.trail[this.trail.length - 1];
+      if (!lastPoint || Math.hypot(lastPoint.x - this.x, lastPoint.y - this.y) > 2) {
+        this.trail.push({ x: this.x, y: this.y });
+      }
+
+      if (this.trail.length > PHYSICS.trailLimit) {
+        this.trail.splice(0, this.trail.length - PHYSICS.trailLimit);
+      }
     }
   }
 
@@ -182,6 +194,33 @@
   function drawBodies() {
     for (const body of state.bodies) {
       body.draw(ctx);
+    }
+  }
+
+  function hexToRgba(hex, alpha) {
+    const value = parseInt(hex.slice(1), 16);
+    const r = (value >> 16) & 255;
+    const g = (value >> 8) & 255;
+    const b = value & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  function drawTrails() {
+    for (const body of state.bodies) {
+      if (body.trail.length < 2) continue;
+
+      for (let i = 1; i < body.trail.length; i += 1) {
+        const previous = body.trail[i - 1];
+        const current = body.trail[i];
+        const progress = i / body.trail.length;
+
+        ctx.beginPath();
+        ctx.moveTo(previous.x, previous.y);
+        ctx.lineTo(current.x, current.y);
+        ctx.strokeStyle = hexToRgba(body.color, progress * 0.4);
+        ctx.lineWidth = Math.max(1, body.radius * 0.16);
+        ctx.stroke();
+      }
     }
   }
 
@@ -318,6 +357,7 @@
             vx: ((a.vx * a.mass) + (b.vx * b.mass)) / mergedMass,
             vy: ((a.vy * a.mass) + (b.vy * b.mass)) / mergedMass,
             mass: mergedMass,
+            trail: [...a.trail.slice(-90), ...b.trail.slice(-90)],
           });
 
           state.bodies.splice(j, 1);
@@ -344,9 +384,13 @@
 
     if (simDt > 0) {
       stepSimulation(simDt);
+      for (const body of state.bodies) {
+        body.recordTrail();
+      }
     }
 
     drawBackground(time);
+    drawTrails();
     drawBodies();
     drawSpawnIndicator(time);
     updateHud();
