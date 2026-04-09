@@ -25,6 +25,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 15 | Magnetic Cursor Trail | Spring-driven cursor trail with glowing pastel particles, idle orbiting, click explosions, and an afterimage toggle. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-15-magnetic-cursor/) | [day-15-magnetic-cursor](./day-15-magnetic-cursor/) |
 | 16 | Sorting Algorithm Visualizer | Side-by-side sorting labs with animated bars, step mode, live stats, and pitch-mapped comparison tones. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-16-sorting-visualizer/) | [day-16-sorting-visualizer](./day-16-sorting-visualizer/) |
 | 17 | Isometric City Builder | Canvas isometric grid with 8 tile types, day/night cycle, minimap, and procedural city generation. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-17-isometric-city/) | [day-17-isometric-city](./day-17-isometric-city/) |
+| 18 | Gravitational N-Body Simulation | Hold-to-spawn gravity sandbox with orbital trails, merge collisions, grid warp, and solar or binary presets. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-18-nbody-gravity/) | [day-18-nbody-gravity](./day-18-nbody-gravity/) |
 
 ## Adding a New Day
 

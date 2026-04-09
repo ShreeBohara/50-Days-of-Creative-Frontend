@@ -16,6 +16,7 @@
   const starterButton = document.getElementById("starter-button");
   const solarButton = document.getElementById("solar-button");
   const binaryButton = document.getElementById("binary-button");
+  const numberFormatter = new Intl.NumberFormat("en-US");
 
   const state = {
     width: 0,
@@ -29,6 +30,7 @@
     timeScale: 1,
     trailsEnabled: true,
     gridEnabled: true,
+    hasInitialized: false,
     spawn: {
       active: false,
       pointerId: null,
@@ -214,7 +216,9 @@
 
   function loadPreset(factory) {
     state.bodies = factory();
+    state.spawn.active = false;
     state.lastTime = performance.now();
+    renderScene(state.lastTime);
   }
 
   function buildStars() {
@@ -246,8 +250,9 @@
 
     state.stars = buildStars();
 
-    if (!state.bodies.length) {
+    if (!state.bodies.length && !state.hasInitialized) {
       state.bodies = createStarterBodies();
+      state.hasInitialized = true;
     } else {
       const shiftX = state.centerX - previousCenterX;
       const shiftY = state.centerY - previousCenterY;
@@ -377,6 +382,52 @@
         ctx.stroke();
       }
     }
+  }
+
+  function getCenterOfMass() {
+    if (!state.bodies.length) return null;
+
+    let totalMass = 0;
+    let x = 0;
+    let y = 0;
+
+    for (const body of state.bodies) {
+      totalMass += body.mass;
+      x += body.x * body.mass;
+      y += body.y * body.mass;
+    }
+
+    return {
+      x: x / totalMass,
+      y: y / totalMass,
+    };
+  }
+
+  function drawCenterOfMass() {
+    const com = getCenterOfMass();
+    if (!com) return;
+
+    ctx.save();
+    ctx.translate(com.x, com.y);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.76)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-8, 0);
+    ctx.lineTo(8, 0);
+    ctx.moveTo(0, -8);
+    ctx.lineTo(0, 8);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(255, 211, 106, 0.35)";
+    ctx.beginPath();
+    ctx.arc(0, 0, 12, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.52)";
+    ctx.font = '400 10px "Azeret Mono", monospace';
+    ctx.textAlign = "left";
+    ctx.fillText("COM", 16, 4);
+    ctx.restore();
   }
 
   function getHeldMass() {
@@ -529,7 +580,17 @@
   function updateHud() {
     bodyCountNode.textContent = `Bodies: ${state.bodies.length}`;
     const totalMass = state.bodies.reduce((sum, body) => sum + body.mass, 0);
-    totalMassNode.textContent = `Mass: ${Math.round(totalMass)}`;
+    totalMassNode.textContent = `Mass: ${numberFormatter.format(Math.round(totalMass))}`;
+  }
+
+  function renderScene(time) {
+    drawBackground(time);
+    drawWarpedGrid();
+    drawTrails();
+    drawCenterOfMass();
+    drawBodies();
+    drawSpawnIndicator(time);
+    updateHud();
   }
 
   function frame(time) {
@@ -544,12 +605,7 @@
       }
     }
 
-    drawBackground(time);
-    drawWarpedGrid();
-    drawTrails();
-    drawBodies();
-    drawSpawnIndicator(time);
-    updateHud();
+    renderScene(time);
 
     if (delta >= 0) {
       requestAnimationFrame(frame);
@@ -557,10 +613,13 @@
   }
 
   resize();
-  updateHud();
+  renderScene(performance.now());
   requestAnimationFrame(frame);
 
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", () => {
+    resize();
+    renderScene(performance.now());
+  });
 
   canvas.addEventListener("contextmenu", (event) => {
     event.preventDefault();
@@ -638,5 +697,6 @@
   clearButton.addEventListener("click", () => {
     state.bodies = [];
     state.lastTime = performance.now();
+    renderScene(state.lastTime);
   });
 })();
