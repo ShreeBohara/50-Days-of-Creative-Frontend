@@ -290,6 +290,44 @@
 
     for (let i = 0; i < substeps; i += 1) {
       velocityVerletStep(stepDt);
+      handleCollisions();
+    }
+  }
+
+  function handleCollisions() {
+    let hasMerged = true;
+
+    while (hasMerged) {
+      hasMerged = false;
+
+      for (let i = 0; i < state.bodies.length; i += 1) {
+        const a = state.bodies[i];
+
+        for (let j = i + 1; j < state.bodies.length; j += 1) {
+          const b = state.bodies[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const distance = Math.hypot(dx, dy);
+
+          if (distance > a.radius + b.radius) continue;
+
+          const mergedMass = a.mass + b.mass;
+          const mergedBody = new Body({
+            x: ((a.x * a.mass) + (b.x * b.mass)) / mergedMass,
+            y: ((a.y * a.mass) + (b.y * b.mass)) / mergedMass,
+            vx: ((a.vx * a.mass) + (b.vx * b.mass)) / mergedMass,
+            vy: ((a.vy * a.mass) + (b.vy * b.mass)) / mergedMass,
+            mass: mergedMass,
+          });
+
+          state.bodies.splice(j, 1);
+          state.bodies.splice(i, 1, mergedBody);
+          hasMerged = true;
+          break;
+        }
+
+        if (hasMerged) break;
+      }
     }
   }
 
