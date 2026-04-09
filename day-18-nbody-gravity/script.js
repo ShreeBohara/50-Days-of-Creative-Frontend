@@ -8,6 +8,9 @@
 
   const bodyCountNode = document.getElementById("body-count");
   const totalMassNode = document.getElementById("total-mass");
+  const starterButton = document.getElementById("starter-button");
+  const solarButton = document.getElementById("solar-button");
+  const binaryButton = document.getElementById("binary-button");
 
   const state = {
     width: 0,
@@ -127,6 +130,85 @@
         mass: outerMass,
       }),
     ];
+  }
+
+  function createSolarSystemBodies() {
+    const sunMass = 3200;
+    const radii = [150, 255, 380];
+    const masses = [16, 24, 44];
+    const bodies = [
+      new Body({
+        x: state.centerX,
+        y: state.centerY,
+        mass: sunMass,
+      }),
+    ];
+
+    const momentum = [];
+
+    masses.forEach((mass, index) => {
+      const radius = radii[index];
+      const velocity = Math.sqrt((PHYSICS.gravity * sunMass) / radius);
+      const angle = index === 1 ? Math.PI : index === 2 ? Math.PI * 1.45 : Math.PI * 0.2;
+      const x = state.centerX + Math.cos(angle) * radius;
+      const y = state.centerY + Math.sin(angle) * radius;
+      const vx = -Math.sin(angle) * velocity;
+      const vy = Math.cos(angle) * velocity;
+
+      momentum.push({ vx: vx * mass, vy: vy * mass });
+      bodies.push(new Body({ x, y, vx, vy, mass }));
+    });
+
+    const totalMomentum = momentum.reduce(
+      (sum, item) => ({ vx: sum.vx + item.vx, vy: sum.vy + item.vy }),
+      { vx: 0, vy: 0 }
+    );
+
+    bodies[0].vx = -(totalMomentum.vx / sunMass);
+    bodies[0].vy = -(totalMomentum.vy / sunMass);
+    return bodies;
+  }
+
+  function createBinaryStarBodies() {
+    const separation = 260;
+    const starAMass = 980;
+    const starBMass = 860;
+    const totalMass = starAMass + starBMass;
+    const starARadius = separation * (starBMass / totalMass);
+    const starBRadius = separation * (starAMass / totalMass);
+    const angularVelocity = Math.sqrt((PHYSICS.gravity * totalMass) / Math.pow(separation, 3));
+    const starAVelocity = angularVelocity * starARadius;
+    const starBVelocity = angularVelocity * starBRadius;
+
+    const planetRadius = 410;
+    const planetMass = 22;
+    const planetVelocity = Math.sqrt((PHYSICS.gravity * totalMass) / planetRadius);
+
+    return [
+      new Body({
+        x: state.centerX - starARadius,
+        y: state.centerY,
+        vy: -starAVelocity,
+        mass: starAMass,
+      }),
+      new Body({
+        x: state.centerX + starBRadius,
+        y: state.centerY,
+        vy: starBVelocity,
+        mass: starBMass,
+      }),
+      new Body({
+        x: state.centerX,
+        y: state.centerY - planetRadius,
+        vx: planetVelocity,
+        mass: planetMass,
+      }),
+    ];
+  }
+
+  function loadPreset(factory) {
+    state.bodies = factory();
+    state.lastTime = performance.now();
   }
 
   function buildStars() {
@@ -497,4 +579,16 @@
 
   canvas.addEventListener("pointerup", releaseSpawn);
   canvas.addEventListener("pointercancel", releaseSpawn);
+
+  starterButton.addEventListener("click", () => {
+    loadPreset(createStarterBodies);
+  });
+
+  solarButton.addEventListener("click", () => {
+    loadPreset(createSolarSystemBodies);
+  });
+
+  binaryButton.addEventListener("click", () => {
+    loadPreset(createBinaryStarBodies);
+  });
 })();
