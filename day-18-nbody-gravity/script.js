@@ -230,6 +230,8 @@
   }
 
   function resize() {
+    const previousCenterX = state.centerX;
+    const previousCenterY = state.centerY;
     state.dpr = Math.min(window.devicePixelRatio || 1, 2);
     state.width = window.innerWidth;
     state.height = window.innerHeight;
@@ -246,6 +248,18 @@
 
     if (!state.bodies.length) {
       state.bodies = createStarterBodies();
+    } else {
+      const shiftX = state.centerX - previousCenterX;
+      const shiftY = state.centerY - previousCenterY;
+
+      for (const body of state.bodies) {
+        body.x += shiftX;
+        body.y += shiftY;
+        body.trail = body.trail.map((point) => ({
+          x: point.x + shiftX,
+          y: point.y + shiftY,
+        }));
+      }
     }
   }
 
@@ -554,23 +568,28 @@
 
   canvas.addEventListener("pointerdown", (event) => {
     if (event.button !== 0) return;
+    event.preventDefault();
 
     state.spawn.active = true;
     state.spawn.pointerId = event.pointerId;
     state.spawn.x = event.clientX;
     state.spawn.y = event.clientY;
     state.spawn.startedAt = performance.now();
-    canvas.setPointerCapture(event.pointerId);
+    if (canvas.setPointerCapture) {
+      canvas.setPointerCapture(event.pointerId);
+    }
   });
 
   canvas.addEventListener("pointermove", (event) => {
     if (!state.spawn.active || event.pointerId !== state.spawn.pointerId) return;
+    event.preventDefault();
     state.spawn.x = event.clientX;
     state.spawn.y = event.clientY;
   });
 
   function releaseSpawn(event) {
     if (!state.spawn.active || event.pointerId !== state.spawn.pointerId) return;
+    event.preventDefault();
 
     const mass = getHeldMass();
     state.bodies.push(
@@ -583,6 +602,9 @@
 
     state.spawn.active = false;
     state.spawn.pointerId = null;
+    if (canvas.releasePointerCapture) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
   }
 
   canvas.addEventListener("pointerup", releaseSpawn);

@@ -64,6 +64,7 @@ body {
   height: 100%;
   display: block;
   cursor: crosshair;
+  touch-action: none;
 }
 
 .hero-panel,
@@ -333,4 +334,82 @@ input[type="range"]::-moz-range-thumb {
 .no-script {
   left: 1.25rem;
   bottom: 6.5rem;
+}
+
+@media (max-width: 960px) {
+  .hero-panel,
+  .control-dock,
+  .status-bar,
+  .no-script {
+    left: 0.9rem;
+    right: 0.9rem;
+    width: auto;
+  }
+
+  .hero-panel {
+    top: 0.9rem;
+  }
+
+  .hero-panel h1 {
+    font-size: clamp(1.9rem, 8vw, 2.8rem);
+    max-width: 12ch;
+  }
+
+  .control-dock {
+    top: auto;
+    bottom: 7.9rem;
+  }
+
+  .status-bar {
+    bottom: 0.9rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-copy {
+    max-width: none;
+  }
+
+  .status-metrics {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-panel,
+  .control-dock,
+  .status-bar {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero-panel__lede {
+    font-size: 0.9rem;
+  }
+
+  .toggle-row,
+  .action-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .toggle,
+  .action-row button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .status-metrics {
+    gap: 0.55rem;
+  }
+
+  .status-metrics span {
+    flex: 1 1 10rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .no-script {
+    bottom: 14rem;
+  }
 }
