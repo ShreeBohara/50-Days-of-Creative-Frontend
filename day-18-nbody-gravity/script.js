@@ -19,6 +19,13 @@
     centerY: 0,
     lastTime: performance.now(),
     timeScale: 1,
+    spawn: {
+      active: false,
+      pointerId: null,
+      x: 0,
+      y: 0,
+      startedAt: 0,
+    },
   };
 
   const PHYSICS = {
@@ -178,6 +185,50 @@
     }
   }
 
+  function getHeldMass() {
+    if (!state.spawn.active) return 0;
+    const heldSeconds = Math.min((performance.now() - state.spawn.startedAt) / 1000, 3.4);
+    return 14 + (Math.pow(heldSeconds, 1.65) * 260);
+  }
+
+  function drawSpawnIndicator(time) {
+    if (!state.spawn.active) return;
+
+    const mass = getHeldMass();
+    const radius = 2.8 + Math.cbrt(mass) * 1.22;
+    const pulse = 1 + (Math.sin(time * 0.008) * 0.06);
+
+    ctx.save();
+    ctx.translate(state.spawn.x, state.spawn.y);
+
+    const ring = ctx.createRadialGradient(0, 0, 2, 0, 0, radius * 3.2);
+    ring.addColorStop(0, "rgba(126, 216, 255, 0.18)");
+    ring.addColorStop(1, "rgba(126, 216, 255, 0)");
+    ctx.fillStyle = ring;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 3.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(126, 216, 255, 0.85)";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 1.9 * pulse, -Math.PI / 2, Math.PI * 1.35);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+    ctx.fillStyle = getBodyColor(mass);
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
+    ctx.font = '500 11px "Azeret Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText(`${Math.round(mass)}`, 0, -(radius * 2.7));
+    ctx.restore();
+  }
+
   function computeAccelerations(bodies) {
     for (const body of bodies) {
       body.ax = 0;
@@ -259,6 +310,7 @@
 
     drawBackground(time);
     drawBodies();
+    drawSpawnIndicator(time);
     updateHud();
 
     if (delta >= 0) {
@@ -271,4 +323,44 @@
   requestAnimationFrame(frame);
 
   window.addEventListener("resize", resize);
+
+  canvas.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+  });
+
+  canvas.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+
+    state.spawn.active = true;
+    state.spawn.pointerId = event.pointerId;
+    state.spawn.x = event.clientX;
+    state.spawn.y = event.clientY;
+    state.spawn.startedAt = performance.now();
+    canvas.setPointerCapture(event.pointerId);
+  });
+
+  canvas.addEventListener("pointermove", (event) => {
+    if (!state.spawn.active || event.pointerId !== state.spawn.pointerId) return;
+    state.spawn.x = event.clientX;
+    state.spawn.y = event.clientY;
+  });
+
+  function releaseSpawn(event) {
+    if (!state.spawn.active || event.pointerId !== state.spawn.pointerId) return;
+
+    const mass = getHeldMass();
+    state.bodies.push(
+      new Body({
+        x: state.spawn.x,
+        y: state.spawn.y,
+        mass,
+      })
+    );
+
+    state.spawn.active = false;
+    state.spawn.pointerId = null;
+  }
+
+  canvas.addEventListener("pointerup", releaseSpawn);
+  canvas.addEventListener("pointercancel", releaseSpawn);
 })();
