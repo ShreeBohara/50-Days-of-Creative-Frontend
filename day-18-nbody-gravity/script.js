@@ -18,6 +18,12 @@
     centerX: 0,
     centerY: 0,
     lastTime: performance.now(),
+    timeScale: 1,
+  };
+
+  const PHYSICS = {
+    gravity: 3200,
+    softening: 18,
   };
 
   class Body {
@@ -71,15 +77,14 @@
   }
 
   function createStarterBodies() {
-    const G = 3200;
     const starMass = 2400;
     const innerMass = 24;
     const outerMass = 38;
     const innerRadius = 210;
     const outerRadius = 340;
 
-    const innerVelocity = Math.sqrt((G * starMass) / innerRadius);
-    const outerVelocity = Math.sqrt((G * starMass) / outerRadius);
+    const innerVelocity = Math.sqrt((PHYSICS.gravity * starMass) / innerRadius);
+    const outerVelocity = Math.sqrt((PHYSICS.gravity * starMass) / outerRadius);
     const starVelocityY = -((innerMass * innerVelocity) + (outerMass * -outerVelocity)) / starMass;
 
     return [
@@ -173,6 +178,45 @@
     }
   }
 
+  function computeAccelerations(bodies) {
+    for (const body of bodies) {
+      body.ax = 0;
+      body.ay = 0;
+    }
+
+    for (let i = 0; i < bodies.length; i += 1) {
+      const a = bodies[i];
+      for (let j = i + 1; j < bodies.length; j += 1) {
+        const b = bodies[j];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const distanceSq = (dx * dx) + (dy * dy) + (PHYSICS.softening * PHYSICS.softening);
+        const distance = Math.sqrt(distanceSq);
+        const forceScale = PHYSICS.gravity / (distanceSq * distance);
+        const ax = dx * forceScale * b.mass;
+        const ay = dy * forceScale * b.mass;
+        const bx = dx * forceScale * a.mass;
+        const by = dy * forceScale * a.mass;
+
+        a.ax += ax;
+        a.ay += ay;
+        b.ax -= bx;
+        b.ay -= by;
+      }
+    }
+  }
+
+  function stepSimulation(dt) {
+    computeAccelerations(state.bodies);
+
+    for (const body of state.bodies) {
+      body.vx += body.ax * dt;
+      body.vy += body.ay * dt;
+      body.x += body.vx * dt;
+      body.y += body.vy * dt;
+    }
+  }
+
   function updateHud() {
     bodyCountNode.textContent = `Bodies: ${state.bodies.length}`;
     const totalMass = state.bodies.reduce((sum, body) => sum + body.mass, 0);
@@ -182,6 +226,11 @@
   function frame(time) {
     const delta = time - state.lastTime;
     state.lastTime = time;
+    const simDt = Math.min(delta, 32) / 1000 * state.timeScale;
+
+    if (simDt > 0) {
+      stepSimulation(simDt);
+    }
 
     drawBackground(time);
     drawBodies();
