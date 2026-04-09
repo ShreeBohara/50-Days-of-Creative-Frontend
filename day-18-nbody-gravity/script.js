@@ -6,6 +6,11 @@
   const canvas = document.getElementById("gravity-canvas");
   const ctx = canvas.getContext("2d");
 
+  const timeScaleInput = document.getElementById("time-scale");
+  const timeScaleValue = document.getElementById("time-scale-value");
+  const trailToggle = document.getElementById("trail-toggle");
+  const gridToggle = document.getElementById("grid-toggle");
+  const clearButton = document.getElementById("clear-button");
   const bodyCountNode = document.getElementById("body-count");
   const totalMassNode = document.getElementById("total-mass");
   const starterButton = document.getElementById("starter-button");
@@ -22,6 +27,7 @@
     centerY: 0,
     lastTime: performance.now(),
     timeScale: 1,
+    trailsEnabled: true,
     gridEnabled: true,
     spawn: {
       active: false,
@@ -339,6 +345,8 @@
   }
 
   function drawTrails() {
+    if (!state.trailsEnabled) return;
+
     for (const body of state.bodies) {
       if (body.trail.length < 2) continue;
 
@@ -590,5 +598,23 @@
 
   binaryButton.addEventListener("click", () => {
     loadPreset(createBinaryStarBodies);
+  });
+
+  timeScaleInput.addEventListener("input", () => {
+    state.timeScale = Number(timeScaleInput.value);
+    timeScaleValue.textContent = `${state.timeScale.toFixed(1)}x`;
+  });
+
+  trailToggle.addEventListener("change", () => {
+    state.trailsEnabled = trailToggle.checked;
+  });
+
+  gridToggle.addEventListener("change", () => {
+    state.gridEnabled = gridToggle.checked;
+  });
+
+  clearButton.addEventListener("click", () => {
+    state.bodies = [];
+    state.lastTime = performance.now();
   });
 })();
