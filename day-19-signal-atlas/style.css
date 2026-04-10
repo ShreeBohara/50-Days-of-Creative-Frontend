@@ -1,0 +1,596 @@
+/* Day 19 — Signal Atlas */
+
+:root {
+  color-scheme: dark;
+  --bg: #041018;
+  --bg-deep: #02070d;
+  --panel: rgba(4, 13, 21, 0.82);
+  --panel-soft: rgba(4, 13, 21, 0.46);
+  --line: rgba(138, 241, 255, 0.18);
+  --line-strong: rgba(138, 241, 255, 0.42);
+  --text: #f5fcff;
+  --text-soft: rgba(214, 237, 243, 0.7);
+  --accent: #89efff;
+  --accent-soft: rgba(137, 239, 255, 0.14);
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(78, 196, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 85% 12%, rgba(76, 112, 255, 0.14), transparent 24%),
+    linear-gradient(145deg, #02070d 0%, #03111a 48%, #020a11 100%);
+  color: var(--text);
+  font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+.atlas-shell {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.atlas-shell::before,
+.atlas-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.atlas-shell::before {
+  background:
+    radial-gradient(circle at 50% 52%, rgba(83, 207, 255, 0.18), transparent 18%),
+    radial-gradient(circle at 50% 54%, rgba(83, 207, 255, 0.08), transparent 32%);
+  filter: blur(18px);
+  opacity: 0.9;
+}
+
+.atlas-shell::after {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 14%),
+    radial-gradient(circle at center, transparent 52%, rgba(0, 0, 0, 0.35) 100%);
+  opacity: 0.8;
+}
+
+.scene-noise {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 4.75rem 4.75rem;
+  mask-image: radial-gradient(circle at center, black 24%, transparent 88%);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+#atlas-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+body.is-dragging #atlas-canvas {
+  cursor: grabbing;
+}
+
+.masthead,
+.detail-rail,
+.hub-strip,
+.no-script {
+  position: absolute;
+  z-index: 2;
+}
+
+.masthead {
+  top: clamp(1.2rem, 3vw, 2.2rem);
+  left: clamp(1.2rem, 3vw, 2.2rem);
+  width: min(30rem, calc(100vw - 2.4rem));
+  padding-right: 3rem;
+  background: linear-gradient(90deg, rgba(2, 9, 15, 0.88), rgba(2, 9, 15, 0.4) 70%, transparent);
+}
+
+.eyebrow,
+.meta-strip span,
+.rail-label,
+.score-head span,
+.hub-stats dt,
+.hub-strip__label,
+.route-section__head span,
+.hub-picker span,
+.hub-button__region {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.rail-label,
+.route-section__head span,
+.hub-strip__label,
+.hub-picker span {
+  color: var(--accent);
+  font-size: 0.72rem;
+}
+
+.masthead h1,
+.detail-rail h2,
+.route-section__head h3 {
+  margin: 0;
+  font-family: "Syne", "Segoe UI", sans-serif;
+}
+
+.eyebrow {
+  margin: 0 0 0.95rem;
+}
+
+.masthead h1 {
+  max-width: 8ch;
+  font-size: clamp(3.2rem, 8vw, 6.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+}
+
+.lede {
+  max-width: 34ch;
+  margin: 1rem 0 0;
+  color: var(--text-soft);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.meta-strip,
+.masthead-actions,
+.hub-buttons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.meta-strip {
+  gap: 1rem;
+  margin-top: 1.35rem;
+}
+
+.meta-strip span {
+  position: relative;
+  padding-right: 1rem;
+  color: rgba(214, 237, 243, 0.86);
+  font-size: 0.7rem;
+}
+
+.meta-strip span:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 0.45rem;
+  height: 1px;
+  background: rgba(214, 237, 243, 0.28);
+  transform: translateY(-50%);
+}
+
+.masthead-actions {
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.35rem;
+}
+
+.text-link {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.text-link:hover {
+  color: var(--accent);
+}
+
+.status-note {
+  margin: 0;
+  color: rgba(214, 237, 243, 0.84);
+  font-size: 0.82rem;
+}
+
+.detail-rail {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(25rem, 34vw);
+  padding: clamp(1.45rem, 3vw, 2.4rem) clamp(1.2rem, 2vw, 1.9rem) clamp(1.5rem, 4vw, 2.2rem);
+  display: grid;
+  align-content: start;
+  gap: 1.1rem;
+  background:
+    linear-gradient(270deg, rgba(2, 9, 15, 0.92), rgba(2, 9, 15, 0.68) 44%, rgba(2, 9, 15, 0.18) 100%);
+  border-left: 1px solid var(--line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.detail-rail h2 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 0.94;
+  letter-spacing: -0.07em;
+}
+
+.hub-region,
+.hub-blurb,
+.hub-stats dd,
+.route-list,
+.route-city,
+.route-region,
+.route-score {
+  margin: 0;
+}
+
+.hub-region {
+  color: rgba(214, 237, 243, 0.76);
+  font-size: 0.95rem;
+}
+
+.score-block {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.score-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.score-head span,
+.hub-stats dt {
+  color: var(--text-soft);
+  font-size: 0.68rem;
+}
+
+.score-head strong {
+  color: var(--text);
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.score-track {
+  width: 100%;
+  height: 0.45rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.score-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(137, 239, 255, 0.42), rgba(137, 239, 255, 0.98));
+  box-shadow: 0 0 24px rgba(137, 239, 255, 0.42);
+  transition: width 320ms ease;
+}
+
+.hub-blurb {
+  max-width: 30ch;
+  color: rgba(214, 237, 243, 0.82);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.hub-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hub-stats div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.hub-stats dd {
+  color: var(--text);
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.route-section {
+  display: grid;
+  gap: 0.9rem;
+  min-height: 0;
+}
+
+.route-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.route-section__head h3 {
+  font-size: 1.25rem;
+  letter-spacing: -0.04em;
+}
+
+.route-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.route-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.72rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.route-meta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.route-city {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.route-region {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+}
+
+.route-score {
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.hub-picker {
+  display: none;
+  gap: 0.5rem;
+}
+
+.hub-picker select {
+  width: 100%;
+  appearance: none;
+  border: 1px solid rgba(137, 239, 255, 0.24);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(3, 14, 21, 0.88);
+  color: var(--text);
+  padding: 0.9rem 1rem;
+  font: inherit;
+}
+
+.hub-strip {
+  left: clamp(1.2rem, 3vw, 2.2rem);
+  bottom: clamp(1.15rem, 3vw, 2rem);
+  width: min(44rem, calc(100vw - 4rem));
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(0deg, rgba(2, 9, 15, 0.8), rgba(2, 9, 15, 0));
+}
+
+.hub-strip__label {
+  margin: 0 0 0.85rem;
+}
+
+.hub-buttons {
+  gap: 0.7rem 1rem;
+}
+
+.hub-button {
+  min-width: 8.4rem;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  background: none;
+  color: rgba(214, 237, 243, 0.74);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.hub-button:hover,
+.hub-button:focus-visible {
+  color: var(--text);
+  border-color: rgba(137, 239, 255, 0.52);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.hub-button.is-active {
+  color: var(--accent);
+  border-color: rgba(137, 239, 255, 0.78);
+}
+
+.hub-button__city {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.hub-button__region {
+  display: block;
+  margin-top: 0.25rem;
+  color: inherit;
+  font-size: 0.6rem;
+}
+
+.no-script {
+  left: 1.2rem;
+  bottom: 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  background: rgba(2, 9, 15, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body .masthead,
+body .detail-rail,
+body .hub-strip {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+body.is-ready .masthead,
+body.is-ready .detail-rail,
+body.is-ready .hub-strip {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 700ms ease,
+    transform 700ms ease;
+}
+
+body.is-ready .detail-rail {
+  transition-delay: 70ms;
+}
+
+body.is-ready .hub-strip {
+  transition-delay: 120ms;
+}
+
+@media (max-width: 980px) {
+  .masthead {
+    width: min(27rem, calc(100vw - 2.4rem));
+    padding-right: 0;
+  }
+
+  .detail-rail {
+    width: min(22rem, 38vw);
+  }
+
+  .hub-strip {
+    width: min(36rem, calc(100vw - 2.4rem));
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    overflow: auto;
+  }
+
+  .atlas-shell {
+    min-height: 100svh;
+  }
+
+  .masthead {
+    top: 1rem;
+    left: 1rem;
+    width: min(23rem, calc(100vw - 2rem));
+    background: linear-gradient(90deg, rgba(2, 9, 15, 0.9), rgba(2, 9, 15, 0.2) 88%, transparent);
+  }
+
+  .masthead h1 {
+    font-size: clamp(2.85rem, 17vw, 4.2rem);
+  }
+
+  .lede {
+    max-width: 30ch;
+    font-size: 0.94rem;
+  }
+
+  .meta-strip {
+    gap: 0.7rem;
+  }
+
+  .meta-strip span {
+    padding-right: 0.8rem;
+  }
+
+  .masthead-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .detail-rail {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: min(25rem, 48svh);
+    padding: 1rem 1rem 1.2rem;
+    gap: 0.9rem;
+    background:
+      linear-gradient(180deg, rgba(2, 9, 15, 0.22), rgba(2, 9, 15, 0.92) 16%, rgba(2, 9, 15, 0.96) 100%);
+    border-left: none;
+    border-top: 1px solid var(--line);
+    overflow: auto;
+  }
+
+  .detail-rail h2 {
+    font-size: 2rem;
+  }
+
+  .hub-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .route-section {
+    padding-bottom: 0.2rem;
+  }
+
+  .hub-strip {
+    display: none;
+  }
+
+  .hub-picker {
+    display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

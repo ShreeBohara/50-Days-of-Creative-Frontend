@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Day 19 — Signal Atlas, a cinematic orbitable globe with live city hubs and animated network corridors."
+    />
+    <meta name="theme-color" content="#041018" />
+    <title>Day 19 | Signal Atlas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Syne:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="atlas-shell">
+      <canvas id="atlas-canvas" aria-label="Interactive signal globe showing linked cities"></canvas>
+      <div class="scene-noise" aria-hidden="true"></div>
+
+      <header class="masthead" aria-label="Experience introduction">
+        <p class="eyebrow">Day 19 / 50</p>
+        <h1>Signal Atlas</h1>
+        <p class="lede">
+          Orbit a live network of synchronized hubs and lock onto the corridors carrying the cleanest signal across the globe.
+        </p>
+
+        <div class="meta-strip" aria-label="Experience overview">
+          <span id="hub-count-label">8 hubs</span>
+          <span id="route-count-label">0 corridors</span>
+          <span>Drag to orbit</span>
+        </div>
+
+        <div class="masthead-actions">
+          <a class="text-link" href="../index.html">Back to archive</a>
+          <p class="status-note">Tap or click a hub to pin the route map.</p>
+        </div>
+      </header>
+
+      <aside class="detail-rail" aria-label="Selected hub details">
+        <p class="rail-label">Selected hub</p>
+        <h2 id="hub-name">Signal hub</h2>
+        <p id="hub-region" class="hub-region"></p>
+
+        <div class="score-block">
+          <div class="score-head">
+            <span>Signal score</span>
+            <strong id="hub-score">0</strong>
+          </div>
+          <div class="score-track" aria-hidden="true">
+            <span id="hub-score-fill"></span>
+          </div>
+        </div>
+
+        <p id="hub-blurb" class="hub-blurb"></p>
+
+        <dl class="hub-stats">
+          <div>
+            <dt>Connected routes</dt>
+            <dd id="hub-route-total">0</dd>
+          </div>
+          <div>
+            <dt>Latitude</dt>
+            <dd id="hub-latitude">0deg</dd>
+          </div>
+          <div>
+            <dt>Longitude</dt>
+            <dd id="hub-longitude">0deg</dd>
+          </div>
+        </dl>
+
+        <section class="route-section" aria-labelledby="route-section-title">
+          <div class="route-section__head">
+            <h3 id="route-section-title">Live corridors</h3>
+            <span id="route-status">0 online</span>
+          </div>
+          <ul id="route-list" class="route-list"></ul>
+        </section>
+
+        <label class="hub-picker" for="hub-select">
+          <span>Mobile hub picker</span>
+          <select id="hub-select"></select>
+        </label>
+      </aside>
+
+      <nav class="hub-strip" aria-label="Hub index">
+        <p class="hub-strip__label">Hub index</p>
+        <div id="hub-buttons" class="hub-buttons"></div>
+      </nav>
+
+      <p id="selection-announcer" class="sr-only" aria-live="polite"></p>
+      <noscript class="no-script">This experiment needs JavaScript enabled.</noscript>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
