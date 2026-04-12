@@ -27,6 +27,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 17 | Isometric City Builder | Canvas isometric grid with 8 tile types, day/night cycle, minimap, and procedural city generation. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-17-isometric-city/) | [day-17-isometric-city](./day-17-isometric-city/) |
 | 18 | Gravitational N-Body Simulation | Hold-to-spawn gravity sandbox with orbital trails, merge collisions, grid warp, and solar or binary presets. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-18-nbody-gravity/) | [day-18-nbody-gravity](./day-18-nbody-gravity/) |
 | 19 | Signal Atlas | Cinematic orbitable globe with linked city hubs, glowing corridors, and a live signal detail rail. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-19-signal-atlas/) | [day-19-signal-atlas](./day-19-signal-atlas/) |
+| 20 | Shader Playground | Live GLSL editor with split-view, real-time WebGL rendering, syntax highlighting, and five preset shaders. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-20-shader-playground/) | [day-20-shader-playground](./day-20-shader-playground/) |
 
 ## Adding a New Day
 
