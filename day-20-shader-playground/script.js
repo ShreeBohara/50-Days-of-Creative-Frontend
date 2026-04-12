@@ -181,7 +181,168 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
+  /* Preset 4 — Voronoi Cells: animated diagram with distance coloring */
+  PRESETS.voronoi = `precision mediump float;
+
+uniform float u_time;
+uniform vec2  u_resolution;
+uniform vec2  u_mouse;
+
+vec2 random2(vec2 p) {
+  return fract(sin(vec2(
+    dot(p, vec2(127.1, 311.7)),
+    dot(p, vec2(269.5, 183.3))
+  )) * 43758.5453);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec2 st = uv * 6.0;
+  vec2 ip = floor(st);
+  vec2 fp = fract(st);
+
+  float minDist = 10.0;
+  float secondDist = 10.0;
+  vec2 minPoint = vec2(0.0);
+
+  // Search 3x3 neighborhood
+  for (int y = -1; y <= 1; y++) {
+    for (int x = -1; x <= 1; x++) {
+      vec2 neighbor = vec2(float(x), float(y));
+      vec2 point = random2(ip + neighbor);
+      point = 0.5 + 0.5 * sin(u_time * 0.8 + 6.28 * point);
+      vec2 diff = neighbor + point - fp;
+      float d = length(diff);
+      if (d < minDist) {
+        secondDist = minDist;
+        minDist = d;
+        minPoint = point;
+      } else if (d < secondDist) {
+        secondDist = d;
+      }
+    }
+  }
+
+  // Edge detection
+  float edge = secondDist - minDist;
+
+  // Coloring
+  float hue = fract(minPoint.x * 3.14 + minPoint.y * 2.71 + u_time * 0.05);
+  vec3 col;
+  col.r = 0.5 + 0.4 * cos(6.28 * (hue + 0.0));
+  col.g = 0.5 + 0.4 * cos(6.28 * (hue + 0.33));
+  col.b = 0.5 + 0.4 * cos(6.28 * (hue + 0.67));
+
+  // Darken edges
+  col *= smoothstep(0.0, 0.08, edge);
+
+  // Mouse glow
+  float mouseDist = length(uv - u_mouse);
+  col += vec3(0.1, 0.05, 0.2) * exp(-mouseDist * 4.0);
+
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+  /* Preset 5 — Simplex Noise Terrain Flyover: faux-3D height-mapped landscape */
+  PRESETS.noise = `precision mediump float;
+
+uniform float u_time;
+uniform vec2  u_resolution;
+uniform vec2  u_mouse;
+
+// Simple hash-based noise
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+    mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
+    f.y
+  );
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  vec2 shift = vec2(100.0);
+  for (int i = 0; i < 6; i++) {
+    v += a * noise(p);
+    p = p * 2.0 + shift;
+    a *= 0.5;
+  }
+  return v;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+
+  // Perspective transformation for 3D-like flyover
+  float py = max(uv.y, 0.001);
+  float depth = 1.0 / py;
+  float px = (uv.x - 0.5) * depth;
+
+  // Scrolling terrain
+  vec2 terrain = vec2(px * 3.0, depth * 2.0 - u_time * 0.6);
+  float h = fbm(terrain);
+
+  // Height-based coloring (water → sand → grass → rock → snow)
+  vec3 col;
+  float waterLevel = u_mouse.y * 0.3 + 0.25;
+  if (h < waterLevel) {
+    col = mix(vec3(0.05, 0.1, 0.3), vec3(0.1, 0.3, 0.6), h / waterLevel);
+  } else if (h < 0.45) {
+    col = vec3(0.76, 0.7, 0.5); // sand
+  } else if (h < 0.62) {
+    col = mix(vec3(0.2, 0.5, 0.15), vec3(0.1, 0.35, 0.1), (h - 0.45) / 0.17);
+  } else if (h < 0.78) {
+    col = mix(vec3(0.4, 0.35, 0.3), vec3(0.5, 0.45, 0.4), (h - 0.62) / 0.16);
+  } else {
+    col = mix(vec3(0.6, 0.6, 0.6), vec3(1.0), (h - 0.78) / 0.22);
+  }
+
+  // Distance fog
+  float fog = 1.0 - exp(-0.15 * depth);
+  vec3 skyCol = mix(vec3(0.5, 0.7, 1.0), vec3(0.1, 0.15, 0.4), uv.y);
+
+  // Sky above horizon
+  if (uv.y > 0.85) {
+    col = skyCol;
+  } else {
+    col = mix(col, skyCol, fog);
+  }
+
+  // Sun
+  float sun = smoothstep(0.05, 0.0, length(uv - vec2(0.7, 0.92)));
+  col += vec3(1.0, 0.9, 0.7) * sun * 2.0;
+
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
   const DEFAULT_SHADER = PRESETS.plasma;
+
+  /* ─── Preset Switcher ─── */
+  const presetSelect = $('#preset-select');
+
+  function loadPreset(name) {
+    if (!PRESETS[name] || !codeEditor) return;
+    codeEditor.value = PRESETS[name];
+    onEditorInput();
+    // Immediate compile (bypass debounce)
+    clearTimeout(compileTimer);
+    compileCurrentShader();
+  }
+
+  function initPresetSwitcher() {
+    if (!presetSelect) return;
+    presetSelect.addEventListener('change', () => {
+      loadPreset(presetSelect.value);
+    });
+  }
 
   /* ─── Line Numbers ─── */
   function updateLineNumbers() {
@@ -644,6 +805,7 @@ void main() {
   function init() {
     initEditor();
     initDivider();
+    initPresetSwitcher();
 
     if (initWebGL()) {
       compileCurrentShader();
