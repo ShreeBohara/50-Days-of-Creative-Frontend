@@ -528,3 +528,70 @@ body::before {
 .hl-number   { color: #4ade80; }                /* Fresh green */
 .hl-comment  { color: #475569; font-style: italic; } /* Muted slate */
 .hl-preproc  { color: #fbbf24; }                /* Amber/yellow */
+
+/* ─── Responsive: Stack on Mobile ─── */
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 0 10px;
+    height: 46px;
+    gap: 6px;
+  }
+  .toolbar__brand { display: none; }
+  .toolbar__btn-label { display: none; }
+  .toolbar__btn { padding: 6px 8px; }
+  .preset-selector__label { display: none; }
+  .preset-selector__select {
+    min-width: 120px;
+    font-size: 12px;
+    padding: 5px 28px 5px 8px;
+  }
+  .fps-badge { font-size: 10px; padding: 2px 6px; }
+
+  /* Stack panels vertically */
+  .panels {
+    flex-direction: column;
+  }
+  .panel--editor {
+    flex: 0 0 45%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .panel--canvas {
+    flex: 1;
+  }
+  .divider {
+    width: 100%;
+    height: var(--divider-w);
+    cursor: row-resize;
+  }
+  .divider::after {
+    width: 32px;
+    height: 3px;
+  }
+
+  .editor-header { padding: 0 10px; }
+  .line-numbers { width: 36px; font-size: 11px; }
+  .highlight-layer, .code-textarea {
+    font-size: 12px;
+    padding: 10px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar__left { flex: 0; gap: 6px; }
+  .toolbar__center { flex: 1; }
+  .toolbar__right { gap: 4px; }
+  .preset-selector__select {
+    min-width: 100px;
+    font-size: 11px;
+  }
+}
+
+/* ─── Fullscreen Canvas Mode ─── */
+.panel--canvas:fullscreen {
+  background: #000;
+}
+.panel--canvas:fullscreen #gl-canvas {
+  width: 100vw;
+  height: 100vh;
+}
