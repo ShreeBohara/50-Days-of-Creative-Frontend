@@ -14,8 +14,11 @@
   const editorWrap     = $('#editor-wrap');
   const editorLayers   = codeEditor ? codeEditor.parentElement : null;
 
-  /* ─── Default shader placeholder ─── */
-  const DEFAULT_SHADER = `precision mediump float;
+  /* ─── Shader Presets ─── */
+  const PRESETS = {};
+
+  /* Preset 1 — Plasma Waves: sin/cos interference patterns with rich color */
+  PRESETS.plasma = `precision mediump float;
 
 uniform float u_time;
 uniform vec2  u_resolution;
@@ -23,9 +26,34 @@ uniform vec2  u_mouse;
 
 void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution;
-  vec3 col = 0.5 + 0.5 * cos(u_time + uv.xyx + vec3(0, 2, 4));
+  float t = u_time * 0.5;
+
+  // Multi-layered plasma interference
+  float v1 = sin(uv.x * 10.0 + t);
+  float v2 = sin(10.0 * (uv.x * sin(t / 2.0) + uv.y * cos(t / 3.0)) + t);
+  float cx = uv.x + 0.5 * sin(t / 5.0);
+  float cy = uv.y + 0.5 * cos(t / 3.0);
+  float v3 = sin(sqrt(100.0 * (cx * cx + cy * cy) + 1.0) + t);
+
+  // Mouse influence
+  float md = length(uv - u_mouse) * 4.0;
+  float v4 = sin(md * 8.0 - t * 2.0);
+
+  float v = v1 + v2 + v3 + v4;
+
+  // Vibrant color palette
+  vec3 col;
+  col.r = sin(v * 3.14159) * 0.5 + 0.5;
+  col.g = sin(v * 3.14159 + 2.094) * 0.5 + 0.5;
+  col.b = sin(v * 3.14159 + 4.188) * 0.5 + 0.5;
+
+  // Boost saturation
+  col = pow(col, vec3(0.85));
+
   gl_FragColor = vec4(col, 1.0);
 }`;
+
+  const DEFAULT_SHADER = PRESETS.plasma;
 
   /* ─── Line Numbers ─── */
   function updateLineNumbers() {
