@@ -278,10 +278,214 @@ void main() {
     }
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     WebGL Engine
+     ═══════════════════════════════════════════════════════════════════ */
+
+  const glCanvas      = $('#gl-canvas');
+  let gl              = null;
+  let currentProgram  = null;
+  let quadVAO         = null;
+  let quadVBO         = null;
+  let startTime       = performance.now() / 1000;
+  let mouseX = 0.5, mouseY = 0.5;
+
+  /* Passthrough vertex shader — just draws the full-screen quad */
+  const VERTEX_SHADER_SRC = `
+    attribute vec2 a_position;
+    void main() {
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }
+  `;
+
+  /**
+   * Initialize WebGL context and create the full-screen quad geometry.
+   */
+  function initWebGL() {
+    if (!glCanvas) return false;
+
+    gl = glCanvas.getContext('webgl', { antialias: false, preserveDrawingBuffer: false })
+      || glCanvas.getContext('experimental-webgl');
+
+    if (!gl) {
+      console.error('WebGL not supported');
+      return false;
+    }
+
+    // Full-screen quad: two triangles covering clip-space [-1, 1]
+    const vertices = new Float32Array([
+      -1, -1,   1, -1,   -1,  1,
+      -1,  1,   1, -1,    1,  1,
+    ]);
+
+    quadVBO = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadVBO);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    // Track mouse on canvas
+    glCanvas.addEventListener('mousemove', (e) => {
+      const r = glCanvas.getBoundingClientRect();
+      mouseX = (e.clientX - r.left) / r.width;
+      mouseY = 1.0 - (e.clientY - r.top) / r.height; // flip Y for GL
+    });
+
+    resizeCanvas();
+    return true;
+  }
+
+  /**
+   * Resize the WebGL canvas to match its CSS layout size.
+   */
+  function resizeCanvas() {
+    if (!glCanvas || !gl) return;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = glCanvas.getBoundingClientRect();
+    const w = Math.round(rect.width * dpr);
+    const h = Math.round(rect.height * dpr);
+    if (glCanvas.width !== w || glCanvas.height !== h) {
+      glCanvas.width = w;
+      glCanvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+  }
+
+  /**
+   * Compile a shader of the given type from source.
+   * Returns the compiled shader or null on error.
+   */
+  function compileShader(type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      const info = gl.getShaderInfoLog(shader);
+      gl.deleteShader(shader);
+      return { error: info };
+    }
+    return { shader };
+  }
+
+  /**
+   * Build a shader program from the user's fragment shader source.
+   * Returns { program } on success or { error } on failure.
+   */
+  function buildProgram(fragSource) {
+    const vs = compileShader(gl.VERTEX_SHADER, VERTEX_SHADER_SRC);
+    if (vs.error) return { error: 'Vertex shader error:\n' + vs.error };
+
+    const fs = compileShader(gl.FRAGMENT_SHADER, fragSource);
+    if (fs.error) {
+      gl.deleteShader(vs.shader);
+      return { error: fs.error };
+    }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs.shader);
+    gl.attachShader(program, fs.shader);
+    gl.linkProgram(program);
+
+    // Shaders no longer needed once linked
+    gl.deleteShader(vs.shader);
+    gl.deleteShader(fs.shader);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      const info = gl.getProgramInfoLog(program);
+      gl.deleteProgram(program);
+      return { error: 'Link error:\n' + info };
+    }
+
+    return { program };
+  }
+
+  /* ─── Error / Compile Status UI ─── */
+  const errorOverlay = $('#error-overlay');
+  const errorMessage = $('#error-message');
+  const compileStatus = $('#compile-status');
+
+  function showError(msg) {
+    if (errorOverlay) { errorOverlay.hidden = false; }
+    if (errorMessage) { errorMessage.textContent = msg; }
+    if (compileStatus) {
+      compileStatus.textContent = '● Error';
+      compileStatus.className = 'compile-badge compile-badge--error';
+    }
+  }
+
+  function clearError() {
+    if (errorOverlay) { errorOverlay.hidden = true; }
+    if (compileStatus) {
+      compileStatus.textContent = '● Compiled';
+      compileStatus.className = 'compile-badge compile-badge--ok';
+    }
+  }
+
+  /**
+   * Attempt to compile the current editor's shader and make it active.
+   */
+  function compileCurrentShader() {
+    if (!gl || !codeEditor) return;
+    const source = codeEditor.value;
+    const result = buildProgram(source);
+
+    if (result.error) {
+      showError(result.error);
+      return;
+    }
+
+    // Success: swap programs
+    if (currentProgram) gl.deleteProgram(currentProgram);
+    currentProgram = result.program;
+    clearError();
+  }
+
+  /**
+   * Render a single frame.
+   */
+  function renderFrame() {
+    if (!gl || !currentProgram) return;
+
+    resizeCanvas();
+
+    gl.useProgram(currentProgram);
+
+    // Pass uniforms
+    const uTime = gl.getUniformLocation(currentProgram, 'u_time');
+    const uRes  = gl.getUniformLocation(currentProgram, 'u_resolution');
+    const uMouse = gl.getUniformLocation(currentProgram, 'u_mouse');
+
+    const now = performance.now() / 1000 - startTime;
+    if (uTime)  gl.uniform1f(uTime, now);
+    if (uRes)   gl.uniform2f(uRes, glCanvas.width, glCanvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouseX, mouseY);
+
+    // Draw quad
+    const aPos = gl.getAttribLocation(currentProgram, 'a_position');
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadVBO);
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  }
+
+  /* ─── Animation Loop ─── */
+  let animId = null;
+
+  function loop() {
+    renderFrame();
+    animId = requestAnimationFrame(loop);
+  }
+
   /* ─── Boot ─── */
   function init() {
     initEditor();
     initDivider();
+
+    if (initWebGL()) {
+      compileCurrentShader();
+      loop();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
   }
 
   if (document.readyState === 'loading') {
