@@ -370,7 +370,7 @@ body::before {
 .highlight-layer {
   margin: 0;
   pointer-events: none;
-  color: transparent;
+  color: var(--text-primary);
   z-index: 1;
 }
 .highlight-layer code {
@@ -447,6 +447,9 @@ body::before {
   backdrop-filter: blur(6px);
   z-index: 6;
   animation: errorFadeIn 0.25s var(--ease-out);
+}
+.error-overlay[hidden] {
+  display: none;
 }
 @keyframes errorFadeIn {
   from { opacity: 0; }
