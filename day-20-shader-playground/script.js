@@ -101,10 +101,19 @@ void main() {
   }
 
   /* ─── Editor Input Handler ─── */
+  let compileTimer = null;
+  const DEBOUNCE_MS = 300;
+
   function onEditorInput() {
     updateLineNumbers();
     syncScroll();
     updateHighlight();
+
+    // Debounced shader recompilation
+    clearTimeout(compileTimer);
+    compileTimer = setTimeout(() => {
+      compileCurrentShader();
+    }, DEBOUNCE_MS);
   }
 
   /* ─── GLSL Syntax Highlighting ─── */
