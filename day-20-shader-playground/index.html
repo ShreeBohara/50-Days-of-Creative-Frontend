@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Day 20 — A live WebGL GLSL shader playground with split-view editor, real-time rendering, and 5 preset shaders."
+    />
+    <meta name="theme-color" content="#0a0a0f" />
+    <title>Day 20 | Shader Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="playground-shell">
+      <div class="playground-shell__inner">
+
+        <!-- ─── Toolbar ─── -->
+        <header class="toolbar" aria-label="Shader controls">
+          <div class="toolbar__left">
+            <a class="toolbar__back" href="../index.html" aria-label="Back to archive">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <div class="toolbar__brand">
+              <span class="toolbar__day">Day 20 / 50</span>
+              <h1 class="toolbar__title">Shader Playground</h1>
+            </div>
+          </div>
+
+          <div class="toolbar__center">
+            <label class="preset-selector" for="preset-select">
+              <span class="preset-selector__label">Preset</span>
+              <select id="preset-select" class="preset-selector__select">
+                <option value="plasma">Plasma Waves</option>
+                <option value="fractal">Mandelbrot Fractal</option>
+                <option value="raymarching">Raymarched Sphere</option>
+                <option value="voronoi">Voronoi Cells</option>
+                <option value="noise">Noise Terrain</option>
+              </select>
+              <svg class="preset-selector__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </label>
+          </div>
+
+          <div class="toolbar__right">
+            <button id="btn-copy" class="toolbar__btn" aria-label="Copy shader code" data-tooltip="Copy">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="currentColor" stroke-width="1.4"/>
+              </svg>
+              <span class="toolbar__btn-label">Copy</span>
+            </button>
+            <button id="btn-fullscreen" class="toolbar__btn" aria-label="Toggle fullscreen canvas" data-tooltip="Fullscreen">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 6V3a1 1 0 011-1h3M10 2h3a1 1 0 011 1v3M14 10v3a1 1 0 01-1 1h-3M6 14H3a1 1 0 01-1-1v-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="toolbar__btn-label">Fullscreen</span>
+            </button>
+            <span id="fps-counter" class="fps-badge" aria-label="Frames per second">60 FPS</span>
+          </div>
+        </header>
+
+        <!-- ─── Split Panels ─── -->
+        <div class="panels" id="panels">
+
+          <!-- Editor Panel -->
+          <section class="panel panel--editor" id="panel-editor" aria-label="GLSL code editor">
+            <div class="editor-header">
+              <span class="editor-header__dot editor-header__dot--red"></span>
+              <span class="editor-header__dot editor-header__dot--yellow"></span>
+              <span class="editor-header__dot editor-header__dot--green"></span>
+              <span class="editor-header__filename">fragment.glsl</span>
+              <span id="compile-status" class="compile-badge compile-badge--ok">● Compiled</span>
+            </div>
+            <div class="editor-wrap" id="editor-wrap">
+              <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
+              <div class="editor-layers">
+                <pre class="highlight-layer" id="highlight-layer" aria-hidden="true"><code id="highlight-code"></code></pre>
+                <textarea
+                  id="code-editor"
+                  class="code-textarea"
+                  spellcheck="false"
+                  autocomplete="off"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  data-gramm="false"
+                  aria-label="GLSL fragment shader source code"
+                ></textarea>
+              </div>
+            </div>
+          </section>
+
+          <!-- Draggable Divider -->
+          <div class="divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Resize panels" tabindex="0"></div>
+
+          <!-- Canvas Panel -->
+          <section class="panel panel--canvas" id="panel-canvas" aria-label="Shader render output">
+            <canvas id="gl-canvas" aria-label="WebGL shader output"></canvas>
+            <div id="error-overlay" class="error-overlay" hidden>
+              <div class="error-overlay__inner">
+                <span class="error-overlay__icon">⚠</span>
+                <p class="error-overlay__title">Compilation Error</p>
+                <pre id="error-message" class="error-overlay__msg"></pre>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
+
+      <!-- Toast notification -->
+      <div id="toast" class="toast" aria-live="polite"></div>
+
+    </main>
+
+    <noscript class="no-script">This experiment requires JavaScript enabled.</noscript>
+    <script src="./script.js"></script>
+  </body>
+</html>
