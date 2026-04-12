@@ -793,12 +793,85 @@ void main() {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
-  /* ─── Animation Loop ─── */
+  /* ─── Animation Loop with FPS Counter ─── */
   let animId = null;
+  const fpsCounter = $('#fps-counter');
+  let frameCount = 0;
+  let lastFpsTime = performance.now();
 
   function loop() {
     renderFrame();
+
+    // FPS counting
+    frameCount++;
+    const now = performance.now();
+    if (now - lastFpsTime >= 500) {
+      const fps = Math.round(frameCount / ((now - lastFpsTime) / 1000));
+      if (fpsCounter) fpsCounter.textContent = fps + ' FPS';
+      frameCount = 0;
+      lastFpsTime = now;
+    }
+
     animId = requestAnimationFrame(loop);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     Controls — Copy, Fullscreen, Keyboard
+     ═══════════════════════════════════════════════════════════════════ */
+
+  const btnCopy       = $('#btn-copy');
+  const btnFullscreen = $('#btn-fullscreen');
+  const toast         = $('#toast');
+  const panelCanvas   = $('#panel-canvas');
+
+  /** Show a toast message */
+  function showToast(msg) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  /** Copy shader code to clipboard */
+  async function copyShader() {
+    if (!codeEditor) return;
+    try {
+      await navigator.clipboard.writeText(codeEditor.value);
+      showToast('✓ Shader copied to clipboard');
+    } catch {
+      // Fallback
+      codeEditor.select();
+      document.execCommand('copy');
+      showToast('✓ Shader copied');
+    }
+  }
+
+  /** Toggle fullscreen on the canvas panel */
+  function toggleFullscreen() {
+    if (!panelCanvas) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      panelCanvas.requestFullscreen().catch(() => {});
+    }
+  }
+
+  function initControls() {
+    if (btnCopy)       btnCopy.addEventListener('click', copyShader);
+    if (btnFullscreen) btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + S → copy shader
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        copyShader();
+      }
+      // Escape → exit fullscreen
+      if (e.key === 'Escape' && document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    });
   }
 
   /* ─── Boot ─── */
@@ -806,6 +879,7 @@ void main() {
     initEditor();
     initDivider();
     initPresetSwitcher();
+    initControls();
 
     if (initWebGL()) {
       compileCurrentShader();
