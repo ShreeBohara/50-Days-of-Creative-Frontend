@@ -95,6 +95,92 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
+  /* Preset 3 — Raymarched Sphere: sphere with Phong lighting & soft shadows */
+  PRESETS.raymarching = `precision mediump float;
+
+uniform float u_time;
+uniform vec2  u_resolution;
+uniform vec2  u_mouse;
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+
+float sdPlane(vec3 p) { return p.y + 1.0; }
+
+float scene(vec3 p) {
+  float d = sdSphere(p - vec3(0.0, sin(u_time) * 0.3, 0.0), 1.0);
+  d = min(d, sdPlane(p));
+  return d;
+}
+
+vec3 calcNormal(vec3 p) {
+  vec2 e = vec2(0.001, 0.0);
+  return normalize(vec3(
+    scene(p + e.xyy) - scene(p - e.xyy),
+    scene(p + e.yxy) - scene(p - e.yxy),
+    scene(p + e.yyx) - scene(p - e.yyx)
+  ));
+}
+
+float softShadow(vec3 ro, vec3 rd, float k) {
+  float res = 1.0;
+  float t = 0.1;
+  for (int i = 0; i < 32; i++) {
+    float d = scene(ro + rd * t);
+    res = min(res, k * d / t);
+    if (d < 0.001) return 0.0;
+    t += d;
+  }
+  return clamp(res, 0.0, 1.0);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / u_resolution.y;
+
+  // Camera
+  vec3 ro = vec3(0.0, 0.5, 3.5);
+  vec3 rd = normalize(vec3(uv, -1.5));
+
+  // Light position follows mouse
+  vec3 lightPos = vec3((u_mouse.x - 0.5) * 6.0, 3.0 + u_mouse.y * 2.0, 2.0);
+
+  // Raymarching
+  float t = 0.0;
+  for (int i = 0; i < 80; i++) {
+    vec3 p = ro + rd * t;
+    float d = scene(p);
+    if (d < 0.001 || t > 20.0) break;
+    t += d;
+  }
+
+  vec3 col = vec3(0.05, 0.05, 0.12); // background
+
+  if (t < 20.0) {
+    vec3 p = ro + rd * t;
+    vec3 n = calcNormal(p);
+    vec3 l = normalize(lightPos - p);
+
+    // Phong shading
+    float diff = max(dot(n, l), 0.0);
+    vec3 h = normalize(l - rd);
+    float spec = pow(max(dot(n, h), 0.0), 32.0);
+    float sha = softShadow(p + n * 0.01, l, 16.0);
+
+    // Material color
+    vec3 matCol = p.y > -0.99
+      ? vec3(0.4, 0.6, 1.0)  // sphere: blue
+      : vec3(0.15 + 0.05 * mod(floor(p.x) + floor(p.z), 2.0)); // checker floor
+
+    col = matCol * (0.15 + diff * sha * 0.85) + vec3(1.0) * spec * sha * 0.6;
+
+    // Fog
+    col = mix(col, vec3(0.05, 0.05, 0.12), 1.0 - exp(-0.04 * t * t));
+  }
+
+  // Gamma
+  col = pow(col, vec3(0.4545));
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
   const DEFAULT_SHADER = PRESETS.plasma;
 
   /* ─── Line Numbers ─── */
