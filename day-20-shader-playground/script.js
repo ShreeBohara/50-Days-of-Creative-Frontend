@@ -107,11 +107,106 @@ void main() {
     updateHighlight();
   }
 
-  /* ─── Simple Syntax Highlighting (placeholder — enhanced in Part 3) ─── */
+  /* ─── GLSL Syntax Highlighting ─── */
+
+  // Token categories with CSS class names
+  const GLSL_TYPES = new Set([
+    'void','bool','int','uint','float','double',
+    'vec2','vec3','vec4','dvec2','dvec3','dvec4',
+    'bvec2','bvec3','bvec4','ivec2','ivec3','ivec4','uvec2','uvec3','uvec4',
+    'mat2','mat3','mat4','mat2x2','mat2x3','mat2x4','mat3x2','mat3x3','mat3x4','mat4x2','mat4x3','mat4x4',
+    'sampler1D','sampler2D','sampler3D','samplerCube','sampler2DShadow',
+    'sampler1DShadow','samplerCubeShadow',
+    'isampler2D','usampler2D',
+  ]);
+
+  const GLSL_KEYWORDS = new Set([
+    'attribute','const','uniform','varying','layout',
+    'centroid','flat','smooth','noperspective',
+    'break','continue','do','for','while','switch','case','default',
+    'if','else','in','out','inout',
+    'return','discard',
+    'lowp','mediump','highp','precision',
+    'struct','invariant','buffer','shared',
+  ]);
+
+  const GLSL_BUILTINS = new Set([
+    'radians','degrees','sin','cos','tan','asin','acos','atan',
+    'sinh','cosh','tanh','asinh','acosh','atanh',
+    'pow','exp','log','exp2','log2','sqrt','inversesqrt',
+    'abs','sign','floor','ceil','fract','mod','modf',
+    'min','max','clamp','mix','step','smoothstep',
+    'length','distance','dot','cross','normalize','faceforward',
+    'reflect','refract','matrixCompMult','outerProduct','transpose','determinant','inverse',
+    'lessThan','lessThanEqual','greaterThan','greaterThanEqual','equal','notEqual',
+    'any','all','not','texture','texture2D','textureCube','texture2DProj','textureLod',
+    'textureGrad','textureProj','textureSize','texelFetch',
+    'dFdx','dFdy','fwidth',
+    'gl_FragCoord','gl_FragColor','gl_Position','gl_PointSize','gl_FrontFacing',
+    'gl_PointCoord','gl_FragData','gl_FragDepth',
+    'main',
+  ]);
+
+  /**
+   * Escapes HTML special chars to prevent XSS in the highlight layer.
+   */
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /**
+   * Tokenizes and highlights GLSL source code.
+   * Returns HTML string with <span class="hl-*"> wrappers.
+   */
+  function highlightGLSL(source) {
+    // Regex-based tokenizer — order matters
+    const tokenRe = /\/\/[^\n]*|\/\*[\s\S]*?\*\/|#\s*\w+|[0-9]*\.[0-9]+(?:[eE][+-]?[0-9]+)?|[0-9]+\.?(?:[eE][+-]?[0-9]+)?|[a-zA-Z_]\w*|[{}()\[\];,=+\-*/<>!&|^~?:%.]|\S/g;
+
+    let result = '';
+    let lastIndex = 0;
+    let match;
+
+    while ((match = tokenRe.exec(source)) !== null) {
+      // Preserve whitespace between tokens
+      if (match.index > lastIndex) {
+        result += escapeHtml(source.substring(lastIndex, match.index));
+      }
+      lastIndex = match.index + match[0].length;
+
+      const tok = match[0];
+
+      if (tok.startsWith('//') || tok.startsWith('/*')) {
+        result += `<span class="hl-comment">${escapeHtml(tok)}</span>`;
+      } else if (tok.startsWith('#')) {
+        result += `<span class="hl-preproc">${escapeHtml(tok)}</span>`;
+      } else if (/^[0-9]/.test(tok) || /^\.[0-9]/.test(tok)) {
+        result += `<span class="hl-number">${escapeHtml(tok)}</span>`;
+      } else if (GLSL_TYPES.has(tok)) {
+        result += `<span class="hl-type">${escapeHtml(tok)}</span>`;
+      } else if (GLSL_KEYWORDS.has(tok)) {
+        result += `<span class="hl-keyword">${escapeHtml(tok)}</span>`;
+      } else if (GLSL_BUILTINS.has(tok)) {
+        result += `<span class="hl-builtin">${escapeHtml(tok)}</span>`;
+      } else {
+        result += escapeHtml(tok);
+      }
+    }
+
+    // Remaining text
+    if (lastIndex < source.length) {
+      result += escapeHtml(source.substring(lastIndex));
+    }
+
+    return result;
+  }
+
   function updateHighlight() {
     if (!highlightCode || !codeEditor) return;
-    // For now, just mirror the text (no coloring yet)
-    highlightCode.textContent = codeEditor.value;
+    highlightCode.innerHTML = highlightGLSL(codeEditor.value);
   }
 
   /* ─── Initialize Editor ─── */

@@ -520,3 +520,11 @@ body::before {
   font-family: var(--font-ui);
   font-size: 16px;
 }
+
+/* ─── Syntax Highlighting Colors ─── */
+.hl-keyword  { color: #c084fc; }                /* Soft magenta/purple */
+.hl-type     { color: #22d3ee; }                /* Bright cyan */
+.hl-builtin  { color: #fb923c; }                /* Warm orange */
+.hl-number   { color: #4ade80; }                /* Fresh green */
+.hl-comment  { color: #475569; font-style: italic; } /* Muted slate */
+.hl-preproc  { color: #fbbf24; }                /* Amber/yellow */
