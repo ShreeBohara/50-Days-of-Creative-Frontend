@@ -282,7 +282,7 @@ function CategoryDonutChart({ data }) {
   )
 }
 
-/* ── Stacked Area Chart ── */
+/* ── Stacked Area Chart with gradient fills ── */
 function StackedArea({ data }) {
   return (
     <motion.div
@@ -296,6 +296,7 @@ function StackedArea({ data }) {
           <h3 className="chart-card-title">Traffic Sources</h3>
           <p className="chart-card-subtitle">Hourly breakdown by source</p>
         </div>
+        <span className="chart-time-badge">Last 24h</span>
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <AreaChart data={data}>
