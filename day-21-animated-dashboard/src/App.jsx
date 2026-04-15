@@ -86,8 +86,9 @@ function StatCard({ stat, index, pulse }) {
     <motion.div
       className={`stat-card ${pulse ? 'pulse' : ''}`}
       style={{ '--card-accent': stat.color }}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
     >
       <div className="stat-card-header">
