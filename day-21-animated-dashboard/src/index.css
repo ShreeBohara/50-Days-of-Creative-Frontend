@@ -380,6 +380,11 @@ body {
   font-size: 14px;
 }
 
+.last-updated {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 /* ── Stat Cards ── */
 
 .stat-cards {

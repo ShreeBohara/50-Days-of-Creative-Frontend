@@ -464,6 +464,7 @@ function App() {
   const [categoryData, setCategoryData] = useState(generateCategoryData)
   const [areaData] = useState(generateAreaData)
   const [pulsing, setPulsing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState(new Date())
 
   /* ── Live data refresh every 2 seconds ── */
   useEffect(() => {
@@ -500,6 +501,7 @@ function App() {
 
       // Pulse effect
       setPulsing(true)
+      setLastUpdated(new Date())
       setTimeout(() => setPulsing(false), 600)
     }, 2000)
 
@@ -595,7 +597,12 @@ function App() {
       <main className="main-content">
         <div className="page-header">
           <h1>{NAV_ITEMS.find((n) => n.id === activePage)?.label}</h1>
-          <p className="page-subtitle">Welcome back — here's what's happening today.</p>
+          <p className="page-subtitle">
+            Welcome back — here's what's happening today.
+            {activePage === 'dashboard' && (
+              <span className="last-updated"> · Updated {lastUpdated.toLocaleTimeString()}</span>
+            )}
+          </p>
         </div>
 
         <AnimatePresence mode="wait">
