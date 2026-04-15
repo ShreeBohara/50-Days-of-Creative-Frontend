@@ -175,7 +175,7 @@ function LiveLineChart({ data }) {
   )
 }
 
-/* ── Monthly Bar Chart ── */
+/* ── Monthly Bar Chart with gradient fills ── */
 function MonthlyBarChart({ data }) {
   return (
     <motion.div
@@ -192,6 +192,16 @@ function MonthlyBarChart({ data }) {
       </div>
       <ResponsiveContainer width="100%" height={240}>
         <BarChart data={data} barGap={4}>
+          <defs>
+            <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#00d4ff" stopOpacity={1} />
+              <stop offset="100%" stopColor="#00d4ff" stopOpacity={0.6} />
+            </linearGradient>
+            <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#7c3aed" stopOpacity={1} />
+              <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.6} />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="month" tick={{ fontSize: 10 }} />
           <YAxis tick={{ fontSize: 11 }} width={40} />
@@ -199,14 +209,14 @@ function MonthlyBarChart({ data }) {
           <Bar
             dataKey="thisYear"
             name="2026"
-            fill="#00d4ff"
+            fill="url(#barGrad1)"
             radius={[4, 4, 0, 0]}
             animationDuration={800}
           />
           <Bar
             dataKey="lastYear"
             name="2025"
-            fill="#7c3aed"
+            fill="url(#barGrad2)"
             radius={[4, 4, 0, 0]}
             animationDuration={800}
           />
