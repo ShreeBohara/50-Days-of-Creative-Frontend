@@ -22,10 +22,11 @@ const NAV_ITEMS = [
 
 /* ── FAB actions ── */
 const FAB_ACTIONS = [
-  { icon: '➕', label: 'Add Widget', angle: -90 },
-  { icon: '📤', label: 'Export', angle: -135 },
-  { icon: '🔄', label: 'Refresh', angle: -180 },
-  { icon: '⚙️', label: 'Settings', angle: -45 },
+  { icon: '➕', label: 'Add Widget', angle: -60 },
+  { icon: '📤', label: 'Export', angle: -105 },
+  { icon: '🔄', label: 'Refresh', angle: -150 },
+  { icon: '⚙️', label: 'Settings', angle: -195 },
+  { icon: '❓', label: 'Help', angle: -240 },
 ]
 
 /* ── Custom useCountUp hook ── */
