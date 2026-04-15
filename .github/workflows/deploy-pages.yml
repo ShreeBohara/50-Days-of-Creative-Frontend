@@ -27,6 +27,7 @@ on:
       - "day-18-nbody-gravity/**"
       - "day-19-signal-atlas/**"
       - "day-20-shader-playground/**"
+      - "day-21-animated-dashboard/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -55,7 +56,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: day-03-solar-system/package-lock.json
+          cache-dependency-path: |
+            day-03-solar-system/package-lock.json
+            day-21-animated-dashboard/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -63,6 +66,14 @@ jobs:
 
       - name: Build Day 03 app
         working-directory: day-03-solar-system
+        run: npm run build
+
+      - name: Install Day 21 app dependencies
+        working-directory: day-21-animated-dashboard
+        run: npm ci
+
+      - name: Build Day 21 app
+        working-directory: day-21-animated-dashboard
         run: npm run build
 
       - name: Configure GitHub Pages
@@ -93,6 +104,8 @@ jobs:
           cp -R day-20-shader-playground _site/
           mkdir -p _site/day-03-solar-system
           cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
+          mkdir -p _site/day-21-animated-dashboard
+          cp -R day-21-animated-dashboard/dist/. _site/day-21-animated-dashboard/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
