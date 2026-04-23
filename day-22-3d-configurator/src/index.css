@@ -1,0 +1,66 @@
+/* ── Day 22 — 3D Product Configurator ── */
+/* Global reset & design tokens              */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Neutral palette */
+  --bg-dark: #0a0a0f;
+  --bg-light: #f0f0f5;
+  --surface-dark: rgba(255, 255, 255, 0.06);
+  --surface-light: rgba(0, 0, 0, 0.04);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.3);
+
+  /* Accent */
+  --accent: #6c63ff;
+  --accent-glow: rgba(108, 99, 255, 0.35);
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-blur: 24px;
+
+  /* Spacing */
+  --panel-width: 340px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  /* Typography */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-dark);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  color: inherit;
+}
+
+input {
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
