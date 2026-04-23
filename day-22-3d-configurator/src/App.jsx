@@ -11,6 +11,7 @@ export default function App() {
   const [selectedPart, setSelectedPart] = useState('upper')
   const [partColors, setPartColors] = useState({ ...DEFAULT_COLORS })
   const [partMaterials, setPartMaterials] = useState({})
+  const [cameraPreset, setCameraPreset] = useState('quarter')
 
   const handleColorChange = useCallback((part, color) => {
     setPartColors((prev) => ({ ...prev, [part]: color }))
@@ -26,7 +27,7 @@ export default function App() {
 
   return (
     <div className="app-shell" style={{ width: '100vw', height: '100vh', background: 'var(--bg-dark)' }}>
-      <Scene>
+      <Scene cameraPreset={cameraPreset}>
         <SneakerModel
           partColors={partColors}
           partMaterials={partMaterials}
@@ -42,6 +43,8 @@ export default function App() {
         onColorChange={handleColorChange}
         partMaterials={partMaterials}
         onMaterialChange={handleMaterialChange}
+        cameraPreset={cameraPreset}
+        onCameraPreset={setCameraPreset}
       />
     </div>
   )

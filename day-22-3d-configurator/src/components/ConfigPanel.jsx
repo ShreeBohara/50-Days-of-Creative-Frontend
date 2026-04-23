@@ -3,6 +3,7 @@
  * Manages: part selection, color swatches, material toggles, camera presets, screenshot
  */
 import { PART_NAMES, DEFAULT_COLORS } from './SneakerModel'
+import { CAMERA_PRESETS } from './CameraRig'
 import './ConfigPanel.css'
 
 const PRESET_COLORS = [
@@ -25,6 +26,8 @@ export default function ConfigPanel({
   onColorChange,
   partMaterials,
   onMaterialChange,
+  cameraPreset,
+  onCameraPreset,
 }) {
   const currentColor = partColors[selectedPart] || DEFAULT_COLORS[selectedPart] || '#ffffff'
   const currentMaterial = partMaterials[selectedPart] || 'matte'
@@ -118,6 +121,25 @@ export default function ConfigPanel({
                 {mat === 'matte' ? '◉' : mat === 'glossy' ? '◈' : '◆'}
               </span>
               {mat.charAt(0).toUpperCase() + mat.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="panel-divider" />
+
+      {/* Camera presets */}
+      <div className="panel-section">
+        <div className="section-label">Camera Angle</div>
+        <div className="camera-presets">
+          {Object.entries(CAMERA_PRESETS).map(([key, { label }]) => (
+            <button
+              key={key}
+              className={`camera-btn ${cameraPreset === key ? 'active' : ''}`}
+              onClick={() => onCameraPreset(key)}
+              id={`camera-${key}`}
+            >
+              {label}
             </button>
           ))}
         </div>

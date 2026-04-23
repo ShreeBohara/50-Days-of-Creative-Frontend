@@ -3,6 +3,7 @@
  */
 import { Canvas } from '@react-three/fiber'
 import { Environment, ContactShadows, OrbitControls } from '@react-three/drei'
+import CameraRig from './CameraRig'
 
 function StudioLights() {
   return (
@@ -33,7 +34,7 @@ function StudioLights() {
   )
 }
 
-export default function Scene({ children }) {
+export default function Scene({ children, cameraPreset }) {
   return (
     <Canvas
       camera={{ position: [4, 2, 5], fov: 40, near: 0.1, far: 100 }}
@@ -80,8 +81,12 @@ export default function Scene({ children }) {
         makeDefault
       />
 
+      {/* Smooth camera preset tweening */}
+      <CameraRig targetPreset={cameraPreset} />
+
       {/* 3D model and controls will be injected as children */}
       {children}
     </Canvas>
   )
 }
+
