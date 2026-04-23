@@ -2,7 +2,7 @@
  * Scene.jsx — R3F Canvas with studio lighting, environment, and shadows
  */
 import { Canvas } from '@react-three/fiber'
-import { Environment, ContactShadows } from '@react-three/drei'
+import { Environment, ContactShadows, OrbitControls } from '@react-three/drei'
 
 function StudioLights() {
   return (
@@ -67,6 +67,18 @@ export default function Scene({ children }) {
           metalness={0.1}
         />
       </mesh>
+
+      {/* Orbit controls with auto-rotate */}
+      <OrbitControls
+        autoRotate
+        autoRotateSpeed={0.5}
+        enablePan={false}
+        minDistance={3}
+        maxDistance={10}
+        minPolarAngle={Math.PI * 0.15}
+        maxPolarAngle={Math.PI * 0.48}
+        makeDefault
+      />
 
       {/* 3D model and controls will be injected as children */}
       {children}
