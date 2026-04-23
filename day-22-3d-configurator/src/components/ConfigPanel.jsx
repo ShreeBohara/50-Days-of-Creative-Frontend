@@ -35,6 +35,9 @@ export default function ConfigPanel({
 
   return (
     <aside className="config-panel" id="config-panel">
+      {/* Mobile pull tab */}
+      <div className="panel-pull-tab" />
+
       {/* Header */}
       <div className="panel-header">
         <div className="panel-title">Configure</div>
