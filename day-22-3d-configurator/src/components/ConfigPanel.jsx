@@ -28,6 +28,7 @@ export default function ConfigPanel({
   onMaterialChange,
   cameraPreset,
   onCameraPreset,
+  onScreenshot,
 }) {
   const currentColor = partColors[selectedPart] || DEFAULT_COLORS[selectedPart] || '#ffffff'
   const currentMaterial = partMaterials[selectedPart] || 'matte'
@@ -143,6 +144,15 @@ export default function ConfigPanel({
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="panel-divider" />
+
+      {/* Actions */}
+      <div className="action-row">
+        <button className="action-btn" onClick={onScreenshot} id="screenshot-btn">
+          📸 Screenshot
+        </button>
       </div>
     </aside>
   )

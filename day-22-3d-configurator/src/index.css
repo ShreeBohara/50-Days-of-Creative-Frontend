@@ -64,3 +64,9 @@ input {
   border: none;
   outline: none;
 }
+
+/* Screenshot flash animation */
+@keyframes flashFade {
+  0% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
