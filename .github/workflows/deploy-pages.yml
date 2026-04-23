@@ -28,6 +28,7 @@ on:
       - "day-19-signal-atlas/**"
       - "day-20-shader-playground/**"
       - "day-21-animated-dashboard/**"
+      - "day-22-3d-configurator/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -59,6 +60,7 @@ jobs:
           cache-dependency-path: |
             day-03-solar-system/package-lock.json
             day-21-animated-dashboard/package-lock.json
+            day-22-3d-configurator/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -74,6 +76,14 @@ jobs:
 
       - name: Build Day 21 app
         working-directory: day-21-animated-dashboard
+        run: npm run build
+
+      - name: Install Day 22 app dependencies
+        working-directory: day-22-3d-configurator
+        run: npm ci
+
+      - name: Build Day 22 app
+        working-directory: day-22-3d-configurator
         run: npm run build
 
       - name: Configure GitHub Pages
@@ -106,6 +116,8 @@ jobs:
           cp -R day-03-solar-system/dist/. _site/day-03-solar-system/
           mkdir -p _site/day-21-animated-dashboard
           cp -R day-21-animated-dashboard/dist/. _site/day-21-animated-dashboard/
+          mkdir -p _site/day-22-3d-configurator
+          cp -R day-22-3d-configurator/dist/. _site/day-22-3d-configurator/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

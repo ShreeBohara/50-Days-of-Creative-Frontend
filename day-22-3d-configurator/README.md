@@ -1,16 +1,40 @@
-# React + Vite
+# Day 22 — 3D Product Configurator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A real-time 3D sneaker configurator built with React Three Fiber. Customize colors, materials, and camera angles — all in a studio-lit environment.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **3D Sneaker Model** — Built entirely from Three.js primitives (no external model files)
+- **Part Selection** — Click any part on the model or pick from the panel to customize
+- **8 Preset Colors** — Plus custom color picker and hex input
+- **Material Switching** — Matte, Glossy, and Metallic finishes with smooth animated transitions
+- **Camera Presets** — Front, Side, Top, and 3/4 View with smooth tweening
+- **Screenshot Capture** — Download your custom sneaker as a PNG
+- **Studio Lighting** — HDRI environment, three-point lighting, contact shadows
+- **Auto-Rotate** — Idle rotation that pauses on interaction
+- **Loading Screen** — Animated progress bar while assets load
+- **Responsive** — Mobile drawer panel with compact controls
 
-## React Compiler
+## 🛠 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Tech | Purpose |
+|------|---------|
+| React | UI components |
+| React Three Fiber | 3D rendering |
+| Drei | R3F helpers (OrbitControls, Environment, ContactShadows) |
+| Three.js | 3D primitives, materials, lighting |
+| Vite | Build tool |
 
-## Expanding the ESLint configuration
+## 🚀 Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## 📦 Build
+
+```bash
+npm run build
+npm run preview
+```
