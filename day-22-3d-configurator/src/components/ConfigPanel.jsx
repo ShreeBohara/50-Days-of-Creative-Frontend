@@ -114,6 +114,9 @@ export default function ConfigPanel({
               onClick={() => selectedPart && onMaterialChange(selectedPart, mat)}
               id={`material-${mat}`}
             >
+              <span className="material-icon">
+                {mat === 'matte' ? '◉' : mat === 'glossy' ? '◈' : '◆'}
+              </span>
               {mat.charAt(0).toUpperCase() + mat.slice(1)}
             </button>
           ))}
