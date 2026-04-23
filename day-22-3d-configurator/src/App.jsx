@@ -2,10 +2,11 @@
  * Day 22 — 3D Product Configurator
  * Main application shell — Scene + ConfigPanel + full state management
  */
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, Suspense } from 'react'
 import Scene from './components/Scene'
 import SneakerModel, { DEFAULT_COLORS } from './components/SneakerModel'
 import ConfigPanel from './components/ConfigPanel'
+import Loader from './components/Loader'
 
 export default function App() {
   const [selectedPart, setSelectedPart] = useState('upper')
@@ -49,14 +50,19 @@ export default function App() {
       {/* Canvas container — ref for screenshot access */}
       <div ref={canvasContainerRef} style={{ width: '100%', height: '100%' }}>
         <Scene cameraPreset={cameraPreset}>
-          <SneakerModel
-            partColors={partColors}
-            partMaterials={partMaterials}
-            selectedPart={selectedPart}
-            onPartClick={handlePartClick}
-          />
+          <Suspense fallback={null}>
+            <SneakerModel
+              partColors={partColors}
+              partMaterials={partMaterials}
+              selectedPart={selectedPart}
+              onPartClick={handlePartClick}
+            />
+          </Suspense>
         </Scene>
       </div>
+
+      {/* Loading screen overlay */}
+      <Loader />
 
       {/* Camera flash overlay */}
       {flashVisible && (

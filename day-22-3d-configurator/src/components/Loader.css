@@ -1,0 +1,62 @@
+/* ── Loader — animated loading screen ── */
+
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  transition: opacity 0.6s ease-out;
+}
+
+.loader-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sneaker silhouette pulse */
+.loader-icon {
+  font-size: 56px;
+  margin-bottom: 28px;
+  animation: loaderPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loaderPulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+/* Progress bar container */
+.loader-progress-track {
+  width: 200px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.loader-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #a78bfa);
+  border-radius: 4px;
+  transition: width 0.3s ease-out;
+}
+
+/* Loading text */
+.loader-text {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  animation: loaderTextFade 2s ease-in-out infinite;
+}
+
+@keyframes loaderTextFade {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
