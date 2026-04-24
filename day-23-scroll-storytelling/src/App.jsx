@@ -6,6 +6,7 @@ import HorizontalScroll from './components/HorizontalScroll';
 import ImageReveal from './components/ImageReveal';
 import ParallaxLayers from './components/ParallaxLayers';
 import TextReveal from './components/TextReveal';
+import ComparisonSlider from './components/ComparisonSlider';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <ImageReveal />
         <ParallaxLayers />
         <TextReveal />
+        <ComparisonSlider />
       </div>
     </SmoothScroll>
   );
