@@ -10,11 +10,13 @@ import ComparisonSlider from './components/ComparisonSlider';
 import FeatureGrid from './components/FeatureGrid';
 import Timeline from './components/Timeline';
 import FinalCTA from './components/FinalCTA';
+import ProgressBar from './components/ProgressBar';
 import './App.css';
 
 function App() {
   return (
     <SmoothScroll>
+      <ProgressBar />
       <div className="app-container">
         <Hero />
         <Stats />
