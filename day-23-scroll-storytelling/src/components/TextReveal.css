@@ -1,0 +1,32 @@
+.text-reveal-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color);
+  padding: 0 5vw;
+}
+
+.text-reveal-container {
+  max-width: 1200px;
+}
+
+.reveal-line {
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.reveal-line-inner {
+  font-size: 5vw;
+  font-weight: 300;
+  color: var(--text-color);
+  line-height: 1.1;
+  will-change: transform, opacity;
+  transform-origin: left bottom;
+}
+
+@media (max-width: 768px) {
+  .reveal-line-inner {
+    font-size: 8vw;
+  }
+}
