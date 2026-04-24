@@ -9,6 +9,7 @@ import TextReveal from './components/TextReveal';
 import ComparisonSlider from './components/ComparisonSlider';
 import FeatureGrid from './components/FeatureGrid';
 import Timeline from './components/Timeline';
+import FinalCTA from './components/FinalCTA';
 import './App.css';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <ComparisonSlider />
         <FeatureGrid />
         <Timeline />
+        <FinalCTA />
       </div>
     </SmoothScroll>
   );
