@@ -7,6 +7,8 @@ import ImageReveal from './components/ImageReveal';
 import ParallaxLayers from './components/ParallaxLayers';
 import TextReveal from './components/TextReveal';
 import ComparisonSlider from './components/ComparisonSlider';
+import FeatureGrid from './components/FeatureGrid';
+import Timeline from './components/Timeline';
 import './App.css';
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
         <ParallaxLayers />
         <TextReveal />
         <ComparisonSlider />
+        <FeatureGrid />
+        <Timeline />
       </div>
     </SmoothScroll>
   );

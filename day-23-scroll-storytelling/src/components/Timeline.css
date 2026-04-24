@@ -1,0 +1,120 @@
+.timeline-section {
+  padding: 10rem 5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--bg-color);
+}
+
+.timeline-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin-top: 4rem;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(-50%);
+  transform-origin: top center;
+  will-change: transform;
+}
+
+.timeline-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--accent-color);
+}
+
+.timeline-event {
+  position: relative;
+  width: 50%;
+  padding: 2rem 4rem;
+  will-change: transform, opacity;
+}
+
+.timeline-event.left {
+  left: 0;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timeline-event.right {
+  left: 50%;
+  text-align: left;
+}
+
+.event-dot {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: var(--bg-color);
+  border: 4px solid var(--accent-color);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.timeline-event.left .event-dot {
+  right: -10px;
+}
+
+.timeline-event.right .event-dot {
+  left: -10px;
+}
+
+.event-content {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 300px;
+  backdrop-filter: blur(10px);
+}
+
+.event-year {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.event-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .timeline-line {
+    left: 20px;
+  }
+  .timeline-event {
+    width: 100%;
+    padding: 2rem 0 2rem 50px;
+  }
+  .timeline-event.left, .timeline-event.right {
+    left: 0;
+    text-align: left;
+    justify-content: flex-start;
+  }
+  .timeline-event.left .event-dot, .timeline-event.right .event-dot {
+    left: 10px;
+    right: auto;
+  }
+  .event-content {
+    max-width: 100%;
+  }
+}
