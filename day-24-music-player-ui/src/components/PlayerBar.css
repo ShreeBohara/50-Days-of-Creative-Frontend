@@ -1,0 +1,226 @@
+/* ───────── Player Bar ───────── */
+.player-bar {
+  grid-area: player;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-base);
+  border-top: 1px solid var(--divider);
+  padding: 0 16px;
+  height: 90px;
+  z-index: 100;
+}
+
+/* ── Left — Song Info ── */
+.player-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+  max-width: 280px;
+  flex: 1;
+}
+
+.player-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-art-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+  cursor: pointer;
+}
+.player-art-btn:hover {
+  transform: scale(1.05);
+}
+.player-art-btn.spinning .player-art {
+  animation: spin-art 4s linear infinite;
+}
+
+.player-art {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.player-art-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.player-song-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.player-song-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.player-song-title.empty {
+  color: var(--text-secondary);
+}
+
+.player-song-artist {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes spin-art {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Center — Controls + Progress ── */
+.player-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  max-width: 720px;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-btn {
+  display: grid;
+  place-items: center;
+  transition: all var(--transition-fast);
+  color: var(--text-secondary);
+}
+.control-btn:hover {
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+.control-btn:active {
+  transform: scale(0.95);
+}
+.control-btn.small {
+  width: 32px;
+  height: 32px;
+}
+.control-btn.active {
+  color: var(--accent);
+  position: relative;
+}
+.control-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.play-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--text-primary);
+  color: var(--bg-base);
+  border-radius: var(--radius-full);
+}
+.play-btn:hover {
+  transform: scale(1.08);
+  color: var(--bg-base);
+}
+
+/* ── Progress Row ── */
+.player-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.player-time {
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: center;
+}
+
+/* ── Right — Volume ── */
+.player-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 160px;
+  justify-content: flex-end;
+  flex: 1;
+  max-width: 200px;
+}
+
+.volume-slider-container {
+  position: relative;
+  width: 100px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-active);
+  cursor: pointer;
+}
+
+.volume-slider {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+.volume-slider-container:hover .volume-slider::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.volume-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--text-primary);
+  pointer-events: none;
+  transition: background var(--transition-fast);
+}
+.volume-slider-container:hover .volume-fill {
+  background: var(--accent);
+}

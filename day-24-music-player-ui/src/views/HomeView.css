@@ -1,0 +1,76 @@
+/* ───────── Home View ───────── */
+.home-view {
+  padding-bottom: 32px;
+}
+
+.home-greeting {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+/* ── Quick Picks Grid ── */
+.quick-picks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 40px;
+}
+
+.quick-pick-card {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  height: 64px;
+  transition: background var(--transition-normal);
+  cursor: pointer;
+  text-align: left;
+}
+.quick-pick-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.quick-pick-art {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.quick-pick-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 0 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Section ── */
+.home-section {
+  margin-bottom: 40px;
+}
+
+.home-section-title {
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.home-scroll-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+}
+.home-scroll-row::-webkit-scrollbar {
+  height: 0;
+}
+.home-scroll-row > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
