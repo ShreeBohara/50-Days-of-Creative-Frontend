@@ -1,0 +1,35 @@
+/* ───────── Mobile Nav ───────── */
+.mobile-nav {
+  display: none;
+  grid-area: mobilenav;
+  background: var(--bg-base);
+  border-top: 1px solid var(--divider);
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 16px;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex;
+  }
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 12px;
+  font-size: 0.625rem;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.mobile-nav-item.active {
+  color: var(--text-primary);
+}
+
+.mobile-nav-item:hover {
+  color: var(--text-primary);
+}

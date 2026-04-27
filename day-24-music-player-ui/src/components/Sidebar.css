@@ -150,3 +150,37 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── Tablet: icons only ── */
+@media (max-width: 1024px) {
+  .sidebar-nav-item span,
+  .library-title span,
+  .library-item-info,
+  .library-add {
+    display: none;
+  }
+  .sidebar-nav-item {
+    justify-content: center;
+    padding: 10px;
+  }
+  .library-header {
+    justify-content: center;
+  }
+  .library-item {
+    justify-content: center;
+    padding: 6px;
+  }
+  .library-item-art,
+  .liked-songs-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ── Mobile: hide sidebar ── */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+

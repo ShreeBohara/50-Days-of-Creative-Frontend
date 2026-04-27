@@ -1,6 +1,7 @@
 import { AnimatePresence } from 'framer-motion';
 import { PlayerProvider, usePlayer } from './context/PlayerContext';
 import Sidebar from './components/Sidebar';
+import MobileNav from './components/MobileNav';
 import PlayerBar from './components/PlayerBar';
 import NowPlayingView from './views/NowPlayingView';
 import HomeView from './views/HomeView';
@@ -27,6 +28,7 @@ function App() {
           <MainContent />
         </main>
         <PlayerBar />
+        <MobileNav />
         <NowPlayingOverlay />
       </div>
     </PlayerProvider>

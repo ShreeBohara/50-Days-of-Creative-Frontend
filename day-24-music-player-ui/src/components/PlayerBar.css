@@ -224,3 +224,40 @@
 .volume-slider-container:hover .volume-fill {
   background: var(--accent);
 }
+
+/* ── Mobile: compact player ── */
+@media (max-width: 768px) {
+  .player-bar {
+    height: 72px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .player-left {
+    min-width: 0;
+    max-width: none;
+    flex: 1;
+  }
+  .player-art-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .player-center {
+    flex: 0;
+  }
+  .player-controls {
+    gap: 4px;
+  }
+  .control-btn.small {
+    display: none;
+  }
+  .player-progress-row {
+    display: none;
+  }
+  .player-right {
+    display: none;
+  }
+  .player-song-info {
+    max-width: 120px;
+  }
+}
+
