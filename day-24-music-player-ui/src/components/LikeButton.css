@@ -1,0 +1,21 @@
+/* ───────── Like Button ───────── */
+.like-btn {
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.track-row:hover .like-btn,
+.like-btn.liked {
+  opacity: 1;
+}
+
+.like-btn:hover {
+  color: var(--text-primary);
+}
+
+.like-btn.liked {
+  color: var(--accent);
+}
