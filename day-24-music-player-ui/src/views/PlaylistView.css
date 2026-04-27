@@ -1,0 +1,121 @@
+/* ───────── Playlist View ───────── */
+.playlist-view {
+  margin: -24px -32px;
+  padding-bottom: 32px;
+}
+
+/* ── Header ── */
+.playlist-header {
+  position: relative;
+  padding: 80px 32px 32px;
+}
+
+.playlist-back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.4);
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+  transition: background var(--transition-fast);
+}
+.playlist-back-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.playlist-header-content {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.playlist-header-art {
+  width: 192px;
+  height: 192px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  flex-shrink: 0;
+}
+
+.playlist-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.playlist-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.playlist-title {
+  font-size: 3rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.playlist-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.playlist-meta {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+/* ── Actions ── */
+.playlist-actions {
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.playlist-play-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+  transition: background var(--transition-fast);
+}
+.playlist-play-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* ── Track List ── */
+.playlist-track-list {
+  padding: 0 32px;
+}
+
+.track-list-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 80px;
+  gap: 16px;
+  padding: 0 16px 8px;
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.track-col-num {
+  text-align: center;
+}
+.track-col-duration {
+  text-align: right;
+}
