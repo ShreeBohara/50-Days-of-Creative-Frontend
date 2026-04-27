@@ -74,3 +74,41 @@
   scroll-snap-align: start;
   flex-shrink: 0;
 }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .quick-picks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .home-greeting {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+  .quick-picks-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .quick-pick-card {
+    height: 56px;
+  }
+  .quick-pick-art {
+    width: 56px;
+    height: 56px;
+  }
+  .quick-pick-title {
+    font-size: 0.8125rem;
+    padding: 0 10px;
+  }
+  .home-section {
+    margin-bottom: 24px;
+  }
+  .home-section-title {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+}
+
