@@ -30,6 +30,7 @@ on:
       - "day-21-animated-dashboard/**"
       - "day-22-3d-configurator/**"
       - "day-23-scroll-storytelling/**"
+      - "day-24-music-player-ui/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -63,6 +64,7 @@ jobs:
             day-21-animated-dashboard/package-lock.json
             day-22-3d-configurator/package-lock.json
             day-23-scroll-storytelling/package-lock.json
+            day-24-music-player-ui/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -94,6 +96,14 @@ jobs:
 
       - name: Build Day 23 app
         working-directory: day-23-scroll-storytelling
+        run: npm run build
+
+      - name: Install Day 24 app dependencies
+        working-directory: day-24-music-player-ui
+        run: npm ci
+
+      - name: Build Day 24 app
+        working-directory: day-24-music-player-ui
         run: npm run build
 
       - name: Configure GitHub Pages
@@ -130,6 +140,8 @@ jobs:
           cp -R day-22-3d-configurator/dist/. _site/day-22-3d-configurator/
           mkdir -p _site/day-23-scroll-storytelling
           cp -R day-23-scroll-storytelling/dist/. _site/day-23-scroll-storytelling/
+          mkdir -p _site/day-24-music-player-ui
+          cp -R day-24-music-player-ui/dist/. _site/day-24-music-player-ui/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
