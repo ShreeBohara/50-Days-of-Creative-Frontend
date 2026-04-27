@@ -6,6 +6,8 @@ import {
   Volume2, Volume1, VolumeX,
 } from 'lucide-react';
 import WaveformProgress from './WaveformProgress';
+import MarqueeText from './MarqueeText';
+import LikeButton from './LikeButton';
 import './PlayerBar.css';
 
 export default function PlayerBar() {
@@ -57,9 +59,10 @@ export default function PlayerBar() {
               />
             </button>
             <div className="player-song-info">
-              <span className="player-song-title">{currentTrack.title}</span>
+              <MarqueeText text={currentTrack.title} className="player-song-title" />
               <span className="player-song-artist">{currentTrack.artist}</span>
             </div>
+            <LikeButton songId={currentTrack.id} size={16} />
           </>
         ) : (
           <div className="player-empty">
