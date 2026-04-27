@@ -1,16 +1,40 @@
-# React + Vite
+# Day 24 — Spotify-Style Music Player UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fully designed Spotify-like music player interface built with React, featuring animated album art, a waveform progress bar, playlist management, smooth page transitions, and a vinyl record Now Playing view.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Dark Spotify Theme** — True dark `#121212` background with green `#1DB954` accent
+- **Home View** — Time-based greeting, quick picks grid, horizontal scroll album rows
+- **Playlist View** — Gradient header from album colors, track list with hover states
+- **Now Playing** — Full-screen overlay with spinning vinyl record and blurred background
+- **Waveform Progress** — 80-bar generated waveform visualization with click-to-seek
+- **Web Audio** — Real oscillator tone on play/pause (subtle sine wave)
+- **Micro-interactions** — Like heart bounce, marquee text, equalizer animation
+- **Responsive** — Mobile bottom nav, compact player bar, tablet collapsed sidebar
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Tech | Purpose |
+|------|---------|
+| React 19 | Component architecture |
+| Vite 8 | Build tool |
+| Framer Motion | Animations & page transitions |
+| Lucide React | Icon library |
+| Web Audio API | Oscillator for play state |
+| CSS Custom Properties | Design tokens |
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Built output in `dist/` is configured for GitHub Pages deployment.
