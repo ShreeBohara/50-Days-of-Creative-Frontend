@@ -1,0 +1,219 @@
+/* ───────── Now Playing View ───────── */
+.now-playing-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Blurred BG ── */
+.np-bg {
+  position: absolute;
+  inset: -40px;
+  filter: blur(80px) brightness(0.6) saturate(1.5);
+  z-index: 0;
+}
+
+.np-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+/* ── Content ── */
+.np-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px 40px;
+  gap: 24px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Header ── */
+.np-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: absolute;
+  top: 16px;
+  left: 0;
+  padding: 0 24px;
+}
+
+.np-close-btn {
+  color: var(--text-primary);
+  transition: opacity var(--transition-fast);
+}
+.np-close-btn:hover {
+  opacity: 0.7;
+}
+
+.np-header-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+/* ── Album Art + Vinyl ── */
+.np-art-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.np-vinyl {
+  position: absolute;
+  top: 0;
+  left: 30px;
+  width: 300px;
+  height: 300px;
+  border-radius: var(--radius-full);
+  background: #111;
+  display: grid;
+  place-items: center;
+  z-index: 0;
+  transition: transform 0.5s ease;
+}
+.np-vinyl.spinning {
+  animation: spin-vinyl 3s linear infinite;
+}
+
+.np-vinyl-grooves {
+  position: absolute;
+  inset: 20px;
+  border-radius: var(--radius-full);
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0px,
+    transparent 3px,
+    rgba(255,255,255,0.04) 3px,
+    rgba(255,255,255,0.04) 4px
+  );
+}
+
+.np-vinyl-label {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  z-index: 1;
+}
+
+.np-album-art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1;
+  transition: transform 0.5s ease;
+}
+.np-album-art.spinning {
+  animation: spin-album 20s linear infinite;
+  border-radius: var(--radius-full);
+}
+
+@keyframes spin-vinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-album {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Song Info ── */
+.np-song-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+
+.np-song-text {
+  min-width: 0;
+}
+
+.np-song-title {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-song-artist {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+/* ── Waveform ── */
+.np-waveform {
+  width: 100%;
+}
+
+.np-waveform .waveform-container {
+  height: 24px;
+}
+
+.np-time-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Controls ── */
+.np-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.np-ctrl-btn {
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+.np-ctrl-btn:hover {
+  opacity: 0.7;
+}
+.np-ctrl-btn.active {
+  color: var(--accent);
+}
+
+.np-play-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--text-primary);
+  display: grid;
+  place-items: center;
+  transition: transform var(--transition-fast);
+}
+.np-play-btn:hover {
+  transform: scale(1.06);
+}
+
+/* ── Like button in NP view ── */
+.np-song-info .like-btn {
+  opacity: 1;
+}
