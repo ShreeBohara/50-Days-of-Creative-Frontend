@@ -1,8 +1,8 @@
-import { useMemo, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import './WaveformProgress.css';
 
-/* Generate random waveform bars (deterministic per track) */
+/* Generate deterministic random waveform bars from a seed */
 function generateWaveform(seed = 0, count = 80) {
   const bars = [];
   let s = seed || 1;
@@ -19,11 +19,13 @@ export default function WaveformProgress() {
   const { currentTrack, isPlaying, elapsed } = state;
   const containerRef = useRef(null);
   const animRef = useRef(null);
-  const lastTimeRef = useRef(null);
+  const elapsedRef = useRef(elapsed);
+
+  // Keep ref in sync
+  elapsedRef.current = elapsed;
 
   const bars = useMemo(() => {
     if (!currentTrack) return generateWaveform(0);
-    // Use song id as seed
     const seed = currentTrack.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
     return generateWaveform(seed);
   }, [currentTrack]);
@@ -31,24 +33,30 @@ export default function WaveformProgress() {
   const progress = currentTrack ? Math.min(elapsed / currentTrack.duration, 1) : 0;
 
   // Animation loop for elapsed time
-  const tick = useCallback((timestamp) => {
-    if (!lastTimeRef.current) lastTimeRef.current = timestamp;
-    const delta = (timestamp - lastTimeRef.current) / 1000;
-    lastTimeRef.current = timestamp;
-
-    dispatch({ type: 'SET_ELAPSED', payload: state.elapsed + delta });
-    animRef.current = requestAnimationFrame(tick);
-  }, [dispatch, state.elapsed]);
-
   useEffect(() => {
-    if (isPlaying && currentTrack) {
-      lastTimeRef.current = null;
-      animRef.current = requestAnimationFrame(tick);
-    }
+    if (!isPlaying || !currentTrack) return;
+
+    let lastTimestamp = null;
+
+    const tick = (timestamp) => {
+      if (lastTimestamp === null) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      const newElapsed = elapsedRef.current + delta;
+      dispatch({ type: 'SET_ELAPSED', payload: newElapsed });
+
+      if (newElapsed < currentTrack.duration) {
+        animRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    animRef.current = requestAnimationFrame(tick);
+
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
-  }, [isPlaying, currentTrack, tick]);
+  }, [isPlaying, currentTrack, dispatch]);
 
   // Auto-advance when song ends
   useEffect(() => {
@@ -60,7 +68,7 @@ export default function WaveformProgress() {
   const handleClick = (e) => {
     if (!currentTrack || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     dispatch({ type: 'SET_ELAPSED', payload: x * currentTrack.duration });
   };
 
