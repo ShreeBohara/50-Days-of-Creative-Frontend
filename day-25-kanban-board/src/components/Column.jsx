@@ -6,6 +6,7 @@ import { useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import useKanbanStore from '../store/useKanbanStore'
 import Card from './Card'
+import AddCardForm from './AddCardForm'
 import { useDrag } from './DragContext'
 import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react'
 
@@ -114,8 +115,12 @@ export default function Column({ column }) {
               <span>Drop here</span>
             </div>
           )}
+
+          {/* Add card form */}
+          <AddCardForm columnId={column.id} />
         </div>
       )}
     </div>
   )
 }
+

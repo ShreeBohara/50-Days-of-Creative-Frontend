@@ -1,9 +1,11 @@
 /* ═══════════════════════════════════════════════════════
    Card — kanban card with label, priority, avatar, etc.
-   Now with Framer Motion drag support.
+   Framer Motion drag + inline title editing.
    ═══════════════════════════════════════════════════════ */
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LABELS, PRIORITIES } from '../store/useKanbanStore'
+import useKanbanStore from '../store/useKanbanStore'
 import { AlertTriangle, Clock, CheckCircle2 } from 'lucide-react'
 import { useDrag } from './DragContext'
 
@@ -20,7 +22,8 @@ const PriorityIcon = ({ priority }) => {
 }
 
 export default function Card({ card }) {
-  const { draggedCard, startDrag, endDrag, cancelDrag } = useDrag()
+  const { draggedCard, startDrag, endDrag } = useDrag()
+  const updateCard = useKanbanStore(s => s.updateCard)
   const labelObj = LABELS.find(l => l.id === card.label)
   const subtaskPct = card.subtasks?.total > 0
     ? Math.round((card.subtasks.done / card.subtasks.total) * 100)
@@ -28,13 +31,50 @@ export default function Card({ card }) {
 
   const isDragging = draggedCard?.id === card.id
 
+  /* ---- Inline title editing ---- */
+  const [editing, setEditing] = useState(false)
+  const [editValue, setEditValue] = useState(card.title)
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editing])
+
+  const startEdit = (e) => {
+    e.stopPropagation()
+    setEditValue(card.title)
+    setEditing(true)
+  }
+
+  const commitEdit = () => {
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== card.title) {
+      updateCard(card.id, { title: trimmed })
+    }
+    setEditing(false)
+  }
+
+  const handleEditKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      commitEdit()
+    }
+    if (e.key === 'Escape') {
+      setEditing(false)
+      setEditValue(card.title)
+    }
+  }
+
   return (
     <motion.div
       className={`kanban-card ${isDragging ? 'kanban-card--dragging' : ''}`}
       id={`card-${card.id}`}
       layout
       layoutId={card.id}
-      drag
+      drag={!editing}
       dragSnapToOrigin
       dragElastic={0.1}
       whileDrag={{
@@ -56,8 +96,22 @@ export default function Card({ card }) {
       )}
 
       <div className="card-body">
-        {/* Title */}
-        <h3 className="card-title">{card.title}</h3>
+        {/* Title — double-click to edit */}
+        {editing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            className="card-title-input"
+            value={editValue}
+            onChange={e => setEditValue(e.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={handleEditKeyDown}
+          />
+        ) : (
+          <h3 className="card-title" onDoubleClick={startEdit}>
+            {card.title}
+          </h3>
+        )}
 
         {/* Description */}
         {card.description && (

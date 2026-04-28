@@ -445,3 +445,164 @@
   50%      { border-color: var(--accent-light); opacity: 1; }
 }
 
+/* ============ INLINE EDITING ============ */
+.card-title-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ============ ADD CARD FORM ============ */
+.add-card-wrapper {
+  margin-top: var(--space-1);
+}
+
+.add-card-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.add-card-trigger:hover {
+  color: var(--text-primary);
+  background: var(--border-subtle);
+}
+
+.add-card-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow: hidden;
+}
+
+.add-card-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+
+.add-card-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.add-card-input::placeholder {
+  color: var(--text-muted);
+}
+
+.add-card-labels {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.label-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--dot-color);
+  border: 2px solid transparent;
+  opacity: 0.5;
+  transition: opacity var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast);
+}
+
+.label-dot:hover {
+  opacity: 0.8;
+  transform: scale(1.15);
+}
+
+.label-dot--active {
+  opacity: 1;
+  border-color: var(--text-primary);
+  transform: scale(1.15);
+}
+
+.add-card-priorities {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.priority-pill {
+  padding: 2px 8px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  color: var(--pill-color);
+  background: transparent;
+  border: 1px solid var(--pill-color);
+  opacity: 0.4;
+  transition: opacity var(--duration-fast), background var(--duration-fast);
+}
+
+.priority-pill:hover {
+  opacity: 0.7;
+}
+
+.priority-pill--active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--pill-color) 15%, transparent);
+}
+
+.add-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn-add {
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-fast);
+}
+
+.btn-add:hover:not(:disabled) {
+  background: var(--accent-light);
+}
+
+.btn-add:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.btn-cancel:hover {
+  color: var(--text-primary);
+  background: var(--border-medium);
+}
