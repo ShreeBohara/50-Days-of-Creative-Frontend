@@ -1,13 +1,16 @@
 import './App.css'
 import TopBar from './components/TopBar'
 import Board from './components/Board'
+import { DragProvider } from './components/DragContext'
 
 function App() {
   return (
-    <div className="app-shell">
-      <TopBar />
-      <Board />
-    </div>
+    <DragProvider>
+      <div className="app-shell">
+        <TopBar />
+        <Board />
+      </div>
+    </DragProvider>
   )
 }
 

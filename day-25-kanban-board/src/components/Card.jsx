@@ -1,8 +1,11 @@
 /* ═══════════════════════════════════════════════════════
    Card — kanban card with label, priority, avatar, etc.
+   Now with Framer Motion drag support.
    ═══════════════════════════════════════════════════════ */
+import { motion } from 'framer-motion'
 import { LABELS, PRIORITIES } from '../store/useKanbanStore'
 import { AlertTriangle, Clock, CheckCircle2 } from 'lucide-react'
+import { useDrag } from './DragContext'
 
 /* Priority icon mapping */
 const PriorityIcon = ({ priority }) => {
@@ -17,13 +20,36 @@ const PriorityIcon = ({ priority }) => {
 }
 
 export default function Card({ card }) {
+  const { draggedCard, startDrag, endDrag, cancelDrag } = useDrag()
   const labelObj = LABELS.find(l => l.id === card.label)
   const subtaskPct = card.subtasks?.total > 0
     ? Math.round((card.subtasks.done / card.subtasks.total) * 100)
     : null
 
+  const isDragging = draggedCard?.id === card.id
+
   return (
-    <div className="kanban-card" id={`card-${card.id}`}>
+    <motion.div
+      className={`kanban-card ${isDragging ? 'kanban-card--dragging' : ''}`}
+      id={`card-${card.id}`}
+      layout
+      layoutId={card.id}
+      drag
+      dragSnapToOrigin
+      dragElastic={0.1}
+      whileDrag={{
+        scale: 1.04,
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)',
+        zIndex: 999,
+        cursor: 'grabbing',
+      }}
+      onDragStart={() => startDrag(card)}
+      onDragEnd={() => endDrag()}
+      transition={{
+        layout: { type: 'spring', stiffness: 350, damping: 30 },
+      }}
+      style={{ position: 'relative', zIndex: isDragging ? 999 : 'auto' }}
+    >
       {/* Label strip */}
       {labelObj && (
         <div className="card-label-strip" style={{ background: labelObj.color }} />
@@ -72,6 +98,6 @@ export default function Card({ card }) {
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
