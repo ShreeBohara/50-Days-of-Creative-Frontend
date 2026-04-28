@@ -3,6 +3,7 @@
    Columns, cards, CRUD, ordering
    ═══════════════════════════════════════════════════════ */
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 /* ---- helpers ---- */
 let _id = Date.now()
@@ -76,7 +77,9 @@ const seedCardsWithAvatars = seedCards.map(c => ({ ...c, avatar: pickAvatar(c.id
 /* ──────────────────────────────────────────────────── */
 /*  Store                                               */
 /* ──────────────────────────────────────────────────── */
-const useKanbanStore = create((set, get) => ({
+const useKanbanStore = create(
+  persist(
+    (set, get) => ({
   columns: seedColumns,
   cards: seedCardsWithAvatars,
 
@@ -179,6 +182,12 @@ const useKanbanStore = create((set, get) => ({
       .filter(c => c.columnId === columnId)
       .sort((a, b) => a.order - b.order)
   },
-}))
+    }),
+    {
+      name: 'kanban-board-storage',
+      version: 1,
+    }
+  )
+)
 
 export default useKanbanStore

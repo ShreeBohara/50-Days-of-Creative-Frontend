@@ -3,11 +3,22 @@
    ═══════════════════════════════════════════════════════ */
 import { useState, useCallback } from 'react'
 import { LayoutGrid, Search, Plus, X, Filter } from 'lucide-react'
-import { LABELS, PRIORITIES } from '../store/useKanbanStore'
+import useKanbanStore, { LABELS, PRIORITIES } from '../store/useKanbanStore'
 
 export default function TopBar({ onSearch, filters, onFilterChange }) {
   const [searchValue, setSearchValue] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [showAddCol, setShowAddCol] = useState(false)
+  const [newColTitle, setNewColTitle] = useState('')
+  const addColumn = useKanbanStore(s => s.addColumn)
+
+  const handleAddColumn = () => {
+    if (newColTitle.trim()) {
+      addColumn(newColTitle.trim())
+      setNewColTitle('')
+      setShowAddCol(false)
+    }
+  }
 
   const handleSearch = useCallback((e) => {
     const val = e.target.value
@@ -78,10 +89,35 @@ export default function TopBar({ onSearch, filters, onFilterChange }) {
           <span>Filter</span>
           {hasActiveFilters && <span className="filter-badge" />}
         </button>
-        <button className="btn-add-column" id="btn-add-column">
+        <button
+          className="btn-add-column"
+          id="btn-add-column"
+          onClick={() => setShowAddCol(!showAddCol)}
+        >
           <Plus size={16} />
           <span>Add Column</span>
         </button>
+
+        {showAddCol && (
+          <div className="add-column-popover">
+            <input
+              type="text"
+              className="add-card-input"
+              placeholder="Column name…"
+              value={newColTitle}
+              onChange={e => setNewColTitle(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleAddColumn()
+                if (e.key === 'Escape') setShowAddCol(false)
+              }}
+              autoFocus
+            />
+            <div className="add-card-actions">
+              <button className="btn-add" onClick={handleAddColumn} disabled={!newColTitle.trim()}>Create</button>
+              <button className="btn-cancel" onClick={() => setShowAddCol(false)}><X size={14} /></button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Filter panel dropdown */}
