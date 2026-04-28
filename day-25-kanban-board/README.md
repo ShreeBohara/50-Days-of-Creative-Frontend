@@ -1,16 +1,42 @@
-# React + Vite
+# Day 25 — Drag-and-Drop Kanban Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Trello/Linear-style animated kanban board with silky cross-column drag-and-drop, inline editing, real-time search, and full persistence.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **4 default columns** (Backlog, In Progress, Review, Done) — fully customizable
+- **Drag & drop** cards between columns with Framer Motion layout animations
+- **Drop zone indicators** with glowing insertion lines and pulsing empty zones
+- **Inline editing** — double-click card titles or column headers to rename
+- **Add Card form** — inline form with label color picker and priority selector
+- **Card detail modal** — full editing (title, description, label, priority, due date, subtasks)
+- **Label colors** (6 colors) and **priority badges** (Low/Medium/High/Urgent)
+- **Real-time search** with text highlighting and dimmed non-matching cards
+- **Filter panel** — filter by label color and/or priority level
+- **Column features** — collapse/expand, rename, add/delete columns
+- **LocalStorage persistence** — board state survives page reload
+- **Responsive** — mobile snap-scroll columns, compact topbar
+- **Keyboard support** — ESC cancels drag/edit, Enter confirms
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite 8
+- Framer Motion (drag, layout animations, AnimatePresence)
+- Zustand (state management with persist middleware)
+- Lucide React (icons)
+- Plus Jakarta Sans (typography)
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Output is in `dist/`, configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-25-kanban-board/`.
