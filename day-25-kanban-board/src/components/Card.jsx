@@ -21,7 +21,21 @@ const PriorityIcon = ({ priority }) => {
   )
 }
 
-export default function Card({ card, onCardClick }) {
+/* Highlight search text in title */
+function HighlightedTitle({ text, query }) {
+  if (!query) return text
+  const idx = text.toLowerCase().indexOf(query)
+  if (idx === -1) return text
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="search-highlight">{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </>
+  )
+}
+
+export default function Card({ card, onCardClick, isMatched = true, isFiltering = false, searchQuery = '' }) {
   const { draggedCard, startDrag, endDrag } = useDrag()
   const updateCard = useKanbanStore(s => s.updateCard)
   const labelObj = LABELS.find(l => l.id === card.label)
@@ -71,7 +85,7 @@ export default function Card({ card, onCardClick }) {
 
   return (
     <motion.div
-      className={`kanban-card ${isDragging ? 'kanban-card--dragging' : ''}`}
+      className={`kanban-card ${isDragging ? 'kanban-card--dragging' : ''} ${isFiltering && !isMatched ? 'kanban-card--dimmed' : ''}`}
       id={`card-${card.id}`}
       layout
       layoutId={card.id}
@@ -115,7 +129,7 @@ export default function Card({ card, onCardClick }) {
           />
         ) : (
           <h3 className="card-title" onDoubleClick={startEdit}>
-            {card.title}
+            <HighlightedTitle text={card.title} query={searchQuery} />
           </h3>
         )}
 

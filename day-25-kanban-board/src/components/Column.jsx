@@ -10,7 +10,7 @@ import AddCardForm from './AddCardForm'
 import { useDrag } from './DragContext'
 import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react'
 
-export default function Column({ column, onCardClick }) {
+export default function Column({ column, onCardClick, searchQuery, filters }) {
   const cards = useKanbanStore(s =>
     s.cards
       .filter(c => c.columnId === column.id)
@@ -50,6 +50,18 @@ export default function Column({ column, onCardClick }) {
 
   const isDropTarget = draggedCard && overColumn === column.id
 
+  /* Compute whether filtering is active */
+  const isFiltering = searchQuery || filters?.labels?.length > 0 || filters?.priorities?.length > 0
+
+  /* Check if a card matches current search/filters */
+  const cardMatches = (card) => {
+    if (!isFiltering) return true
+    if (searchQuery && !card.title.toLowerCase().includes(searchQuery)) return false
+    if (filters?.labels?.length > 0 && !filters.labels.includes(card.label)) return false
+    if (filters?.priorities?.length > 0 && !filters.priorities.includes(card.priority)) return false
+    return true
+  }
+
   return (
     <div
       className={`column ${column.collapsed ? 'column--collapsed' : ''} ${isDropTarget ? 'column--drop-target' : ''}`}
@@ -88,7 +100,7 @@ export default function Column({ column, onCardClick }) {
                     transition={{ duration: 0.15 }}
                   />
                 )}
-                <Card card={card} onCardClick={onCardClick} />
+                <Card card={card} onCardClick={onCardClick} isMatched={cardMatches(card)} isFiltering={isFiltering} searchQuery={searchQuery} />
               </div>
             ))}
           </AnimatePresence>

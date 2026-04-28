@@ -877,3 +877,128 @@
 .btn-save:hover {
   background: var(--accent-light);
 }
+
+/* ============ FILTER & SEARCH ============ */
+.btn-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  position: relative;
+  transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.btn-filter:hover {
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.btn-filter--active {
+  color: var(--accent-light);
+  border-color: var(--accent);
+  background: rgba(13, 148, 136, 0.08);
+}
+
+.btn-filter--has-filters .filter-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--cta);
+}
+
+.filter-panel {
+  position: absolute;
+  top: 56px;
+  right: var(--space-6);
+  background: var(--bg-column);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  z-index: 200;
+  box-shadow: var(--shadow-modal);
+  min-width: 220px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filter-group-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filter-group-items {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.label-dot--filter {
+  width: 24px;
+  height: 24px;
+}
+
+.filter-clear {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  padding: var(--space-1) 0;
+  transition: color var(--duration-fast);
+}
+
+.filter-clear:hover {
+  color: var(--label-red);
+}
+
+.search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+  background: var(--border-medium);
+}
+
+/* Dimmed non-matching card */
+.kanban-card--dimmed {
+  opacity: 0.2;
+  transform: scale(0.97);
+  filter: grayscale(0.8);
+  pointer-events: none;
+  transition: opacity var(--duration-slow), transform var(--duration-slow), filter var(--duration-slow);
+}
+
+/* Search highlight */
+.search-highlight {
+  background: rgba(249, 115, 22, 0.3);
+  color: var(--cta);
+  border-radius: 2px;
+  padding: 0 1px;
+}
