@@ -10,7 +10,7 @@ import AddCardForm from './AddCardForm'
 import { useDrag } from './DragContext'
 import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react'
 
-export default function Column({ column }) {
+export default function Column({ column, onCardClick }) {
   const cards = useKanbanStore(s =>
     s.cards
       .filter(c => c.columnId === column.id)
@@ -88,7 +88,7 @@ export default function Column({ column }) {
                     transition={{ duration: 0.15 }}
                   />
                 )}
-                <Card card={card} />
+                <Card card={card} onCardClick={onCardClick} />
               </div>
             ))}
           </AnimatePresence>

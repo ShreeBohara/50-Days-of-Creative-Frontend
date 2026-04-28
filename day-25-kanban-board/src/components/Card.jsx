@@ -21,7 +21,7 @@ const PriorityIcon = ({ priority }) => {
   )
 }
 
-export default function Card({ card }) {
+export default function Card({ card, onCardClick }) {
   const { draggedCard, startDrag, endDrag } = useDrag()
   const updateCard = useKanbanStore(s => s.updateCard)
   const labelObj = LABELS.find(l => l.id === card.label)
@@ -30,6 +30,7 @@ export default function Card({ card }) {
     : null
 
   const isDragging = draggedCard?.id === card.id
+  const wasDraggedRef = useRef(false)
 
   /* ---- Inline title editing ---- */
   const [editing, setEditing] = useState(false)
@@ -83,8 +84,13 @@ export default function Card({ card }) {
         zIndex: 999,
         cursor: 'grabbing',
       }}
-      onDragStart={() => startDrag(card)}
-      onDragEnd={() => endDrag()}
+      onDragStart={() => { wasDraggedRef.current = true; startDrag(card) }}
+      onDragEnd={() => { endDrag(); setTimeout(() => { wasDraggedRef.current = false }, 100) }}
+      onClick={() => {
+        if (!editing && !wasDraggedRef.current && onCardClick) {
+          onCardClick(card)
+        }
+      }}
       transition={{
         layout: { type: 'spring', stiffness: 350, damping: 30 },
       }}
