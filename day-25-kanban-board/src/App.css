@@ -370,12 +370,18 @@
 
 /* ============ DRAG & DROP ============ */
 .kanban-card--dragging {
-  opacity: 0.6;
+  opacity: 0.4;
+  transform: scale(0.98);
 }
 
 .column--drop-target {
   border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent-glow), 0 0 20px var(--accent-glow);
+  box-shadow: inset 0 0 0 1px var(--accent-glow), 0 0 24px var(--accent-glow);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-base);
+}
+
+.column--drop-target .column-header {
+  border-bottom-color: var(--accent-glow);
 }
 
 .card-slot {
@@ -383,18 +389,46 @@
 }
 
 .drop-indicator {
-  height: 2px;
-  background: var(--accent-light);
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
   border-radius: var(--radius-full);
   margin: var(--space-1) 0;
   transform-origin: left center;
-  box-shadow: 0 0 8px var(--accent-glow);
+  box-shadow: 0 0 12px var(--accent-glow), 0 0 4px var(--accent);
+  position: relative;
+}
+
+.drop-indicator::before,
+.drop-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent-light);
+  transform: translateY(-50%);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.drop-indicator::before { left: -2px; }
+.drop-indicator::after  { right: -2px; }
+
+/* Ghost placeholder — shows the approximate size of the card being dropped */
+.ghost-placeholder {
+  height: 60px;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-md);
+  background: rgba(13, 148, 136, 0.06);
+  margin: var(--space-1) 0;
 }
 
 .column-drop-empty {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: var(--space-2);
   padding: var(--space-8) var(--space-4);
   border: 2px dashed var(--accent);
   border-radius: var(--radius-md);
@@ -403,4 +437,11 @@
   font-size: var(--font-sm);
   font-weight: 600;
   background: rgba(13, 148, 136, 0.05);
+  animation: pulse-border 1.5s ease-in-out infinite;
 }
+
+@keyframes pulse-border {
+  0%, 100% { border-color: var(--accent); opacity: 0.7; }
+  50%      { border-color: var(--accent-light); opacity: 1; }
+}
+

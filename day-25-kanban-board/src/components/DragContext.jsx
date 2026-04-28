@@ -2,8 +2,9 @@
    DragContext — coordinates cross-column card dragging
    Tracks: which card is being dragged, which column is
    hovered, and the target drop index.
+   ESC cancels any active drag.
    ═══════════════════════════════════════════════════════ */
-import { createContext, useContext, useState, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
 import useKanbanStore from '../store/useKanbanStore'
 
 const DragContext = createContext(null)
@@ -45,6 +46,17 @@ export function DragProvider({ children }) {
     setOverColumn(null)
     setDropIndex(0)
   }, [])
+
+  /* ESC key cancels drag */
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && draggedCard) {
+        cancelDrag()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [draggedCard, cancelDrag])
 
   return (
     <DragContext.Provider
