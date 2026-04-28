@@ -1,7 +1,8 @@
 /* ═══════════════════════════════════════════
-   App Shell — placeholder for Commit 1
+   App Shell + Board + TopBar layout styles
    ═══════════════════════════════════════════ */
 
+/* ---------- app shell ---------- */
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -9,4 +10,165 @@
   width: 100vw;
   background: var(--bg-base);
   overflow: hidden;
+}
+
+/* ============ TOP BAR ============ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--space-6);
+  background: var(--bg-board);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--accent-light);
+}
+
+.topbar-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.topbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 400px;
+  margin: 0 var(--space-6);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  transition: border-color var(--duration-base) var(--ease-smooth),
+              box-shadow var(--duration-base) var(--ease-smooth);
+}
+
+.search-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-right: var(--space-2);
+}
+
+.search-input {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: var(--font-md);
+  color: var(--text-primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.btn-add-column {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast) var(--ease-smooth),
+              transform var(--duration-fast) var(--ease-spring);
+}
+
+.btn-add-column:hover {
+  background: var(--accent-light);
+  transform: translateY(-1px);
+}
+
+.btn-add-column:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ============ BOARD ============ */
+.board {
+  flex: 1;
+  overflow: hidden;
+  padding: var(--space-5);
+}
+
+.board-scroll {
+  display: flex;
+  gap: var(--space-5);
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: var(--space-4);
+  scroll-behavior: smooth;
+}
+
+/* Column placeholders (will be replaced by Column component) */
+.column-placeholder {
+  flex-shrink: 0;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-column);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}
+
+.column-header-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.column-title-text {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.column-body-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+.placeholder-text {
+  color: var(--text-muted);
+  font-size: var(--font-sm);
 }

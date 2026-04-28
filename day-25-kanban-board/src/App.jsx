@@ -1,11 +1,12 @@
 import './App.css'
+import TopBar from './components/TopBar'
+import Board from './components/Board'
 
 function App() {
   return (
     <div className="app-shell">
-      <h1 style={{ margin: 'auto', color: 'var(--accent-light)' }}>
-        Day 25 — Kanban Board
-      </h1>
+      <TopBar />
+      <Board />
     </div>
   )
 }
