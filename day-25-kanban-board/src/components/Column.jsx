@@ -2,8 +2,9 @@
    Column — header (title, count, collapse) + card list
    With drag-and-drop, inline header editing, collapse.
    ═══════════════════════════════════════════════════════ */
-import { useRef, useCallback, useState, useEffect } from 'react'
+import { useRef, useCallback, useState, useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useShallow } from 'zustand/react/shallow'
 import useKanbanStore from '../store/useKanbanStore'
 import Card from './Card'
 import AddCardForm from './AddCardForm'
@@ -11,10 +12,12 @@ import { useDrag } from './DragContext'
 import { ChevronDown, ChevronRight, MoreHorizontal, Trash2 } from 'lucide-react'
 
 export default function Column({ column, onCardClick, searchQuery, filters }) {
-  const cards = useKanbanStore(s =>
-    s.cards
+  const allCards = useKanbanStore(useShallow(s => s.cards))
+  const cards = useMemo(
+    () => allCards
       .filter(c => c.columnId === column.id)
-      .sort((a, b) => a.order - b.order)
+      .sort((a, b) => a.order - b.order),
+    [allCards, column.id]
   )
   const toggleCollapse = useKanbanStore(s => s.toggleCollapseColumn)
   const updateTitle = useKanbanStore(s => s.updateColumnTitle)
