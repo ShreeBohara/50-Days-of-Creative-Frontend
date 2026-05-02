@@ -10,10 +10,15 @@ import {
 } from 'lucide-react'
 import './App.css'
 import GraphCanvas from './components/GraphCanvas'
-import { categoryMeta, createGraphData } from './data/graphData'
+import {
+  categoryMeta,
+  createGraphData,
+  expansionLibrary,
+  expansionSupportNodes,
+} from './data/graphData'
 
 function App() {
-  const graph = useMemo(() => createGraphData(), [])
+  const [graph, setGraph] = useState(() => createGraphData())
   const [query, setQuery] = useState('')
   const [labelsVisible, setLabelsVisible] = useState(true)
   const [layoutVersion, setLayoutVersion] = useState(0)
@@ -29,6 +34,54 @@ function App() {
       }, {}),
     [graph.nodes],
   )
+
+  const expandedCount = graph.nodes.filter((node) => node.expanded).length
+
+  const handleExpandNode = (nodeId) => {
+    setGraph((currentGraph) => {
+      const sourceNode = currentGraph.nodes.find((node) => node.id === nodeId)
+      const expansionNodes = expansionLibrary[nodeId] ?? []
+
+      if (!sourceNode || sourceNode.expanded || !expansionNodes.length) {
+        return currentGraph
+      }
+
+      const existingIds = new Set(currentGraph.nodes.map((node) => node.id))
+      const expansionIds = new Set(expansionNodes.map((node) => node.id))
+      const supportIds = new Set(
+        expansionNodes.flatMap((node) =>
+          node.dependencies.filter((dependencyId) => !existingIds.has(dependencyId)),
+        ),
+      )
+      const supportNodes = expansionSupportNodes.filter(
+        (node) => supportIds.has(node.id) && !existingIds.has(node.id) && !expansionIds.has(node.id),
+      )
+      const nextNodes = currentGraph.nodes.map((node) => {
+        if (node.id !== nodeId) {
+          return node
+        }
+
+        return {
+          ...node,
+          expanded: true,
+          dependencies: [...new Set([...node.dependencies, ...expansionNodes.map((item) => item.id)])],
+        }
+      })
+
+      expansionNodes.forEach((node) => {
+        if (!existingIds.has(node.id)) {
+          nextNodes.push({ ...node, expanded: false })
+        }
+      })
+
+      supportNodes.forEach((node) => {
+        nextNodes.push({ ...node, expanded: false })
+      })
+
+      return createGraphData(nextNodes)
+    })
+    setSelectedNodeId(nodeId)
+  }
 
   return (
     <main className="app-shell">
@@ -89,6 +142,7 @@ function App() {
             onHoverNode={setHoveredNodeId}
             selectedNodeId={activeNode.id}
             onSelectNode={setSelectedNodeId}
+            onExpandNode={handleExpandNode}
             layoutVersion={layoutVersion}
           />
         </section>
@@ -123,6 +177,14 @@ function App() {
                 <dd>{activeNode.dependentCount}</dd>
               </div>
             </dl>
+            <div className="expand-state">
+              <span>{activeNode.expanded ? 'Expanded' : 'Collapsed'}</span>
+              <strong>
+                {expansionLibrary[activeNode.id]?.length
+                  ? `${expansionLibrary[activeNode.id].length} hidden packages`
+                  : 'No expansion bundle'}
+              </strong>
+            </div>
             <div className="dependency-list">
               <h3>Direct dependencies</h3>
               {activeNode.dependencies.length ? (
@@ -160,6 +222,10 @@ function App() {
               <div>
                 <dt>Categories</dt>
                 <dd>{Object.keys(categoryCounts).length}</dd>
+              </div>
+              <div>
+                <dt>Expanded</dt>
+                <dd>{expandedCount}</dd>
               </div>
             </dl>
           </div>

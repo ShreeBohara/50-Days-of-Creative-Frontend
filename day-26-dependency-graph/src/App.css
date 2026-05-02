@@ -401,6 +401,33 @@ dd {
   font-weight: 700;
 }
 
+.expand-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: var(--text-soft);
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(134, 239, 172, 0.18);
+  border-radius: var(--radius-sm);
+}
+
+.expand-state span {
+  color: var(--accent-strong);
+  font-family: var(--font-code);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.expand-state strong {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: right;
+}
+
 .dependency-list {
   margin-top: 14px;
 }

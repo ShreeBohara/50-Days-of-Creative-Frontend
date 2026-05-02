@@ -57,6 +57,7 @@ function GraphCanvas({
   onHoverNode,
   selectedNodeId,
   onSelectNode,
+  onExpandNode,
   layoutVersion,
 }) {
   const containerRef = useRef(null)
@@ -267,10 +268,17 @@ function GraphCanvas({
                   onBlur={() => onHoverNode(null)}
                   onFocus={() => onHoverNode(node.id)}
                   onClick={() => onSelectNode(node.id)}
+                  onDoubleClick={(event) => {
+                    event.stopPropagation()
+                    onExpandNode(node.id)
+                  }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()
                       onSelectNode(node.id)
+                    }
+                    if (event.key === 'e' || event.key === 'E') {
+                      onExpandNode(node.id)
                     }
                   }}
                   onMouseEnter={() => onHoverNode(node.id)}
