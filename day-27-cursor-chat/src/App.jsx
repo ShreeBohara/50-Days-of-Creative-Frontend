@@ -1,19 +1,26 @@
 import { useState } from 'react'
 import { MessageCircle, MousePointer2, Send, Shuffle, Sparkles, Users } from 'lucide-react'
 import { CursorLayer } from './components/CursorLayer'
+import { EmojiPicker, ReactionLayer } from './components/Reactions'
 import { useBroadcastRoom } from './hooks/useBroadcastRoom'
 import { useCursorTracking } from './hooks/useCursorTracking'
 import { useRoomStore } from './store/useRoomStore'
+import { normalizePoint } from './utils/viewport'
 import './App.css'
+
+const defaultEmoji = '✨'
 
 function App() {
   const localUser = useRoomStore((state) => state.localUser)
   const hasJoined = useRoomStore((state) => state.hasJoined)
   const remoteUsers = useRoomStore((state) => state.remoteUsers)
+  const reactions = useRoomStore((state) => state.reactions)
+  const addReaction = useRoomStore((state) => state.addReaction)
   const joinRoom = useRoomStore((state) => state.joinRoom)
   const randomizeLocalIdentity = useRoomStore((state) => state.randomizeLocalIdentity)
   const { post, isSupported } = useBroadcastRoom()
   const [nameInput, setNameInput] = useState(localUser.name)
+  const [picker, setPicker] = useState(null)
   const collaborators = Object.values(remoteUsers)
   useCursorTracking(post)
 
@@ -28,13 +35,66 @@ function App() {
     setNameInput(latestName)
   }
 
+  const sendReaction = (emoji, point) => {
+    if (!hasJoined) {
+      return
+    }
+
+    const reaction = {
+      id: `reaction-${localUser.id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      emoji,
+      x: point.x,
+      y: point.y,
+      color: localUser.color,
+      userId: localUser.id,
+    }
+
+    addReaction(reaction)
+    post('reaction', reaction)
+    setPicker(null)
+  }
+
+  const isControlClick = (event) => event.target.closest('[data-control]')
+
+  const handleCanvasClick = (event) => {
+    if (!hasJoined || event.button !== 0 || isControlClick(event)) {
+      return
+    }
+
+    sendReaction(defaultEmoji, normalizePoint(event.clientX, event.clientY))
+  }
+
+  const handleCanvasContextMenu = (event) => {
+    if (!hasJoined || isControlClick(event)) {
+      return
+    }
+
+    event.preventDefault()
+    setPicker({
+      clientX: Math.min(event.clientX, window.innerWidth - 120),
+      clientY: Math.min(event.clientY, window.innerHeight - 120),
+      point: normalizePoint(event.clientX, event.clientY),
+    })
+  }
+
   return (
     <main className="room-app">
-      <section className="room-canvas" aria-label="Collaborative cursor canvas">
+      <section
+        className="room-canvas"
+        aria-label="Collaborative cursor canvas"
+        onClick={handleCanvasClick}
+        onContextMenu={handleCanvasContextMenu}
+      >
         <div className="canvas-grid" aria-hidden="true" />
         <div className="canvas-glow canvas-glow-a" aria-hidden="true" />
         <div className="canvas-glow canvas-glow-b" aria-hidden="true" />
+        {hasJoined ? <ReactionLayer reactions={reactions} /> : null}
         {hasJoined ? <CursorLayer users={collaborators} /> : null}
+        <EmojiPicker
+          picker={picker}
+          onPick={sendReaction}
+          onDismiss={() => setPicker(null)}
+        />
 
         <header className="room-header" data-control>
           <div>
@@ -117,6 +177,25 @@ function App() {
             </button>
           </form>
         </section>
+
+        {hasJoined ? (
+          <button
+            className="reaction-fab"
+            type="button"
+            data-control
+            aria-label="Open emoji reactions"
+            onClick={() => {
+              const point = { x: localUser.x, y: localUser.y }
+              setPicker({
+                clientX: window.innerWidth - 106,
+                clientY: window.innerHeight - 168,
+                point,
+              })
+            }}
+          >
+            <Sparkles size={20} aria-hidden="true" />
+          </button>
+        ) : null}
       </section>
     </main>
   )

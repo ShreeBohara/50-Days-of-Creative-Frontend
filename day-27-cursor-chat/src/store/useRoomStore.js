@@ -224,6 +224,22 @@ export const useRoomStore = create((set, get) => ({
     }))
   },
 
+  addReaction: (reaction) => {
+    set((state) => ({
+      reactions: [...state.reactions, reaction].slice(-32),
+    }))
+
+    window.setTimeout(() => {
+      get().removeReaction(reaction.id)
+    }, 1200)
+  },
+
+  removeReaction: (id) => {
+    set((state) => ({
+      reactions: state.reactions.filter((reaction) => reaction.id !== id),
+    }))
+  },
+
   getLocalPresence: () => {
     const { localUser } = get()
 

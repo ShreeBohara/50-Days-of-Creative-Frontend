@@ -9,6 +9,7 @@ export function useBroadcastRoom() {
   const updateRemoteCursor = useRoomStore((state) => state.updateRemoteCursor)
   const markRemoteLeaving = useRoomStore((state) => state.markRemoteLeaving)
   const prunePresence = useRoomStore((state) => state.prunePresence)
+  const addReaction = useRoomStore((state) => state.addReaction)
   const channelRef = useRef(null)
   const isSupported = typeof BroadcastChannel !== 'undefined'
 
@@ -54,6 +55,15 @@ export function useBroadcastRoom() {
         return
       }
 
+      if (message.type === 'reaction') {
+        addReaction({
+          ...message.payload,
+          color: message.user?.color ?? message.payload?.color,
+          userId: message.senderId,
+        })
+        return
+      }
+
       if (message.user) {
         upsertRemoteUser(message.user)
       }
@@ -91,6 +101,7 @@ export function useBroadcastRoom() {
   }, [
     hasJoined,
     isSupported,
+    addReaction,
     markRemoteLeaving,
     post,
     prunePresence,
