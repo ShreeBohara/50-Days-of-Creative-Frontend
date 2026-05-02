@@ -6,6 +6,7 @@ const CHANNEL_NAME = 'day-27-cursor-chat-room'
 export function useBroadcastRoom() {
   const hasJoined = useRoomStore((state) => state.hasJoined)
   const upsertRemoteUser = useRoomStore((state) => state.upsertRemoteUser)
+  const updateRemoteCursor = useRoomStore((state) => state.updateRemoteCursor)
   const markRemoteLeaving = useRoomStore((state) => state.markRemoteLeaving)
   const prunePresence = useRoomStore((state) => state.prunePresence)
   const channelRef = useRef(null)
@@ -48,6 +49,11 @@ export function useBroadcastRoom() {
         return
       }
 
+      if (message.type === 'cursor') {
+        updateRemoteCursor(message.user, message.payload)
+        return
+      }
+
       if (message.user) {
         upsertRemoteUser(message.user)
       }
@@ -82,7 +88,15 @@ export function useBroadcastRoom() {
       channel.close()
       channelRef.current = null
     }
-  }, [hasJoined, isSupported, markRemoteLeaving, post, prunePresence, upsertRemoteUser])
+  }, [
+    hasJoined,
+    isSupported,
+    markRemoteLeaving,
+    post,
+    prunePresence,
+    updateRemoteCursor,
+    upsertRemoteUser,
+  ])
 
   return { post, isSupported }
 }

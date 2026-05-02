@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { createDisplayName, createLocalUser, pickUserColor } from '../utils/identity'
+import { pointDistance } from '../utils/viewport'
 
 const presenceTimers = new Map()
 
@@ -91,6 +92,46 @@ export const useRoomStore = create((set, get) => ({
             ...user,
             trail: existing?.trail ?? [],
             presence: existing?.presence === 'leaving' ? 'active' : (existing?.presence ?? 'entering'),
+            lastSeen: Date.now(),
+          },
+        },
+      }
+    })
+
+    const remote = get().remoteUsers[user.id]
+    if (remote?.presence === 'entering') {
+      scheduleRemoteActivation(user.id, set)
+    }
+  },
+
+  updateRemoteCursor: (user, position) => {
+    if (!user || user.id === get().localUser.id) {
+      return
+    }
+
+    set((state) => {
+      const existing = state.remoteUsers[user.id]
+      const previousPoint = existing ? { x: existing.x, y: existing.y } : null
+      const nextPoint = {
+        x: position?.x ?? user.x ?? 0.5,
+        y: position?.y ?? user.y ?? 0.5,
+      }
+      const shouldAddTrail =
+        previousPoint && pointDistance(previousPoint, nextPoint) > 0.006
+      const nextTrail = shouldAddTrail
+        ? [...(existing.trail ?? []), previousPoint].slice(-10)
+        : (existing?.trail ?? [])
+
+      return {
+        remoteUsers: {
+          ...state.remoteUsers,
+          [user.id]: {
+            ...existing,
+            ...user,
+            ...nextPoint,
+            trail: nextTrail,
+            presence: existing?.presence === 'leaving' ? 'active' : (existing?.presence ?? 'entering'),
+            idle: false,
             lastSeen: Date.now(),
           },
         },

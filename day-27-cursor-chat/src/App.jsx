@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MessageCircle, MousePointer2, Send, Shuffle, Sparkles, Users } from 'lucide-react'
 import { useBroadcastRoom } from './hooks/useBroadcastRoom'
+import { useCursorTracking } from './hooks/useCursorTracking'
 import { useRoomStore } from './store/useRoomStore'
 import './App.css'
 
@@ -10,9 +11,10 @@ function App() {
   const remoteUsers = useRoomStore((state) => state.remoteUsers)
   const joinRoom = useRoomStore((state) => state.joinRoom)
   const randomizeLocalIdentity = useRoomStore((state) => state.randomizeLocalIdentity)
-  const { isSupported } = useBroadcastRoom()
+  const { post, isSupported } = useBroadcastRoom()
   const [nameInput, setNameInput] = useState(localUser.name)
   const collaborators = Object.values(remoteUsers)
+  useCursorTracking(post)
 
   const handleJoin = (event) => {
     event.preventDefault()
