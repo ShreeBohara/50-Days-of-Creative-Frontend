@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   BadgeInfo,
   GitBranch,
@@ -25,6 +25,21 @@ function App() {
   const [hoveredNodeId, setHoveredNodeId] = useState(null)
   const [selectedNodeId, setSelectedNodeId] = useState('aurora-workbench')
   const activeNode = graph.nodes.find((node) => node.id === selectedNodeId) ?? graph.nodes[0]
+  const normalizedQuery = query.trim().toLowerCase()
+  const searchMatch = useMemo(() => {
+    if (!normalizedQuery) {
+      return null
+    }
+
+    return (
+      graph.nodes.find(
+        (node) =>
+          node.name.toLowerCase().includes(normalizedQuery) ||
+          node.id.toLowerCase().includes(normalizedQuery) ||
+          node.description.toLowerCase().includes(normalizedQuery),
+      ) ?? null
+    )
+  }, [graph.nodes, normalizedQuery])
 
   const categoryCounts = useMemo(
     () =>
@@ -36,6 +51,18 @@ function App() {
   )
 
   const expandedCount = graph.nodes.filter((node) => node.expanded).length
+
+  useEffect(() => {
+    if (!normalizedQuery) {
+      setHoveredNodeId(null)
+      return
+    }
+
+    if (searchMatch) {
+      setSelectedNodeId(searchMatch.id)
+      setHoveredNodeId(searchMatch.id)
+    }
+  }, [normalizedQuery, searchMatch])
 
   const handleExpandNode = (nodeId) => {
     setGraph((currentGraph) => {
@@ -143,6 +170,7 @@ function App() {
             selectedNodeId={activeNode.id}
             onSelectNode={setSelectedNodeId}
             onExpandNode={handleExpandNode}
+            searchMatchId={searchMatch?.id ?? null}
             layoutVersion={layoutVersion}
           />
         </section>
@@ -254,7 +282,11 @@ function App() {
 
       <footer className="status-strip" aria-live="polite">
         <span>Selected: {activeNode.name}</span>
-        <span>Drag nodes, search packages, or inspect dependencies.</span>
+        <span>
+          {normalizedQuery && !searchMatch
+            ? `No package found for "${query}"`
+            : 'Drag nodes, search packages, or inspect dependencies.'}
+        </span>
       </footer>
     </main>
   )

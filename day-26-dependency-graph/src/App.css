@@ -217,6 +217,14 @@
   fill: var(--text);
 }
 
+.graph-node.is-search-match .node-core {
+  animation: node-pulse 1.2s var(--ease) infinite;
+}
+
+.graph-node.is-search-match .node-label {
+  fill: var(--accent-strong);
+}
+
 .graph-node.is-hovered .node-halo {
   opacity: 0.72;
 }
@@ -274,6 +282,17 @@
   font-weight: 600;
   text-anchor: middle;
   pointer-events: none;
+}
+
+@keyframes node-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px var(--node-glow));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 28px var(--node-color));
+  }
 }
 
 .simulation-hint {

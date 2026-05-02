@@ -58,14 +58,17 @@ function GraphCanvas({
   selectedNodeId,
   onSelectNode,
   onExpandNode,
+  searchMatchId,
   layoutVersion,
 }) {
   const containerRef = useRef(null)
   const svgRef = useRef(null)
   const simulationRef = useRef(null)
+  const lastCenteredSearchRef = useRef(null)
   const size = useStageSize(containerRef)
   const [layoutNodes, setLayoutNodes] = useState([])
   const [layoutLinks, setLayoutLinks] = useState([])
+  const [viewTransform, setViewTransform] = useState({ x: 0, y: 0, k: 1 })
 
   const simulationSeed = useMemo(
     () =>
@@ -178,6 +181,30 @@ function GraphCanvas({
     }
   }, [layoutNodes, size.height, size.width])
 
+  useEffect(() => {
+    if (!searchMatchId) {
+      lastCenteredSearchRef.current = null
+      return
+    }
+
+    if (lastCenteredSearchRef.current === searchMatchId) {
+      return
+    }
+
+    const match = layoutNodes.find((node) => node.id === searchMatchId)
+    if (!match) {
+      return
+    }
+
+    const nextScale = 1.55
+    setViewTransform({
+      k: nextScale,
+      x: size.width / 2 - (match.x ?? 0) * nextScale,
+      y: size.height / 2 - (match.y ?? 0) * nextScale,
+    })
+    lastCenteredSearchRef.current = searchMatchId
+  }, [layoutNodes, searchMatchId, size.height, size.width])
+
   return (
     <div ref={containerRef} className="graph-canvas-wrap">
       <svg
@@ -200,7 +227,10 @@ function GraphCanvas({
             <path d="M 0 0 L 10 5 L 0 10 z" className="link-arrow" />
           </marker>
         </defs>
-        <g className="graph-viewport">
+        <g
+          className="graph-viewport"
+          transform={`translate(${viewTransform.x} ${viewTransform.y}) scale(${viewTransform.k})`}
+        >
           <g className="link-layer" aria-hidden="true">
             {layoutLinks.map((link) => {
               const source = link.source
@@ -241,8 +271,10 @@ function GraphCanvas({
               const meta = categoryMeta[node.category]
               const isHovered = hoveredNodeId === node.id
               const isSelected = selectedNodeId === node.id
+              const isSearchMatch = searchMatchId === node.id
               const isConnected = connectedNodeIds.has(node.id)
-              const showLabel = labelsVisible || node.radius >= 18 || isHovered || isSelected
+              const showLabel =
+                labelsVisible || node.radius >= 18 || isHovered || isSelected || isSearchMatch
               const isDimmed = hoveredNodeId && !isConnected
 
               return (
@@ -252,6 +284,7 @@ function GraphCanvas({
                     'graph-node',
                     isHovered ? 'is-hovered' : '',
                     isSelected ? 'is-selected' : '',
+                    isSearchMatch ? 'is-search-match' : '',
                     isConnected ? 'is-connected' : '',
                     isDimmed ? 'is-dimmed' : '',
                   ]
