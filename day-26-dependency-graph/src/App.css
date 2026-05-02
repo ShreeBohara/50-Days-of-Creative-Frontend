@@ -203,9 +203,18 @@
 }
 
 .graph-node.is-hovered .node-core,
-.graph-node.is-connected .node-core {
+.graph-node.is-connected .node-core,
+.graph-node.is-selected .node-core {
   stroke: var(--text);
   stroke-width: 2.2;
+}
+
+.graph-node.is-selected .node-halo {
+  opacity: 0.86;
+}
+
+.graph-node.is-selected .node-label {
+  fill: var(--text);
 }
 
 .graph-node.is-hovered .node-halo {
@@ -390,6 +399,57 @@ dd {
   font-family: var(--font-code);
   font-size: 0.96rem;
   font-weight: 700;
+}
+
+.dependency-list {
+  margin-top: 14px;
+}
+
+.dependency-list h3 {
+  margin: 0 0 10px;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dependency-list ul {
+  display: grid;
+  gap: 8px;
+  max-height: 210px;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.dependency-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 8px 10px;
+  background: rgba(30, 41, 59, 0.48);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.dependency-list span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dependency-list small,
+.dependency-list p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.76rem;
 }
 
 .stat-list div {

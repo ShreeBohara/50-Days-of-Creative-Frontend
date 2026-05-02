@@ -18,7 +18,8 @@ function App() {
   const [labelsVisible, setLabelsVisible] = useState(true)
   const [layoutVersion, setLayoutVersion] = useState(0)
   const [hoveredNodeId, setHoveredNodeId] = useState(null)
-  const activeNode = graph.nodes[0]
+  const [selectedNodeId, setSelectedNodeId] = useState('aurora-workbench')
+  const activeNode = graph.nodes.find((node) => node.id === selectedNodeId) ?? graph.nodes[0]
 
   const categoryCounts = useMemo(
     () =>
@@ -86,6 +87,8 @@ function App() {
             labelsVisible={labelsVisible}
             hoveredNodeId={hoveredNodeId}
             onHoverNode={setHoveredNodeId}
+            selectedNodeId={activeNode.id}
+            onSelectNode={setSelectedNodeId}
             layoutVersion={layoutVersion}
           />
         </section>
@@ -120,6 +123,24 @@ function App() {
                 <dd>{activeNode.dependentCount}</dd>
               </div>
             </dl>
+            <div className="dependency-list">
+              <h3>Direct dependencies</h3>
+              {activeNode.dependencies.length ? (
+                <ul>
+                  {activeNode.dependencies.map((dependencyId) => {
+                    const dependency = graph.nodes.find((node) => node.id === dependencyId)
+                    return (
+                      <li key={dependencyId}>
+                        <span>{dependency?.name ?? dependencyId}</span>
+                        {dependency && <small>{categoryMeta[dependency.category].label}</small>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              ) : (
+                <p>No direct dependencies in this graph.</p>
+              )}
+            </div>
           </div>
 
           <div className="panel-block">
@@ -166,7 +187,7 @@ function App() {
       </section>
 
       <footer className="status-strip" aria-live="polite">
-        <span>Ready</span>
+        <span>Selected: {activeNode.name}</span>
         <span>Drag nodes, search packages, or inspect dependencies.</span>
       </footer>
     </main>

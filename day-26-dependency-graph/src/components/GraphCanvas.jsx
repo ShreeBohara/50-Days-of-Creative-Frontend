@@ -55,6 +55,8 @@ function GraphCanvas({
   labelsVisible,
   hoveredNodeId,
   onHoverNode,
+  selectedNodeId,
+  onSelectNode,
   layoutVersion,
 }) {
   const containerRef = useRef(null)
@@ -237,8 +239,9 @@ function GraphCanvas({
             {layoutNodes.map((node) => {
               const meta = categoryMeta[node.category]
               const isHovered = hoveredNodeId === node.id
+              const isSelected = selectedNodeId === node.id
               const isConnected = connectedNodeIds.has(node.id)
-              const showLabel = labelsVisible || node.radius >= 18 || isHovered
+              const showLabel = labelsVisible || node.radius >= 18 || isHovered || isSelected
               const isDimmed = hoveredNodeId && !isConnected
 
               return (
@@ -247,6 +250,7 @@ function GraphCanvas({
                   className={[
                     'graph-node',
                     isHovered ? 'is-hovered' : '',
+                    isSelected ? 'is-selected' : '',
                     isConnected ? 'is-connected' : '',
                     isDimmed ? 'is-dimmed' : '',
                   ]
@@ -262,6 +266,13 @@ function GraphCanvas({
                   tabIndex={0}
                   onBlur={() => onHoverNode(null)}
                   onFocus={() => onHoverNode(node.id)}
+                  onClick={() => onSelectNode(node.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      onSelectNode(node.id)
+                    }
+                  }}
                   onMouseEnter={() => onHoverNode(node.id)}
                   onMouseLeave={() => onHoverNode(null)}
                 >
