@@ -15,3 +15,34 @@ export function getInitialPosition(index, total, width, height) {
     y: height / 2 + Math.sin(angle) * radius,
   }
 }
+
+export function getEndpointPoint(endpoint) {
+  if (!endpoint || typeof endpoint !== 'object') {
+    return null
+  }
+
+  return {
+    x: endpoint.x ?? 0,
+    y: endpoint.y ?? 0,
+  }
+}
+
+export function getCurvedLinkPath(link) {
+  const source = getEndpointPoint(link.source)
+  const target = getEndpointPoint(link.target)
+
+  if (!source || !target) {
+    return ''
+  }
+
+  const dx = target.x - source.x
+  const dy = target.y - source.y
+  const distance = Math.hypot(dx, dy) || 1
+  const normalX = -dy / distance
+  const normalY = dx / distance
+  const bend = Math.min(52, distance * 0.18)
+  const midX = (source.x + target.x) / 2 + normalX * bend
+  const midY = (source.y + target.y) / 2 + normalY * bend
+
+  return `M ${source.x} ${source.y} Q ${midX} ${midY} ${target.x} ${target.y}`
+}

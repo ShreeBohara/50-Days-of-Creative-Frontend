@@ -168,6 +168,20 @@
   touch-action: none;
 }
 
+.graph-link {
+  fill: none;
+  stroke: var(--link-color);
+  stroke-width: var(--link-width);
+  stroke-linecap: round;
+  opacity: 0.34;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--link-color) 44%, transparent));
+}
+
+.link-arrow {
+  fill: rgba(203, 213, 225, 0.78);
+}
+
 .graph-node {
   color: var(--node-color);
   transition: opacity 180ms var(--ease);

@@ -8,7 +8,11 @@ import {
   forceY,
 } from 'd3'
 import { categoryMeta } from '../data/graphData'
-import { getInitialPosition, getNodeRadius } from '../utils/graphMetrics'
+import {
+  getCurvedLinkPath,
+  getInitialPosition,
+  getNodeRadius,
+} from '../utils/graphMetrics'
 
 const MIN_STAGE = {
   width: 720,
@@ -112,33 +116,73 @@ function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
         role="img"
         aria-label="Force-directed npm dependency graph"
       >
+        <defs>
+          <marker
+            id="dependency-arrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" className="link-arrow" />
+          </marker>
+        </defs>
         <g className="graph-viewport">
-          {layoutNodes.map((node) => {
-            const meta = categoryMeta[node.category]
-            const showLabel = labelsVisible || node.radius >= 18
+          <g className="link-layer" aria-hidden="true">
+            {layoutLinks.map((link) => {
+              const source = link.source
+              const target = link.target
+              const sourceNode = typeof source === 'object' ? source : null
+              const targetNode = typeof target === 'object' ? target : null
+              const color = sourceNode ? categoryMeta[sourceNode.category].color : '#94a3b8'
+              const width = targetNode
+                ? Math.max(1.1, getNodeRadius(targetNode) / 10)
+                : 1.2
 
-            return (
-              <g
-                key={node.id}
-                className="graph-node"
-                style={{
-                  '--node-color': meta.color,
-                  '--node-glow': meta.glow,
-                }}
-                transform={`translate(${node.x ?? 0} ${node.y ?? 0})`}
-                aria-label={`${node.name} ${node.version}`}
-              >
-                <circle className="node-halo" r={node.radius + 8} />
-                <circle className="node-core" r={node.radius} />
-                <circle className="node-rim" r={Math.max(2, node.radius - 3)} />
-                {showLabel && (
-                  <text className="node-label" y={node.radius + 18}>
-                    {node.name}
-                  </text>
-                )}
-              </g>
-            )
-          })}
+              return (
+                <path
+                  key={link.id}
+                  className="graph-link"
+                  d={getCurvedLinkPath(link)}
+                  style={{
+                    '--link-color': color,
+                    '--link-width': width,
+                  }}
+                  markerEnd="url(#dependency-arrow)"
+                />
+              )
+            })}
+          </g>
+          <g className="node-layer">
+            {layoutNodes.map((node) => {
+              const meta = categoryMeta[node.category]
+              const showLabel = labelsVisible || node.radius >= 18
+
+              return (
+                <g
+                  key={node.id}
+                  className="graph-node"
+                  style={{
+                    '--node-color': meta.color,
+                    '--node-glow': meta.glow,
+                  }}
+                  transform={`translate(${node.x ?? 0} ${node.y ?? 0})`}
+                  aria-label={`${node.name} ${node.version}`}
+                >
+                  <circle className="node-halo" r={node.radius + 8} />
+                  <circle className="node-core" r={node.radius} />
+                  <circle className="node-rim" r={Math.max(2, node.radius - 3)} />
+                  {showLabel && (
+                    <text className="node-label" y={node.radius + 18}>
+                      {node.name}
+                    </text>
+                  )}
+                </g>
+              )
+            })}
+          </g>
         </g>
       </svg>
       <div className="simulation-hint" aria-hidden="true">
