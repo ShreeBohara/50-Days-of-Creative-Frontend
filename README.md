@@ -34,6 +34,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 24 | Spotify Music Player | Spotify-style player with waveform progress, vinyl Now Playing view, playlist UI, and Web Audio demo playback. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-24-music-player-ui/) | [day-24-music-player-ui](./day-24-music-player-ui/) |
 | 25 | Drag-and-Drop Kanban Board | Trello-style animated kanban with drag-and-drop, inline editing, filters, search, and localStorage persistence. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-25-kanban-board/) | [day-25-kanban-board](./day-25-kanban-board/) |
 | 26 | Animated Dependency Graph | Force-directed npm dependency explorer with D3 physics, search zoom, package inspection, and expandable graph bundles. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-26-dependency-graph/) | [day-26-dependency-graph](./day-26-dependency-graph/) |
+| 27 | Cursor Chat Room | Local multi-tab presence room with colored cursors, trails, emoji reactions, typing indicators, and floating chat bubbles. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-27-cursor-chat/) | [day-27-cursor-chat](./day-27-cursor-chat/) |
 
 ## Adding a New Day
 
