@@ -1,121 +1,165 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useMemo, useState } from 'react'
+import {
+  BadgeInfo,
+  GitBranch,
+  Network,
+  RotateCcw,
+  Search,
+  Tags,
+  ZoomIn,
+} from 'lucide-react'
 import './App.css'
+import { categoryMeta, createGraphData } from './data/graphData'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const graph = useMemo(() => createGraphData(), [])
+  const [query, setQuery] = useState('')
+  const [labelsVisible, setLabelsVisible] = useState(true)
+  const activeNode = graph.nodes[0]
+
+  const categoryCounts = useMemo(
+    () =>
+      graph.nodes.reduce((counts, node) => {
+        counts[node.category] = (counts[node.category] ?? 0) + 1
+        return counts
+      }, {}),
+    [graph.nodes],
+  )
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="app-shell">
+      <header className="topbar" aria-label="Dependency graph controls">
+        <div className="brand-lockup">
+          <span className="brand-mark" aria-hidden="true">
+            <Network size={22} />
+          </span>
+          <div>
+            <h1>Dependency Graph</h1>
+            <p>npm package topology explorer</p>
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+
+        <label className="search-control" htmlFor="package-search">
+          <Search size={18} aria-hidden="true" />
+          <span className="sr-only">Search packages</span>
+          <input
+            id="package-search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search packages"
+            type="search"
+          />
+        </label>
+
+        <div className="toolbar-actions">
+          <button type="button" className="control-button">
+            <RotateCcw size={17} aria-hidden="true" />
+            <span>Reset</span>
+          </button>
+          <button
+            type="button"
+            className="control-button"
+            aria-pressed={labelsVisible}
+            onClick={() => setLabelsVisible((value) => !value)}
+          >
+            <Tags size={17} aria-hidden="true" />
+            <span>{labelsVisible ? 'Labels on' : 'Labels off'}</span>
+          </button>
+          <button type="button" className="icon-button" aria-label="Zoom to fit">
+            <ZoomIn size={18} aria-hidden="true" />
+          </button>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+      </header>
+
+      <section className="workspace" aria-label="Interactive dependency workspace">
+        <section className="graph-stage" aria-label="Dependency graph canvas">
+          <div className="graph-placeholder">
+            <Network size={44} aria-hidden="true" />
+            <p>Force simulation loading surface</p>
+            <span>{graph.nodes.length} packages / {graph.links.length} edges</span>
+          </div>
+        </section>
+
+        <aside className="inspector" aria-label="Package details">
+          <div className="panel-block">
+            <div className="panel-heading">
+              <BadgeInfo size={18} aria-hidden="true" />
+              <h2>Selected package</h2>
+            </div>
+            <div className="package-card">
+              <span
+                className="category-dot"
+                style={{ '--category-color': categoryMeta[activeNode.category].color }}
+              />
+              <div>
+                <h3>{activeNode.name}</h3>
+                <p>{activeNode.description}</p>
+              </div>
+            </div>
+            <dl className="metric-grid">
+              <div>
+                <dt>Version</dt>
+                <dd>{activeNode.version}</dd>
+              </div>
+              <div>
+                <dt>Depends on</dt>
+                <dd>{activeNode.dependencyCount}</dd>
+              </div>
+              <div>
+                <dt>Dependents</dt>
+                <dd>{activeNode.dependentCount}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="panel-block">
+            <div className="panel-heading">
+              <GitBranch size={18} aria-hidden="true" />
+              <h2>Graph stats</h2>
+            </div>
+            <dl className="stat-list">
+              <div>
+                <dt>Packages</dt>
+                <dd>{graph.nodes.length}</dd>
+              </div>
+              <div>
+                <dt>Dependency edges</dt>
+                <dd>{graph.links.length}</dd>
+              </div>
+              <div>
+                <dt>Categories</dt>
+                <dd>{Object.keys(categoryCounts).length}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="panel-block">
+            <div className="panel-heading">
+              <Tags size={18} aria-hidden="true" />
+              <h2>Legend</h2>
+            </div>
+            <ul className="legend-list" aria-label="Package categories">
+              {Object.entries(categoryMeta).map(([category, meta]) => (
+                <li key={category}>
+                  <span
+                    className="category-dot"
+                    style={{ '--category-color': meta.color }}
+                    aria-hidden="true"
+                  />
+                  <span>{meta.label}</span>
+                  <strong>{categoryCounts[category] ?? 0}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
       </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <footer className="status-strip" aria-live="polite">
+        <span>Ready</span>
+        <span>Drag nodes, search packages, or inspect dependencies.</span>
+      </footer>
+    </main>
   )
 }
 
