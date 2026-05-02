@@ -9,12 +9,14 @@ import {
   ZoomIn,
 } from 'lucide-react'
 import './App.css'
+import GraphCanvas from './components/GraphCanvas'
 import { categoryMeta, createGraphData } from './data/graphData'
 
 function App() {
   const graph = useMemo(() => createGraphData(), [])
   const [query, setQuery] = useState('')
   const [labelsVisible, setLabelsVisible] = useState(true)
+  const [layoutVersion, setLayoutVersion] = useState(0)
   const activeNode = graph.nodes[0]
 
   const categoryCounts = useMemo(
@@ -52,7 +54,11 @@ function App() {
         </label>
 
         <div className="toolbar-actions">
-          <button type="button" className="control-button">
+          <button
+            type="button"
+            className="control-button"
+            onClick={() => setLayoutVersion((version) => version + 1)}
+          >
             <RotateCcw size={17} aria-hidden="true" />
             <span>Reset</span>
           </button>
@@ -73,11 +79,11 @@ function App() {
 
       <section className="workspace" aria-label="Interactive dependency workspace">
         <section className="graph-stage" aria-label="Dependency graph canvas">
-          <div className="graph-placeholder">
-            <Network size={44} aria-hidden="true" />
-            <p>Force simulation loading surface</p>
-            <span>{graph.nodes.length} packages / {graph.links.length} edges</span>
-          </div>
+          <GraphCanvas
+            nodes={graph.nodes}
+            links={graph.links}
+            layoutVersion={layoutVersion}
+          />
         </section>
 
         <aside className="inspector" aria-label="Package details">
