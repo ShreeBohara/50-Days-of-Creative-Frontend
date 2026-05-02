@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  drag,
   forceCollide,
   forceLink,
   forceManyBody,
   forceSimulation,
   forceX,
   forceY,
+  select,
 } from 'd3'
 import { categoryMeta } from '../data/graphData'
 import {
@@ -48,6 +50,7 @@ function useStageSize(containerRef) {
 
 function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
   const containerRef = useRef(null)
+  const svgRef = useRef(null)
   const simulationRef = useRef(null)
   const size = useStageSize(containerRef)
   const [layoutNodes, setLayoutNodes] = useState([])
@@ -108,9 +111,48 @@ function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
     return () => simulation.stop()
   }, [layoutVersion, links, simulationSeed, size.height, size.width])
 
+  useEffect(() => {
+    const svg = svgRef.current
+    const simulation = simulationRef.current
+
+    if (!svg || !simulation || !layoutNodes.length) {
+      return undefined
+    }
+
+    const dragBehavior = drag()
+      .on('start', function handleDragStart(event, node) {
+        select(this).classed('is-dragging', true)
+        if (!event.active) {
+          simulation.alphaTarget(0.28).restart()
+        }
+        node.fx = node.x
+        node.fy = node.y
+      })
+      .on('drag', (event, node) => {
+        node.fx = Math.max(18, Math.min(size.width - 18, event.x))
+        node.fy = Math.max(18, Math.min(size.height - 18, event.y))
+        setLayoutNodes([...simulation.nodes()])
+      })
+      .on('end', function handleDragEnd(event, node) {
+        select(this).classed('is-dragging', false)
+        if (!event.active) {
+          simulation.alphaTarget(0)
+        }
+        node.fx = null
+        node.fy = null
+      })
+
+    select(svg).selectAll('.graph-node').data(layoutNodes, (node) => node.id).call(dragBehavior)
+
+    return () => {
+      select(svg).selectAll('.graph-node').on('.drag', null)
+    }
+  }, [layoutNodes, size.height, size.width])
+
   return (
     <div ref={containerRef} className="graph-canvas-wrap">
       <svg
+        ref={svgRef}
         className="graph-canvas"
         viewBox={`0 0 ${size.width} ${size.height}`}
         role="img"

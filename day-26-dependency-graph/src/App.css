@@ -184,7 +184,21 @@
 
 .graph-node {
   color: var(--node-color);
+  cursor: grab;
   transition: opacity 180ms var(--ease);
+}
+
+.graph-node.is-dragging {
+  cursor: grabbing;
+}
+
+.graph-node.is-dragging .node-core {
+  stroke: var(--text);
+  stroke-width: 2.4;
+}
+
+.graph-node.is-dragging .node-halo {
+  opacity: 0.66;
 }
 
 .node-halo,
