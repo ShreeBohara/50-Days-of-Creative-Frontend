@@ -1,6 +1,35 @@
 import { create } from 'zustand'
 import { createDisplayName, createLocalUser, pickUserColor } from '../utils/identity'
 
+const presenceTimers = new Map()
+
+const scheduleRemoteActivation = (id, set) => {
+  window.clearTimeout(presenceTimers.get(id))
+  presenceTimers.set(
+    id,
+    window.setTimeout(() => {
+      set((state) => {
+        const remote = state.remoteUsers[id]
+
+        if (!remote || remote.presence !== 'entering') {
+          return state
+        }
+
+        return {
+          remoteUsers: {
+            ...state.remoteUsers,
+            [id]: {
+              ...remote,
+              presence: 'active',
+            },
+          },
+        }
+      })
+      presenceTimers.delete(id)
+    }, 650),
+  )
+}
+
 export const useRoomStore = create((set, get) => ({
   localUser: createLocalUser(),
   hasJoined: false,
@@ -44,6 +73,83 @@ export const useRoomStore = create((set, get) => ({
 
   leaveRoom: () => {
     set({ hasJoined: false, remoteUsers: {}, reactions: [], messages: [] })
+  },
+
+  upsertRemoteUser: (user) => {
+    if (!user || user.id === get().localUser.id) {
+      return
+    }
+
+    set((state) => {
+      const existing = state.remoteUsers[user.id]
+
+      return {
+        remoteUsers: {
+          ...state.remoteUsers,
+          [user.id]: {
+            ...existing,
+            ...user,
+            trail: existing?.trail ?? [],
+            presence: existing?.presence === 'leaving' ? 'active' : (existing?.presence ?? 'entering'),
+            lastSeen: Date.now(),
+          },
+        },
+      }
+    })
+
+    const remote = get().remoteUsers[user.id]
+    if (remote?.presence === 'entering') {
+      scheduleRemoteActivation(user.id, set)
+    }
+  },
+
+  removeRemoteUser: (id) => {
+    window.clearTimeout(presenceTimers.get(id))
+    presenceTimers.delete(id)
+
+    set((state) => {
+      const nextUsers = { ...state.remoteUsers }
+      delete nextUsers[id]
+
+      return { remoteUsers: nextUsers }
+    })
+  },
+
+  markRemoteLeaving: (id) => {
+    const remote = get().remoteUsers[id]
+
+    if (!remote) {
+      return
+    }
+
+    set((state) => ({
+      remoteUsers: {
+        ...state.remoteUsers,
+        [id]: {
+          ...state.remoteUsers[id],
+          presence: 'leaving',
+          lastSeen: Date.now(),
+        },
+      },
+    }))
+
+    window.clearTimeout(presenceTimers.get(id))
+    presenceTimers.set(
+      id,
+      window.setTimeout(() => {
+        get().removeRemoteUser(id)
+      }, 800),
+    )
+  },
+
+  prunePresence: () => {
+    const now = Date.now()
+
+    Object.values(get().remoteUsers).forEach((user) => {
+      if (user.presence !== 'leaving' && now - user.lastSeen > 7000) {
+        get().markRemoteLeaving(user.id)
+      }
+    })
   },
 
   setLocalPosition: (position) => {

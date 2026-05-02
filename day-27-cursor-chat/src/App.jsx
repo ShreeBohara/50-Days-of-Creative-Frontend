@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { MessageCircle, MousePointer2, Send, Shuffle, Sparkles, Users } from 'lucide-react'
+import { useBroadcastRoom } from './hooks/useBroadcastRoom'
 import { useRoomStore } from './store/useRoomStore'
 import './App.css'
 
 function App() {
   const localUser = useRoomStore((state) => state.localUser)
   const hasJoined = useRoomStore((state) => state.hasJoined)
+  const remoteUsers = useRoomStore((state) => state.remoteUsers)
   const joinRoom = useRoomStore((state) => state.joinRoom)
   const randomizeLocalIdentity = useRoomStore((state) => state.randomizeLocalIdentity)
+  const { isSupported } = useBroadcastRoom()
   const [nameInput, setNameInput] = useState(localUser.name)
+  const collaborators = Object.values(remoteUsers)
 
   const handleJoin = (event) => {
     event.preventDefault()
@@ -34,8 +38,8 @@ function App() {
             <h1>Cursor Chat Room</h1>
           </div>
           <div className="room-status-pill">
-            <span className="live-dot" />
-            Local multi-tab room
+            <span className={`live-dot ${hasJoined ? 'is-online' : ''}`} />
+            {isSupported ? `${collaborators.length + 1} in local room` : 'BroadcastChannel unavailable'}
           </div>
         </header>
 
@@ -46,8 +50,9 @@ function App() {
           <p className="eyebrow">Figma-style presence</p>
           <h2 id="welcome-title">Open another tab and watch the room wake up.</h2>
           <p>
-            Every tab becomes a collaborator with a colored cursor, live reactions, and
-            chat bubbles that float from the pointer.
+            {hasJoined
+              ? 'You are in. Open this same URL in another tab to sync live presence.'
+              : 'Every tab becomes a collaborator with a colored cursor, live reactions, and chat bubbles that float from the pointer.'}
           </p>
           <form className="join-form" onSubmit={handleJoin}>
             <label htmlFor="display-name">Display name</label>
@@ -86,6 +91,13 @@ function App() {
               <span>{localUser.name}</span>
               <small>{hasJoined ? 'you' : 'ready'}</small>
             </li>
+            {collaborators.map((user) => (
+              <li className={`user-row is-${user.presence}`} key={user.id}>
+                <span className="user-dot" style={{ '--user-color': user.color }} />
+                <span>{user.name}</span>
+                <small>{user.presence === 'leaving' ? 'leaving' : 'live'}</small>
+              </li>
+            ))}
           </ul>
         </aside>
 
