@@ -8,6 +8,8 @@ import {
   forceX,
   forceY,
   select,
+  zoom,
+  zoomIdentity,
 } from 'd3'
 import { categoryMeta } from '../data/graphData'
 import {
@@ -60,15 +62,17 @@ function GraphCanvas({
   onExpandNode,
   searchMatchId,
   layoutVersion,
+  viewResetVersion,
 }) {
   const containerRef = useRef(null)
   const svgRef = useRef(null)
   const simulationRef = useRef(null)
+  const zoomBehaviorRef = useRef(null)
   const lastCenteredSearchRef = useRef(null)
   const size = useStageSize(containerRef)
   const [layoutNodes, setLayoutNodes] = useState([])
   const [layoutLinks, setLayoutLinks] = useState([])
-  const [viewTransform, setViewTransform] = useState({ x: 0, y: 0, k: 1 })
+  const [viewTransform, setViewTransform] = useState(zoomIdentity)
 
   const simulationSeed = useMemo(
     () =>
@@ -137,11 +141,45 @@ function GraphCanvas({
       })
 
     simulationRef.current = simulation
-    setLayoutNodes(simNodes)
-    setLayoutLinks(simLinks)
 
     return () => simulation.stop()
   }, [layoutVersion, links, simulationSeed, size.height, size.width])
+
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg) {
+      return undefined
+    }
+
+    const zoomBehavior = zoom()
+      .scaleExtent([0.45, 2.6])
+      .translateExtent([
+        [-size.width * 0.8, -size.height * 0.8],
+        [size.width * 1.8, size.height * 1.8],
+      ])
+      .on('zoom', (event) => {
+        setViewTransform(event.transform)
+      })
+
+    zoomBehaviorRef.current = zoomBehavior
+    select(svg).call(zoomBehavior).on('dblclick.zoom', null)
+
+    return () => {
+      select(svg).on('.zoom', null)
+    }
+  }, [size.height, size.width])
+
+  useEffect(() => {
+    const svg = svgRef.current
+    const zoomBehavior = zoomBehaviorRef.current
+
+    if (!svg || !zoomBehavior) {
+      return
+    }
+
+    lastCenteredSearchRef.current = null
+    select(svg).call(zoomBehavior.transform, zoomIdentity)
+  }, [layoutVersion, viewResetVersion])
 
   useEffect(() => {
     const svg = svgRef.current
@@ -152,6 +190,7 @@ function GraphCanvas({
     }
 
     const dragBehavior = drag()
+      .container(svg)
       .on('start', function handleDragStart(event, node) {
         select(this).classed('is-dragging', true)
         if (!event.active) {
@@ -161,8 +200,9 @@ function GraphCanvas({
         node.fy = node.y
       })
       .on('drag', (event, node) => {
-        node.fx = Math.max(18, Math.min(size.width - 18, event.x))
-        node.fy = Math.max(18, Math.min(size.height - 18, event.y))
+        const [x, y] = viewTransform.invert([event.x, event.y])
+        node.fx = Math.max(18, Math.min(size.width - 18, x))
+        node.fy = Math.max(18, Math.min(size.height - 18, y))
         setLayoutNodes([...simulation.nodes()])
       })
       .on('end', function handleDragEnd(event, node) {
@@ -179,7 +219,7 @@ function GraphCanvas({
     return () => {
       select(svg).selectAll('.graph-node').on('.drag', null)
     }
-  }, [layoutNodes, size.height, size.width])
+  }, [layoutNodes, size.height, size.width, viewTransform])
 
   useEffect(() => {
     if (!searchMatchId) {
@@ -197,11 +237,20 @@ function GraphCanvas({
     }
 
     const nextScale = 1.55
-    setViewTransform({
-      k: nextScale,
-      x: size.width / 2 - (match.x ?? 0) * nextScale,
-      y: size.height / 2 - (match.y ?? 0) * nextScale,
-    })
+    const nextTransform = zoomIdentity
+      .translate(
+        size.width / 2 - (match.x ?? 0) * nextScale,
+        size.height / 2 - (match.y ?? 0) * nextScale,
+      )
+      .scale(nextScale)
+    const svg = svgRef.current
+    const zoomBehavior = zoomBehaviorRef.current
+
+    if (svg && zoomBehavior) {
+      select(svg).call(zoomBehavior.transform, nextTransform)
+    } else {
+      setViewTransform(nextTransform)
+    }
     lastCenteredSearchRef.current = searchMatchId
   }, [layoutNodes, searchMatchId, size.height, size.width])
 
@@ -229,7 +278,7 @@ function GraphCanvas({
         </defs>
         <g
           className="graph-viewport"
-          transform={`translate(${viewTransform.x} ${viewTransform.y}) scale(${viewTransform.k})`}
+          transform={viewTransform.toString()}
         >
           <g className="link-layer" aria-hidden="true">
             {layoutLinks.map((link) => {

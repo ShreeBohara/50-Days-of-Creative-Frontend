@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   BadgeInfo,
   GitBranch,
@@ -22,6 +22,7 @@ function App() {
   const [query, setQuery] = useState('')
   const [labelsVisible, setLabelsVisible] = useState(true)
   const [layoutVersion, setLayoutVersion] = useState(0)
+  const [viewResetVersion, setViewResetVersion] = useState(0)
   const [hoveredNodeId, setHoveredNodeId] = useState(null)
   const [selectedNodeId, setSelectedNodeId] = useState('aurora-workbench')
   const activeNode = graph.nodes.find((node) => node.id === selectedNodeId) ?? graph.nodes[0]
@@ -52,17 +53,30 @@ function App() {
 
   const expandedCount = graph.nodes.filter((node) => node.expanded).length
 
-  useEffect(() => {
-    if (!normalizedQuery) {
+  const handleSearchChange = (event) => {
+    const nextQuery = event.target.value
+    const nextNormalizedQuery = nextQuery.trim().toLowerCase()
+    const nextMatch = nextNormalizedQuery
+      ? graph.nodes.find(
+          (node) =>
+            node.name.toLowerCase().includes(nextNormalizedQuery) ||
+            node.id.toLowerCase().includes(nextNormalizedQuery) ||
+            node.description.toLowerCase().includes(nextNormalizedQuery),
+        )
+      : null
+
+    setQuery(nextQuery)
+
+    if (!nextNormalizedQuery) {
       setHoveredNodeId(null)
       return
     }
 
-    if (searchMatch) {
-      setSelectedNodeId(searchMatch.id)
-      setHoveredNodeId(searchMatch.id)
+    if (nextMatch) {
+      setSelectedNodeId(nextMatch.id)
+      setHoveredNodeId(nextMatch.id)
     }
-  }, [normalizedQuery, searchMatch])
+  }
 
   const handleExpandNode = (nodeId) => {
     setGraph((currentGraph) => {
@@ -129,7 +143,7 @@ function App() {
           <input
             id="package-search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search packages"
             type="search"
           />
@@ -153,7 +167,12 @@ function App() {
             <Tags size={17} aria-hidden="true" />
             <span>{labelsVisible ? 'Labels on' : 'Labels off'}</span>
           </button>
-          <button type="button" className="icon-button" aria-label="Zoom to fit">
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Zoom to fit"
+            onClick={() => setViewResetVersion((version) => version + 1)}
+          >
             <ZoomIn size={18} aria-hidden="true" />
           </button>
         </div>
@@ -172,6 +191,7 @@ function App() {
             onExpandNode={handleExpandNode}
             searchMatchId={searchMatch?.id ?? null}
             layoutVersion={layoutVersion}
+            viewResetVersion={viewResetVersion}
           />
         </section>
 

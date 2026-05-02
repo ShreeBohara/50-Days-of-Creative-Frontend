@@ -177,6 +177,7 @@
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 8px color-mix(in srgb, var(--link-color) 44%, transparent));
   transition: opacity 180ms var(--ease), stroke-width 180ms var(--ease);
+  animation: link-enter 520ms var(--ease);
 }
 
 .graph-link.is-related {
@@ -196,6 +197,7 @@
   color: var(--node-color);
   cursor: grab;
   transition: opacity 180ms var(--ease);
+  animation: node-enter 460ms var(--ease);
 }
 
 .graph-node.is-dragging {
@@ -292,6 +294,28 @@
 
   50% {
     filter: drop-shadow(0 0 28px var(--node-color));
+  }
+}
+
+@keyframes node-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes link-enter {
+  from {
+    opacity: 0;
+    stroke-dasharray: 4 16;
+  }
+
+  to {
+    opacity: 0.34;
+    stroke-dasharray: 1 0;
   }
 }
 
@@ -547,4 +571,104 @@ dd {
 .status-strip span:first-child {
   color: var(--accent-strong);
   font-weight: 700;
+}
+
+@media (max-width: 1020px) {
+  .topbar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .toolbar-actions {
+    justify-content: stretch;
+  }
+
+  .control-button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) minmax(250px, 38dvh);
+  }
+
+  .graph-stage {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inspector {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.2fr) minmax(220px, 0.8fr) minmax(220px, 0.8fr);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .panel-block {
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell {
+    min-height: 100dvh;
+  }
+
+  .topbar {
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .brand-mark,
+  .icon-button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .brand-lockup h1 {
+    font-size: 1.12rem;
+  }
+
+  .brand-lockup p {
+    font-size: 0.68rem;
+  }
+
+  .toolbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .control-button {
+    min-width: calc(50% - 5px);
+  }
+
+  .workspace {
+    grid-template-rows: minmax(0, 1fr) 42dvh;
+  }
+
+  .inspector {
+    grid-template-columns: 84vw 76vw 76vw;
+    padding: 12px;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .simulation-hint {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    justify-content: space-between;
+  }
+
+  .status-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 54px;
+    padding: 8px 12px;
+  }
 }
