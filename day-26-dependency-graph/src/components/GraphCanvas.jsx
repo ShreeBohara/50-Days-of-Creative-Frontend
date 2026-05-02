@@ -102,6 +102,27 @@ function GraphCanvas({
     return connected
   }, [hoveredNodeId, links])
 
+  const seededLinks = useMemo(() => {
+    const nodesById = new Map(simulationSeed.map((node) => [node.id, node]))
+
+    return links
+      .map((link) => ({
+        ...link,
+        source: nodesById.get(link.source),
+        target: nodesById.get(link.target),
+      }))
+      .filter((link) => link.source && link.target)
+  }, [links, simulationSeed])
+
+  const positionedNodes = useMemo(
+    () => (layoutNodes.length ? layoutNodes : simulationSeed),
+    [layoutNodes, simulationSeed],
+  )
+  const positionedLinks = useMemo(
+    () => (layoutLinks.length ? layoutLinks : seededLinks),
+    [layoutLinks, seededLinks],
+  )
+
   useEffect(() => {
     if (!simulationSeed.length) {
       return undefined
@@ -214,12 +235,15 @@ function GraphCanvas({
         node.fy = null
       })
 
-    select(svg).selectAll('.graph-node').data(layoutNodes, (node) => node.id).call(dragBehavior)
+    select(svg)
+      .selectAll('.graph-node')
+      .data(positionedNodes, (node, index) => node?.id ?? positionedNodes[index]?.id ?? index)
+      .call(dragBehavior)
 
     return () => {
       select(svg).selectAll('.graph-node').on('.drag', null)
     }
-  }, [layoutNodes, size.height, size.width, viewTransform])
+  }, [layoutNodes.length, positionedNodes, size.height, size.width, viewTransform])
 
   useEffect(() => {
     if (!searchMatchId) {
@@ -231,7 +255,7 @@ function GraphCanvas({
       return
     }
 
-    const match = layoutNodes.find((node) => node.id === searchMatchId)
+    const match = positionedNodes.find((node) => node.id === searchMatchId)
     if (!match) {
       return
     }
@@ -252,7 +276,7 @@ function GraphCanvas({
       setViewTransform(nextTransform)
     }
     lastCenteredSearchRef.current = searchMatchId
-  }, [layoutNodes, searchMatchId, size.height, size.width])
+  }, [positionedNodes, searchMatchId, size.height, size.width])
 
   return (
     <div ref={containerRef} className="graph-canvas-wrap">
@@ -281,7 +305,7 @@ function GraphCanvas({
           transform={viewTransform.toString()}
         >
           <g className="link-layer" aria-hidden="true">
-            {layoutLinks.map((link) => {
+            {positionedLinks.map((link) => {
               const source = link.source
               const target = link.target
               const sourceNode = typeof source === 'object' ? source : null
@@ -316,7 +340,7 @@ function GraphCanvas({
             })}
           </g>
           <g className="node-layer">
-            {layoutNodes.map((node) => {
+            {positionedNodes.map((node) => {
               const meta = categoryMeta[node.category]
               const isHovered = hoveredNodeId === node.id
               const isSelected = selectedNodeId === node.id
@@ -381,8 +405,8 @@ function GraphCanvas({
         </g>
       </svg>
       <div className="simulation-hint" aria-hidden="true">
-        <span>{layoutNodes.length} nodes</span>
-        <span>{layoutLinks.length} curved links queued</span>
+        <span>{positionedNodes.length} nodes</span>
+        <span>{positionedLinks.length} curved links queued</span>
       </div>
     </div>
   )

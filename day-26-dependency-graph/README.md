@@ -1,16 +1,38 @@
-# React + Vite
+# Day 26 — Animated Dependency Graph
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive force-directed dependency explorer for a mock npm application graph.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 49 deterministic npm-style packages with 80 dependency edges
+- D3 force simulation with charge, collision, link distance, and center gravity
+- SVG package nodes sized by graph importance and colored by category
+- Curved Bezier dependency links with direction markers
+- Drag nodes to pin and reheat the simulation
+- Hover or focus a node to highlight connected packages and dim unrelated paths
+- Click a package to inspect version, category, description, dependencies, and dependents
+- Double-click expandable packages to load hidden dependency bundles
+- Search packages by name, id, or description and zoom to the first match
+- D3 zoom and pan with reset controls, label toggle, legend, and responsive mobile inspector
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite 8
+- D3 force, drag, and zoom
+- Lucide React icons
+- Fira Sans + Fira Code
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Output is in `dist/`, configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-26-dependency-graph/`.
