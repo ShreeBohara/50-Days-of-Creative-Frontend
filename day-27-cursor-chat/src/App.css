@@ -206,6 +206,12 @@ h2 {
     box-shadow 180ms ease;
 }
 
+.join-row button:disabled,
+.chat-form button:disabled {
+  box-shadow: none;
+  transform: none;
+}
+
 .join-row button {
   padding: 0 18px;
   white-space: nowrap;
@@ -696,6 +702,25 @@ h2 {
     position: fixed;
     right: 18px;
     bottom: 18px;
+  }
+
+  .emoji-picker {
+    position: fixed;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 761px) {
+  .welcome-panel {
+    max-width: 460px;
+    padding: 20px;
+  }
+
+  .welcome-panel > p:not(.eyebrow) {
+    font-size: 0.94rem;
+  }
+
+  .chat-panel {
+    max-width: 340px;
   }
 }
 

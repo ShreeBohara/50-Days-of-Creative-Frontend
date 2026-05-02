@@ -1,16 +1,41 @@
-# React + Vite
+# Day 27 — Multi-Tab Cursor Chat Room
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A local Figma-style multiplayer presence demo built with React, Zustand, and the BroadcastChannel API.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Per-tab generated collaborator identity with editable display name and unique color
+- BroadcastChannel room protocol for join, hello, cursor, typing, chat, reaction, idle, and leave events
+- Normalized cursor coordinates so different browser sizes stay in sync
+- Remote SVG cursors with name tags, typing dots, idle badges, pop-in, and poof-out states
+- Short fading cursor trails for remote collaborators
+- Click-to-send emoji reactions plus a right-click radial reaction picker
+- Floating chat bubbles that appear near the sender's cursor and fade after 5 seconds
+- Connected users panel with live, idle, and leaving states
+- Responsive mobile layout with a touch-friendly reaction button
+- Accessible focus states, reduced-motion handling, and 44px minimum touch targets
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite 8
+- Zustand
+- BroadcastChannel API
+- Lucide React icons
+- CSS animations
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+Open the same local URL in two or more tabs to test multiplayer presence.
+
+## Build
+
+```bash
+npm run build
+```
+
+Output is in `dist/`, configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-27-cursor-chat/`.

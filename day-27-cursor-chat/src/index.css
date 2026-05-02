@@ -63,6 +63,10 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 button:focus-visible,
 input:focus-visible {
   outline: 3px solid rgba(249, 115, 22, 0.44);

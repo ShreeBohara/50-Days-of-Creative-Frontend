@@ -91,8 +91,8 @@ function App() {
 
     event.preventDefault()
     setPicker({
-      clientX: Math.min(event.clientX, window.innerWidth - 120),
-      clientY: Math.min(event.clientY, window.innerHeight - 120),
+      clientX: Math.max(92, Math.min(event.clientX, window.innerWidth - 120)),
+      clientY: Math.max(92, Math.min(event.clientY, window.innerHeight - 120)),
       point: normalizePoint(event.clientX, event.clientY),
     })
   }
@@ -268,8 +268,8 @@ function App() {
             onClick={() => {
               const point = { x: localUser.x, y: localUser.y }
               setPicker({
-                clientX: window.innerWidth - 106,
-                clientY: window.innerHeight - 168,
+                clientX: Math.max(92, window.innerWidth - 106),
+                clientY: Math.max(92, window.innerHeight - 168),
                 point,
               })
             }}
