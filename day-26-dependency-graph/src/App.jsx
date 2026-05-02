@@ -82,6 +82,7 @@ function App() {
           <GraphCanvas
             nodes={graph.nodes}
             links={graph.links}
+            labelsVisible={labelsVisible}
             layoutVersion={layoutVersion}
           />
         </section>

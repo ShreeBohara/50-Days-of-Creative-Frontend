@@ -168,6 +168,49 @@
   touch-action: none;
 }
 
+.graph-node {
+  color: var(--node-color);
+  transition: opacity 180ms var(--ease);
+}
+
+.node-halo,
+.node-core,
+.node-rim {
+  transition: r 180ms var(--ease), fill 180ms var(--ease), stroke 180ms var(--ease);
+}
+
+.node-halo {
+  fill: var(--node-glow);
+  opacity: 0.35;
+  filter: blur(3px);
+}
+
+.node-core {
+  fill: var(--node-color);
+  stroke: rgba(248, 250, 252, 0.52);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 12px var(--node-glow));
+}
+
+.node-rim {
+  fill: rgba(255, 255, 255, 0.12);
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1;
+}
+
+.node-label {
+  fill: var(--text-soft);
+  paint-order: stroke;
+  stroke: rgba(7, 11, 20, 0.92);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
 .simulation-hint {
   position: absolute;
   left: 18px;

@@ -7,6 +7,7 @@ import {
   forceX,
   forceY,
 } from 'd3'
+import { categoryMeta } from '../data/graphData'
 import { getInitialPosition, getNodeRadius } from '../utils/graphMetrics'
 
 const MIN_STAGE = {
@@ -41,7 +42,7 @@ function useStageSize(containerRef) {
   return size
 }
 
-function GraphCanvas({ nodes, links, layoutVersion }) {
+function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
   const containerRef = useRef(null)
   const simulationRef = useRef(null)
   const size = useStageSize(containerRef)
@@ -111,7 +112,34 @@ function GraphCanvas({ nodes, links, layoutVersion }) {
         role="img"
         aria-label="Force-directed npm dependency graph"
       >
-        <g className="graph-viewport" />
+        <g className="graph-viewport">
+          {layoutNodes.map((node) => {
+            const meta = categoryMeta[node.category]
+            const showLabel = labelsVisible || node.radius >= 18
+
+            return (
+              <g
+                key={node.id}
+                className="graph-node"
+                style={{
+                  '--node-color': meta.color,
+                  '--node-glow': meta.glow,
+                }}
+                transform={`translate(${node.x ?? 0} ${node.y ?? 0})`}
+                aria-label={`${node.name} ${node.version}`}
+              >
+                <circle className="node-halo" r={node.radius + 8} />
+                <circle className="node-core" r={node.radius} />
+                <circle className="node-rim" r={Math.max(2, node.radius - 3)} />
+                {showLabel && (
+                  <text className="node-label" y={node.radius + 18}>
+                    {node.name}
+                  </text>
+                )}
+              </g>
+            )
+          })}
+        </g>
       </svg>
       <div className="simulation-hint" aria-hidden="true">
         <span>{layoutNodes.length} nodes</span>
