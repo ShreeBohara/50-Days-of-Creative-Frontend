@@ -12,6 +12,7 @@ import {
 import { categoryMeta } from '../data/graphData'
 import {
   getCurvedLinkPath,
+  getEndpointId,
   getInitialPosition,
   getNodeRadius,
 } from '../utils/graphMetrics'
@@ -48,7 +49,14 @@ function useStageSize(containerRef) {
   return size
 }
 
-function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
+function GraphCanvas({
+  nodes,
+  links,
+  labelsVisible,
+  hoveredNodeId,
+  onHoverNode,
+  layoutVersion,
+}) {
   const containerRef = useRef(null)
   const svgRef = useRef(null)
   const simulationRef = useRef(null)
@@ -65,6 +73,24 @@ function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
       })),
     [nodes, size.height, size.width],
   )
+
+  const connectedNodeIds = useMemo(() => {
+    if (!hoveredNodeId) {
+      return new Set()
+    }
+
+    const connected = new Set([hoveredNodeId])
+    links.forEach((link) => {
+      if (link.source === hoveredNodeId) {
+        connected.add(link.target)
+      }
+      if (link.target === hoveredNodeId) {
+        connected.add(link.source)
+      }
+    })
+
+    return connected
+  }, [hoveredNodeId, links])
 
   useEffect(() => {
     if (!simulationSeed.length) {
@@ -178,15 +204,25 @@ function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
               const target = link.target
               const sourceNode = typeof source === 'object' ? source : null
               const targetNode = typeof target === 'object' ? target : null
+              const sourceId = getEndpointId(source)
+              const targetId = getEndpointId(target)
               const color = sourceNode ? categoryMeta[sourceNode.category].color : '#94a3b8'
               const width = targetNode
                 ? Math.max(1.1, getNodeRadius(targetNode) / 10)
                 : 1.2
+              const isRelated =
+                hoveredNodeId && (sourceId === hoveredNodeId || targetId === hoveredNodeId)
 
               return (
                 <path
                   key={link.id}
-                  className="graph-link"
+                  className={[
+                    'graph-link',
+                    isRelated ? 'is-related' : '',
+                    hoveredNodeId && !isRelated ? 'is-dimmed' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                   d={getCurvedLinkPath(link)}
                   style={{
                     '--link-color': color,
@@ -200,18 +236,34 @@ function GraphCanvas({ nodes, links, labelsVisible, layoutVersion }) {
           <g className="node-layer">
             {layoutNodes.map((node) => {
               const meta = categoryMeta[node.category]
-              const showLabel = labelsVisible || node.radius >= 18
+              const isHovered = hoveredNodeId === node.id
+              const isConnected = connectedNodeIds.has(node.id)
+              const showLabel = labelsVisible || node.radius >= 18 || isHovered
+              const isDimmed = hoveredNodeId && !isConnected
 
               return (
                 <g
                   key={node.id}
-                  className="graph-node"
+                  className={[
+                    'graph-node',
+                    isHovered ? 'is-hovered' : '',
+                    isConnected ? 'is-connected' : '',
+                    isDimmed ? 'is-dimmed' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                   style={{
                     '--node-color': meta.color,
                     '--node-glow': meta.glow,
                   }}
                   transform={`translate(${node.x ?? 0} ${node.y ?? 0})`}
                   aria-label={`${node.name} ${node.version}`}
+                  role="button"
+                  tabIndex={0}
+                  onBlur={() => onHoverNode(null)}
+                  onFocus={() => onHoverNode(node.id)}
+                  onMouseEnter={() => onHoverNode(node.id)}
+                  onMouseLeave={() => onHoverNode(null)}
                 >
                   <circle className="node-halo" r={node.radius + 8} />
                   <circle className="node-core" r={node.radius} />

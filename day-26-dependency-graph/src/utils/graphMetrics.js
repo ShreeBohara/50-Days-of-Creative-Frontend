@@ -27,6 +27,10 @@ export function getEndpointPoint(endpoint) {
   }
 }
 
+export function getEndpointId(endpoint) {
+  return typeof endpoint === 'object' ? endpoint.id : endpoint
+}
+
 export function getCurvedLinkPath(link) {
   const source = getEndpointPoint(link.source)
   const target = getEndpointPoint(link.target)

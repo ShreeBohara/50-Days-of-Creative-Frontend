@@ -17,6 +17,7 @@ function App() {
   const [query, setQuery] = useState('')
   const [labelsVisible, setLabelsVisible] = useState(true)
   const [layoutVersion, setLayoutVersion] = useState(0)
+  const [hoveredNodeId, setHoveredNodeId] = useState(null)
   const activeNode = graph.nodes[0]
 
   const categoryCounts = useMemo(
@@ -83,6 +84,8 @@ function App() {
             nodes={graph.nodes}
             links={graph.links}
             labelsVisible={labelsVisible}
+            hoveredNodeId={hoveredNodeId}
+            onHoverNode={setHoveredNodeId}
             layoutVersion={layoutVersion}
           />
         </section>
