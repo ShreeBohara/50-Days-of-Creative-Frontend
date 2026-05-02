@@ -8,6 +8,7 @@ export function useBroadcastRoom() {
   const upsertRemoteUser = useRoomStore((state) => state.upsertRemoteUser)
   const updateRemoteCursor = useRoomStore((state) => state.updateRemoteCursor)
   const updateRemoteTyping = useRoomStore((state) => state.updateRemoteTyping)
+  const updateRemoteIdle = useRoomStore((state) => state.updateRemoteIdle)
   const markRemoteLeaving = useRoomStore((state) => state.markRemoteLeaving)
   const prunePresence = useRoomStore((state) => state.prunePresence)
   const addReaction = useRoomStore((state) => state.addReaction)
@@ -71,6 +72,11 @@ export function useBroadcastRoom() {
         return
       }
 
+      if (message.type === 'idle') {
+        updateRemoteIdle(message.user, Boolean(message.payload?.idle))
+        return
+      }
+
       if (message.type === 'chat') {
         addMessage({
           ...message.payload,
@@ -125,6 +131,7 @@ export function useBroadcastRoom() {
     post,
     prunePresence,
     updateRemoteCursor,
+    updateRemoteIdle,
     updateRemoteTyping,
     upsertRemoteUser,
   ])

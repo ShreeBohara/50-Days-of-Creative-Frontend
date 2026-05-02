@@ -11,6 +11,18 @@ import './App.css'
 
 const defaultEmoji = '✨'
 
+const getPresenceLabel = (user, isLocal = false) => {
+  if (!isLocal && user.presence === 'leaving') {
+    return 'leaving'
+  }
+
+  if (user.idle) {
+    return 'idle'
+  }
+
+  return isLocal ? 'you' : 'live'
+}
+
 function App() {
   const localUser = useRoomStore((state) => state.localUser)
   const hasJoined = useRoomStore((state) => state.hasJoined)
@@ -208,13 +220,16 @@ function App() {
             <li>
               <span className="user-dot" style={{ '--user-color': localUser.color }} />
               <span>{localUser.name}</span>
-              <small>{hasJoined ? 'you' : 'ready'}</small>
+              <small>{hasJoined ? getPresenceLabel(localUser, true) : 'ready'}</small>
             </li>
             {collaborators.map((user) => (
-              <li className={`user-row is-${user.presence}`} key={user.id}>
+              <li
+                className={`user-row is-${user.presence} ${user.idle ? 'is-idle' : ''}`}
+                key={user.id}
+              >
                 <span className="user-dot" style={{ '--user-color': user.color }} />
                 <span>{user.name}</span>
-                <small>{user.presence === 'leaving' ? 'leaving' : 'live'}</small>
+                <small>{getPresenceLabel(user)}</small>
               </li>
             ))}
           </ul>

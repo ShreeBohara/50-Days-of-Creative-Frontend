@@ -278,6 +278,14 @@ h2 {
   animation: user-poof 760ms ease both;
 }
 
+.user-row.is-idle {
+  opacity: 0.72;
+}
+
+.user-row.is-idle .user-dot {
+  filter: saturate(0.45);
+}
+
 .users-panel small {
   color: var(--text-muted);
   font-size: 0.74rem;

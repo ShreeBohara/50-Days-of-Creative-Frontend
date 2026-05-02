@@ -225,6 +225,18 @@ export const useRoomStore = create((set, get) => ({
     })
   },
 
+  updateRemoteIdle: (user, idle) => {
+    if (!user || user.id === get().localUser.id) {
+      return
+    }
+
+    get().upsertRemoteUser({
+      ...user,
+      idle,
+      isTyping: idle ? false : user.isTyping,
+    })
+  },
+
   setLocalIdle: (idle) => {
     set((state) => ({
       localUser: {
