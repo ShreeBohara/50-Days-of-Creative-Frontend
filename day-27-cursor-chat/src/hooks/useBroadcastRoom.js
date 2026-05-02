@@ -7,9 +7,11 @@ export function useBroadcastRoom() {
   const hasJoined = useRoomStore((state) => state.hasJoined)
   const upsertRemoteUser = useRoomStore((state) => state.upsertRemoteUser)
   const updateRemoteCursor = useRoomStore((state) => state.updateRemoteCursor)
+  const updateRemoteTyping = useRoomStore((state) => state.updateRemoteTyping)
   const markRemoteLeaving = useRoomStore((state) => state.markRemoteLeaving)
   const prunePresence = useRoomStore((state) => state.prunePresence)
   const addReaction = useRoomStore((state) => state.addReaction)
+  const addMessage = useRoomStore((state) => state.addMessage)
   const channelRef = useRef(null)
   const isSupported = typeof BroadcastChannel !== 'undefined'
 
@@ -64,6 +66,22 @@ export function useBroadcastRoom() {
         return
       }
 
+      if (message.type === 'typing') {
+        updateRemoteTyping(message.user, Boolean(message.payload?.isTyping))
+        return
+      }
+
+      if (message.type === 'chat') {
+        addMessage({
+          ...message.payload,
+          color: message.user?.color ?? message.payload?.color,
+          name: message.user?.name ?? message.payload?.name,
+          userId: message.senderId,
+        })
+        updateRemoteTyping(message.user, false)
+        return
+      }
+
       if (message.user) {
         upsertRemoteUser(message.user)
       }
@@ -102,10 +120,12 @@ export function useBroadcastRoom() {
     hasJoined,
     isSupported,
     addReaction,
+    addMessage,
     markRemoteLeaving,
     post,
     prunePresence,
     updateRemoteCursor,
+    updateRemoteTyping,
     upsertRemoteUser,
   ])
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MessageCircle, MousePointer2, Send, Shuffle, Sparkles, Users } from 'lucide-react'
+import { ChatBubbles } from './components/ChatBubbles'
 import { CursorLayer } from './components/CursorLayer'
 import { EmojiPicker, ReactionLayer } from './components/Reactions'
 import { useBroadcastRoom } from './hooks/useBroadcastRoom'
@@ -15,14 +16,21 @@ function App() {
   const hasJoined = useRoomStore((state) => state.hasJoined)
   const remoteUsers = useRoomStore((state) => state.remoteUsers)
   const reactions = useRoomStore((state) => state.reactions)
+  const messages = useRoomStore((state) => state.messages)
   const addReaction = useRoomStore((state) => state.addReaction)
+  const addMessage = useRoomStore((state) => state.addMessage)
+  const setLocalTyping = useRoomStore((state) => state.setLocalTyping)
   const joinRoom = useRoomStore((state) => state.joinRoom)
   const randomizeLocalIdentity = useRoomStore((state) => state.randomizeLocalIdentity)
   const { post, isSupported } = useBroadcastRoom()
   const [nameInput, setNameInput] = useState(localUser.name)
+  const [chatInput, setChatInput] = useState('')
   const [picker, setPicker] = useState(null)
+  const typingTimer = useRef(0)
   const collaborators = Object.values(remoteUsers)
   useCursorTracking(post)
+
+  useEffect(() => () => window.clearTimeout(typingTimer.current), [])
 
   const handleJoin = (event) => {
     event.preventDefault()
@@ -77,6 +85,52 @@ function App() {
     })
   }
 
+  const stopTypingSoon = () => {
+    window.clearTimeout(typingTimer.current)
+    typingTimer.current = window.setTimeout(() => {
+      setLocalTyping(false)
+      post('typing', { isTyping: false })
+    }, 900)
+  }
+
+  const handleChatChange = (event) => {
+    setChatInput(event.target.value)
+
+    if (!hasJoined) {
+      return
+    }
+
+    setLocalTyping(true)
+    post('typing', { isTyping: true })
+    stopTypingSoon()
+  }
+
+  const handleChatSubmit = (event) => {
+    event.preventDefault()
+
+    const text = chatInput.trim()
+
+    if (!hasJoined || !text) {
+      return
+    }
+
+    const message = {
+      id: `message-${localUser.id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      text,
+      x: localUser.x,
+      y: localUser.y,
+      color: localUser.color,
+      userId: localUser.id,
+      name: localUser.name,
+    }
+
+    addMessage(message)
+    post('chat', message)
+    setChatInput('')
+    setLocalTyping(false)
+    post('typing', { isTyping: false })
+  }
+
   return (
     <main className="room-app">
       <section
@@ -88,6 +142,7 @@ function App() {
         <div className="canvas-grid" aria-hidden="true" />
         <div className="canvas-glow canvas-glow-a" aria-hidden="true" />
         <div className="canvas-glow canvas-glow-b" aria-hidden="true" />
+        {hasJoined ? <ChatBubbles messages={messages} /> : null}
         {hasJoined ? <ReactionLayer reactions={reactions} /> : null}
         {hasJoined ? <CursorLayer users={collaborators} /> : null}
         <EmojiPicker
@@ -170,9 +225,20 @@ function App() {
             <MessageCircle size={18} aria-hidden="true" />
             <span>Room chat</span>
           </div>
-          <form className="chat-form">
-            <input type="text" placeholder="Say something near your cursor..." />
-            <button type="button" aria-label="Send message">
+          <form className="chat-form" onSubmit={handleChatSubmit}>
+            <input
+              type="text"
+              placeholder={hasJoined ? 'Say something near your cursor...' : 'Join to chat...'}
+              value={chatInput}
+              maxLength={96}
+              disabled={!hasJoined}
+              onBlur={() => {
+                setLocalTyping(false)
+                post('typing', { isTyping: false })
+              }}
+              onChange={handleChatChange}
+            />
+            <button type="submit" aria-label="Send message" disabled={!hasJoined || !chatInput.trim()}>
               <Send size={18} aria-hidden="true" />
             </button>
           </form>

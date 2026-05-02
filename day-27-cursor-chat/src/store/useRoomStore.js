@@ -214,6 +214,17 @@ export const useRoomStore = create((set, get) => ({
     }))
   },
 
+  updateRemoteTyping: (user, isTyping) => {
+    if (!user || user.id === get().localUser.id) {
+      return
+    }
+
+    get().upsertRemoteUser({
+      ...user,
+      isTyping,
+    })
+  },
+
   setLocalIdle: (idle) => {
     set((state) => ({
       localUser: {
@@ -237,6 +248,22 @@ export const useRoomStore = create((set, get) => ({
   removeReaction: (id) => {
     set((state) => ({
       reactions: state.reactions.filter((reaction) => reaction.id !== id),
+    }))
+  },
+
+  addMessage: (message) => {
+    set((state) => ({
+      messages: [...state.messages, message].slice(-24),
+    }))
+
+    window.setTimeout(() => {
+      get().removeMessage(message.id)
+    }, 5200)
+  },
+
+  removeMessage: (id) => {
+    set((state) => ({
+      messages: state.messages.filter((message) => message.id !== id),
     }))
   },
 
