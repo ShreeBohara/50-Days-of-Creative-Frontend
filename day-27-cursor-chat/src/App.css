@@ -324,6 +324,138 @@ h2 {
   flex: 0 0 50px;
 }
 
+.cursor-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.remote-cursor {
+  position: absolute;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 4px 7px;
+  min-width: max-content;
+  transform: translate3d(0, 0, 0);
+  transition:
+    left 90ms linear,
+    top 90ms linear,
+    opacity 260ms ease,
+    transform 260ms ease,
+    filter 260ms ease;
+  filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--cursor-color), transparent 68%));
+}
+
+.remote-cursor.is-entering {
+  animation: cursor-pop 520ms cubic-bezier(0.2, 1.45, 0.32, 1) both;
+}
+
+.remote-cursor.is-leaving {
+  animation: cursor-poof 760ms ease both;
+}
+
+.remote-cursor.is-idle {
+  filter: saturate(0.72) drop-shadow(0 10px 18px rgba(19, 78, 74, 0.14));
+}
+
+.remote-cursor-arrow {
+  grid-row: 1 / span 2;
+  width: 28px;
+  height: 32px;
+}
+
+.cursor-name,
+.idle-badge,
+.typing-dots {
+  border: 1px solid color-mix(in srgb, var(--cursor-color), white 52%);
+  background: color-mix(in srgb, var(--cursor-color), white 84%);
+  box-shadow: 0 10px 22px rgba(19, 78, 74, 0.12);
+}
+
+.cursor-name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+}
+
+.typing-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cursor-color);
+  animation: typing-dot 900ms ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.idle-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  color: var(--primary-strong);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+@keyframes cursor-pop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.42);
+  }
+
+  70% {
+    transform: translate3d(0, 0, 0) scale(1.12);
+  }
+}
+
+@keyframes cursor-poof {
+  to {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(0, -16px, 0) scale(0.34) rotate(-8deg);
+  }
+}
+
+@keyframes typing-dot {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+
+  36% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 760px) {
   body {
     overflow: auto;

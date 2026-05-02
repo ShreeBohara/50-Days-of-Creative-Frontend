@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MessageCircle, MousePointer2, Send, Shuffle, Sparkles, Users } from 'lucide-react'
+import { CursorLayer } from './components/CursorLayer'
 import { useBroadcastRoom } from './hooks/useBroadcastRoom'
 import { useCursorTracking } from './hooks/useCursorTracking'
 import { useRoomStore } from './store/useRoomStore'
@@ -33,6 +34,7 @@ function App() {
         <div className="canvas-grid" aria-hidden="true" />
         <div className="canvas-glow canvas-glow-a" aria-hidden="true" />
         <div className="canvas-glow canvas-glow-b" aria-hidden="true" />
+        {hasJoined ? <CursorLayer users={collaborators} /> : null}
 
         <header className="room-header" data-control>
           <div>
