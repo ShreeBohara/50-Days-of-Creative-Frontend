@@ -1,7 +1,26 @@
-import { MessageCircle, MousePointer2, Send, Sparkles, Users } from 'lucide-react'
+import { useState } from 'react'
+import { MessageCircle, MousePointer2, Send, Shuffle, Sparkles, Users } from 'lucide-react'
+import { useRoomStore } from './store/useRoomStore'
 import './App.css'
 
 function App() {
+  const localUser = useRoomStore((state) => state.localUser)
+  const hasJoined = useRoomStore((state) => state.hasJoined)
+  const joinRoom = useRoomStore((state) => state.joinRoom)
+  const randomizeLocalIdentity = useRoomStore((state) => state.randomizeLocalIdentity)
+  const [nameInput, setNameInput] = useState(localUser.name)
+
+  const handleJoin = (event) => {
+    event.preventDefault()
+    joinRoom(nameInput)
+  }
+
+  const handleRandomize = () => {
+    randomizeLocalIdentity()
+    const latestName = useRoomStore.getState().localUser.name
+    setNameInput(latestName)
+  }
+
   return (
     <main className="room-app">
       <section className="room-canvas" aria-label="Collaborative cursor canvas">
@@ -30,13 +49,27 @@ function App() {
             Every tab becomes a collaborator with a colored cursor, live reactions, and
             chat bubbles that float from the pointer.
           </p>
-          <form className="join-form">
+          <form className="join-form" onSubmit={handleJoin}>
             <label htmlFor="display-name">Display name</label>
             <div className="join-row">
-              <input id="display-name" type="text" defaultValue="Teal Pixel" />
-              <button type="button">
+              <input
+                id="display-name"
+                type="text"
+                value={nameInput}
+                maxLength={28}
+                onChange={(event) => setNameInput(event.target.value)}
+              />
+              <button type="submit">
                 <Sparkles size={18} aria-hidden="true" />
-                Join
+                {hasJoined ? 'Joined' : 'Join'}
+              </button>
+              <button
+                className="icon-button"
+                type="button"
+                aria-label="Generate another display name"
+                onClick={handleRandomize}
+              >
+                <Shuffle size={18} aria-hidden="true" />
               </button>
             </div>
           </form>
@@ -49,9 +82,9 @@ function App() {
           </div>
           <ul>
             <li>
-              <span className="user-dot" style={{ '--user-color': '#0d9488' }} />
-              <span>You</span>
-              <small>ready</small>
+              <span className="user-dot" style={{ '--user-color': localUser.color }} />
+              <span>{localUser.name}</span>
+              <small>{hasJoined ? 'you' : 'ready'}</small>
             </li>
           </ul>
         </aside>

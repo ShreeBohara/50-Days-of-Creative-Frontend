@@ -206,11 +206,25 @@ h2 {
   white-space: nowrap;
 }
 
+.join-row .icon-button {
+  width: 48px;
+  flex: 0 0 48px;
+  padding: 0;
+  color: var(--primary-strong);
+  background: rgba(13, 148, 136, 0.12);
+}
+
 .join-row button:hover,
 .chat-form button:hover {
   background: var(--accent-strong);
   box-shadow: 0 12px 28px rgba(249, 115, 22, 0.24);
   transform: translateY(-1px);
+}
+
+.join-row .icon-button:hover {
+  color: #ffffff;
+  background: var(--primary);
+  box-shadow: 0 12px 28px rgba(13, 148, 136, 0.18);
 }
 
 .users-panel {
@@ -315,6 +329,11 @@ h2 {
 
   .join-row button {
     width: 100%;
+  }
+
+  .join-row .icon-button {
+    width: 100%;
+    flex-basis: auto;
   }
 }
 
