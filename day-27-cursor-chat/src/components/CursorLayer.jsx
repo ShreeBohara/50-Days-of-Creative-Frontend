@@ -36,6 +36,26 @@ function RemoteCursor({ user }) {
   )
 }
 
+function CursorTrail({ user }) {
+  return (user.trail ?? []).map((point, index, trail) => {
+    const progress = (index + 1) / trail.length
+
+    return (
+      <span
+        className="cursor-trail-dot"
+        key={`${user.id}-${index}-${point.x}-${point.y}`}
+        style={{
+          '--cursor-color': user.color,
+          '--trail-alpha': progress,
+          '--trail-size': 5 + progress * 13,
+          left: `${point.x * 100}%`,
+          top: `${point.y * 100}%`,
+        }}
+      />
+    )
+  })
+}
+
 export function CursorLayer({ users }) {
   if (!users.length) {
     return null
@@ -43,6 +63,9 @@ export function CursorLayer({ users }) {
 
   return (
     <div className="cursor-layer" aria-hidden="true">
+      {users.map((user) => (
+        <CursorTrail key={`${user.id}-trail`} user={user} />
+      ))}
       {users.map((user) => (
         <RemoteCursor key={user.id} user={user} />
       ))}
