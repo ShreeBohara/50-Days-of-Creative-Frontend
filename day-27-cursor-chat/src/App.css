@@ -408,16 +408,21 @@ h2 {
 .picker-scrim {
   position: absolute;
   inset: 0;
+}
+
+.emoji-picker-wrap {
   z-index: 30;
 }
 
 .picker-scrim {
+  z-index: 0;
   border: 0;
   background: transparent;
 }
 
 .emoji-picker {
   position: absolute;
+  z-index: 1;
   width: 1px;
   height: 1px;
 }
@@ -658,7 +663,7 @@ h2 {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   body {
     overflow: auto;
   }
@@ -709,7 +714,7 @@ h2 {
   }
 }
 
-@media (max-height: 760px) and (min-width: 761px) {
+@media (max-height: 760px) and (min-width: 901px) {
   .welcome-panel {
     max-width: 460px;
     padding: 20px;
