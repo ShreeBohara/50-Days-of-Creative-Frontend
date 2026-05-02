@@ -1,121 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { MessageCircle, MousePointer2, Send, Sparkles, Users } from 'lucide-react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
+    <main className="room-app">
+      <section className="room-canvas" aria-label="Collaborative cursor canvas">
+        <div className="canvas-grid" aria-hidden="true" />
+        <div className="canvas-glow canvas-glow-a" aria-hidden="true" />
+        <div className="canvas-glow canvas-glow-b" aria-hidden="true" />
+
+        <header className="room-header" data-control>
+          <div>
+            <p className="eyebrow">Day 27</p>
+            <h1>Cursor Chat Room</h1>
+          </div>
+          <div className="room-status-pill">
+            <span className="live-dot" />
+            Local multi-tab room
+          </div>
+        </header>
+
+        <section className="welcome-panel" data-control aria-labelledby="welcome-title">
+          <div className="welcome-icon">
+            <MousePointer2 size={26} aria-hidden="true" />
+          </div>
+          <p className="eyebrow">Figma-style presence</p>
+          <h2 id="welcome-title">Open another tab and watch the room wake up.</h2>
           <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+            Every tab becomes a collaborator with a colored cursor, live reactions, and
+            chat bubbles that float from the pointer.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+          <form className="join-form">
+            <label htmlFor="display-name">Display name</label>
+            <div className="join-row">
+              <input id="display-name" type="text" defaultValue="Teal Pixel" />
+              <button type="button">
+                <Sparkles size={18} aria-hidden="true" />
+                Join
+              </button>
+            </div>
+          </form>
+        </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
+        <aside className="users-panel" data-control aria-label="Connected users">
+          <div className="panel-title">
+            <Users size={18} aria-hidden="true" />
+            <span>Connected</span>
+          </div>
           <ul>
             <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
+              <span className="user-dot" style={{ '--user-color': '#0d9488' }} />
+              <span>You</span>
+              <small>ready</small>
             </li>
           </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        </aside>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <section className="chat-panel" data-control aria-label="Room chat">
+          <div className="panel-title">
+            <MessageCircle size={18} aria-hidden="true" />
+            <span>Room chat</span>
+          </div>
+          <form className="chat-form">
+            <input type="text" placeholder="Say something near your cursor..." />
+            <button type="button" aria-label="Send message">
+              <Send size={18} aria-hidden="true" />
+            </button>
+          </form>
+        </section>
+      </section>
+    </main>
   )
 }
 
