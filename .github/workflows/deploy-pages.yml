@@ -34,6 +34,7 @@ on:
       - "day-25-kanban-board/**"
       - "day-26-dependency-graph/**"
       - "day-27-cursor-chat/**"
+      - "day-28-infinite-tunnel/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -71,6 +72,7 @@ jobs:
             day-25-kanban-board/package-lock.json
             day-26-dependency-graph/package-lock.json
             day-27-cursor-chat/package-lock.json
+            day-28-infinite-tunnel/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -136,6 +138,14 @@ jobs:
         working-directory: day-27-cursor-chat
         run: npm run build
 
+      - name: Install Day 28 app dependencies
+        working-directory: day-28-infinite-tunnel
+        run: npm ci
+
+      - name: Build Day 28 app
+        working-directory: day-28-infinite-tunnel
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -178,6 +188,8 @@ jobs:
           cp -R day-26-dependency-graph/dist/. _site/day-26-dependency-graph/
           mkdir -p _site/day-27-cursor-chat
           cp -R day-27-cursor-chat/dist/. _site/day-27-cursor-chat/
+          mkdir -p _site/day-28-infinite-tunnel
+          cp -R day-28-infinite-tunnel/dist/. _site/day-28-infinite-tunnel/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
