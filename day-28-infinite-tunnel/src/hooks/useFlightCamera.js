@@ -15,17 +15,31 @@ export default function useFlightCamera(curve, { baseSpeed = 0.0003, meshRef } =
   const targetLookAt = useRef(new THREE.Vector3())
   const mouse = useRef({ x: 0, y: 0 })
 
-  /* Track mouse movement */
+  /* Track mouse and tilt movement */
   const onMouseMove = useCallback((e) => {
     mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
     mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1
   }, [])
 
+  const onDeviceOrientation = useCallback((e) => {
+    if (!e.gamma || !e.beta) return
+    /* Gamma (tilt left/right): -90 to 90 -> normalize to -1 to 1 */
+    const x = Math.max(-1, Math.min(1, e.gamma / 45))
+    /* Beta (tilt front/back): -180 to 180, typical holding angle ~45 -> normalize */
+    const y = Math.max(-1, Math.min(1, (e.beta - 45) / 45))
+    mouse.current.x = x
+    mouse.current.y = -y
+  }, [])
+
   /* Attach event listener */
   useMemo(() => {
     window.addEventListener('mousemove', onMouseMove)
-    return () => window.removeEventListener('mousemove', onMouseMove)
-  }, [onMouseMove])
+    window.addEventListener('deviceorientation', onDeviceOrientation)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('deviceorientation', onDeviceOrientation)
+    }
+  }, [onMouseMove, onDeviceOrientation])
 
   useFrame((state, delta) => {
     if (!curve) return
