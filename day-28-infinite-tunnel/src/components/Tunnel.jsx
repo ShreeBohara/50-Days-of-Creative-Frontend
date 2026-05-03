@@ -1,6 +1,9 @@
 import { useMemo, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import useFlightCamera from '../hooks/useFlightCamera'
+import tunnelVert from '../shaders/tunnel.vert'
+import tunnelFrag from '../shaders/tunnel.frag'
 
 /**
  * Tunnel configuration constants.
@@ -12,9 +15,8 @@ const TUNNEL_RADIAL_SEGMENTS = 64
 const CURVE_POINTS = 80
 
 /**
- * Tunnel — Procedural tube geometry following a wavy CatmullRom spline.
- * The camera sits inside, so the mesh uses BackSide rendering.
- * A flight-camera hook drives the camera along the spline infinitely.
+ * Tunnel — Procedural tube geometry with custom GLSL shader material.
+ * Camera flies through the inside of the tube.
  */
 export default function Tunnel() {
   const meshRef = useRef()
@@ -25,7 +27,6 @@ export default function Tunnel() {
     for (let i = 0; i < CURVE_POINTS; i++) {
       const t = i / (CURVE_POINTS - 1)
       const z = -t * TUNNEL_LENGTH
-      /* Gentle sinusoidal sway so the tunnel isn't a boring straight pipe */
       const x = Math.sin(t * Math.PI * 4) * 2.5
       const y = Math.cos(t * Math.PI * 3) * 1.8
       points.push(new THREE.Vector3(x, y, z))
@@ -44,18 +45,35 @@ export default function Tunnel() {
     return { curve: c, geometry: geo }
   }, [])
 
+  /* Custom shader material uniforms */
+  const uniforms = useMemo(
+    () => ({
+      u_time: { value: 0 },
+      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      u_speed: { value: 1.0 },
+      u_mouseInfluence: { value: new THREE.Vector2(0, 0) },
+    }),
+    [],
+  )
+
+  /* Animate time uniform every frame */
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.material.uniforms.u_time.value = state.clock.elapsedTime
+    }
+  })
+
   /* Fly the camera through the tunnel */
   useFlightCamera(curve, { baseSpeed: 0.0004 })
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial
-        color="#7c3aed"
+      <shaderMaterial
+        vertexShader={tunnelVert}
+        fragmentShader={tunnelFrag}
+        uniforms={uniforms}
         side={THREE.BackSide}
-        emissive="#3b0764"
-        emissiveIntensity={0.3}
-        roughness={0.6}
-        metalness={0.2}
+        transparent={false}
       />
     </mesh>
   )
