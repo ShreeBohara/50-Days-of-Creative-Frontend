@@ -1,9 +1,9 @@
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import useFlightCamera from '../hooks/useFlightCamera'
 
 /**
- * Total length of the tunnel spline.
- * We build one long tube and loop the camera seamlessly.
+ * Tunnel configuration constants.
  */
 const TUNNEL_LENGTH = 200
 const TUNNEL_SEGMENTS = 512
@@ -14,6 +14,7 @@ const CURVE_POINTS = 80
 /**
  * Tunnel — Procedural tube geometry following a wavy CatmullRom spline.
  * The camera sits inside, so the mesh uses BackSide rendering.
+ * A flight-camera hook drives the camera along the spline infinitely.
  */
 export default function Tunnel() {
   const meshRef = useRef()
@@ -43,6 +44,9 @@ export default function Tunnel() {
     return { curve: c, geometry: geo }
   }, [])
 
+  /* Fly the camera through the tunnel */
+  useFlightCamera(curve, { baseSpeed: 0.0004 })
+
   return (
     <mesh ref={meshRef} geometry={geometry}>
       <meshStandardMaterial
@@ -57,5 +61,4 @@ export default function Tunnel() {
   )
 }
 
-/* Export constants so other components can reuse */
 export { TUNNEL_LENGTH, TUNNEL_SEGMENTS, TUNNEL_RADIUS, CURVE_POINTS }
