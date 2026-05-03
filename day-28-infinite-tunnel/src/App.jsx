@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import TunnelScene from './components/TunnelScene'
 import HUD from './components/HUD'
+import useAmbientDrone from './hooks/useAmbientDrone'
 import './App.css'
 
 /**
@@ -11,6 +12,10 @@ import './App.css'
 export default function App() {
   const [speed, setSpeed] = useState(0.5) // Normalized 0 to 1
   const [warpActive, setWarpActive] = useState(false)
+  const [audioActive, setAudioActive] = useState(false)
+
+  /* Start the ambient audio drone */
+  useAmbientDrone(audioActive, speed)
 
   return (
     <div id="app-container">
@@ -27,6 +32,8 @@ export default function App() {
         setSpeed={setSpeed} 
         warpActive={warpActive} 
         setWarpActive={setWarpActive} 
+        audioActive={audioActive}
+        setAudioActive={setAudioActive}
       />
     </div>
   )
