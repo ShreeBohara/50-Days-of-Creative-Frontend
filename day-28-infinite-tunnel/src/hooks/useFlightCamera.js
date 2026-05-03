@@ -10,8 +10,22 @@ import * as THREE from 'three'
  * @param {object} opts
  * @param {number} opts.baseSpeed - Base flight speed (0-1 normalized per frame)
  */
-export default function useFlightCamera(curve, { baseSpeed = 0.0003 } = {}) {
+export default function useFlightCamera(curve, { baseSpeed = 0.0003, meshRef } = {}) {
   const progressRef = useRef(0)
+  const targetLookAt = useRef(new THREE.Vector3())
+  const mouse = useRef({ x: 0, y: 0 })
+
+  /* Track mouse movement */
+  const onMouseMove = useCallback((e) => {
+    mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
+    mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1
+  }, [])
+
+  /* Attach event listener */
+  useMemo(() => {
+    window.addEventListener('mousemove', onMouseMove)
+    return () => window.removeEventListener('mousemove', onMouseMove)
+  }, [onMouseMove])
 
   useFrame((state, delta) => {
     if (!curve) return
@@ -33,8 +47,25 @@ export default function useFlightCamera(curve, { baseSpeed = 0.0003 } = {}) {
 
     /* Look slightly ahead on the curve for flight direction */
     const lookAheadT = Math.min(progressRef.current + 0.01, 0.99)
-    const lookAt = curve.getPointAt(lookAheadT)
-    camera.lookAt(lookAt)
+    const baseLookAt = curve.getPointAt(lookAheadT)
+
+    /* Add subtle mouse sway to the lookAt target */
+    targetLookAt.current.copy(baseLookAt)
+    targetLookAt.current.x += mouse.current.x * 2.0
+    targetLookAt.current.y += mouse.current.y * 2.0
+
+    /* Smoothly interpolate camera rotation for organic feel */
+    const currentLookAt = new THREE.Vector3()
+    camera.getWorldDirection(currentLookAt)
+    currentLookAt.add(camera.position) // Convert direction to target point
+    currentLookAt.lerp(targetLookAt.current, 0.05)
+    camera.lookAt(currentLookAt)
+
+    /* Update shader mouse influence if material is available */
+    if (meshRef?.current?.material?.uniforms?.u_mouseInfluence) {
+      const uMouse = meshRef.current.material.uniforms.u_mouseInfluence.value
+      uMouse.lerp(new THREE.Vector2(mouse.current.x, mouse.current.y), 0.05)
+    }
   })
 
   return { progressRef }

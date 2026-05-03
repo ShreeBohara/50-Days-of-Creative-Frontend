@@ -64,7 +64,7 @@ export default function Tunnel() {
   })
 
   /* Fly the camera through the tunnel */
-  useFlightCamera(curve, { baseSpeed: 0.0004 })
+  useFlightCamera(curve, { baseSpeed: 0.0004, meshRef })
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
