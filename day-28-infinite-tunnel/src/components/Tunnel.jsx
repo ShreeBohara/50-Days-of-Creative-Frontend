@@ -16,7 +16,7 @@ const CURVE_POINTS = 80
 
 /**
  * Tunnel — Procedural tube geometry with custom GLSL shader material.
- * Camera flies through the inside of the tube.
+ * Cross-section morphs between shapes. Camera flies through the inside.
  */
 export default function Tunnel() {
   const meshRef = useRef()
@@ -45,7 +45,7 @@ export default function Tunnel() {
     return { curve: c, geometry: geo }
   }, [])
 
-  /* Custom shader material uniforms */
+  /* Custom shader material uniforms — shared between vertex & fragment */
   const uniforms = useMemo(
     () => ({
       u_time: { value: 0 },
@@ -56,7 +56,7 @@ export default function Tunnel() {
     [],
   )
 
-  /* Animate time uniform every frame */
+  /* Animate uniforms every frame */
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.material.uniforms.u_time.value = state.clock.elapsedTime
