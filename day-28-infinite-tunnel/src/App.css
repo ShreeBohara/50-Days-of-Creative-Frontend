@@ -199,3 +199,12 @@ html, body, #root {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.6);
 }
+
+.stats-panel {
+  position: absolute !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  left: auto !important;
+  opacity: 0.6;
+  pointer-events: none;
+}

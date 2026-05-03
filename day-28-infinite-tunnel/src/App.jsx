@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { Stats } from '@react-three/drei'
 import TunnelScene from './components/TunnelScene'
 import HUD from './components/HUD'
 import useAmbientDrone from './hooks/useAmbientDrone'
@@ -27,6 +28,7 @@ export default function App() {
       >
         <TunnelScene speed={speed} warpActive={warpActive} />
       </Canvas>
+      <Stats className="stats-panel" />
       <HUD 
         speed={speed} 
         setSpeed={setSpeed} 
