@@ -7,7 +7,7 @@ import Effects from './Effects'
  * TunnelScene — Main scene orchestrator.
  * Configures the scene environment, renders the tunnel, and applies post-processing.
  */
-export default function TunnelScene() {
+export default function TunnelScene({ speed, warpActive }) {
   const { scene } = useThree()
 
   /* Pitch-black background with exponential fog for depth fade */
@@ -23,10 +23,10 @@ export default function TunnelScene() {
       <pointLight position={[0, 0, 0]} intensity={2} color="#c084fc" distance={30} decay={2} />
 
       {/* The procedural tube with shader and flight camera */}
-      <Tunnel />
+      <Tunnel speed={speed} warpActive={warpActive} />
 
       {/* Post-processing: bloom, chromatic aberration, vignette, grain */}
-      <Effects />
+      <Effects warpActive={warpActive} />
     </>
   )
 }

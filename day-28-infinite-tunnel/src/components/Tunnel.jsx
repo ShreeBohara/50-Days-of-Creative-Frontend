@@ -18,8 +18,11 @@ const CURVE_POINTS = 80
  * Tunnel — Procedural tube geometry with custom GLSL shader material.
  * Cross-section morphs between shapes. Camera flies through the inside.
  */
-export default function Tunnel() {
+export default function Tunnel({ speed = 0.5, warpActive = false }) {
   const meshRef = useRef()
+
+  /* Effective speed is base + warp boost */
+  const currentSpeed = warpActive ? 2.5 : speed * 0.8 + 0.1
 
   /* Generate a sinuous spline path for the tunnel */
   const { curve, geometry } = useMemo(() => {
@@ -60,11 +63,14 @@ export default function Tunnel() {
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.material.uniforms.u_time.value = state.clock.elapsedTime
+      /* Smoothly interpolate speed uniform */
+      const uSpeed = meshRef.current.material.uniforms.u_speed.value
+      meshRef.current.material.uniforms.u_speed.value += (currentSpeed - uSpeed) * 0.05
     }
   })
 
   /* Fly the camera through the tunnel */
-  useFlightCamera(curve, { baseSpeed: 0.0004, meshRef })
+  useFlightCamera(curve, { baseSpeed: currentSpeed * 0.0006, meshRef })
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
