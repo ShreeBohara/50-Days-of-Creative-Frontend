@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -32,7 +32,7 @@ export default function useFlightCamera(curve, { baseSpeed = 0.0003, meshRef } =
   }, [])
 
   /* Attach event listener */
-  useMemo(() => {
+  useEffect(() => {
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('deviceorientation', onDeviceOrientation)
     return () => {
