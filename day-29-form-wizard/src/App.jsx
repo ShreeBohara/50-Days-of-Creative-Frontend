@@ -4,7 +4,10 @@ import {
   ClipboardCheck,
   CreditCard,
   ImageUp,
+  Moon,
+  Sparkles,
   SlidersHorizontal,
+  SunMedium,
   UserRound,
 } from 'lucide-react'
 import './App.css'
@@ -57,6 +60,15 @@ const initialForm = {
   plan: 'pro',
 }
 
+const interestOptions = [
+  'Product design',
+  'Motion systems',
+  'Analytics',
+  'Automation',
+  'Frontend craft',
+  'Launch planning',
+]
+
 function FloatingField({ id, label, type = 'text', value, onChange, autoComplete }) {
   return (
     <div className="floating-field">
@@ -105,9 +117,73 @@ function PersonalStep({ data, onUpdate }) {
   )
 }
 
+function PreferencesStep({ data, onUpdate }) {
+  const toggleInterest = (interest) => {
+    const nextInterests = data.interests.includes(interest)
+      ? data.interests.filter((item) => item !== interest)
+      : [...data.interests, interest]
+
+    onUpdate('interests', nextInterests)
+  }
+
+  return (
+    <div className="step-body">
+      <fieldset className="choice-group">
+        <legend>Choose your interests</legend>
+        <div className="chip-grid">
+          {interestOptions.map((interest) => {
+            const isSelected = data.interests.includes(interest)
+
+            return (
+              <button
+                type="button"
+                className={`interest-chip ${isSelected ? 'is-selected' : ''}`}
+                aria-pressed={isSelected}
+                key={interest}
+                onClick={() => toggleInterest(interest)}
+              >
+                <Sparkles size={16} aria-hidden="true" />
+                {interest}
+              </button>
+            )
+          })}
+        </div>
+      </fieldset>
+
+      <fieldset className="choice-group">
+        <legend>Interface theme</legend>
+        <div className="theme-toggle" role="group" aria-label="Interface theme">
+          <button
+            type="button"
+            className={data.theme === 'light' ? 'is-selected' : ''}
+            aria-pressed={data.theme === 'light'}
+            onClick={() => onUpdate('theme', 'light')}
+          >
+            <SunMedium size={18} aria-hidden="true" />
+            Light
+          </button>
+          <button
+            type="button"
+            className={data.theme === 'dark' ? 'is-selected' : ''}
+            aria-pressed={data.theme === 'dark'}
+            onClick={() => onUpdate('theme', 'dark')}
+          >
+            <Moon size={18} aria-hidden="true" />
+            Dark
+          </button>
+        </div>
+      </fieldset>
+    </div>
+  )
+}
+
 function StepContent({ stepId, data, onUpdate }) {
   if (stepId === 'personal') {
     return <PersonalStep data={data} onUpdate={onUpdate} />
+  }
+
+  if (stepId === 'preferences') {
+    return <PreferencesStep data={data} onUpdate={onUpdate} />
   }
 
   return (

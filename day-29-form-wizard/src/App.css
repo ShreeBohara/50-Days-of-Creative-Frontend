@@ -188,6 +188,88 @@
   gap: 1rem;
 }
 
+.choice-group {
+  display: grid;
+  gap: 0.9rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice-group legend {
+  padding: 0;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.interest-chip,
+.theme-toggle button {
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 800;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.interest-chip {
+  padding: 0.7rem 0.95rem;
+}
+
+.interest-chip:hover,
+.theme-toggle button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+.interest-chip.is-selected {
+  border-color: rgba(37, 99, 235, 0.55);
+  background: var(--blue);
+  color: #ffffff;
+  box-shadow: 0 14px 26px rgba(37, 99, 235, 0.18);
+}
+
+.theme-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 24rem);
+  gap: 0.5rem;
+  padding: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+}
+
+.theme-toggle button {
+  width: 100%;
+  padding: 0.68rem 1rem;
+}
+
+.theme-toggle button.is-selected {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: var(--blue-600);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
 .floating-field {
   position: relative;
 }
