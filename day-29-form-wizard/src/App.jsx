@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  Camera,
   CheckCircle2,
   ClipboardCheck,
   CreditCard,
@@ -8,6 +9,8 @@ import {
   Sparkles,
   SlidersHorizontal,
   SunMedium,
+  UploadCloud,
+  X,
   UserRound,
 } from 'lucide-react'
 import './App.css'
@@ -177,6 +180,78 @@ function PreferencesStep({ data, onUpdate }) {
   )
 }
 
+function ProfileStep({ data, onUpdate }) {
+  const setAvatarFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return
+    }
+
+    if (data.avatar?.url) {
+      URL.revokeObjectURL(data.avatar.url)
+    }
+
+    onUpdate('avatar', {
+      name: file.name,
+      url: URL.createObjectURL(file),
+    })
+  }
+
+  const handleDrop = (event) => {
+    event.preventDefault()
+    setAvatarFile(event.dataTransfer.files?.[0])
+  }
+
+  const clearAvatar = () => {
+    if (data.avatar?.url) {
+      URL.revokeObjectURL(data.avatar.url)
+    }
+
+    onUpdate('avatar', null)
+  }
+
+  return (
+    <div className="step-body">
+      <div
+        className={`upload-zone ${data.avatar ? 'has-preview' : ''}`}
+        onDrop={handleDrop}
+        onDragOver={(event) => event.preventDefault()}
+      >
+        <input
+          id="avatar-upload"
+          className="visually-hidden"
+          type="file"
+          accept="image/*"
+          onChange={(event) => setAvatarFile(event.target.files?.[0])}
+        />
+
+        {data.avatar ? (
+          <div className="avatar-preview">
+            <img src={data.avatar.url} alt="Selected profile preview" />
+            <span className="crop-ring" aria-hidden="true" />
+            <button type="button" className="remove-avatar" onClick={clearAvatar}>
+              <X size={16} aria-hidden="true" />
+              Remove
+            </button>
+          </div>
+        ) : (
+          <div className="upload-empty">
+            <span className="upload-icon" aria-hidden="true">
+              <UploadCloud size={28} />
+            </span>
+            <strong>Drop a profile image here</strong>
+            <p>Use a square portrait for the cleanest circular crop.</p>
+          </div>
+        )}
+
+        <label className="upload-button" htmlFor="avatar-upload">
+          <Camera size={18} aria-hidden="true" />
+          {data.avatar ? 'Choose a different image' : 'Browse files'}
+        </label>
+      </div>
+    </div>
+  )
+}
+
 function StepContent({ stepId, data, onUpdate }) {
   if (stepId === 'personal') {
     return <PersonalStep data={data} onUpdate={onUpdate} />
@@ -184,6 +259,10 @@ function StepContent({ stepId, data, onUpdate }) {
 
   if (stepId === 'preferences') {
     return <PreferencesStep data={data} onUpdate={onUpdate} />
+  }
+
+  if (stepId === 'profile') {
+    return <ProfileStep data={data} onUpdate={onUpdate} />
   }
 
   return (

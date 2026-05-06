@@ -270,6 +270,117 @@
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
 }
 
+.upload-zone {
+  position: relative;
+  min-height: 23rem;
+  display: grid;
+  place-items: center;
+  gap: 1.2rem;
+  padding: 1.25rem;
+  border: 1px dashed rgba(37, 99, 235, 0.36);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent),
+    #ffffff;
+  text-align: center;
+}
+
+.upload-zone.has-preview {
+  border-style: solid;
+  background: #eef4ff;
+}
+
+.upload-empty {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+}
+
+.upload-empty strong {
+  color: var(--ink);
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+}
+
+.upload-empty p {
+  max-width: 24rem;
+}
+
+.upload-icon {
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #ffffff;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.24);
+}
+
+.avatar-preview {
+  position: relative;
+  width: min(100%, 24rem);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #dbeafe;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.crop-ring {
+  position: absolute;
+  inset: 12%;
+  border: 3px solid rgba(255, 255, 255, 0.88);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 999px rgba(15, 23, 42, 0.2),
+    0 0 0 1px rgba(37, 99, 235, 0.55);
+}
+
+.remove-avatar {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  min-height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.upload-button {
+  min-height: 2.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: var(--blue);
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.upload-button:hover {
+  transform: translateY(-1px);
+  background: var(--blue-600);
+}
+
 .floating-field {
   position: relative;
 }
