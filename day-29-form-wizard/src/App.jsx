@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   AlertCircle,
@@ -517,6 +517,107 @@ function ProgressBar({ currentIndex }) {
   )
 }
 
+function ConfettiCanvas({ active }) {
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    if (!active) {
+      return undefined
+    }
+
+    const canvas = canvasRef.current
+    const context = canvas.getContext('2d')
+    let frameId = 0
+    let tick = 0
+    const colors = ['#2563eb', '#3b82f6', '#f97316', '#16a34a', '#0f172a']
+
+    const resize = () => {
+      canvas.width = window.innerWidth * window.devicePixelRatio
+      canvas.height = window.innerHeight * window.devicePixelRatio
+      context.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0)
+    }
+
+    resize()
+    window.addEventListener('resize', resize)
+
+    const particles = Array.from({ length: 200 }, (_, index) => {
+      const angle = (Math.PI * 2 * index) / 200 + Math.random() * 0.5
+      const speed = 4 + Math.random() * 8
+
+      return {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        gravity: 0.16 + Math.random() * 0.08,
+        size: 5 + Math.random() * 7,
+        rotation: Math.random() * Math.PI,
+        spin: -0.18 + Math.random() * 0.36,
+        color: colors[index % colors.length],
+      }
+    })
+
+    const draw = () => {
+      tick += 1
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight)
+
+      particles.forEach((particle) => {
+        particle.x += particle.vx
+        particle.y += particle.vy
+        particle.vy += particle.gravity
+        particle.rotation += particle.spin
+
+        context.save()
+        context.translate(particle.x, particle.y)
+        context.rotate(particle.rotation)
+        context.globalAlpha = Math.max(0, 1 - tick / 170)
+        context.fillStyle = particle.color
+        context.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size * 0.58)
+        context.restore()
+      })
+
+      if (tick < 170) {
+        frameId = window.requestAnimationFrame(draw)
+      }
+    }
+
+    draw()
+
+    return () => {
+      window.removeEventListener('resize', resize)
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [active])
+
+  return <canvas className="confetti-canvas" ref={canvasRef} aria-hidden="true" />
+}
+
+function SuccessScreen({ data, onStartOver }) {
+  const selectedPlan = plans.find((plan) => plan.id === data.plan)
+
+  return (
+    <motion.div
+      className="success-screen"
+      initial={{ opacity: 0, y: 24, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+    >
+      <ConfettiCanvas active />
+      <span className="success-icon" aria-hidden="true">
+        <CheckCircle2 size={34} />
+      </span>
+      <h2>Onboarding request sent.</h2>
+      <p>
+        {data.name || 'Your profile'} is ready to launch with the {selectedPlan?.name} plan.
+        We saved the preferences and prepared the next-step handoff.
+      </p>
+      <button type="button" className="primary-button" onClick={onStartOver}>
+        Start Over
+      </button>
+    </motion.div>
+  )
+}
+
 function StepContent({ stepId, data, errors, onBlur, onUpdate, onEdit }) {
   if (stepId === 'personal') {
     return <PersonalStep data={data} errors={errors} onBlur={onBlur} onUpdate={onUpdate} />
@@ -595,10 +696,15 @@ function App() {
   const [formData, setFormData] = useState(initialForm)
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isComplete, setIsComplete] = useState(false)
+  const submitTimer = useRef(0)
 
   const currentStep = steps[currentIndex]
   const isFirstStep = currentIndex === 0
   const isLastStep = currentIndex === steps.length - 1
+
+  useEffect(() => () => window.clearTimeout(submitTimer.current), [])
 
   const updateField = (field, value) => {
     const nextData = {
@@ -687,6 +793,59 @@ function App() {
     }
   }
 
+  const handleSubmit = () => {
+    const nextErrors = validateForm(formData)
+
+    if (hasErrors(nextErrors)) {
+      const firstInvalidStep = steps.findIndex((step) =>
+        hasErrors(pickStepErrors(step.id, nextErrors)),
+      )
+
+      setErrors(nextErrors)
+      setTouched(
+        Object.keys(nextErrors).reduce(
+          (nextTouched, field) => ({
+            ...nextTouched,
+            [field]: true,
+          }),
+          {},
+        ),
+      )
+      goToStep(firstInvalidStep === -1 ? 0 : firstInvalidStep)
+      return
+    }
+
+    setIsSubmitting(true)
+    submitTimer.current = window.setTimeout(() => {
+      setIsSubmitting(false)
+      setIsComplete(true)
+    }, 850)
+  }
+
+  const handlePrimaryAction = () => {
+    if (isLastStep) {
+      handleSubmit()
+      return
+    }
+
+    goNext()
+  }
+
+  const handleStartOver = () => {
+    if (formData.avatar?.url) {
+      URL.revokeObjectURL(formData.avatar.url)
+    }
+
+    window.clearTimeout(submitTimer.current)
+    setDirection(-1)
+    setCurrentIndex(0)
+    setFormData(initialForm)
+    setErrors({})
+    setTouched({})
+    setIsSubmitting(false)
+    setIsComplete(false)
+  }
+
   const handleStepSelect = (nextIndex) => {
     if (nextIndex > currentIndex && !validateCurrentStep()) {
       return
@@ -709,45 +868,62 @@ function App() {
 
       <section className="wizard-panel" aria-label="Onboarding form">
         <div className="wizard-card">
-          <ProgressBar currentIndex={currentIndex} />
-          <div className="wizard-card__header">
-            <span className="step-count">
-              Step {currentIndex + 1} of {steps.length}
-            </span>
-            <h2>{currentStep.title}</h2>
-            <p>{currentStep.description}</p>
-          </div>
+          {isComplete ? (
+            <SuccessScreen data={formData} onStartOver={handleStartOver} />
+          ) : (
+            <>
+              <ProgressBar currentIndex={currentIndex} />
+              <div className="wizard-card__header">
+                <span className="step-count">
+                  Step {currentIndex + 1} of {steps.length}
+                </span>
+                <h2>{currentStep.title}</h2>
+                <p>{currentStep.description}</p>
+              </div>
 
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              className="step-frame"
-              key={currentStep.id}
-              custom={direction}
-              variants={stepVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <StepContent
-                stepId={currentStep.id}
-                data={formData}
-                errors={errors}
-                onBlur={markTouched}
-                onUpdate={updateField}
-                onEdit={goToStep}
-              />
-            </motion.div>
-          </AnimatePresence>
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  className="step-frame"
+                  key={currentStep.id}
+                  custom={direction}
+                  variants={stepVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <StepContent
+                    stepId={currentStep.id}
+                    data={formData}
+                    errors={errors}
+                    onBlur={markTouched}
+                    onUpdate={updateField}
+                    onEdit={goToStep}
+                  />
+                </motion.div>
+              </AnimatePresence>
 
-          <div className="wizard-actions">
-            <button type="button" className="secondary-button" onClick={goBack} disabled={isFirstStep}>
-              Back
-            </button>
-            <button type="button" className="primary-button" onClick={goNext} disabled={isLastStep}>
-              Continue
-            </button>
-          </div>
+              <div className="wizard-actions">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={goBack}
+                  disabled={isFirstStep || isSubmitting}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={handlePrimaryAction}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? <span className="spinner" aria-hidden="true" /> : null}
+                  {isLastStep ? (isSubmitting ? 'Submitting' : 'Submit') : 'Continue'}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </main>
