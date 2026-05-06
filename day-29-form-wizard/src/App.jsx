@@ -72,6 +72,30 @@ const interestOptions = [
   'Launch planning',
 ]
 
+const plans = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: '$19',
+    description: 'For a focused solo launch.',
+    features: ['Profile setup', '3 project spaces', 'Email support'],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: '$49',
+    description: 'For teams moving quickly.',
+    features: ['Everything in Starter', 'Unlimited spaces', 'Priority onboarding'],
+  },
+  {
+    id: 'studio',
+    name: 'Studio',
+    price: '$99',
+    description: 'For advanced collaboration.',
+    features: ['Everything in Pro', 'Custom templates', 'Dedicated success review'],
+  },
+]
+
 function FloatingField({ id, label, type = 'text', value, onChange, autoComplete }) {
   return (
     <div className="floating-field">
@@ -252,6 +276,42 @@ function ProfileStep({ data, onUpdate }) {
   )
 }
 
+function PlanStep({ data, onUpdate }) {
+  return (
+    <div className="step-body">
+      <div className="plan-grid" role="radiogroup" aria-label="Plan selection">
+        {plans.map((plan) => {
+          const isSelected = data.plan === plan.id
+
+          return (
+            <button
+              type="button"
+              className={`plan-card ${isSelected ? 'is-selected' : ''}`}
+              role="radio"
+              aria-checked={isSelected}
+              key={plan.id}
+              onClick={() => onUpdate('plan', plan.id)}
+            >
+              <span className="plan-radio" aria-hidden="true" />
+              <span className="plan-name">{plan.name}</span>
+              <span className="plan-price">{plan.price}</span>
+              <span className="plan-description">{plan.description}</span>
+              <span className="feature-list">
+                {plan.features.map((feature) => (
+                  <span key={feature}>
+                    <CheckCircle2 size={15} aria-hidden="true" />
+                    {feature}
+                  </span>
+                ))}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function StepContent({ stepId, data, onUpdate }) {
   if (stepId === 'personal') {
     return <PersonalStep data={data} onUpdate={onUpdate} />
@@ -263,6 +323,10 @@ function StepContent({ stepId, data, onUpdate }) {
 
   if (stepId === 'profile') {
     return <ProfileStep data={data} onUpdate={onUpdate} />
+  }
+
+  if (stepId === 'plan') {
+    return <PlanStep data={data} onUpdate={onUpdate} />
   }
 
   return (

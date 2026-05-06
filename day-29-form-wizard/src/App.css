@@ -381,6 +381,91 @@
   background: var(--blue-600);
 }
 
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.plan-card {
+  position: relative;
+  min-height: 22rem;
+  display: grid;
+  align-content: start;
+  gap: 0.8rem;
+  padding: 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+.plan-card.is-selected {
+  border-color: var(--blue);
+  background: linear-gradient(180deg, #ffffff, #eff6ff);
+  box-shadow: 0 20px 42px rgba(37, 99, 235, 0.16);
+}
+
+.plan-radio {
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+}
+
+.plan-card.is-selected .plan-radio {
+  border: 5px solid var(--blue);
+}
+
+.plan-name {
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.plan-price {
+  font: 700 clamp(2.2rem, 4vw, 3.2rem)/0.95 Syncopate, sans-serif;
+  letter-spacing: 0;
+}
+
+.plan-description {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.feature-list {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.feature-list span {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.feature-list svg {
+  flex: 0 0 auto;
+  color: var(--blue);
+}
+
 .floating-field {
   position: relative;
 }
@@ -510,5 +595,9 @@
   .wizard-card {
     min-height: auto;
     margin: 0;
+  }
+
+  .plan-grid {
+    grid-template-columns: 1fr;
   }
 }
