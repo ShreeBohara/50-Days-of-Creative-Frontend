@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
+  AlertCircle,
   Camera,
   CheckCircle2,
   ClipboardCheck,
@@ -113,23 +114,99 @@ const stepVariants = {
   }),
 }
 
-function FloatingField({ id, label, type = 'text', value, onChange, autoComplete }) {
+const stepFieldMap = {
+  personal: ['name', 'email', 'phone'],
+  preferences: ['interests'],
+  profile: [],
+  plan: ['plan'],
+  review: [],
+}
+
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+
+const validateForm = (data) => {
+  const nextErrors = {}
+
+  if (data.name.trim().length < 2) {
+    nextErrors.name = 'Enter at least 2 characters.'
+  }
+
+  if (!validateEmail(data.email)) {
+    nextErrors.email = 'Enter a valid email address.'
+  }
+
+  const digits = data.phone.replace(/\D/g, '')
+  if (digits.length < 10) {
+    nextErrors.phone = 'Enter a phone number with at least 10 digits.'
+  }
+
+  if (data.interests.length === 0) {
+    nextErrors.interests = 'Select at least one interest.'
+  }
+
+  if (!data.plan) {
+    nextErrors.plan = 'Choose a plan before continuing.'
+  }
+
+  return nextErrors
+}
+
+const pickStepErrors = (stepId, allErrors) => {
+  const fields = stepFieldMap[stepId] ?? []
+
+  return fields.reduce((stepErrors, field) => {
+    if (allErrors[field]) {
+      stepErrors[field] = allErrors[field]
+    }
+
+    return stepErrors
+  }, {})
+}
+
+const hasErrors = (errors) => Object.keys(errors).length > 0
+
+function FloatingField({
+  id,
+  label,
+  type = 'text',
+  value,
+  error,
+  onBlur,
+  onChange,
+  autoComplete,
+}) {
+  const errorId = `${id}-error`
+
   return (
-    <div className="floating-field">
+    <div className={`floating-field ${error ? 'has-error' : ''}`}>
       <input
         id={id}
         type={type}
         value={value}
         placeholder=" "
         autoComplete={autoComplete}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? errorId : undefined}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
       />
       <label htmlFor={id}>{label}</label>
+      {error ? (
+        <motion.p
+          className="field-error"
+          id={errorId}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <AlertCircle size={15} aria-hidden="true" />
+          {error}
+        </motion.p>
+      ) : null}
     </div>
   )
 }
 
-function PersonalStep({ data, onUpdate }) {
+function PersonalStep({ data, errors, onBlur, onUpdate }) {
   return (
     <div className="step-body">
       <div className="form-grid">
@@ -138,6 +215,8 @@ function PersonalStep({ data, onUpdate }) {
           label="Full name"
           value={data.name}
           autoComplete="name"
+          error={errors.name}
+          onBlur={() => onBlur('name')}
           onChange={(value) => onUpdate('name', value)}
         />
         <FloatingField
@@ -146,6 +225,8 @@ function PersonalStep({ data, onUpdate }) {
           type="email"
           value={data.email}
           autoComplete="email"
+          error={errors.email}
+          onBlur={() => onBlur('email')}
           onChange={(value) => onUpdate('email', value)}
         />
         <FloatingField
@@ -154,6 +235,8 @@ function PersonalStep({ data, onUpdate }) {
           type="tel"
           value={data.phone}
           autoComplete="tel"
+          error={errors.phone}
+          onBlur={() => onBlur('phone')}
           onChange={(value) => onUpdate('phone', value)}
         />
       </div>
@@ -161,7 +244,7 @@ function PersonalStep({ data, onUpdate }) {
   )
 }
 
-function PreferencesStep({ data, onUpdate }) {
+function PreferencesStep({ data, errors, onUpdate }) {
   const toggleInterest = (interest) => {
     const nextInterests = data.interests.includes(interest)
       ? data.interests.filter((item) => item !== interest)
@@ -174,7 +257,10 @@ function PreferencesStep({ data, onUpdate }) {
     <div className="step-body">
       <fieldset className="choice-group">
         <legend>Choose your interests</legend>
-        <div className="chip-grid">
+        <div
+          className={`chip-grid ${errors.interests ? 'has-error' : ''}`}
+          aria-describedby={errors.interests ? 'interests-error' : undefined}
+        >
           {interestOptions.map((interest) => {
             const isSelected = data.interests.includes(interest)
 
@@ -192,6 +278,17 @@ function PreferencesStep({ data, onUpdate }) {
             )
           })}
         </div>
+        {errors.interests ? (
+          <motion.p
+            className="field-error"
+            id="interests-error"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <AlertCircle size={15} aria-hidden="true" />
+            {errors.interests}
+          </motion.p>
+        ) : null}
       </fieldset>
 
       <fieldset className="choice-group">
@@ -293,10 +390,15 @@ function ProfileStep({ data, onUpdate }) {
   )
 }
 
-function PlanStep({ data, onUpdate }) {
+function PlanStep({ data, errors, onUpdate }) {
   return (
     <div className="step-body">
-      <div className="plan-grid" role="radiogroup" aria-label="Plan selection">
+      <div
+        className={`plan-grid ${errors.plan ? 'has-error' : ''}`}
+        role="radiogroup"
+        aria-label="Plan selection"
+        aria-describedby={errors.plan ? 'plan-error' : undefined}
+      >
         {plans.map((plan) => {
           const isSelected = data.plan === plan.id
 
@@ -325,6 +427,17 @@ function PlanStep({ data, onUpdate }) {
           )
         })}
       </div>
+      {errors.plan ? (
+        <motion.p
+          className="field-error"
+          id="plan-error"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <AlertCircle size={15} aria-hidden="true" />
+          {errors.plan}
+        </motion.p>
+      ) : null}
     </div>
   )
 }
@@ -389,13 +502,28 @@ function ReviewStep({ data, onEdit }) {
   )
 }
 
-function StepContent({ stepId, data, onUpdate, onEdit }) {
+function ProgressBar({ currentIndex }) {
+  return (
+    <div className="progress-wrap" aria-label={`Step ${currentIndex + 1} of ${steps.length}`}>
+      {steps.map((step, index) => (
+        <span
+          className={`${index < currentIndex ? 'is-complete' : ''} ${
+            index === currentIndex ? 'is-active' : ''
+          }`}
+          key={step.id}
+        />
+      ))}
+    </div>
+  )
+}
+
+function StepContent({ stepId, data, errors, onBlur, onUpdate, onEdit }) {
   if (stepId === 'personal') {
-    return <PersonalStep data={data} onUpdate={onUpdate} />
+    return <PersonalStep data={data} errors={errors} onBlur={onBlur} onUpdate={onUpdate} />
   }
 
   if (stepId === 'preferences') {
-    return <PreferencesStep data={data} onUpdate={onUpdate} />
+    return <PreferencesStep data={data} errors={errors} onUpdate={onUpdate} />
   }
 
   if (stepId === 'profile') {
@@ -403,7 +531,7 @@ function StepContent({ stepId, data, onUpdate, onEdit }) {
   }
 
   if (stepId === 'plan') {
-    return <PlanStep data={data} onUpdate={onUpdate} />
+    return <PlanStep data={data} errors={errors} onUpdate={onUpdate} />
   }
 
   if (stepId === 'review') {
@@ -465,16 +593,79 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [direction, setDirection] = useState(1)
   const [formData, setFormData] = useState(initialForm)
+  const [errors, setErrors] = useState({})
+  const [touched, setTouched] = useState({})
 
   const currentStep = steps[currentIndex]
   const isFirstStep = currentIndex === 0
   const isLastStep = currentIndex === steps.length - 1
 
   const updateField = (field, value) => {
-    setFormData((data) => ({
-      ...data,
+    const nextData = {
+      ...formData,
       [field]: value,
+    }
+    setFormData(nextData)
+
+    if (touched[field] || errors[field]) {
+      const nextErrors = validateForm(nextData)
+      setErrors((currentErrors) => {
+        const mergedErrors = { ...currentErrors }
+
+        if (nextErrors[field]) {
+          mergedErrors[field] = nextErrors[field]
+        } else {
+          delete mergedErrors[field]
+        }
+
+        return mergedErrors
+      })
+    }
+  }
+
+  const markTouched = (field) => {
+    setTouched((currentTouched) => ({
+      ...currentTouched,
+      [field]: true,
     }))
+
+    const fieldError = validateForm(formData)[field]
+    setErrors((currentErrors) => {
+      const nextErrors = { ...currentErrors }
+
+      if (fieldError) {
+        nextErrors[field] = fieldError
+      } else {
+        delete nextErrors[field]
+      }
+
+      return nextErrors
+    })
+  }
+
+  const validateCurrentStep = () => {
+    const nextErrors = validateForm(formData)
+    const stepErrors = pickStepErrors(currentStep.id, nextErrors)
+    const stepFields = stepFieldMap[currentStep.id] ?? []
+
+    setTouched((currentTouched) => ({
+      ...currentTouched,
+      ...stepFields.reduce((nextTouched, field) => ({ ...nextTouched, [field]: true }), {}),
+    }))
+
+    setErrors((currentErrors) => {
+      const mergedErrors = { ...currentErrors }
+      stepFields.forEach((field) => {
+        delete mergedErrors[field]
+      })
+
+      return {
+        ...mergedErrors,
+        ...stepErrors,
+      }
+    })
+
+    return !hasErrors(stepErrors)
   }
 
   const goToStep = (nextIndex) => {
@@ -491,7 +682,17 @@ function App() {
   }
 
   const goNext = () => {
-    goToStep(currentIndex + 1)
+    if (validateCurrentStep()) {
+      goToStep(currentIndex + 1)
+    }
+  }
+
+  const handleStepSelect = (nextIndex) => {
+    if (nextIndex > currentIndex && !validateCurrentStep()) {
+      return
+    }
+
+    goToStep(nextIndex)
   }
 
   return (
@@ -503,11 +704,12 @@ function App() {
           A crisp onboarding flow with progressive disclosure, validation, motion, and a
           final celebration when every detail is ready.
         </p>
-        <StepOverview currentIndex={currentIndex} onStepSelect={goToStep} />
+        <StepOverview currentIndex={currentIndex} onStepSelect={handleStepSelect} />
       </section>
 
       <section className="wizard-panel" aria-label="Onboarding form">
         <div className="wizard-card">
+          <ProgressBar currentIndex={currentIndex} />
           <div className="wizard-card__header">
             <span className="step-count">
               Step {currentIndex + 1} of {steps.length}
@@ -530,6 +732,8 @@ function App() {
               <StepContent
                 stepId={currentStep.id}
                 data={formData}
+                errors={errors}
+                onBlur={markTouched}
                 onUpdate={updateField}
                 onEdit={goToStep}
               />

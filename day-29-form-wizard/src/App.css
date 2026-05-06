@@ -151,6 +151,34 @@
   box-shadow: var(--shadow);
 }
 
+.progress-wrap {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.progress-wrap span {
+  height: 0.45rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.progress-wrap span::before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--orange));
+  transition: width 260ms ease;
+}
+
+.progress-wrap span.is-complete::before,
+.progress-wrap span.is-active::before {
+  width: 100%;
+}
+
 .wizard-card__header {
   display: grid;
   gap: 0.6rem;
@@ -212,6 +240,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.chip-grid.has-error {
+  padding: 0.4rem;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  border-radius: 8px;
+  animation: shake 260ms ease;
 }
 
 .interest-chip,
@@ -390,6 +425,13 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.85rem;
+}
+
+.plan-grid.has-error {
+  padding: 0.4rem;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  border-radius: 8px;
+  animation: shake 260ms ease;
 }
 
 .plan-card {
@@ -585,6 +627,45 @@
 .floating-field input:not(:placeholder-shown) + label {
   color: var(--blue);
   transform: translateY(-0.82rem) scale(0.75);
+}
+
+.floating-field.has-error input {
+  border-color: #dc2626;
+  background: #fff7f7;
+  animation: shake 260ms ease;
+}
+
+.floating-field.has-error input:focus {
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+.floating-field.has-error label {
+  color: #b91c1c;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.45rem 0 0;
+  color: #b91c1c;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 .placeholder-step {
