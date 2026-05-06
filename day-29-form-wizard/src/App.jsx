@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   Camera,
   CheckCircle2,
@@ -96,6 +97,21 @@ const plans = [
     features: ['Everything in Pro', 'Custom templates', 'Dedicated success review'],
   },
 ]
+
+const stepVariants = {
+  enter: (direction) => ({
+    x: direction > 0 ? 36 : -36,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction) => ({
+    x: direction > 0 ? -36 : 36,
+    opacity: 0,
+  }),
+}
 
 function FloatingField({ id, label, type = 'text', value, onChange, autoComplete }) {
   return (
@@ -421,7 +437,17 @@ function StepOverview({ currentIndex, onStepSelect }) {
               onClick={() => onStepSelect(index)}
             >
               <span className="step-marker" aria-hidden="true">
-                {isComplete ? <CheckCircle2 size={18} /> : <Icon size={18} />}
+                {isComplete ? (
+                  <motion.span
+                    initial={{ scale: 0.6, rotate: -18 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 20 }}
+                  >
+                    <CheckCircle2 size={18} />
+                  </motion.span>
+                ) : (
+                  <Icon size={18} />
+                )}
               </span>
               <span>
                 <strong>{step.label}</strong>
@@ -490,14 +516,25 @@ function App() {
             <p>{currentStep.description}</p>
           </div>
 
-          <div className="step-frame" data-direction={direction}>
-            <StepContent
-              stepId={currentStep.id}
-              data={formData}
-              onUpdate={updateField}
-              onEdit={goToStep}
-            />
-          </div>
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              className="step-frame"
+              key={currentStep.id}
+              custom={direction}
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <StepContent
+                stepId={currentStep.id}
+                data={formData}
+                onUpdate={updateField}
+                onEdit={goToStep}
+              />
+            </motion.div>
+          </AnimatePresence>
 
           <div className="wizard-actions">
             <button type="button" className="secondary-button" onClick={goBack} disabled={isFirstStep}>

@@ -110,6 +110,10 @@
   color: var(--blue);
 }
 
+.step-marker span {
+  display: grid;
+}
+
 .step-list strong,
 .step-list small {
   display: block;
@@ -176,6 +180,7 @@
 
 .step-frame {
   min-height: 18rem;
+  overflow: hidden;
 }
 
 .step-body {
