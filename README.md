@@ -35,6 +35,8 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 25 | Drag-and-Drop Kanban Board | Trello-style animated kanban with drag-and-drop, inline editing, filters, search, and localStorage persistence. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-25-kanban-board/) | [day-25-kanban-board](./day-25-kanban-board/) |
 | 26 | Animated Dependency Graph | Force-directed npm dependency explorer with D3 physics, search zoom, package inspection, and expandable graph bundles. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-26-dependency-graph/) | [day-26-dependency-graph](./day-26-dependency-graph/) |
 | 27 | Cursor Chat Room | Local multi-tab presence room with colored cursors, trails, emoji reactions, typing indicators, and floating chat bubbles. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-27-cursor-chat/) | [day-27-cursor-chat](./day-27-cursor-chat/) |
+| 28 | Infinite Psychedelic Tunnel | Shader-driven tunnel flight with procedural tube geometry, color flow, post-processing, speed controls, and ambient audio. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-28-infinite-tunnel/) | [day-28-infinite-tunnel](./day-28-infinite-tunnel/) |
+| 29 | Multi-Step Form Wizard | Animated onboarding wizard with validated steps, profile image upload, pricing selection, review editing, and confetti completion. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-29-form-wizard/) | [day-29-form-wizard](./day-29-form-wizard/) |
 
 ## Adding a New Day
 
