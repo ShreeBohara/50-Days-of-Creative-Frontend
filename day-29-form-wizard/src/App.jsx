@@ -6,6 +6,7 @@ import {
   CreditCard,
   ImageUp,
   Moon,
+  Pencil,
   Sparkles,
   SlidersHorizontal,
   SunMedium,
@@ -312,7 +313,67 @@ function PlanStep({ data, onUpdate }) {
   )
 }
 
-function StepContent({ stepId, data, onUpdate }) {
+function ReviewStep({ data, onEdit }) {
+  const selectedPlan = plans.find((plan) => plan.id === data.plan)
+  const summarySections = [
+    {
+      title: 'Personal info',
+      stepIndex: 0,
+      rows: [
+        ['Name', data.name || 'Not provided'],
+        ['Email', data.email || 'Not provided'],
+        ['Phone', data.phone || 'Not provided'],
+      ],
+    },
+    {
+      title: 'Preferences',
+      stepIndex: 1,
+      rows: [
+        ['Interests', data.interests.length ? data.interests.join(', ') : 'None selected'],
+        ['Theme', data.theme === 'light' ? 'Light interface' : 'Dark interface'],
+      ],
+    },
+    {
+      title: 'Profile photo',
+      stepIndex: 2,
+      rows: [['Image', data.avatar?.name || 'No image uploaded']],
+    },
+    {
+      title: 'Plan',
+      stepIndex: 3,
+      rows: [
+        ['Selected plan', selectedPlan?.name || 'Not selected'],
+        ['Monthly price', selectedPlan?.price || ''],
+      ],
+    },
+  ]
+
+  return (
+    <div className="review-grid">
+      {summarySections.map((section) => (
+        <article className="review-card" key={section.title}>
+          <div className="review-card__head">
+            <h3>{section.title}</h3>
+            <button type="button" onClick={() => onEdit(section.stepIndex)}>
+              <Pencil size={15} aria-hidden="true" />
+              Edit
+            </button>
+          </div>
+          <dl>
+            {section.rows.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function StepContent({ stepId, data, onUpdate, onEdit }) {
   if (stepId === 'personal') {
     return <PersonalStep data={data} onUpdate={onUpdate} />
   }
@@ -327,6 +388,10 @@ function StepContent({ stepId, data, onUpdate }) {
 
   if (stepId === 'plan') {
     return <PlanStep data={data} onUpdate={onUpdate} />
+  }
+
+  if (stepId === 'review') {
+    return <ReviewStep data={data} onEdit={onEdit} />
   }
 
   return (
@@ -426,7 +491,12 @@ function App() {
           </div>
 
           <div className="step-frame" data-direction={direction}>
-            <StepContent stepId={currentStep.id} data={formData} onUpdate={updateField} />
+            <StepContent
+              stepId={currentStep.id}
+              data={formData}
+              onUpdate={updateField}
+              onEdit={goToStep}
+            />
           </div>
 
           <div className="wizard-actions">
