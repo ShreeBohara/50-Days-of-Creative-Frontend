@@ -195,6 +195,7 @@ function FloatingField({
         <motion.p
           className="field-error"
           id={errorId}
+          role="alert"
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -282,6 +283,7 @@ function PreferencesStep({ data, errors, onUpdate }) {
           <motion.p
             className="field-error"
             id="interests-error"
+            role="alert"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -394,10 +396,11 @@ function PlanStep({ data, errors, onUpdate }) {
   return (
     <div className="step-body">
       <div
-        className={`plan-grid ${errors.plan ? 'has-error' : ''}`}
-        role="radiogroup"
-        aria-label="Plan selection"
-        aria-describedby={errors.plan ? 'plan-error' : undefined}
+          className={`plan-grid ${errors.plan ? 'has-error' : ''}`}
+          role="radiogroup"
+          aria-label="Plan selection"
+          aria-invalid={errors.plan ? 'true' : 'false'}
+          aria-describedby={errors.plan ? 'plan-error' : undefined}
       >
         {plans.map((plan) => {
           const isSelected = data.plan === plan.id
@@ -431,6 +434,7 @@ function PlanStep({ data, errors, onUpdate }) {
         <motion.p
           className="field-error"
           id="plan-error"
+          role="alert"
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
         >

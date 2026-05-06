@@ -816,3 +816,65 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 560px) {
+  .intro-panel h1 {
+    font-size: clamp(2.35rem, 17vw, 4rem);
+  }
+
+  .intro-copy {
+    margin-bottom: 1.25rem;
+  }
+
+  .step-list {
+    gap: 0.4rem;
+  }
+
+  .step-button {
+    grid-template-columns: 2.45rem 1fr;
+    min-height: 3.45rem;
+    padding: 0.5rem;
+  }
+
+  .step-marker {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .wizard-card {
+    gap: 1.25rem;
+    padding: 1rem;
+  }
+
+  .wizard-card h2,
+  .success-screen h2 {
+    font-size: clamp(2rem, 12vw, 3rem);
+  }
+
+  .theme-toggle {
+    width: 100%;
+  }
+
+  .upload-zone {
+    min-height: 19rem;
+    padding: 1rem;
+  }
+
+  .plan-card {
+    min-height: auto;
+  }
+
+  .wizard-actions {
+    flex-direction: column-reverse;
+  }
+
+  .wizard-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

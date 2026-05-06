@@ -1,16 +1,36 @@
-# React + Vite
+# Day 29 — Animated Multi-Step Form Wizard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Swiss-light onboarding wizard built with React, Vite, Framer Motion, and Lucide icons.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Five-step signup flow: personal info, preferences, profile photo, plan selection, and review
+- Controlled form state with step-aware validation and blocked forward navigation
+- Floating labels, animated interest chips, segmented theme selector, and selectable pricing cards
+- Drag-and-drop profile image upload with preview and circular crop overlay
+- Framer Motion directional step transitions and completed-step bounce indicators
+- Segmented progress bar, inline error messages, and accessible labels/error wiring
+- Submit loading state, success screen, Start Over reset, and canvas confetti burst
+- Responsive mobile layout with 44px-friendly controls and reduced-motion handling
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite 8
+- Framer Motion
+- Lucide React
+- CSS custom properties and responsive CSS
 
-## Expanding the ESLint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Output is in `dist/`, configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-29-form-wizard/`.
