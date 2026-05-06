@@ -174,6 +174,68 @@
   line-height: 1.65;
 }
 
+.step-frame {
+  min-height: 18rem;
+}
+
+.step-body {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.floating-field {
+  position: relative;
+}
+
+.floating-field input {
+  width: 100%;
+  min-height: 4rem;
+  padding: 1.35rem 1rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 700;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.floating-field input:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+.floating-field input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.floating-field label {
+  position: absolute;
+  top: 1.23rem;
+  left: 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+  pointer-events: none;
+  transform-origin: left center;
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.floating-field input:focus + label,
+.floating-field input:not(:placeholder-shown) + label {
+  color: var(--blue);
+  transform: translateY(-0.82rem) scale(0.75);
+}
+
 .placeholder-step {
   min-height: 18rem;
   display: grid;

@@ -57,6 +57,66 @@ const initialForm = {
   plan: 'pro',
 }
 
+function FloatingField({ id, label, type = 'text', value, onChange, autoComplete }) {
+  return (
+    <div className="floating-field">
+      <input
+        id={id}
+        type={type}
+        value={value}
+        placeholder=" "
+        autoComplete={autoComplete}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      <label htmlFor={id}>{label}</label>
+    </div>
+  )
+}
+
+function PersonalStep({ data, onUpdate }) {
+  return (
+    <div className="step-body">
+      <div className="form-grid">
+        <FloatingField
+          id="name"
+          label="Full name"
+          value={data.name}
+          autoComplete="name"
+          onChange={(value) => onUpdate('name', value)}
+        />
+        <FloatingField
+          id="email"
+          label="Email address"
+          type="email"
+          value={data.email}
+          autoComplete="email"
+          onChange={(value) => onUpdate('email', value)}
+        />
+        <FloatingField
+          id="phone"
+          label="Phone number"
+          type="tel"
+          value={data.phone}
+          autoComplete="tel"
+          onChange={(value) => onUpdate('phone', value)}
+        />
+      </div>
+    </div>
+  )
+}
+
+function StepContent({ stepId, data, onUpdate }) {
+  if (stepId === 'personal') {
+    return <PersonalStep data={data} onUpdate={onUpdate} />
+  }
+
+  return (
+    <div className="placeholder-step">
+      <p>{stepId} controls land in the next commits.</p>
+    </div>
+  )
+}
+
 function StepOverview({ currentIndex, onStepSelect }) {
   return (
     <ol className="step-list" aria-label="Wizard steps">
@@ -97,7 +157,6 @@ function App() {
   const [formData, setFormData] = useState(initialForm)
 
   const currentStep = steps[currentIndex]
-  const CurrentIcon = currentStep.icon
   const isFirstStep = currentIndex === 0
   const isLastStep = currentIndex === steps.length - 1
 
@@ -147,19 +206,8 @@ function App() {
             <p>{currentStep.description}</p>
           </div>
 
-          <div className="placeholder-step" data-direction={direction}>
-            <CurrentIcon size={32} aria-hidden="true" />
-            <p>
-              {currentStep.label} step is selected. The data model is ready for{' '}
-              {Object.keys(formData).length} onboarding fields.
-            </p>
-            <button
-              type="button"
-              className="ghost-button"
-              onClick={() => updateField('theme', formData.theme === 'light' ? 'dark' : 'light')}
-            >
-              Toggle seed theme: {formData.theme}
-            </button>
+          <div className="step-frame" data-direction={direction}>
+            <StepContent stepId={currentStep.id} data={formData} onUpdate={updateField} />
           </div>
 
           <div className="wizard-actions">
