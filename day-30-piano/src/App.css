@@ -460,6 +460,19 @@
   }
 }
 
+@keyframes recording-pulse {
+  0%,
+  100% {
+    transform: scale(0.82);
+    opacity: 0.76;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -496,4 +509,68 @@
   margin: 0;
   color: var(--muted);
   line-height: 1.65;
+}
+
+.recording-status {
+  display: inline-flex;
+  min-height: 2.4rem;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.recording-status span {
+  display: block;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: var(--subtle);
+}
+
+.recording-status.is-recording {
+  color: #fecdd3;
+}
+
+.recording-status.is-recording span {
+  background: var(--rose);
+  box-shadow: 0 0 0.9rem rgba(251, 113, 133, 0.72);
+  animation: recording-pulse 920ms ease-in-out infinite;
+}
+
+.transport-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.transport-controls button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(153, 171, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.055);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 800;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.transport-controls button:not(:disabled):hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 212, 191, 0.38);
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.transport-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
 }

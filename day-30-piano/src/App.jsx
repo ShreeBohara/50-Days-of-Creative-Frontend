@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { CircleDot, Gauge, KeyboardMusic, Radio, SlidersHorizontal } from 'lucide-react'
+import {
+  CircleDot,
+  Gauge,
+  KeyboardMusic,
+  Play,
+  Radio,
+  Square,
+  Trash2,
+  SlidersHorizontal,
+} from 'lucide-react'
 import './App.css'
 import {
   BLACK_NOTES,
@@ -91,16 +100,32 @@ function PianoKeyboard({
   )
 }
 
+function formatDuration(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = String(totalSeconds % 60).padStart(2, '0')
+
+  return `${minutes}:${seconds}`
+}
+
 function App() {
   const [instrument] = useState('piano')
   const [keyboardOctave] = useState(FIRST_OCTAVE)
   const [volume] = useState(-10)
   const [activeNotes, setActiveNotes] = useState(() => new Set())
+  const [isPlayingRecording, setIsPlayingRecording] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordedNotes, setRecordedNotes] = useState([])
+  const [recordingElapsed, setRecordingElapsed] = useState(0)
   const [visualNotes, setVisualNotes] = useState([])
   const activeNotesRef = useRef(new Set())
+  const activeRecordingNotesRef = useRef(new Map())
   const activeVisualNotesRef = useRef(new Map())
   const heldKeyboardKeysRef = useRef(new Map())
   const pointerNotesRef = useRef(new Map())
+  const playbackTimersRef = useRef([])
+  const recordingStartedAtRef = useRef(0)
+  const isRecordingRef = useRef(false)
   const noteByName = useMemo(() => new Map(NOTES.map((note) => [note.note, note])), [])
   const keyboardAssignments = useMemo(
     () => getKeyboardAssignments(keyboardOctave),
@@ -120,6 +145,10 @@ function App() {
   const { audioError, isAudioReady, triggerAttack, triggerAttackRelease, triggerRelease } =
     usePianoEngine({ instrument, volume })
   const activeNoteReadout = activeNotes.size ? Array.from(activeNotes).join(' ') : 'No notes held'
+  const recordedDuration = recordedNotes.reduce(
+    (duration, note) => Math.max(duration, note.startedAtMs + (note.durationMs ?? 0)),
+    0,
+  )
 
   const handleAudioCheck = () => {
     triggerAttackRelease('C4', '8n', 0.86)
@@ -137,6 +166,22 @@ function App() {
       activeVisualNotesRef.current.set(note.note, visualNote.id)
       activeNotesRef.current = nextNotes
       setActiveNotes(nextNotes)
+
+      if (isRecordingRef.current && source === 'live') {
+        const recordedNote = {
+          id: `${note.note}-${performance.now()}`,
+          durationMs: null,
+          note: note.note,
+          noteIndex: note.noteIndex,
+          source,
+          startedAtMs: performance.now() - recordingStartedAtRef.current,
+          velocity,
+        }
+
+        activeRecordingNotesRef.current.set(note.note, recordedNote.id)
+        setRecordedNotes((currentNotes) => [...currentNotes, recordedNote])
+      }
+
       setVisualNotes((currentNotes) => [
         ...currentNotes.filter((entry) => performance.now() - entry.startedAt < 4200),
         visualNote,
@@ -158,6 +203,21 @@ function App() {
       activeVisualNotesRef.current.delete(note.note)
       activeNotesRef.current = nextNotes
       setActiveNotes(nextNotes)
+
+      if (isRecordingRef.current) {
+        const recordedNoteId = activeRecordingNotesRef.current.get(note.note)
+        const releasedAt = performance.now() - recordingStartedAtRef.current
+
+        activeRecordingNotesRef.current.delete(note.note)
+        setRecordedNotes((currentNotes) =>
+          currentNotes.map((entry) =>
+            entry.id === recordedNoteId && entry.durationMs === null
+              ? { ...entry, durationMs: Math.max(80, releasedAt - entry.startedAtMs) }
+              : entry,
+          ),
+        )
+      }
+
       setVisualNotes((currentNotes) =>
         currentNotes.map((entry) =>
           entry.id === visualId && !entry.endedAt ? { ...entry, endedAt: performance.now() } : entry,
@@ -221,6 +281,103 @@ function App() {
       window.removeEventListener('keyup', handleKeyUp)
     }
   }, [assignmentByKey, noteByName, releaseNote, startNote])
+
+  useEffect(() => {
+    if (!isRecording) {
+      return undefined
+    }
+
+    const timer = window.setInterval(() => {
+      setRecordingElapsed(performance.now() - recordingStartedAtRef.current)
+    }, 120)
+
+    return () => window.clearInterval(timer)
+  }, [isRecording])
+
+  useEffect(() => {
+    return () => {
+      playbackTimersRef.current.forEach((timer) => window.clearTimeout(timer))
+    }
+  }, [])
+
+  const handleRecord = () => {
+    playbackTimersRef.current.forEach((timer) => window.clearTimeout(timer))
+    playbackTimersRef.current = []
+    activeRecordingNotesRef.current.clear()
+    recordingStartedAtRef.current = performance.now()
+    isRecordingRef.current = true
+    setIsPlayingRecording(false)
+    setIsRecording(true)
+    setRecordedNotes([])
+    setRecordingElapsed(0)
+  }
+
+  const handleStopRecording = () => {
+    const stoppedAt = performance.now() - recordingStartedAtRef.current
+
+    isRecordingRef.current = false
+    setIsRecording(false)
+    setRecordingElapsed(stoppedAt)
+
+    setRecordedNotes((currentNotes) =>
+      currentNotes.map((entry) =>
+        entry.durationMs === null
+          ? { ...entry, durationMs: Math.max(80, stoppedAt - entry.startedAtMs) }
+          : entry,
+      ),
+    )
+    activeRecordingNotesRef.current.clear()
+  }
+
+  const handleClearRecording = () => {
+    playbackTimersRef.current.forEach((timer) => window.clearTimeout(timer))
+    playbackTimersRef.current = []
+    activeRecordingNotesRef.current.clear()
+    isRecordingRef.current = false
+    setIsPlayingRecording(false)
+    setIsRecording(false)
+    setRecordedNotes([])
+    setRecordingElapsed(0)
+  }
+
+  const handlePlayRecording = () => {
+    if (!recordedNotes.length || isRecording || isPlayingRecording) {
+      return
+    }
+
+    playbackTimersRef.current.forEach((timer) => window.clearTimeout(timer))
+    playbackTimersRef.current = []
+    setIsPlayingRecording(true)
+
+    recordedNotes.forEach((entry) => {
+      const note = noteByName.get(entry.note)
+      const duration = Math.max(80, entry.durationMs ?? 180)
+
+      if (!note) {
+        return
+      }
+
+      const startTimer = window.setTimeout(() => {
+        startNote(note, entry.velocity, 'playback')
+      }, entry.startedAtMs)
+      const stopTimer = window.setTimeout(() => {
+        releaseNote(note)
+      }, entry.startedAtMs + duration)
+
+      playbackTimersRef.current.push(startTimer, stopTimer)
+    })
+
+    const playbackLength = recordedNotes.reduce(
+      (length, entry) => Math.max(length, entry.startedAtMs + (entry.durationMs ?? 180)),
+      0,
+    )
+
+    playbackTimersRef.current.push(
+      window.setTimeout(() => {
+        setIsPlayingRecording(false)
+      }, playbackLength + 220),
+    )
+  }
 
   const handlePointerDown = (event) => {
     const note = getNoteFromPoint(event)
@@ -341,7 +498,34 @@ function App() {
               <Gauge size={18} aria-hidden="true" />
               <h2>Recorder</h2>
             </div>
-            <p>Capture note timing, replay phrases, and clear takes without leaving the keyboard.</p>
+            <div className={isRecording ? 'recording-status is-recording' : 'recording-status'}>
+              <span aria-hidden="true" />
+              {isRecording
+                ? `Recording ${formatDuration(recordingElapsed)}`
+                : `${recordedNotes.length} notes / ${formatDuration(recordedDuration)}`}
+            </div>
+            <div className="transport-controls" aria-label="Recording controls">
+              <button type="button" onClick={handleRecord} disabled={isRecording}>
+                <CircleDot size={16} aria-hidden="true" />
+                Record
+              </button>
+              <button type="button" onClick={handleStopRecording} disabled={!isRecording}>
+                <Square size={16} aria-hidden="true" />
+                Stop
+              </button>
+              <button
+                type="button"
+                onClick={handlePlayRecording}
+                disabled={!recordedNotes.length || isRecording || isPlayingRecording}
+              >
+                <Play size={16} aria-hidden="true" />
+                {isPlayingRecording ? 'Playing' : 'Play'}
+              </button>
+              <button type="button" onClick={handleClearRecording} disabled={!recordedNotes.length}>
+                <Trash2 size={16} aria-hidden="true" />
+                Clear
+              </button>
+            </div>
           </section>
 
           <section className="rack-panel">
