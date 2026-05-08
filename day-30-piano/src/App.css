@@ -204,9 +204,18 @@
     auto;
 }
 
+.piano-roll-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .scanline {
   position: absolute;
   inset-inline: 0;
+  z-index: 1;
+  pointer-events: none;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.7), transparent);
   opacity: 0.8;

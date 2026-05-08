@@ -10,7 +10,9 @@ import {
   getKeyboardAssignments,
   getNoteColor,
 } from './pianoModel'
+import { PianoRollCanvas } from './PianoRollCanvas'
 import { usePianoEngine } from './usePianoEngine'
+import { createVisualNote } from './visualNotes'
 
 function PianoKey({ isActive, keyboardLabel, note, type }) {
   const style =
@@ -94,7 +96,9 @@ function App() {
   const [keyboardOctave] = useState(FIRST_OCTAVE)
   const [volume] = useState(-10)
   const [activeNotes, setActiveNotes] = useState(() => new Set())
+  const [visualNotes, setVisualNotes] = useState([])
   const activeNotesRef = useRef(new Set())
+  const activeVisualNotesRef = useRef(new Map())
   const heldKeyboardKeysRef = useRef(new Map())
   const pointerNotesRef = useRef(new Map())
   const noteByName = useMemo(() => new Map(NOTES.map((note) => [note.note, note])), [])
@@ -122,15 +126,21 @@ function App() {
   }
 
   const startNote = useCallback(
-    (note, velocity = 0.82) => {
+    (note, velocity = 0.82, source = 'live') => {
       if (activeNotesRef.current.has(note.note)) {
         return
       }
 
+      const visualNote = createVisualNote(note, source)
       const nextNotes = new Set(activeNotesRef.current)
       nextNotes.add(note.note)
+      activeVisualNotesRef.current.set(note.note, visualNote.id)
       activeNotesRef.current = nextNotes
       setActiveNotes(nextNotes)
+      setVisualNotes((currentNotes) => [
+        ...currentNotes.filter((entry) => performance.now() - entry.startedAt < 4200),
+        visualNote,
+      ])
       triggerAttack(note.note, velocity)
     },
     [triggerAttack],
@@ -143,9 +153,16 @@ function App() {
       }
 
       const nextNotes = new Set(activeNotesRef.current)
+      const visualId = activeVisualNotesRef.current.get(note.note)
       nextNotes.delete(note.note)
+      activeVisualNotesRef.current.delete(note.note)
       activeNotesRef.current = nextNotes
       setActiveNotes(nextNotes)
+      setVisualNotes((currentNotes) =>
+        currentNotes.map((entry) =>
+          entry.id === visualId && !entry.endedAt ? { ...entry, endedAt: performance.now() } : entry,
+        ),
+      )
       triggerRelease(note.note)
     },
     [triggerRelease],
@@ -293,7 +310,8 @@ function App() {
             </span>
           </div>
 
-          <div className="visualizer-frame" aria-hidden="true">
+          <div className="visualizer-frame" aria-label="Falling notes visualizer">
+            <PianoRollCanvas notes={visualNotes} />
             <span className="scanline scanline-a" />
             <span className="scanline scanline-b" />
             <span className="scanline scanline-c" />
