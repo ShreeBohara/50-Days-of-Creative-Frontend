@@ -35,6 +35,7 @@ function PianoKey({ isActive, keyboardLabel, note, type }) {
       aria-label={`Play ${note.note}`}
     >
       {keyboardLabel ? <span className="key-binding">{keyboardLabel}</span> : null}
+      <span className="key-glow" aria-hidden="true" />
       <span className="note-name">{note.note}</span>
     </button>
   )
@@ -114,6 +115,7 @@ function App() {
   )
   const { audioError, isAudioReady, triggerAttack, triggerAttackRelease, triggerRelease } =
     usePianoEngine({ instrument, volume })
+  const activeNoteReadout = activeNotes.size ? Array.from(activeNotes).join(' ') : 'No notes held'
 
   const handleAudioCheck = () => {
     triggerAttackRelease('C4', '8n', 0.86)
@@ -285,6 +287,9 @@ function App() {
             </button>
             <span className={audioError ? 'engine-message is-error' : 'engine-message'}>
               {audioError || 'Tone.js PolySynth routed through reverb and studio volume.'}
+            </span>
+            <span className="live-note-readout" aria-live="polite">
+              {activeNoteReadout}
             </span>
           </div>
 
