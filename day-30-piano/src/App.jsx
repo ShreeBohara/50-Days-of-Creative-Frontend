@@ -1,121 +1,89 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { CircleDot, Gauge, KeyboardMusic, Radio, SlidersHorizontal } from 'lucide-react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="piano-app">
+      <header className="studio-header" aria-label="Project introduction">
+        <div className="brand-lockup">
+          <span className="brand-mark" aria-hidden="true">
+            <KeyboardMusic size={24} />
+          </span>
+          <div>
+            <p className="day-tag">Day 30</p>
+            <h1>Interactive Piano Studio</h1>
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+        <p className="header-copy">
+          A playable three-octave piano with live synthesis, recording, playback, and a falling-note
+          visualizer tuned for fast keyboard practice.
+        </p>
+      </header>
+
+      <section className="studio-grid" aria-label="Piano workspace">
+        <div className="instrument-stage">
+          <div className="stage-topline">
+            <div>
+              <p className="section-kicker">Visualizer</p>
+              <h2>Piano roll monitor</h2>
+            </div>
+            <span className="engine-pill">
+              <CircleDot size={14} aria-hidden="true" />
+              Audio unlocks on first play
+            </span>
+          </div>
+
+          <div className="visualizer-frame" aria-hidden="true">
+            <span className="scanline scanline-a" />
+            <span className="scanline scanline-b" />
+            <span className="scanline scanline-c" />
+          </div>
+
+          <div className="keyboard-placeholder" aria-label="Piano keyboard preview">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+
+        <aside className="control-rack" aria-label="Piano controls">
+          <section className="rack-panel">
+            <div className="panel-heading">
+              <Radio size={18} aria-hidden="true" />
+              <h2>Sound Engine</h2>
+            </div>
+            <p>Polyphonic Tone.js synthesis, reverb, ADSR shaping, and instrument color.</p>
+          </section>
+
+          <section className="rack-panel">
+            <div className="panel-heading">
+              <Gauge size={18} aria-hidden="true" />
+              <h2>Recorder</h2>
+            </div>
+            <p>Capture note timing, replay phrases, and clear takes without leaving the keyboard.</p>
+          </section>
+
+          <section className="rack-panel">
+            <div className="panel-heading">
+              <SlidersHorizontal size={18} aria-hidden="true" />
+              <h2>Performance</h2>
+            </div>
+            <p>QWERTY mappings, octave shift, sustain, labels, touch-friendly sizing, and focus states.</p>
+          </section>
+        </aside>
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
