@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { CircleDot, Gauge, KeyboardMusic, Radio, SlidersHorizontal } from 'lucide-react'
 import './App.css'
 import { BLACK_NOTES, WHITE_KEY_COUNT, WHITE_NOTES, getNoteColor } from './pianoModel'
+import { usePianoEngine } from './usePianoEngine'
 
 function PianoKey({ note, type }) {
   const style =
@@ -50,6 +52,14 @@ function PianoKeyboard() {
 }
 
 function App() {
+  const [instrument] = useState('piano')
+  const [volume] = useState(-10)
+  const { audioError, isAudioReady, triggerAttackRelease } = usePianoEngine({ instrument, volume })
+
+  const handleAudioCheck = () => {
+    triggerAttackRelease('C4', '8n', 0.86)
+  }
+
   return (
     <main className="piano-app">
       <header className="studio-header" aria-label="Project introduction">
@@ -77,7 +87,16 @@ function App() {
             </div>
             <span className="engine-pill">
               <CircleDot size={14} aria-hidden="true" />
-              Audio unlocks on first play
+              {isAudioReady ? 'Audio engine ready' : 'Audio unlocks on first play'}
+            </span>
+          </div>
+
+          <div className="transport-strip" aria-label="Audio engine controls">
+            <button type="button" className="primary-action" onClick={handleAudioCheck}>
+              Wake Audio
+            </button>
+            <span className={audioError ? 'engine-message is-error' : 'engine-message'}>
+              {audioError || 'Tone.js PolySynth routed through reverb and studio volume.'}
             </span>
           </div>
 
