@@ -37,6 +37,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 27 | Cursor Chat Room | Local multi-tab presence room with colored cursors, trails, emoji reactions, typing indicators, and floating chat bubbles. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-27-cursor-chat/) | [day-27-cursor-chat](./day-27-cursor-chat/) |
 | 28 | Infinite Psychedelic Tunnel | Shader-driven tunnel flight with procedural tube geometry, color flow, post-processing, speed controls, and ambient audio. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-28-infinite-tunnel/) | [day-28-infinite-tunnel](./day-28-infinite-tunnel/) |
 | 29 | Multi-Step Form Wizard | Animated onboarding wizard with validated steps, profile image upload, pricing selection, review editing, and confetti completion. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-29-form-wizard/) | [day-29-form-wizard](./day-29-form-wizard/) |
+| 30 | Interactive Piano Studio | Three-octave Tone.js piano with QWERTY controls, sustain, recording, playback, and a falling-note canvas visualizer. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-30-piano/) | [day-30-piano](./day-30-piano/) |
 
 ## Adding a New Day
 
