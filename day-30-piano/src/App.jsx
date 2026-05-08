@@ -1,5 +1,46 @@
 import { CircleDot, Gauge, KeyboardMusic, Radio, SlidersHorizontal } from 'lucide-react'
 import './App.css'
+import { BLACK_NOTES, WHITE_KEY_COUNT, WHITE_NOTES, getNoteColor } from './pianoModel'
+
+function PianoKey({ note, type }) {
+  const style =
+    type === 'black'
+      ? {
+          '--key-color': getNoteColor(note.noteIndex),
+          left: `${(note.blackSlot / WHITE_KEY_COUNT) * 100}%`,
+        }
+      : {
+          '--key-color': getNoteColor(note.noteIndex),
+        }
+
+  return (
+    <button
+      type="button"
+      className={`piano-key ${type === 'black' ? 'black-key' : 'white-key'}`}
+      style={style}
+      aria-label={`Play ${note.note}`}
+    >
+      <span className="note-name">{note.note}</span>
+    </button>
+  )
+}
+
+function PianoKeyboard() {
+  return (
+    <div className="piano-keyboard" aria-label="Three octave piano keyboard">
+      <div className="white-key-row">
+        {WHITE_NOTES.map((note) => (
+          <PianoKey key={note.id} note={note} type="white" />
+        ))}
+      </div>
+      <div className="black-key-row" aria-hidden="true">
+        {BLACK_NOTES.map((note) => (
+          <PianoKey key={note.id} note={note} type="black" />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function App() {
   return (
@@ -39,22 +80,7 @@ function App() {
             <span className="scanline scanline-c" />
           </div>
 
-          <div className="keyboard-placeholder" aria-label="Piano keyboard preview">
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
+          <PianoKeyboard />
         </div>
 
         <aside className="control-rack" aria-label="Piano controls">
