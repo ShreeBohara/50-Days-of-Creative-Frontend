@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { CircleDot, Gauge, KeyboardMusic, Radio, SlidersHorizontal } from 'lucide-react'
 import './App.css'
-import { BLACK_NOTES, WHITE_KEY_COUNT, WHITE_NOTES, getNoteColor } from './pianoModel'
+import { BLACK_NOTES, NOTES, WHITE_KEY_COUNT, WHITE_NOTES, getNoteColor } from './pianoModel'
 import { usePianoEngine } from './usePianoEngine'
 
-function PianoKey({ note, type }) {
+function PianoKey({ isActive, note, type }) {
   const style =
     type === 'black'
       ? {
@@ -18,7 +18,9 @@ function PianoKey({ note, type }) {
   return (
     <button
       type="button"
-      className={`piano-key ${type === 'black' ? 'black-key' : 'white-key'}`}
+      className={`piano-key ${type === 'black' ? 'black-key' : 'white-key'} ${
+        isActive ? 'is-active' : ''
+      }`}
       style={style}
       data-note={note.note}
       data-octave={note.octave}
@@ -29,17 +31,24 @@ function PianoKey({ note, type }) {
   )
 }
 
-function PianoKeyboard() {
+function PianoKeyboard({ activeNotes, onPointerCancel, onPointerDown, onPointerMove, onPointerUp }) {
   return (
-    <div className="piano-keyboard" aria-label="Three octave piano keyboard">
+    <div
+      className="piano-keyboard"
+      aria-label="Three octave piano keyboard"
+      onPointerCancel={onPointerCancel}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+    >
       <div className="white-key-row">
         {WHITE_NOTES.map((note) => (
-          <PianoKey key={note.id} note={note} type="white" />
+          <PianoKey key={note.id} isActive={activeNotes.has(note.note)} note={note} type="white" />
         ))}
       </div>
       <div className="black-key-row">
         {BLACK_NOTES.map((note) => (
-          <PianoKey key={note.id} note={note} type="black" />
+          <PianoKey key={note.id} isActive={activeNotes.has(note.note)} note={note} type="black" />
         ))}
       </div>
       <div className="octave-rail" aria-hidden="true">
@@ -54,10 +63,91 @@ function PianoKeyboard() {
 function App() {
   const [instrument] = useState('piano')
   const [volume] = useState(-10)
-  const { audioError, isAudioReady, triggerAttackRelease } = usePianoEngine({ instrument, volume })
+  const [activeNotes, setActiveNotes] = useState(() => new Set())
+  const activeNotesRef = useRef(new Set())
+  const pointerNotesRef = useRef(new Map())
+  const noteByName = useMemo(() => new Map(NOTES.map((note) => [note.note, note])), [])
+  const { audioError, isAudioReady, triggerAttack, triggerAttackRelease, triggerRelease } =
+    usePianoEngine({ instrument, volume })
 
   const handleAudioCheck = () => {
     triggerAttackRelease('C4', '8n', 0.86)
+  }
+
+  const startNote = (note, velocity = 0.82) => {
+    if (activeNotesRef.current.has(note.note)) {
+      return
+    }
+
+    const nextNotes = new Set(activeNotesRef.current)
+    nextNotes.add(note.note)
+    activeNotesRef.current = nextNotes
+    setActiveNotes(nextNotes)
+    triggerAttack(note.note, velocity)
+  }
+
+  const releaseNote = (note) => {
+    if (!activeNotesRef.current.has(note.note)) {
+      return
+    }
+
+    const nextNotes = new Set(activeNotesRef.current)
+    nextNotes.delete(note.note)
+    activeNotesRef.current = nextNotes
+    setActiveNotes(nextNotes)
+    triggerRelease(note.note)
+  }
+
+  const getNoteFromPoint = (event) => {
+    const target = document.elementFromPoint(event.clientX, event.clientY)
+    const key = target?.closest?.('.piano-key')
+
+    return key?.dataset.note ? noteByName.get(key.dataset.note) : null
+  }
+
+  const handlePointerDown = (event) => {
+    const note = getNoteFromPoint(event)
+
+    if (!note) {
+      return
+    }
+
+    event.preventDefault()
+    event.currentTarget.setPointerCapture(event.pointerId)
+    pointerNotesRef.current.set(event.pointerId, note.note)
+    startNote(note, event.pointerType === 'touch' ? 0.72 : 0.86)
+  }
+
+  const handlePointerMove = (event) => {
+    if (!pointerNotesRef.current.has(event.pointerId)) {
+      return
+    }
+
+    const nextNote = getNoteFromPoint(event)
+    const previousNoteName = pointerNotesRef.current.get(event.pointerId)
+
+    if (!nextNote || nextNote.note === previousNoteName) {
+      return
+    }
+
+    const previousNote = noteByName.get(previousNoteName)
+    if (previousNote) {
+      releaseNote(previousNote)
+    }
+
+    pointerNotesRef.current.set(event.pointerId, nextNote.note)
+    startNote(nextNote, event.pointerType === 'touch' ? 0.72 : 0.84)
+  }
+
+  const handlePointerEnd = (event) => {
+    const noteName = pointerNotesRef.current.get(event.pointerId)
+    const note = noteName ? noteByName.get(noteName) : null
+
+    if (note) {
+      releaseNote(note)
+    }
+
+    pointerNotesRef.current.delete(event.pointerId)
   }
 
   return (
@@ -106,7 +196,13 @@ function App() {
             <span className="scanline scanline-c" />
           </div>
 
-          <PianoKeyboard />
+          <PianoKeyboard
+            activeNotes={activeNotes}
+            onPointerCancel={handlePointerEnd}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerEnd}
+          />
         </div>
 
         <aside className="control-rack" aria-label="Piano controls">
