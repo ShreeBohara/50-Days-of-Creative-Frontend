@@ -13,6 +13,7 @@ import './App.css'
 import {
   BLACK_NOTES,
   FIRST_OCTAVE,
+  LAST_OCTAVE,
   NOTES,
   WHITE_KEY_COUNT,
   WHITE_NOTES,
@@ -20,7 +21,7 @@ import {
   getNoteColor,
 } from './pianoModel'
 import { PianoRollCanvas } from './PianoRollCanvas'
-import { usePianoEngine } from './usePianoEngine'
+import { INSTRUMENT_PRESETS, usePianoEngine } from './usePianoEngine'
 import { createVisualNote } from './visualNotes'
 
 function PianoKey({ isActive, keyboardLabel, note, type }) {
@@ -109,9 +110,11 @@ function formatDuration(milliseconds) {
 }
 
 function App() {
-  const [instrument] = useState('piano')
-  const [keyboardOctave] = useState(FIRST_OCTAVE)
-  const [volume] = useState(-10)
+  const [instrument, setInstrument] = useState('piano')
+  const [isSustainOn, setIsSustainOn] = useState(false)
+  const [keyboardOctave, setKeyboardOctave] = useState(FIRST_OCTAVE)
+  const [showKeyLabels, setShowKeyLabels] = useState(true)
+  const [volume, setVolume] = useState(-10)
   const [activeNotes, setActiveNotes] = useState(() => new Set())
   const [isPlayingRecording, setIsPlayingRecording] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
@@ -126,6 +129,8 @@ function App() {
   const playbackTimersRef = useRef([])
   const recordingStartedAtRef = useRef(0)
   const isRecordingRef = useRef(false)
+  const sustainedNotesRef = useRef(new Set())
+  const sustainOnRef = useRef(false)
   const noteByName = useMemo(() => new Map(NOTES.map((note) => [note.note, note])), [])
   const keyboardAssignments = useMemo(
     () => getKeyboardAssignments(keyboardOctave),
@@ -141,6 +146,10 @@ function App() {
         keyboardAssignments.map((binding) => [binding.note.note, binding.key.toUpperCase()]),
       ),
     [keyboardAssignments],
+  )
+  const visibleKeyboardLabels = useMemo(
+    () => (showKeyLabels ? keyboardLabels : new Map()),
+    [keyboardLabels, showKeyLabels],
   )
   const { audioError, isAudioReady, triggerAttack, triggerAttackRelease, triggerRelease } =
     usePianoEngine({ instrument, volume })
@@ -192,17 +201,12 @@ function App() {
   )
 
   const releaseNote = useCallback(
-    (note) => {
+    (note, force = false) => {
       if (!activeNotesRef.current.has(note.note)) {
         return
       }
 
-      const nextNotes = new Set(activeNotesRef.current)
       const visualId = activeVisualNotesRef.current.get(note.note)
-      nextNotes.delete(note.note)
-      activeVisualNotesRef.current.delete(note.note)
-      activeNotesRef.current = nextNotes
-      setActiveNotes(nextNotes)
 
       if (isRecordingRef.current) {
         const recordedNoteId = activeRecordingNotesRef.current.get(note.note)
@@ -218,6 +222,17 @@ function App() {
         )
       }
 
+      if (sustainOnRef.current && !force) {
+        sustainedNotesRef.current.add(note.note)
+        return
+      }
+
+      const nextNotes = new Set(activeNotesRef.current)
+      nextNotes.delete(note.note)
+      sustainedNotesRef.current.delete(note.note)
+      activeVisualNotesRef.current.delete(note.note)
+      activeNotesRef.current = nextNotes
+      setActiveNotes(nextNotes)
       setVisualNotes((currentNotes) =>
         currentNotes.map((entry) =>
           entry.id === visualId && !entry.endedAt ? { ...entry, endedAt: performance.now() } : entry,
@@ -361,7 +376,7 @@ function App() {
         startNote(note, entry.velocity, 'playback')
       }, entry.startedAtMs)
       const stopTimer = window.setTimeout(() => {
-        releaseNote(note)
+        releaseNote(note, true)
       }, entry.startedAtMs + duration)
 
       playbackTimersRef.current.push(startTimer, stopTimer)
@@ -376,6 +391,30 @@ function App() {
       window.setTimeout(() => {
         setIsPlayingRecording(false)
       }, playbackLength + 220),
+    )
+  }
+
+  const handleSustainToggle = () => {
+    const nextSustainValue = !isSustainOn
+
+    sustainOnRef.current = nextSustainValue
+    setIsSustainOn(nextSustainValue)
+
+    if (!nextSustainValue) {
+      Array.from(sustainedNotesRef.current).forEach((noteName) => {
+        const note = noteByName.get(noteName)
+
+        if (note) {
+          releaseNote(note, true)
+        }
+      })
+      sustainedNotesRef.current.clear()
+    }
+  }
+
+  const shiftKeyboardOctave = (direction) => {
+    setKeyboardOctave((currentOctave) =>
+      Math.min(LAST_OCTAVE, Math.max(FIRST_OCTAVE, currentOctave + direction)),
     )
   }
 
@@ -476,7 +515,7 @@ function App() {
 
           <PianoKeyboard
             activeNotes={activeNotes}
-            keyboardLabels={keyboardLabels}
+            keyboardLabels={visibleKeyboardLabels}
             onPointerCancel={handlePointerEnd}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -490,7 +529,27 @@ function App() {
               <Radio size={18} aria-hidden="true" />
               <h2>Sound Engine</h2>
             </div>
-            <p>Polyphonic Tone.js synthesis, reverb, ADSR shaping, and instrument color.</p>
+            <label className="field-group">
+              <span>Instrument</span>
+              <select value={instrument} onChange={(event) => setInstrument(event.target.value)}>
+                {Object.entries(INSTRUMENT_PRESETS).map(([value, preset]) => (
+                  <option key={value} value={value}>
+                    {preset.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-group">
+              <span>Volume {volume} dB</span>
+              <input
+                type="range"
+                min="-32"
+                max="0"
+                step="1"
+                value={volume}
+                onChange={(event) => setVolume(Number(event.target.value))}
+              />
+            </label>
           </section>
 
           <section className="rack-panel">
@@ -533,7 +592,39 @@ function App() {
               <SlidersHorizontal size={18} aria-hidden="true" />
               <h2>Performance</h2>
             </div>
-            <p>QWERTY mappings, octave shift, sustain, labels, touch-friendly sizing, and focus states.</p>
+            <div className="octave-controls" aria-label="Keyboard octave shift">
+              <button
+                type="button"
+                onClick={() => shiftKeyboardOctave(-1)}
+                disabled={keyboardOctave === FIRST_OCTAVE}
+              >
+                Oct -
+              </button>
+              <span>C{keyboardOctave} map</span>
+              <button
+                type="button"
+                onClick={() => shiftKeyboardOctave(1)}
+                disabled={keyboardOctave === LAST_OCTAVE}
+              >
+                Oct +
+              </button>
+            </div>
+            <button
+              type="button"
+              className={isSustainOn ? 'toggle-button is-on' : 'toggle-button'}
+              onClick={handleSustainToggle}
+              aria-pressed={isSustainOn}
+            >
+              Sustain {isSustainOn ? 'On' : 'Off'}
+            </button>
+            <button
+              type="button"
+              className={showKeyLabels ? 'toggle-button is-on' : 'toggle-button'}
+              onClick={() => setShowKeyLabels((currentValue) => !currentValue)}
+              aria-pressed={showKeyLabels}
+            >
+              Key Labels {showKeyLabels ? 'On' : 'Off'}
+            </button>
           </section>
         </aside>
       </section>
