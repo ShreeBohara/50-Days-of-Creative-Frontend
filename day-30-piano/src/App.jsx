@@ -18,6 +18,8 @@ function PianoKey({ note, type }) {
       type="button"
       className={`piano-key ${type === 'black' ? 'black-key' : 'white-key'}`}
       style={style}
+      data-note={note.note}
+      data-octave={note.octave}
       aria-label={`Play ${note.note}`}
     >
       <span className="note-name">{note.note}</span>
@@ -33,10 +35,15 @@ function PianoKeyboard() {
           <PianoKey key={note.id} note={note} type="white" />
         ))}
       </div>
-      <div className="black-key-row" aria-hidden="true">
+      <div className="black-key-row">
         {BLACK_NOTES.map((note) => (
           <PianoKey key={note.id} note={note} type="black" />
         ))}
+      </div>
+      <div className="octave-rail" aria-hidden="true">
+        <span>C3</span>
+        <span>C4</span>
+        <span>C5</span>
       </div>
     </div>
   )
