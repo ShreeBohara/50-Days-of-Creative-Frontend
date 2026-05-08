@@ -344,6 +344,36 @@
   text-align: center;
 }
 
+.key-binding {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(8, 9, 21, 0.78);
+  color: #f8fafc;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.22);
+}
+
+.white-key .key-binding {
+  top: 0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.black-key .key-binding {
+  top: 0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(45, 212, 191, 0.88);
+  color: #021210;
+}
+
 .black-key .note-name {
   position: absolute;
   inset-inline: 0;

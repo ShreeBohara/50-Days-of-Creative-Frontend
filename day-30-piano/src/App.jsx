@@ -1,10 +1,18 @@
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CircleDot, Gauge, KeyboardMusic, Radio, SlidersHorizontal } from 'lucide-react'
 import './App.css'
-import { BLACK_NOTES, NOTES, WHITE_KEY_COUNT, WHITE_NOTES, getNoteColor } from './pianoModel'
+import {
+  BLACK_NOTES,
+  FIRST_OCTAVE,
+  NOTES,
+  WHITE_KEY_COUNT,
+  WHITE_NOTES,
+  getKeyboardAssignments,
+  getNoteColor,
+} from './pianoModel'
 import { usePianoEngine } from './usePianoEngine'
 
-function PianoKey({ isActive, note, type }) {
+function PianoKey({ isActive, keyboardLabel, note, type }) {
   const style =
     type === 'black'
       ? {
@@ -26,12 +34,20 @@ function PianoKey({ isActive, note, type }) {
       data-octave={note.octave}
       aria-label={`Play ${note.note}`}
     >
+      {keyboardLabel ? <span className="key-binding">{keyboardLabel}</span> : null}
       <span className="note-name">{note.note}</span>
     </button>
   )
 }
 
-function PianoKeyboard({ activeNotes, onPointerCancel, onPointerDown, onPointerMove, onPointerUp }) {
+function PianoKeyboard({
+  activeNotes,
+  keyboardLabels,
+  onPointerCancel,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+}) {
   return (
     <div
       className="piano-keyboard"
@@ -43,12 +59,24 @@ function PianoKeyboard({ activeNotes, onPointerCancel, onPointerDown, onPointerM
     >
       <div className="white-key-row">
         {WHITE_NOTES.map((note) => (
-          <PianoKey key={note.id} isActive={activeNotes.has(note.note)} note={note} type="white" />
+          <PianoKey
+            key={note.id}
+            isActive={activeNotes.has(note.note)}
+            keyboardLabel={keyboardLabels.get(note.note)}
+            note={note}
+            type="white"
+          />
         ))}
       </div>
       <div className="black-key-row">
         {BLACK_NOTES.map((note) => (
-          <PianoKey key={note.id} isActive={activeNotes.has(note.note)} note={note} type="black" />
+          <PianoKey
+            key={note.id}
+            isActive={activeNotes.has(note.note)}
+            keyboardLabel={keyboardLabels.get(note.note)}
+            note={note}
+            type="black"
+          />
         ))}
       </div>
       <div className="octave-rail" aria-hidden="true">
@@ -62,11 +90,28 @@ function PianoKeyboard({ activeNotes, onPointerCancel, onPointerDown, onPointerM
 
 function App() {
   const [instrument] = useState('piano')
+  const [keyboardOctave] = useState(FIRST_OCTAVE)
   const [volume] = useState(-10)
   const [activeNotes, setActiveNotes] = useState(() => new Set())
   const activeNotesRef = useRef(new Set())
+  const heldKeyboardKeysRef = useRef(new Map())
   const pointerNotesRef = useRef(new Map())
   const noteByName = useMemo(() => new Map(NOTES.map((note) => [note.note, note])), [])
+  const keyboardAssignments = useMemo(
+    () => getKeyboardAssignments(keyboardOctave),
+    [keyboardOctave],
+  )
+  const assignmentByKey = useMemo(
+    () => new Map(keyboardAssignments.map((binding) => [binding.key, binding.note])),
+    [keyboardAssignments],
+  )
+  const keyboardLabels = useMemo(
+    () =>
+      new Map(
+        keyboardAssignments.map((binding) => [binding.note.note, binding.key.toUpperCase()]),
+      ),
+    [keyboardAssignments],
+  )
   const { audioError, isAudioReady, triggerAttack, triggerAttackRelease, triggerRelease } =
     usePianoEngine({ instrument, volume })
 
@@ -74,36 +119,89 @@ function App() {
     triggerAttackRelease('C4', '8n', 0.86)
   }
 
-  const startNote = (note, velocity = 0.82) => {
-    if (activeNotesRef.current.has(note.note)) {
-      return
+  const startNote = useCallback(
+    (note, velocity = 0.82) => {
+      if (activeNotesRef.current.has(note.note)) {
+        return
+      }
+
+      const nextNotes = new Set(activeNotesRef.current)
+      nextNotes.add(note.note)
+      activeNotesRef.current = nextNotes
+      setActiveNotes(nextNotes)
+      triggerAttack(note.note, velocity)
+    },
+    [triggerAttack],
+  )
+
+  const releaseNote = useCallback(
+    (note) => {
+      if (!activeNotesRef.current.has(note.note)) {
+        return
+      }
+
+      const nextNotes = new Set(activeNotesRef.current)
+      nextNotes.delete(note.note)
+      activeNotesRef.current = nextNotes
+      setActiveNotes(nextNotes)
+      triggerRelease(note.note)
+    },
+    [triggerRelease],
+  )
+
+  const getNoteFromPoint = useCallback(
+    (event) => {
+      const target = document.elementFromPoint(event.clientX, event.clientY)
+      const key = target?.closest?.('.piano-key')
+
+      return key?.dataset.note ? noteByName.get(key.dataset.note) : null
+    },
+    [noteByName],
+  )
+
+  useEffect(() => {
+    const ignoreTypingTargets = (target) =>
+      target instanceof HTMLElement &&
+      ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)
+
+    const handleKeyDown = (event) => {
+      if (event.repeat || ignoreTypingTargets(event.target)) {
+        return
+      }
+
+      const keyboardKey = event.key.toLowerCase()
+      const note = assignmentByKey.get(keyboardKey)
+
+      if (!note || heldKeyboardKeysRef.current.has(keyboardKey)) {
+        return
+      }
+
+      event.preventDefault()
+      heldKeyboardKeysRef.current.set(keyboardKey, note.note)
+      startNote(note, 0.9)
     }
 
-    const nextNotes = new Set(activeNotesRef.current)
-    nextNotes.add(note.note)
-    activeNotesRef.current = nextNotes
-    setActiveNotes(nextNotes)
-    triggerAttack(note.note, velocity)
-  }
+    const handleKeyUp = (event) => {
+      const keyboardKey = event.key.toLowerCase()
+      const noteName = heldKeyboardKeysRef.current.get(keyboardKey)
+      const note = noteName ? noteByName.get(noteName) : null
 
-  const releaseNote = (note) => {
-    if (!activeNotesRef.current.has(note.note)) {
-      return
+      if (!note) {
+        return
+      }
+
+      heldKeyboardKeysRef.current.delete(keyboardKey)
+      releaseNote(note)
     }
 
-    const nextNotes = new Set(activeNotesRef.current)
-    nextNotes.delete(note.note)
-    activeNotesRef.current = nextNotes
-    setActiveNotes(nextNotes)
-    triggerRelease(note.note)
-  }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
 
-  const getNoteFromPoint = (event) => {
-    const target = document.elementFromPoint(event.clientX, event.clientY)
-    const key = target?.closest?.('.piano-key')
-
-    return key?.dataset.note ? noteByName.get(key.dataset.note) : null
-  }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [assignmentByKey, noteByName, releaseNote, startNote])
 
   const handlePointerDown = (event) => {
     const note = getNoteFromPoint(event)
@@ -198,6 +296,7 @@ function App() {
 
           <PianoKeyboard
             activeNotes={activeNotes}
+            keyboardLabels={keyboardLabels}
             onPointerCancel={handlePointerEnd}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
