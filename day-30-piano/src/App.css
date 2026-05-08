@@ -234,7 +234,14 @@
 }
 
 .piano-keyboard {
+  overflow-x: auto;
+  border-radius: 8px;
+  scrollbar-color: rgba(45, 212, 191, 0.5) rgba(8, 9, 21, 0.6);
+}
+
+.keyboard-bed {
   position: relative;
+  width: max(100%, 52rem);
   min-height: 15.5rem;
   padding: 0.85rem 0.85rem 1.95rem;
   border: 1px solid rgba(153, 171, 255, 0.16);
@@ -470,6 +477,96 @@
   50% {
     transform: scale(1.15);
     opacity: 1;
+  }
+}
+
+@media (max-width: 980px) {
+  .studio-header,
+  .studio-grid {
+    width: min(100%, 46rem);
+  }
+
+  .studio-header,
+  .studio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-header {
+    align-items: start;
+  }
+
+  .studio-header h1 {
+    max-width: 12ch;
+  }
+
+  .control-rack {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .piano-app {
+    padding: 0.8rem;
+  }
+
+  .studio-header {
+    gap: 1rem;
+    padding-top: 0.6rem;
+  }
+
+  .brand-lockup {
+    gap: 0.75rem;
+  }
+
+  .brand-mark {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .studio-header h1 {
+    font-size: clamp(2.55rem, 14vw, 4.2rem);
+  }
+
+  .stage-topline,
+  .transport-strip {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .engine-pill,
+  .primary-action,
+  .live-note-readout {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .visualizer-frame {
+    height: 10rem;
+  }
+
+  .keyboard-bed {
+    width: 48rem;
+    min-height: 14rem;
+  }
+
+  .white-key-row {
+    height: 11.6rem;
+  }
+
+  .white-key {
+    min-height: 11.6rem;
+  }
+
+  .black-key {
+    height: 7.25rem;
+  }
+
+  .control-rack {
+    grid-template-columns: 1fr;
+  }
+
+  .transport-controls {
+    grid-template-columns: 1fr;
   }
 }
 

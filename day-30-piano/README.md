@@ -1,16 +1,24 @@
-# React + Vite
+# Day 30 - Interactive Piano Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A three-octave React + Tone.js piano with live synthesis, QWERTY input, touch/pointer play, recording, playback, and a canvas falling-note visualizer.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- C3-B5 piano surface with 21 white keys and 15 black keys.
+- Tone.js PolySynth presets for Piano, Synth, Organ, and Marimba.
+- Pointer drag, touch, and QWERTY performance input with octave shifting.
+- Sustain toggle, key-label toggle, and volume control.
+- Record, stop, play, and clear controls with note timing and duration capture.
+- Canvas piano-roll visualizer aligned to the same note model as the keyboard.
+- Responsive studio layout with horizontal key scrolling on small screens.
 
-## React Compiler
+## Local Commands
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+npm run lint
+npm run build
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The Vite base path is configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-30-piano/`.

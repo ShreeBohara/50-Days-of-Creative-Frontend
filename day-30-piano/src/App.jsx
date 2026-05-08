@@ -62,40 +62,41 @@ function PianoKeyboard({
   onPointerUp,
 }) {
   return (
-    <div
-      className="piano-keyboard"
-      aria-label="Three octave piano keyboard"
-      onPointerCancel={onPointerCancel}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-    >
-      <div className="white-key-row">
-        {WHITE_NOTES.map((note) => (
-          <PianoKey
-            key={note.id}
-            isActive={activeNotes.has(note.note)}
-            keyboardLabel={keyboardLabels.get(note.note)}
-            note={note}
-            type="white"
-          />
-        ))}
-      </div>
-      <div className="black-key-row">
-        {BLACK_NOTES.map((note) => (
-          <PianoKey
-            key={note.id}
-            isActive={activeNotes.has(note.note)}
-            keyboardLabel={keyboardLabels.get(note.note)}
-            note={note}
-            type="black"
-          />
-        ))}
-      </div>
-      <div className="octave-rail" aria-hidden="true">
-        <span>C3</span>
-        <span>C4</span>
-        <span>C5</span>
+    <div className="piano-keyboard" aria-label="Three octave piano keyboard">
+      <div
+        className="keyboard-bed"
+        onPointerCancel={onPointerCancel}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+      >
+        <div className="white-key-row">
+          {WHITE_NOTES.map((note) => (
+            <PianoKey
+              key={note.id}
+              isActive={activeNotes.has(note.note)}
+              keyboardLabel={keyboardLabels.get(note.note)}
+              note={note}
+              type="white"
+            />
+          ))}
+        </div>
+        <div className="black-key-row">
+          {BLACK_NOTES.map((note) => (
+            <PianoKey
+              key={note.id}
+              isActive={activeNotes.has(note.note)}
+              keyboardLabel={keyboardLabels.get(note.note)}
+              note={note}
+              type="black"
+            />
+          ))}
+        </div>
+        <div className="octave-rail" aria-hidden="true">
+          <span>C3</span>
+          <span>C4</span>
+          <span>C5</span>
+        </div>
       </div>
     </div>
   )
