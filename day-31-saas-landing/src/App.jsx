@@ -35,14 +35,28 @@ function App() {
   const [testimonialPaused, setTestimonialPaused] = useState(false)
   const [billingCycle, setBillingCycle] = useState('monthly')
   const [activeFaq, setActiveFaq] = useState(0)
+  const [stickyVisible, setStickyVisible] = useState(false)
+  const [stickyCompact, setStickyCompact] = useState(false)
   const heroRef = useRef(null)
   const mockupRef = useRef(null)
   const ctaRef = useRef(null)
   const testimonialRef = useRef(null)
+  const cursorRef = useRef(null)
   const dragRef = useRef({ active: false, startX: 0, startScroll: 0 })
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => {
+      const heroHeight = heroRef.current?.offsetHeight || window.innerHeight
+      setStickyVisible(window.scrollY > heroHeight * 0.72)
+      setStickyCompact(window.scrollY > heroHeight * 1.45)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -125,6 +139,34 @@ function App() {
       })
     })
   }, [activeFaq])
+
+  useEffect(() => {
+    const cursor = cursorRef.current
+    const finePointer = window.matchMedia('(pointer: fine)').matches
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!cursor || !finePointer || reduceMotion) {
+      return undefined
+    }
+
+    const move = (event) => {
+      gsap.to(cursor, {
+        x: event.clientX,
+        y: event.clientY,
+        duration: 0.18,
+        ease: 'power2.out',
+      })
+    }
+    const hover = (event) => {
+      cursor.classList.toggle('is-hovering', Boolean(event.target.closest('a, button')))
+    }
+
+    window.addEventListener('pointermove', move)
+    document.addEventListener('mouseover', hover)
+    return () => {
+      window.removeEventListener('pointermove', move)
+      document.removeEventListener('mouseover', hover)
+    }
+  }, [])
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -313,6 +355,7 @@ function App() {
 
   return (
     <main className="app-shell">
+      <div className="custom-cursor" ref={cursorRef} aria-hidden="true"></div>
       <nav className={`site-nav ${navScrolled ? 'is-scrolled' : ''}`} aria-label="Primary navigation">
         <a className="brand" href="#top" aria-label="NovaDesk home">
           <span className="brand-mark">N</span>
@@ -608,6 +651,17 @@ function App() {
           ))}
         </div>
       </footer>
+
+      <a
+        className={`sticky-cta ${stickyVisible ? 'is-visible' : ''} ${
+          stickyCompact ? 'is-compact' : ''
+        }`}
+        href="#pricing"
+      >
+        <span className="sticky-cta-full">Start your launch room</span>
+        <span className="sticky-cta-short">Start</span>
+        <ArrowRight size={18} aria-hidden="true" />
+      </a>
     </main>
   )
 }
