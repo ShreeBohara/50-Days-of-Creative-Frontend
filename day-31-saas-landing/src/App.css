@@ -460,8 +460,7 @@
 
 .feature-card h3,
 .workflow-step h3,
-.pricing-card h3,
-.faq-item h3 {
+.pricing-card h3 {
   margin: 0 0 12px;
   font-size: 1.25rem;
 }
@@ -695,6 +694,78 @@
   gap: 14px;
 }
 
+.faq-item {
+  padding: 0;
+  overflow: hidden;
+}
+
+.faq-question {
+  display: flex;
+  width: 100%;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 24px;
+  color: var(--text);
+  background: transparent;
+  text-align: left;
+  font-weight: 800;
+}
+
+.faq-question svg {
+  flex: 0 0 auto;
+  color: var(--cyan);
+  transition: transform 220ms ease;
+}
+
+.faq-item.is-open .faq-question svg {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  height: 0;
+  overflow: hidden;
+}
+
+.faq-answer p {
+  margin: 0;
+  padding: 0 24px 24px;
+}
+
+.final-cta {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  min-height: 520px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(143, 92, 255, 0.42), transparent 34rem),
+    linear-gradient(150deg, rgba(49, 168, 255, 0.14), rgba(255, 93, 184, 0.08)),
+    rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.final-cta h2 {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(2.6rem, 7vw, 6.5rem);
+  line-height: 0.96;
+}
+
+.final-cta p {
+  max-width: 660px;
+  margin: 20px 0 32px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.pulse-button {
+  animation: pulse-button 2.4s ease-in-out infinite;
+}
+
 .footer-section {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(420px, 0.8fr);
@@ -702,8 +773,15 @@
   padding-bottom: 64px;
 }
 
-.footer-section .button {
-  margin-top: 28px;
+.footer-brand {
+  width: max-content;
+  margin-bottom: 18px;
+}
+
+.footer-section p {
+  max-width: 360px;
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .footer-columns {
@@ -732,5 +810,16 @@
 
   to {
     transform: translateX(calc(-50% - 27px));
+  }
+}
+
+@keyframes pulse-button {
+  0%,
+  100% {
+    box-shadow: 0 24px 80px rgba(87, 95, 255, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 24px 110px rgba(78, 231, 245, 0.4);
   }
 }

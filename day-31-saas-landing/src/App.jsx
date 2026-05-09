@@ -3,6 +3,7 @@ import {
   Activity,
   ArrowRight,
   CheckCircle2,
+  ChevronDown,
   ListChecks,
   PlugZap,
   Send,
@@ -33,6 +34,7 @@ function App() {
   const [testimonialIndex, setTestimonialIndex] = useState(0)
   const [testimonialPaused, setTestimonialPaused] = useState(false)
   const [billingCycle, setBillingCycle] = useState('monthly')
+  const [activeFaq, setActiveFaq] = useState(0)
   const heroRef = useRef(null)
   const mockupRef = useRef(null)
   const ctaRef = useRef(null)
@@ -112,6 +114,17 @@ function App() {
       })
     })
   }, [billingCycle])
+
+  useEffect(() => {
+    gsap.utils.toArray('.faq-answer').forEach((answer, index) => {
+      const isOpen = index === activeFaq
+      gsap.to(answer, {
+        height: isOpen ? answer.scrollHeight : 0,
+        duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.32,
+        ease: 'power2.out',
+      })
+    })
+  }, [activeFaq])
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -543,21 +556,44 @@ function App() {
           <h2>Questions before the first launch room?</h2>
         </div>
         <div className="faq-list">
-          {faqs.map((faq) => (
-            <article className="faq-item" key={faq.question}>
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
+          {faqs.map((faq, index) => (
+            <article className={`faq-item ${activeFaq === index ? 'is-open' : ''}`} key={faq.question}>
+              <button
+                aria-expanded={activeFaq === index}
+                className="faq-question"
+                onClick={() => setActiveFaq(activeFaq === index ? -1 : index)}
+                type="button"
+              >
+                <span>{faq.question}</span>
+                <ChevronDown size={22} aria-hidden="true" />
+              </button>
+              <div className="faq-answer">
+                <p>{faq.answer}</p>
+              </div>
             </article>
           ))}
         </div>
       </section>
 
+      <section className="final-cta section-frame">
+        <h2>Give every launch one calm source of truth.</h2>
+        <p>
+          Start with a single launch room, connect your existing stack, and watch risk turn into
+          visible next steps before the next weekly review.
+        </p>
+        <a className="button button-primary pulse-button" href="#pricing">
+          Start free
+          <ArrowRight size={18} aria-hidden="true" />
+        </a>
+      </section>
+
       <footer className="footer-section section-frame">
         <div>
-          <h2>Make launch work feel lighter.</h2>
-          <a className="button button-primary" href="#pricing">
-            Start free
+          <a className="brand footer-brand" href="#top" aria-label="NovaDesk home">
+            <span className="brand-mark">N</span>
+            NovaDesk
           </a>
+          <p>Revenue-critical launch work, organized for teams that move fast.</p>
         </div>
         <div className="footer-columns">
           {footerColumns.map((column) => (
