@@ -57,6 +57,38 @@ function App() {
     return () => ctx.revert()
   }, [])
 
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) {
+      return undefined
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray('.feature-card').forEach((card, index) => {
+        const directions = [
+          { x: -72, y: 26 },
+          { x: 72, y: 18 },
+          { x: 0, y: 64 },
+          { x: -52, y: 0 },
+          { x: 52, y: 0 },
+          { x: 0, y: 58 },
+        ]
+        gsap.from(card, {
+          ...directions[index % directions.length],
+          opacity: 0,
+          duration: 0.85,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 82%',
+          },
+        })
+      })
+    })
+
+    return () => ctx.revert()
+  }, [])
+
   const handleMagnetMove = (event) => {
     if (!ctaRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return
@@ -187,9 +219,11 @@ function App() {
       </section>
 
       <section className="logos-strip" aria-label="Trusted by SaaS teams">
-        {logos.map((logo) => (
-          <span key={logo}>{logo}</span>
-        ))}
+        <div className="logo-track">
+          {[...logos, ...logos].map((logo, index) => (
+            <span key={`${logo}-${index}`}>{logo}</span>
+          ))}
+        </div>
       </section>
 
       <section className="section-frame" id="features">
@@ -198,8 +232,9 @@ function App() {
           <p>Every signal, launch task, and executive question lands in a workspace built for action.</p>
         </div>
         <div className="feature-grid">
-          {features.map((feature) => (
+          {features.map((feature, index) => (
             <article className={`feature-card feature-${feature.tone}`} key={feature.title}>
+              <span className="feature-index">{String(index + 1).padStart(2, '0')}</span>
               {feature.metric && <strong>{feature.metric}</strong>}
               <h3>{feature.title}</h3>
               <p>{feature.copy}</p>
