@@ -1,121 +1,179 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
+import {
+  faqs,
+  features,
+  footerColumns,
+  logos,
+  navItems,
+  pricing,
+  stats,
+  testimonials,
+  workflowSteps,
+} from './content'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="app-shell">
+      <nav className="site-nav" aria-label="Primary navigation">
+        <a className="brand" href="#top" aria-label="NovaDesk home">
+          <span className="brand-mark">N</span>
+          NovaDesk
+        </a>
+        <div className="nav-links">
+          {navItems.map((item) => (
+            <a href={item.href} key={item.href}>
+              {item.label}
+            </a>
+          ))}
         </div>
-        <div>
-          <h1>Get started</h1>
+        <a className="nav-cta" href="#pricing">
+          Start free
+        </a>
+      </nav>
+
+      <section className="hero-section section-frame" id="top">
+        <div className="hero-copy">
+          <h1>Run every SaaS launch from one live command center.</h1>
           <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+            NovaDesk helps customer-led teams prioritize risk, automate handoffs, and keep
+            leadership aligned without another status meeting.
           </p>
+          <div className="hero-actions">
+            <a className="button button-primary" href="#pricing">
+              Start free
+            </a>
+            <a className="button button-ghost" href="#workflow">
+              See workflow
+            </a>
+          </div>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div className="product-mockup" aria-label="NovaDesk product preview">
+          <div className="mockup-panel">
+            <span>Launch health</span>
+            <strong>92%</strong>
+          </div>
+          <div className="mockup-list">
+            <span>Risk signals</span>
+            <span>Owner handoffs</span>
+            <span>Exec summary</span>
+          </div>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <section className="logos-strip" aria-label="Trusted by SaaS teams">
+        {logos.map((logo) => (
+          <span key={logo}>{logo}</span>
+        ))}
+      </section>
+
+      <section className="section-frame" id="features">
+        <div className="section-heading">
+          <h2>One operating layer for the messy middle of growth.</h2>
+          <p>Every signal, launch task, and executive question lands in a workspace built for action.</p>
+        </div>
+        <div className="feature-grid">
+          {features.map((feature) => (
+            <article className={`feature-card feature-${feature.tone}`} key={feature.title}>
+              {feature.metric && <strong>{feature.metric}</strong>}
+              <h3>{feature.title}</h3>
+              <p>{feature.copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-frame" id="workflow">
+        <div className="section-heading">
+          <h2>From scattered signals to coordinated execution.</h2>
+        </div>
+        <div className="workflow-track">
+          {workflowSteps.map((step, index) => (
+            <article className="workflow-step" key={step.title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{step.title}</h3>
+              <p>{step.copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-frame stats-section" aria-label="NovaDesk impact metrics">
+        {stats.map((stat) => (
+          <article className="stat-card" key={stat.label}>
+            <strong>
+              {stat.value}
+              {stat.suffix}
+            </strong>
+            <span>{stat.label}</span>
+          </article>
+        ))}
+      </section>
+
+      <section className="section-frame" id="customers">
+        <div className="section-heading">
+          <h2>Built for teams that cannot afford fuzzy ownership.</h2>
+        </div>
+        <div className="testimonial-row">
+          {testimonials.slice(0, 3).map((testimonial) => (
+            <article className="testimonial-card" key={testimonial.name}>
+              <p>{testimonial.quote}</p>
+              <strong>{testimonial.name}</strong>
+              <span>{testimonial.role}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-frame" id="pricing">
+        <div className="section-heading">
+          <h2>Simple plans for serious launch velocity.</h2>
+        </div>
+        <div className="pricing-grid">
+          {pricing.map((plan) => (
+            <article className={`pricing-card ${plan.popular ? 'is-popular' : ''}`} key={plan.name}>
+              <h3>{plan.name}</h3>
+              <strong>${plan.monthly}</strong>
+              <p>{plan.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-frame faq-section">
+        <div className="section-heading">
+          <h2>Questions before the first launch room?</h2>
+        </div>
+        <div className="faq-list">
+          {faqs.map((faq) => (
+            <article className="faq-item" key={faq.question}>
+              <h3>{faq.question}</h3>
+              <p>{faq.answer}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <footer className="footer-section section-frame">
+        <div>
+          <h2>Make launch work feel lighter.</h2>
+          <a className="button button-primary" href="#pricing">
+            Start free
+          </a>
+        </div>
+        <div className="footer-columns">
+          {footerColumns.map((column) => (
+            <div key={column.title}>
+              <h3>{column.title}</h3>
+              {column.links.map((link) => (
+                <a href="#top" key={link}>
+                  {link}
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
+      </footer>
+    </main>
   )
 }
 
