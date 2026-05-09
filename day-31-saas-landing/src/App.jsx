@@ -30,9 +30,13 @@ const workflowIcons = [PlugZap, ListChecks, Send]
 
 function App() {
   const [navScrolled, setNavScrolled] = useState(false)
+  const [testimonialIndex, setTestimonialIndex] = useState(0)
+  const [testimonialPaused, setTestimonialPaused] = useState(false)
   const heroRef = useRef(null)
   const mockupRef = useRef(null)
   const ctaRef = useRef(null)
+  const testimonialRef = useRef(null)
+  const dragRef = useRef({ active: false, startX: 0, startScroll: 0 })
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 24)
@@ -67,6 +71,28 @@ function App() {
 
     return () => ctx.revert()
   }, [])
+
+  useEffect(() => {
+    if (testimonialPaused) {
+      return undefined
+    }
+    const timer = window.setInterval(() => {
+      setTestimonialIndex((current) => (current + 1) % testimonials.length)
+    }, 4200)
+    return () => window.clearInterval(timer)
+  }, [testimonialPaused])
+
+  useEffect(() => {
+    const carousel = testimonialRef.current
+    const card = carousel?.children[testimonialIndex]
+    if (!carousel || !card) {
+      return
+    }
+    carousel.scrollTo({
+      left: card.offsetLeft - carousel.offsetLeft,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    })
+  }, [testimonialIndex])
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -209,6 +235,48 @@ function App() {
         ease: 'power2.out',
       })
     }
+  }
+
+  const handleTestimonialDown = (event) => {
+    const carousel = testimonialRef.current
+    if (!carousel) {
+      return
+    }
+    dragRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScroll: carousel.scrollLeft,
+    }
+    carousel.setPointerCapture(event.pointerId)
+    carousel.classList.add('is-dragging')
+    setTestimonialPaused(true)
+  }
+
+  const handleTestimonialMove = (event) => {
+    const carousel = testimonialRef.current
+    if (!carousel || !dragRef.current.active) {
+      return
+    }
+    carousel.scrollLeft = dragRef.current.startScroll - (event.clientX - dragRef.current.startX)
+  }
+
+  const handleTestimonialUp = (event) => {
+    const carousel = testimonialRef.current
+    if (!carousel || !dragRef.current.active) {
+      return
+    }
+    dragRef.current.active = false
+    carousel.releasePointerCapture(event.pointerId)
+    carousel.classList.remove('is-dragging')
+    const cards = Array.from(carousel.children)
+    const nearest = cards.reduce(
+      (best, card, index) => {
+        const distance = Math.abs(card.offsetLeft - carousel.scrollLeft)
+        return distance < best.distance ? { index, distance } : best
+      },
+      { index: 0, distance: Number.POSITIVE_INFINITY },
+    )
+    setTestimonialIndex(nearest.index)
   }
 
   return (
@@ -364,13 +432,34 @@ function App() {
         <div className="section-heading">
           <h2>Built for teams that cannot afford fuzzy ownership.</h2>
         </div>
-        <div className="testimonial-row">
-          {testimonials.slice(0, 3).map((testimonial) => (
+        <div
+          className="testimonial-row"
+          onMouseEnter={() => setTestimonialPaused(true)}
+          onMouseLeave={() => setTestimonialPaused(false)}
+          onPointerDown={handleTestimonialDown}
+          onPointerMove={handleTestimonialMove}
+          onPointerUp={handleTestimonialUp}
+          onPointerCancel={handleTestimonialUp}
+          ref={testimonialRef}
+        >
+          {testimonials.map((testimonial) => (
             <article className="testimonial-card" key={testimonial.name}>
               <p>{testimonial.quote}</p>
               <strong>{testimonial.name}</strong>
               <span>{testimonial.role}</span>
             </article>
+          ))}
+        </div>
+        <div className="testimonial-dots" aria-label="Testimonial slides">
+          {testimonials.map((testimonial, index) => (
+            <button
+              aria-label={`Show testimonial from ${testimonial.name}`}
+              aria-pressed={testimonialIndex === index}
+              className={testimonialIndex === index ? 'is-active' : ''}
+              key={testimonial.name}
+              onClick={() => setTestimonialIndex(index)}
+              type="button"
+            ></button>
           ))}
         </div>
       </section>

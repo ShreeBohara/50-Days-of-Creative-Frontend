@@ -437,8 +437,7 @@
 }
 
 .workflow-track,
-.stats-section,
-.testimonial-row {
+.stats-section {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
@@ -480,6 +479,77 @@
   color: white;
   background: var(--gradient);
   box-shadow: 0 18px 46px rgba(80, 118, 255, 0.32);
+}
+
+.testimonial-row {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.testimonial-row::-webkit-scrollbar {
+  display: none;
+}
+
+.testimonial-row.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+.testimonial-card {
+  display: flex;
+  flex: 0 0 calc((100% - 36px) / 3);
+  min-height: 300px;
+  flex-direction: column;
+  justify-content: space-between;
+  scroll-snap-align: start;
+}
+
+.testimonial-card p {
+  font-size: 1.08rem;
+}
+
+.testimonial-card strong {
+  display: block;
+  margin-top: 24px;
+}
+
+.testimonial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.testimonial-dots button {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.testimonial-dots button::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  transition:
+    width 180ms ease,
+    background 180ms ease;
+}
+
+.testimonial-dots button.is-active::before,
+.testimonial-dots button[aria-pressed='true']::before {
+  width: 28px;
+  background: var(--gradient);
 }
 
 .stats-section {
