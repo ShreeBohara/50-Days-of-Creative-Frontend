@@ -1,16 +1,26 @@
-# React + Vite
+# Day 31 - GSAP SaaS Landing Page
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-style React + GSAP landing page for a fictional SaaS product, NovaDesk.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Sticky navigation with scroll-aware glass styling.
+- Hero headline stagger, magnetic CTA, and mouse-reactive product mockup.
+- Infinite logo marquee and asymmetric animated feature bento grid.
+- Three-step workflow timeline with line draw and icon bounce.
+- Count-up stats with animated circular progress rings.
+- Testimonial carousel with autoplay, hover pause, drag, and dot controls.
+- Pricing cards with a popular tier, monthly/yearly toggle, and animated price roll.
+- GSAP-height FAQ accordion, final CTA, footer columns, sticky CTA, and desktop custom cursor.
+- Responsive layout with touch-friendly controls and reduced-motion fallbacks.
 
-## React Compiler
+## Local Commands
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+npm run lint
+npm run build
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The Vite base path is configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-31-saas-landing/`.
