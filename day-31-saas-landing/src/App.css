@@ -486,6 +486,50 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.stat-card {
+  position: relative;
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  text-align: center;
+}
+
+.progress-ring {
+  position: absolute;
+  inset: 22px 0 auto;
+  width: 118px;
+  height: 118px;
+  margin: 0 auto;
+  transform: rotate(-90deg);
+}
+
+.progress-ring-track,
+.progress-ring-fill {
+  fill: none;
+  stroke-width: 9;
+}
+
+.progress-ring-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.progress-ring-fill {
+  stroke: var(--cyan);
+  stroke-linecap: round;
+  stroke-dasharray: 289;
+  stroke-dashoffset: 289;
+}
+
+.stat-value {
+  margin-top: 54px;
+}
+
+.stat-label {
+  max-width: 170px;
+  margin-top: -26px;
+  line-height: 1.45;
+}
+
 .pricing-card.is-popular {
   background: linear-gradient(160deg, rgba(143, 92, 255, 0.35), rgba(49, 168, 255, 0.18));
 }

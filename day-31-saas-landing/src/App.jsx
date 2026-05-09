@@ -123,6 +123,41 @@ function App() {
           start: 'top 70%',
         },
       })
+
+      gsap.utils.toArray('.stat-card').forEach((card) => {
+        const value = card.querySelector('.stat-value')
+        const ring = card.querySelector('.progress-ring-fill')
+        const target = Number(value.dataset.value)
+        const suffix = value.dataset.suffix
+        const progress = Number(ring.dataset.progress)
+        const counter = { value: 0 }
+
+        gsap.to(counter, {
+          value: target,
+          duration: 1.4,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 84%',
+            once: true,
+          },
+          onUpdate: () => {
+            const decimals = target % 1 === 0 ? 0 : 1
+            value.textContent = `${counter.value.toFixed(decimals)}${suffix}`
+          },
+        })
+
+        gsap.to(ring, {
+          strokeDashoffset: 289 - (289 * progress) / 100,
+          duration: 1.35,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 84%',
+            once: true,
+          },
+        })
+      })
     })
 
     return () => ctx.revert()
@@ -307,11 +342,20 @@ function App() {
       <section className="section-frame stats-section" aria-label="NovaDesk impact metrics">
         {stats.map((stat) => (
           <article className="stat-card" key={stat.label}>
-            <strong>
-              {stat.value}
-              {stat.suffix}
+            <svg className="progress-ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle className="progress-ring-track" cx="60" cy="60" r="46"></circle>
+              <circle
+                className="progress-ring-fill"
+                cx="60"
+                cy="60"
+                data-progress={stat.progress}
+                r="46"
+              ></circle>
+            </svg>
+            <strong className="stat-value" data-value={stat.value} data-suffix={stat.suffix}>
+              0{stat.suffix}
             </strong>
-            <span>{stat.label}</span>
+            <span className="stat-label">{stat.label}</span>
           </article>
         ))}
       </section>
