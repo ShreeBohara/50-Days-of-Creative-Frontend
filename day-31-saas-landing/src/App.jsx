@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { Activity, ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react'
+import {
+  Activity,
+  ArrowRight,
+  CheckCircle2,
+  ListChecks,
+  PlugZap,
+  Send,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './App.css'
@@ -16,6 +25,8 @@ import {
 } from './content'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const workflowIcons = [PlugZap, ListChecks, Send]
 
 function App() {
   const [navScrolled, setNavScrolled] = useState(false)
@@ -83,6 +94,34 @@ function App() {
             start: 'top 82%',
           },
         })
+      })
+
+      gsap.fromTo(
+        '.workflow-line',
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          duration: 1.1,
+          ease: 'power2.inOut',
+          scrollTrigger: {
+            trigger: '.workflow-track',
+            start: 'top 72%',
+          },
+        },
+      )
+
+      gsap.from('.workflow-icon', {
+        y: 18,
+        scale: 0,
+        rotate: -18,
+        opacity: 0,
+        duration: 0.58,
+        ease: 'back.out(1.8)',
+        stagger: 0.18,
+        scrollTrigger: {
+          trigger: '.workflow-track',
+          start: 'top 70%',
+        },
       })
     })
 
@@ -243,14 +282,21 @@ function App() {
         </div>
       </section>
 
-      <section className="section-frame" id="workflow">
+      <section className="section-frame workflow-section" id="workflow">
         <div className="section-heading">
           <h2>From scattered signals to coordinated execution.</h2>
         </div>
         <div className="workflow-track">
+          <span className="workflow-line" aria-hidden="true"></span>
           {workflowSteps.map((step, index) => (
             <article className="workflow-step" key={step.title}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
+              <span className="workflow-number">{String(index + 1).padStart(2, '0')}</span>
+              <span className="workflow-icon" aria-hidden="true">
+                {(() => {
+                  const Icon = workflowIcons[index]
+                  return <Icon size={24} />
+                })()}
+              </span>
               <h3>{step.title}</h3>
               <p>{step.copy}</p>
             </article>
