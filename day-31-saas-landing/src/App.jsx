@@ -340,7 +340,9 @@ function App() {
       return
     }
     dragRef.current.active = false
-    carousel.releasePointerCapture(event.pointerId)
+    if (carousel.hasPointerCapture(event.pointerId)) {
+      carousel.releasePointerCapture(event.pointerId)
+    }
     carousel.classList.remove('is-dragging')
     const cards = Array.from(carousel.children)
     const nearest = cards.reduce(
