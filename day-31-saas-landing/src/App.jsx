@@ -32,6 +32,7 @@ function App() {
   const [navScrolled, setNavScrolled] = useState(false)
   const [testimonialIndex, setTestimonialIndex] = useState(0)
   const [testimonialPaused, setTestimonialPaused] = useState(false)
+  const [billingCycle, setBillingCycle] = useState('monthly')
   const heroRef = useRef(null)
   const mockupRef = useRef(null)
   const ctaRef = useRef(null)
@@ -93,6 +94,24 @@ function App() {
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     })
   }, [testimonialIndex])
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    gsap.utils.toArray('.price-value').forEach((node) => {
+      const target = Number(node.dataset.price)
+      const current =
+        billingCycle === 'monthly' ? Number(node.dataset.yearly) : Number(node.dataset.monthly)
+      const counter = { value: current }
+      gsap.to(counter, {
+        value: target,
+        duration: reduceMotion ? 0 : 0.55,
+        ease: 'power2.out',
+        onUpdate: () => {
+          node.textContent = `$${Math.round(counter.value)}`
+        },
+      })
+    })
+  }, [billingCycle])
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -468,12 +487,52 @@ function App() {
         <div className="section-heading">
           <h2>Simple plans for serious launch velocity.</h2>
         </div>
+        <div className="billing-toggle" aria-label="Billing period">
+          <button
+            aria-pressed={billingCycle === 'monthly'}
+            className={billingCycle === 'monthly' ? 'is-active' : ''}
+            onClick={() => setBillingCycle('monthly')}
+            type="button"
+          >
+            Monthly
+          </button>
+          <button
+            aria-pressed={billingCycle === 'yearly'}
+            className={billingCycle === 'yearly' ? 'is-active' : ''}
+            onClick={() => setBillingCycle('yearly')}
+            type="button"
+          >
+            Yearly
+          </button>
+        </div>
         <div className="pricing-grid">
           {pricing.map((plan) => (
             <article className={`pricing-card ${plan.popular ? 'is-popular' : ''}`} key={plan.name}>
+              {plan.popular && <span className="popular-label">Most popular</span>}
               <h3>{plan.name}</h3>
-              <strong>${plan.monthly}</strong>
+              <div className="price-line">
+                <strong
+                  className="price-value"
+                  data-monthly={plan.monthly}
+                  data-price={billingCycle === 'monthly' ? plan.monthly : plan.yearly}
+                  data-yearly={plan.yearly}
+                >
+                  ${billingCycle === 'monthly' ? plan.monthly : plan.yearly}
+                </strong>
+                <span>/mo</span>
+              </div>
               <p>{plan.description}</p>
+              <ul>
+                {plan.features.map((feature) => (
+                  <li key={feature}>
+                    <CheckCircle2 size={17} aria-hidden="true" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <a className={`button ${plan.popular ? 'button-primary' : 'button-ghost'}`} href="#top">
+                Choose {plan.name}
+              </a>
             </article>
           ))}
         </div>

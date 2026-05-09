@@ -333,6 +333,36 @@
   gap: 18px;
 }
 
+.billing-toggle {
+  display: flex;
+  width: max-content;
+  margin: -14px 0 26px auto;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.billing-toggle button {
+  min-width: 112px;
+  min-height: 42px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: transparent;
+  font-weight: 800;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.billing-toggle button.is-active,
+.billing-toggle button[aria-pressed='true'] {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
 .feature-card,
 .workflow-step,
 .stat-card,
@@ -601,7 +631,63 @@
 }
 
 .pricing-card.is-popular {
+  position: relative;
+  transform: translateY(-16px);
   background: linear-gradient(160deg, rgba(143, 92, 255, 0.35), rgba(49, 168, 255, 0.18));
+  box-shadow:
+    0 28px 90px rgba(80, 118, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.popular-label {
+  display: inline-flex;
+  width: max-content;
+  min-height: 30px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #e5f6ff;
+  background: rgba(78, 231, 245, 0.13);
+  border: 1px solid rgba(78, 231, 245, 0.24);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.price-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.price-line span {
+  color: var(--muted);
+  padding-bottom: 9px;
+}
+
+.pricing-card ul {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pricing-card li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dce7fb;
+}
+
+.pricing-card li svg {
+  flex: 0 0 auto;
+  color: var(--green);
+}
+
+.pricing-card .button {
+  width: 100%;
 }
 
 .faq-list {
