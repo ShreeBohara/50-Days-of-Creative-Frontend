@@ -129,13 +129,14 @@
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
   padding: 104px 0;
+  scroll-margin-top: 96px;
 }
 
 .hero-section {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
   gap: 62px;
-  min-height: calc(100vh - 76px);
+  min-height: min(860px, calc(100vh - 76px));
   align-items: center;
   padding-top: 56px;
 }
@@ -150,7 +151,7 @@
 
 .hero-copy h1 {
   max-width: 760px;
-  font-size: clamp(3.1rem, 7vw, 6.8rem);
+  font-size: clamp(3.1rem, 6.3vw, 5.9rem);
   line-height: 0.92;
 }
 

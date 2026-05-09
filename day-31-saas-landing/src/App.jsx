@@ -468,19 +468,19 @@ function App() {
         </div>
         <div className="workflow-track">
           <span className="workflow-line" aria-hidden="true"></span>
-          {workflowSteps.map((step, index) => (
-            <article className="workflow-step" key={step.title}>
-              <span className="workflow-number">{String(index + 1).padStart(2, '0')}</span>
-              <span className="workflow-icon" aria-hidden="true">
-                {(() => {
-                  const Icon = workflowIcons[index]
-                  return <Icon size={24} />
-                })()}
-              </span>
-              <h3>{step.title}</h3>
-              <p>{step.copy}</p>
-            </article>
-          ))}
+          {workflowSteps.map((step, index) => {
+            const Icon = workflowIcons[index]
+            return (
+              <article className="workflow-step" key={step.title}>
+                <span className="workflow-number">{String(index + 1).padStart(2, '0')}</span>
+                <span className="workflow-icon" aria-hidden="true">
+                  <Icon size={24} />
+                </span>
+                <h3>{step.title}</h3>
+                <p>{step.copy}</p>
+              </article>
+            )
+          })}
         </div>
       </section>
 

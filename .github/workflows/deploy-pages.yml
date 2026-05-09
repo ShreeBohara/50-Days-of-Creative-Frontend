@@ -37,6 +37,7 @@ on:
       - "day-28-infinite-tunnel/**"
       - "day-29-form-wizard/**"
       - "day-30-piano/**"
+      - "day-31-saas-landing/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -77,6 +78,7 @@ jobs:
             day-28-infinite-tunnel/package-lock.json
             day-29-form-wizard/package-lock.json
             day-30-piano/package-lock.json
+            day-31-saas-landing/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -166,6 +168,14 @@ jobs:
         working-directory: day-30-piano
         run: npm run build
 
+      - name: Install Day 31 app dependencies
+        working-directory: day-31-saas-landing
+        run: npm ci
+
+      - name: Build Day 31 app
+        working-directory: day-31-saas-landing
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -214,6 +224,8 @@ jobs:
           cp -R day-29-form-wizard/dist/. _site/day-29-form-wizard/
           mkdir -p _site/day-30-piano
           cp -R day-30-piano/dist/. _site/day-30-piano/
+          mkdir -p _site/day-31-saas-landing
+          cp -R day-31-saas-landing/dist/. _site/day-31-saas-landing/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
