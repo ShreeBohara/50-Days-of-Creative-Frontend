@@ -160,6 +160,10 @@ function cloneFrame(frame, name) {
   }
 }
 
+function cloneFrames(frames) {
+  return frames.map((frame) => cloneFrame(frame, frame.name))
+}
+
 function composeLayers(frame, gridSize) {
   const composite = createPixels(gridSize)
 
@@ -371,6 +375,8 @@ function App() {
   const [fps, setFps] = useState(6)
   const [previewFrame, setPreviewFrame] = useState(0)
   const [frames, setFrames] = useState(() => [createFrame(32)])
+  const [historyPast, setHistoryPast] = useState([])
+  const [historyFuture, setHistoryFuture] = useState([])
 
   const currentFrame = frames[activeFrame]
   const currentLayer = currentFrame.layers[activeLayer]
@@ -415,6 +421,89 @@ function App() {
     return () => window.clearInterval(interval)
   }, [fps, frames.length, isPlaying])
 
+  useEffect(() => {
+    function handleKeyDown(event) {
+      const target = event.target
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault()
+        if (event.shiftKey) {
+          redo()
+        } else {
+          undo()
+        }
+        return
+      }
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'y') {
+        event.preventDefault()
+        redo()
+        return
+      }
+
+      if (isTyping || event.metaKey || event.ctrlKey || event.altKey) return
+
+      const shortcut = toolbarItems.find((tool) => tool.key.toLowerCase() === event.key.toLowerCase())
+      if (shortcut) {
+        event.preventDefault()
+        setSelectedTool(shortcut.id)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  })
+
+  function snapshot() {
+    return {
+      frames: cloneFrames(frames),
+      gridSize,
+      activeFrame,
+      activeLayer,
+    }
+  }
+
+  function pushHistory() {
+    setHistoryPast((past) => [...past, snapshot()].slice(-50))
+    setHistoryFuture([])
+  }
+
+  function restoreSnapshot(nextSnapshot) {
+    setFrames(cloneFrames(nextSnapshot.frames))
+    setGridSize(nextSnapshot.gridSize)
+    setActiveFrame(nextSnapshot.activeFrame)
+    setPreviewFrame(nextSnapshot.activeFrame)
+    setActiveLayer(nextSnapshot.activeLayer)
+    setShapeStart(null)
+    setPreviewCells([])
+  }
+
+  function undo() {
+    setHistoryPast((past) => {
+      if (!past.length) return past
+
+      const previous = past[past.length - 1]
+      setHistoryFuture((future) => [snapshot(), ...future].slice(0, 50))
+      restoreSnapshot(previous)
+      return past.slice(0, -1)
+    })
+  }
+
+  function redo() {
+    setHistoryFuture((future) => {
+      if (!future.length) return future
+
+      const next = future[0]
+      setHistoryPast((past) => [...past, snapshot()].slice(-50))
+      restoreSnapshot(next)
+      return future.slice(1)
+    })
+  }
+
   function resetGrid(nextSize) {
     if (nextSize === gridSize) return
 
@@ -426,6 +515,7 @@ function App() {
       return
     }
 
+    pushHistory()
     setGridSize(nextSize)
     setFrames([createFrame(nextSize)])
     setActiveFrame(0)
@@ -516,6 +606,7 @@ function App() {
   }
 
   function updateLayer(index, updates) {
+    pushHistory()
     updateActiveFrame((frame) => ({
       ...frame,
       layers: frame.layers.map((layer, layerIndex) =>
@@ -527,6 +618,7 @@ function App() {
   function addLayer() {
     if (currentFrame.layers.length >= 4) return
 
+    pushHistory()
     updateActiveFrame((frame) => ({
       ...frame,
       layers: [...frame.layers, createLayer(gridSize, `Layer ${frame.layers.length + 1}`)],
@@ -537,6 +629,7 @@ function App() {
   function deleteLayer(index) {
     if (currentFrame.layers.length === 1) return
 
+    pushHistory()
     updateActiveFrame((frame) => ({
       ...frame,
       layers: frame.layers.filter((_, layerIndex) => layerIndex !== index),
@@ -548,6 +641,7 @@ function App() {
     const targetIndex = index + direction
     if (targetIndex < 0 || targetIndex >= currentFrame.layers.length) return
 
+    pushHistory()
     updateActiveFrame((frame) => {
       const layers = [...frame.layers]
       const [layer] = layers.splice(index, 1)
@@ -559,6 +653,7 @@ function App() {
 
   function addFrame() {
     const nextFrame = createBlankFrame(gridSize, `Frame ${frames.length + 1}`)
+    pushHistory()
     setFrames((currentFrames) => [...currentFrames, nextFrame])
     setActiveFrame(frames.length)
     setPreviewFrame(frames.length)
@@ -567,6 +662,7 @@ function App() {
 
   function duplicateFrame() {
     const nextFrame = cloneFrame(currentFrame, `Frame ${frames.length + 1}`)
+    pushHistory()
     setFrames((currentFrames) => {
       const nextFrames = [...currentFrames]
       nextFrames.splice(activeFrame + 1, 0, nextFrame)
@@ -580,6 +676,7 @@ function App() {
   function deleteFrame() {
     if (frames.length === 1) return
 
+    pushHistory()
     setFrames((currentFrames) =>
       currentFrames
         .filter((_, index) => index !== activeFrame)
@@ -659,6 +756,7 @@ function App() {
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     const cell = getCanvasCell(event)
+    if (cell && selectedTool !== 'picker') pushHistory()
     if (cell && (selectedTool === 'line' || selectedTool === 'rectangle')) {
       drawSession.current = {
         mode: 'shape',
@@ -719,10 +817,24 @@ function App() {
           <h1>Pixel Art Editor</h1>
         </div>
         <div className="topbar-actions" aria-label="Editor actions">
-          <button type="button" className="icon-button" aria-label="Undo">
+          <button
+            type="button"
+            className="icon-button"
+            onClick={undo}
+            disabled={!historyPast.length}
+            aria-label="Undo"
+            title="Undo (Ctrl+Z)"
+          >
             <Undo2 size={18} />
           </button>
-          <button type="button" className="icon-button" aria-label="Redo">
+          <button
+            type="button"
+            className="icon-button"
+            onClick={redo}
+            disabled={!historyFuture.length}
+            aria-label="Redo"
+            title="Redo (Ctrl+Shift+Z)"
+          >
             <Redo2 size={18} />
           </button>
           <button type="button" className="primary-button">
