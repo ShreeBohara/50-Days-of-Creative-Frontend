@@ -333,6 +333,28 @@ h2 {
   border-radius: 7px;
 }
 
+.hex-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.hex-field input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #120f1d;
+  color: var(--text);
+  padding: 0 10px;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
 .palette-grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -342,6 +364,27 @@ h2 {
 .swatch {
   min-height: 30px;
   aspect-ratio: 1;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 5px;
+}
+
+.swatch.active,
+.recent-swatch:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(251, 242, 54, 0.22);
+}
+
+.recent-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.recent-swatch {
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
   border: 2px solid rgba(255, 255, 255, 0.16);
   border-radius: 5px;
 }

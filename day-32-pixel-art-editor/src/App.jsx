@@ -35,7 +35,7 @@ const toolbarItems = [
   { id: 'rectangle', label: 'Rectangle', key: 'R', icon: Square },
 ]
 
-const palettePreview = [
+const DB32_PALETTE = [
   '#000000',
   '#222034',
   '#45283c',
@@ -52,7 +52,25 @@ const palettePreview = [
   '#524b24',
   '#323c39',
   '#3f3f74',
+  '#306082',
+  '#5b6ee1',
+  '#639bff',
+  '#5fcde4',
+  '#cbdbfc',
+  '#ffffff',
+  '#9badb7',
+  '#847e87',
+  '#696a6a',
+  '#595652',
+  '#76428a',
+  '#ac3232',
+  '#d95763',
+  '#d77bba',
+  '#8f974a',
+  '#8a6f30',
 ]
+
+const HEX_PATTERN = /^#[0-9a-f]{6}$/i
 
 function createPixels(gridSize) {
   return Array.from({ length: gridSize * gridSize }, () => null)
@@ -259,6 +277,8 @@ function App() {
   const drawSession = useRef(null)
   const [selectedTool, setSelectedTool] = useState('pencil')
   const [currentColor, setCurrentColor] = useState('#fbf236')
+  const [customColor, setCustomColor] = useState('#fbf236')
+  const [recentColors, setRecentColors] = useState(['#fbf236', '#99e550', '#5fcde4'])
   const [filledRectangle, setFilledRectangle] = useState(false)
   const [shapeStart, setShapeStart] = useState(null)
   const [previewCells, setPreviewCells] = useState([])
@@ -304,6 +324,18 @@ function App() {
     setActiveLayer(0)
     setZoom(1)
     setPan({ x: 0, y: 0 })
+  }
+
+  function chooseColor(color) {
+    const normalized = color.startsWith('#') ? color.toLowerCase() : `#${color.toLowerCase()}`
+    if (!HEX_PATTERN.test(normalized)) return
+
+    setCurrentColor(normalized)
+    setCustomColor(normalized)
+    setRecentColors((colors) => [
+      normalized,
+      ...colors.filter((recentColor) => recentColor !== normalized),
+    ].slice(0, 8))
   }
 
   function getCanvasCell(event) {
@@ -381,7 +413,7 @@ function App() {
 
     if (selectedTool === 'picker') {
       const sampledColor = compositePixels[cell.y * gridSize + cell.x]
-      if (sampledColor) setCurrentColor(sampledColor)
+      if (sampledColor) chooseColor(sampledColor)
       setSelectedTool('pencil')
     }
   }
@@ -620,14 +652,41 @@ function App() {
               <span style={{ backgroundColor: currentColor }} />
               <strong>{currentColor}</strong>
             </div>
+            <label className="hex-field">
+              <span>Custom hex</span>
+              <input
+                type="text"
+                value={customColor}
+                inputMode="text"
+                spellCheck="false"
+                onChange={(event) => {
+                  setCustomColor(event.target.value)
+                  chooseColor(event.target.value)
+                }}
+                aria-label="Custom hex color"
+              />
+            </label>
             <div className="palette-grid">
-              {palettePreview.map((color) => (
+              {DB32_PALETTE.map((color) => (
                 <button
                   type="button"
                   key={color}
-                  className="swatch"
+                  className={color.toLowerCase() === currentColor ? 'swatch active' : 'swatch'}
                   style={{ backgroundColor: color }}
+                  onClick={() => chooseColor(color)}
                   aria-label={`Select ${color}`}
+                />
+              ))}
+            </div>
+            <div className="recent-row" aria-label="Recent colors">
+              {recentColors.map((color) => (
+                <button
+                  type="button"
+                  key={color}
+                  className="recent-swatch"
+                  style={{ backgroundColor: color }}
+                  onClick={() => chooseColor(color)}
+                  aria-label={`Use recent color ${color}`}
                 />
               ))}
             </div>
