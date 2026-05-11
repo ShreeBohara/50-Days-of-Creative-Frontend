@@ -455,6 +455,33 @@ h2 {
   gap: 4px;
 }
 
+.preview-canvas {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.08) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, #120f1d 25% 75%, rgba(255, 255, 255, 0.08) 75%);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+  image-rendering: pixelated;
+}
+
+.range-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.range-field input {
+  width: 100%;
+  accent-color: var(--accent-pink);
+}
+
 .frame-strip {
   padding: 10px;
   overflow-x: auto;

@@ -3,6 +3,7 @@ import {
   Brush,
   ChevronDown,
   ChevronUp,
+  Copy,
   Download,
   Eraser,
   Eye,
@@ -14,6 +15,7 @@ import {
   Move,
   PaintBucket,
   Palette,
+  Pause,
   Pencil,
   Play,
   Plus,
@@ -134,6 +136,26 @@ function createFrame(gridSize, name = 'Frame 1') {
         pixels: paintSampleSprite(gridSize, baseLayer.pixels),
       },
     ],
+  }
+}
+
+function createBlankFrame(gridSize, name) {
+  return {
+    id: crypto.randomUUID(),
+    name,
+    layers: [createLayer(gridSize, 'Ink')],
+  }
+}
+
+function cloneFrame(frame, name) {
+  return {
+    id: crypto.randomUUID(),
+    name,
+    layers: frame.layers.map((layer) => ({
+      ...layer,
+      id: crypto.randomUUID(),
+      pixels: [...layer.pixels],
+    })),
   }
 }
 
@@ -303,6 +325,7 @@ function clamp(value, min, max) {
 
 function App() {
   const canvasRef = useRef(null)
+  const previewCanvasRef = useRef(null)
   const panSession = useRef(null)
   const drawSession = useRef(null)
   const [selectedTool, setSelectedTool] = useState('pencil')
@@ -319,6 +342,9 @@ function App() {
   const [cursorCell, setCursorCell] = useState(null)
   const [activeFrame, setActiveFrame] = useState(0)
   const [activeLayer, setActiveLayer] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [fps, setFps] = useState(6)
+  const [previewFrame, setPreviewFrame] = useState(0)
   const [frames, setFrames] = useState(() => [createFrame(32)])
 
   const currentFrame = frames[activeFrame]
@@ -337,6 +363,23 @@ function App() {
     drawPixelCanvas(canvasRef.current, renderPixels, gridSize, showGrid)
   }, [gridSize, renderPixels, showGrid])
 
+  useEffect(() => {
+    if (!previewCanvasRef.current) return
+
+    const frame = frames[previewFrame] ?? frames[activeFrame]
+    drawPixelCanvas(previewCanvasRef.current, composeLayers(frame, gridSize), gridSize, false)
+  }, [activeFrame, frames, gridSize, previewFrame])
+
+  useEffect(() => {
+    if (!isPlaying || frames.length < 2) return undefined
+
+    const interval = window.setInterval(() => {
+      setPreviewFrame((frameIndex) => (frameIndex + 1) % frames.length)
+    }, 1000 / fps)
+
+    return () => window.clearInterval(interval)
+  }, [fps, frames.length, isPlaying])
+
   function resetGrid(nextSize) {
     if (nextSize === gridSize) return
 
@@ -352,6 +395,7 @@ function App() {
     setFrames([createFrame(nextSize)])
     setActiveFrame(0)
     setActiveLayer(0)
+    setPreviewFrame(0)
     setZoom(1)
     setPan({ x: 0, y: 0 })
   }
@@ -474,6 +518,39 @@ function App() {
       return { ...frame, layers }
     })
     setActiveLayer(targetIndex)
+  }
+
+  function addFrame() {
+    const nextFrame = createBlankFrame(gridSize, `Frame ${frames.length + 1}`)
+    setFrames((currentFrames) => [...currentFrames, nextFrame])
+    setActiveFrame(frames.length)
+    setPreviewFrame(frames.length)
+    setActiveLayer(0)
+  }
+
+  function duplicateFrame() {
+    const nextFrame = cloneFrame(currentFrame, `Frame ${frames.length + 1}`)
+    setFrames((currentFrames) => {
+      const nextFrames = [...currentFrames]
+      nextFrames.splice(activeFrame + 1, 0, nextFrame)
+      return nextFrames.map((frame, index) => ({ ...frame, name: `Frame ${index + 1}` }))
+    })
+    setActiveFrame(activeFrame + 1)
+    setPreviewFrame(activeFrame + 1)
+    setActiveLayer(0)
+  }
+
+  function deleteFrame() {
+    if (frames.length === 1) return
+
+    setFrames((currentFrames) =>
+      currentFrames
+        .filter((_, index) => index !== activeFrame)
+        .map((frame, index) => ({ ...frame, name: `Frame ${index + 1}` })),
+    )
+    setActiveFrame((index) => clamp(index - 1, 0, frames.length - 2))
+    setPreviewFrame((index) => clamp(index - 1, 0, frames.length - 2))
+    setActiveLayer(0)
   }
 
   function applyToolToCell(cell) {
@@ -830,24 +907,75 @@ function App() {
               Layer
             </button>
           </section>
+
+          <section className="panel">
+            <div className="panel-heading">
+              <div>
+                <p className="panel-kicker">Animation</p>
+                <h2>Preview</h2>
+              </div>
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setIsPlaying((value) => !value)}
+                aria-label={isPlaying ? 'Pause animation preview' : 'Play animation preview'}
+              >
+                {isPlaying ? <Pause size={17} /> : <Play size={17} />}
+              </button>
+            </div>
+            <canvas
+              ref={previewCanvasRef}
+              className="preview-canvas"
+              width={RENDER_SIZE}
+              height={RENDER_SIZE}
+              aria-label="Animation preview canvas"
+            />
+            <label className="range-field">
+              <span>{fps} FPS</span>
+              <input
+                type="range"
+                min="1"
+                max="24"
+                value={fps}
+                onChange={(event) => setFps(Number(event.target.value))}
+              />
+            </label>
+          </section>
         </aside>
       </section>
 
       <footer className="frame-strip" aria-label="Animation frames">
-        <button type="button" className="icon-button active" aria-label="Play animation preview">
-          <Play size={17} />
+        <button
+          type="button"
+          className={isPlaying ? 'icon-button active' : 'icon-button'}
+          onClick={() => setIsPlaying((value) => !value)}
+          aria-label={isPlaying ? 'Pause animation preview' : 'Play animation preview'}
+        >
+          {isPlaying ? <Pause size={17} /> : <Play size={17} />}
         </button>
         {frames.map((frame, index) => (
           <button
             type="button"
             className={index === activeFrame ? 'frame-thumb active' : 'frame-thumb'}
             key={frame.id}
-            onClick={() => setActiveFrame(index)}
+            onClick={() => {
+              setActiveFrame(index)
+              setPreviewFrame(index)
+              setActiveLayer(0)
+            }}
           >
             {frame.name}
           </button>
         ))}
-        <button type="button" className="secondary-button">
+        <button type="button" className="secondary-button" onClick={duplicateFrame}>
+          <Copy size={17} />
+          Duplicate
+        </button>
+        <button type="button" className="secondary-button" onClick={deleteFrame} disabled={frames.length === 1}>
+          <Trash2 size={17} />
+          Delete
+        </button>
+        <button type="button" className="secondary-button" onClick={addFrame}>
           <Plus size={17} />
           Frame
         </button>
