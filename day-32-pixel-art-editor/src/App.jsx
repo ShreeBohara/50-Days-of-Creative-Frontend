@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { GIFEncoder, applyPalette, quantize } from 'gifenc'
 import {
   Brush,
   ChevronDown,
@@ -316,6 +317,18 @@ function paintPixels(context, pixels, gridSize, opacity = 1) {
     context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
   })
   context.restore()
+}
+
+function paintPixelsAtScale(context, pixels, gridSize, cellSize, offsetX = 0) {
+  context.imageSmoothingEnabled = false
+  pixels.forEach((color, index) => {
+    if (!color) return
+
+    const x = index % gridSize
+    const y = Math.floor(index / gridSize)
+    context.fillStyle = color
+    context.fillRect(offsetX + x * cellSize, y * cellSize, cellSize, cellSize)
+  })
 }
 
 function drawPixelCanvas(canvas, pixels, gridSize, showGrid, onionPixels = null) {
@@ -809,6 +822,82 @@ function App() {
     setPan({ x: 0, y: 0 })
   }
 
+  function createExportCanvas(frame, cellSize = 16) {
+    const exportCanvas = document.createElement('canvas')
+    exportCanvas.width = gridSize * cellSize
+    exportCanvas.height = gridSize * cellSize
+    const context = exportCanvas.getContext('2d')
+    context.clearRect(0, 0, exportCanvas.width, exportCanvas.height)
+    paintPixelsAtScale(context, composeLayers(frame, gridSize), gridSize, cellSize)
+    return exportCanvas
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function savePng() {
+    createExportCanvas(currentFrame).toBlob((blob) => {
+      if (blob) downloadBlob(blob, `day-32-frame-${activeFrame + 1}.png`)
+    }, 'image/png')
+  }
+
+  function saveSpritesheet() {
+    const cellSize = 16
+    const frameSize = gridSize * cellSize
+    const sheetCanvas = document.createElement('canvas')
+    sheetCanvas.width = frameSize * frames.length
+    sheetCanvas.height = frameSize
+    const context = sheetCanvas.getContext('2d')
+
+    frames.forEach((frame, index) => {
+      paintPixelsAtScale(
+        context,
+        composeLayers(frame, gridSize),
+        gridSize,
+        cellSize,
+        index * frameSize,
+      )
+    })
+
+    sheetCanvas.toBlob((blob) => {
+      if (blob) downloadBlob(blob, 'day-32-spritesheet.png')
+    }, 'image/png')
+  }
+
+  function saveGif() {
+    const cellSize = gridSize === 64 ? 8 : 16
+    const gif = GIFEncoder()
+
+    frames.forEach((frame) => {
+      const frameCanvas = createExportCanvas(frame, cellSize)
+      const context = frameCanvas.getContext('2d')
+      const image = context.getImageData(0, 0, frameCanvas.width, frameCanvas.height)
+      const palette = quantize(image.data, 256, {
+        format: 'rgba4444',
+        oneBitAlpha: true,
+      })
+      const index = applyPalette(image.data, palette, 'rgba4444')
+      const transparentIndex = palette.findIndex((color) => color[3] === 0)
+
+      gif.writeFrame(index, frameCanvas.width, frameCanvas.height, {
+        palette,
+        delay: Math.round(1000 / fps),
+        repeat: 0,
+        transparent: transparentIndex >= 0,
+        transparentIndex: Math.max(transparentIndex, 0),
+      })
+    })
+
+    gif.finish()
+    downloadBlob(new Blob([gif.bytes()], { type: 'image/gif' }), 'day-32-animation.gif')
+  }
+
   return (
     <main className="editor-shell" aria-label="Pixel art editor">
       <header className="topbar">
@@ -837,9 +926,15 @@ function App() {
           >
             <Redo2 size={18} />
           </button>
-          <button type="button" className="primary-button">
+          <button type="button" className="primary-button" onClick={savePng}>
             <Download size={18} />
-            Export
+            PNG
+          </button>
+          <button type="button" className="secondary-button" onClick={saveSpritesheet}>
+            Sheet
+          </button>
+          <button type="button" className="secondary-button" onClick={saveGif}>
+            GIF
           </button>
         </div>
       </header>
