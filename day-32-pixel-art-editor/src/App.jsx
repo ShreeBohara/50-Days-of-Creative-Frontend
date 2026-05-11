@@ -130,6 +130,91 @@ function composeLayers(frame, gridSize) {
   return composite
 }
 
+function getLineCells(start, end) {
+  const cells = []
+  let x = start.x
+  let y = start.y
+  const dx = Math.abs(end.x - start.x)
+  const dy = Math.abs(end.y - start.y)
+  const sx = start.x < end.x ? 1 : -1
+  const sy = start.y < end.y ? 1 : -1
+  let error = dx - dy
+
+  while (true) {
+    cells.push({ x, y })
+    if (x === end.x && y === end.y) break
+
+    const doubledError = 2 * error
+    if (doubledError > -dy) {
+      error -= dy
+      x += sx
+    }
+    if (doubledError < dx) {
+      error += dx
+      y += sy
+    }
+  }
+
+  return cells
+}
+
+function getRectangleCells(start, end, filled) {
+  const minX = Math.min(start.x, end.x)
+  const maxX = Math.max(start.x, end.x)
+  const minY = Math.min(start.y, end.y)
+  const maxY = Math.max(start.y, end.y)
+  const cells = []
+
+  for (let y = minY; y <= maxY; y += 1) {
+    for (let x = minX; x <= maxX; x += 1) {
+      if (filled || x === minX || x === maxX || y === minY || y === maxY) {
+        cells.push({ x, y })
+      }
+    }
+  }
+
+  return cells
+}
+
+function floodFillPixels(pixels, gridSize, start, color) {
+  const startIndex = start.y * gridSize + start.x
+  const targetColor = pixels[startIndex]
+
+  if (targetColor === color) return pixels
+
+  const next = [...pixels]
+  const stack = [start]
+  const seen = new Set()
+
+  while (stack.length) {
+    const cell = stack.pop()
+    const key = `${cell.x}:${cell.y}`
+    const index = cell.y * gridSize + cell.x
+
+    if (seen.has(key) || next[index] !== targetColor) continue
+
+    seen.add(key)
+    next[index] = color
+
+    if (cell.x > 0) stack.push({ x: cell.x - 1, y: cell.y })
+    if (cell.x < gridSize - 1) stack.push({ x: cell.x + 1, y: cell.y })
+    if (cell.y > 0) stack.push({ x: cell.x, y: cell.y - 1 })
+    if (cell.y < gridSize - 1) stack.push({ x: cell.x, y: cell.y + 1 })
+  }
+
+  return next
+}
+
+function overlayPreview(pixels, gridSize, cells, color) {
+  if (!cells.length) return pixels
+
+  const next = [...pixels]
+  cells.forEach((cell) => {
+    next[cell.y * gridSize + cell.x] = color
+  })
+  return next
+}
+
 function drawPixelCanvas(canvas, pixels, gridSize, showGrid) {
   const context = canvas.getContext('2d')
   const cellSize = RENDER_SIZE / gridSize
@@ -174,6 +259,9 @@ function App() {
   const drawSession = useRef(null)
   const [selectedTool, setSelectedTool] = useState('pencil')
   const [currentColor, setCurrentColor] = useState('#fbf236')
+  const [filledRectangle, setFilledRectangle] = useState(false)
+  const [shapeStart, setShapeStart] = useState(null)
+  const [previewCells, setPreviewCells] = useState([])
   const [gridSize, setGridSize] = useState(32)
   const [showGrid, setShowGrid] = useState(true)
   const [zoom, setZoom] = useState(1)
@@ -189,11 +277,15 @@ function App() {
     () => composeLayers(currentFrame, gridSize),
     [currentFrame, gridSize],
   )
+  const renderPixels = useMemo(
+    () => overlayPreview(compositePixels, gridSize, previewCells, currentColor),
+    [compositePixels, currentColor, gridSize, previewCells],
+  )
 
   useEffect(() => {
     if (!canvasRef.current) return
-    drawPixelCanvas(canvasRef.current, compositePixels, gridSize, showGrid)
-  }, [compositePixels, gridSize, showGrid])
+    drawPixelCanvas(canvasRef.current, renderPixels, gridSize, showGrid)
+  }, [gridSize, renderPixels, showGrid])
 
   function resetGrid(nextSize) {
     if (nextSize === gridSize) return
@@ -260,6 +352,18 @@ function App() {
     })
   }
 
+  function setCells(cells, color) {
+    if (!cells.length) return
+
+    updateActiveLayerPixels((pixels) => {
+      const next = [...pixels]
+      cells.forEach((cell) => {
+        next[cell.y * gridSize + cell.x] = color
+      })
+      return next
+    })
+  }
+
   function applyToolToCell(cell) {
     if (!cell) return
 
@@ -269,6 +373,10 @@ function App() {
 
     if (selectedTool === 'eraser') {
       setPixel(cell, null)
+    }
+
+    if (selectedTool === 'fill') {
+      updateActiveLayerPixels((pixels) => floodFillPixels(pixels, gridSize, cell, currentColor))
     }
 
     if (selectedTool === 'picker') {
@@ -292,6 +400,15 @@ function App() {
 
     if (drawSession.current) {
       const cell = getCanvasCell(event)
+      if (drawSession.current.mode === 'shape' && shapeStart && cell) {
+        const cells =
+          selectedTool === 'line'
+            ? getLineCells(shapeStart, cell)
+            : getRectangleCells(shapeStart, cell, filledRectangle)
+        setPreviewCells(cells)
+        return
+      }
+
       const cellKey = cell ? `${cell.x}:${cell.y}` : null
       if (cellKey && drawSession.current.lastCell !== cellKey) {
         drawSession.current.lastCell = cellKey
@@ -316,13 +433,35 @@ function App() {
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     const cell = getCanvasCell(event)
+    if (cell && (selectedTool === 'line' || selectedTool === 'rectangle')) {
+      drawSession.current = {
+        mode: 'shape',
+        lastCell: `${cell.x}:${cell.y}`,
+      }
+      setShapeStart(cell)
+      setPreviewCells([cell])
+      return
+    }
+
     drawSession.current = {
+      mode: 'paint',
       lastCell: cell ? `${cell.x}:${cell.y}` : null,
     }
     applyToolToCell(cell)
   }
 
   function handlePointerUp(event) {
+    if (drawSession.current?.mode === 'shape' && shapeStart) {
+      const cell = getCanvasCell(event) ?? shapeStart
+      const cells =
+        selectedTool === 'line'
+          ? getLineCells(shapeStart, cell)
+          : getRectangleCells(shapeStart, cell, filledRectangle)
+      setCells(cells, currentColor)
+      setShapeStart(null)
+      setPreviewCells([])
+    }
+
     if (panSession.current || drawSession.current) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
@@ -426,6 +565,15 @@ function App() {
               <button type="button" className="icon-button" onClick={() => setZoomStep(1)} aria-label="Zoom in">
                 <ZoomIn size={16} />
               </button>
+              {selectedTool === 'rectangle' ? (
+                <button
+                  type="button"
+                  className={filledRectangle ? 'chip active' : 'chip'}
+                  onClick={() => setFilledRectangle((value) => !value)}
+                >
+                  Filled
+                </button>
+              ) : null}
             </div>
           </div>
           <div
