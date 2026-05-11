@@ -126,6 +126,12 @@ h2 {
   line-height: 1.15;
 }
 
+.subtle-label {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .topbar-actions,
 .stage-controls,
 .panel-heading,
@@ -246,23 +252,19 @@ h2 {
   background-size: 28px 28px;
 }
 
-.mock-canvas {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.pixel-canvas {
   width: min(58vmin, 480px);
   aspect-ratio: 1;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  background: #120f1d;
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.08) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, #120f1d 25% 75%, rgba(255, 255, 255, 0.08) 75%);
+  background-position: 0 0, 12px 12px;
+  background-size: 24px 24px;
+  box-shadow:
+    0 0 0 12px rgba(18, 15, 29, 0.55),
+    0 22px 60px rgba(0, 0, 0, 0.36);
   image-rendering: pixelated;
-}
-
-.pixel {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.025);
-}
-
-.pixel.lit {
-  background: var(--accent);
 }
 
 .inspector {
@@ -326,6 +328,14 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 7px;
   color: var(--muted);
+  text-align: left;
+}
+
+.layer-row.active,
+.frame-thumb.active {
+  border-color: rgba(251, 242, 54, 0.56);
+  background: rgba(251, 242, 54, 0.12);
+  color: var(--text);
 }
 
 .layer-row span {

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Brush,
   Download,
@@ -16,6 +17,8 @@ import {
   Square,
   Undo2,
 } from 'lucide-react'
+
+const RENDER_SIZE = 768
 
 const toolbarItems = [
   { id: 'pencil', label: 'Pencil', key: 'P', icon: Pencil },
@@ -45,13 +48,154 @@ const palettePreview = [
   '#3f3f74',
 ]
 
-const layerPreview = [
-  { name: 'Ink', visible: true, opacity: 100 },
-  { name: 'Shade', visible: true, opacity: 72 },
-  { name: 'Guide', visible: false, opacity: 45 },
-]
+function createPixels(gridSize) {
+  return Array.from({ length: gridSize * gridSize }, () => null)
+}
+
+function createLayer(gridSize, name = 'Ink') {
+  return {
+    id: crypto.randomUUID(),
+    name,
+    visible: true,
+    opacity: 100,
+    pixels: createPixels(gridSize),
+  }
+}
+
+function paintSampleSprite(gridSize, pixels) {
+  const next = [...pixels]
+  const center = Math.floor(gridSize / 2)
+  const points = [
+    [center - 2, center - 3, '#fbf236'],
+    [center - 1, center - 3, '#fbf236'],
+    [center, center - 3, '#fbf236'],
+    [center + 1, center - 3, '#fbf236'],
+    [center - 3, center - 2, '#99e550'],
+    [center + 2, center - 2, '#99e550'],
+    [center - 3, center - 1, '#5fcde4'],
+    [center - 1, center - 1, '#ffffff'],
+    [center + 1, center - 1, '#ffffff'],
+    [center + 2, center - 1, '#5fcde4'],
+    [center - 2, center, '#ec4899'],
+    [center - 1, center, '#ec4899'],
+    [center, center, '#ec4899'],
+    [center + 1, center, '#ec4899'],
+    [center - 1, center + 1, '#222034'],
+    [center, center + 1, '#222034'],
+    [center - 2, center + 2, '#5fcde4'],
+    [center + 1, center + 2, '#5fcde4'],
+  ]
+
+  points.forEach(([x, y, color]) => {
+    if (x >= 0 && y >= 0 && x < gridSize && y < gridSize) {
+      next[y * gridSize + x] = color
+    }
+  })
+
+  return next
+}
+
+function createFrame(gridSize, name = 'Frame 1') {
+  const baseLayer = createLayer(gridSize, 'Ink')
+
+  return {
+    id: crypto.randomUUID(),
+    name,
+    layers: [
+      {
+        ...baseLayer,
+        pixels: paintSampleSprite(gridSize, baseLayer.pixels),
+      },
+    ],
+  }
+}
+
+function composeLayers(frame, gridSize) {
+  const composite = createPixels(gridSize)
+
+  frame.layers.forEach((layer) => {
+    if (!layer.visible) return
+
+    layer.pixels.forEach((color, index) => {
+      if (color) composite[index] = color
+    })
+  })
+
+  return composite
+}
+
+function drawPixelCanvas(canvas, pixels, gridSize, showGrid) {
+  const context = canvas.getContext('2d')
+  const cellSize = RENDER_SIZE / gridSize
+
+  context.clearRect(0, 0, RENDER_SIZE, RENDER_SIZE)
+  context.imageSmoothingEnabled = false
+
+  pixels.forEach((color, index) => {
+    if (!color) return
+
+    const x = index % gridSize
+    const y = Math.floor(index / gridSize)
+    context.fillStyle = color
+    context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
+  })
+
+  if (showGrid) {
+    context.strokeStyle = 'rgba(255, 255, 255, 0.16)'
+    context.lineWidth = 1
+
+    for (let index = 0; index <= gridSize; index += 1) {
+      const position = Math.round(index * cellSize) + 0.5
+      context.beginPath()
+      context.moveTo(position, 0)
+      context.lineTo(position, RENDER_SIZE)
+      context.stroke()
+      context.beginPath()
+      context.moveTo(0, position)
+      context.lineTo(RENDER_SIZE, position)
+      context.stroke()
+    }
+  }
+}
 
 function App() {
+  const canvasRef = useRef(null)
+  const [selectedTool] = useState('pencil')
+  const [gridSize, setGridSize] = useState(32)
+  const [showGrid, setShowGrid] = useState(true)
+  const [activeFrame, setActiveFrame] = useState(0)
+  const [activeLayer, setActiveLayer] = useState(0)
+  const [frames, setFrames] = useState(() => [createFrame(32)])
+
+  const currentFrame = frames[activeFrame]
+  const currentLayer = currentFrame.layers[activeLayer]
+  const compositePixels = useMemo(
+    () => composeLayers(currentFrame, gridSize),
+    [currentFrame, gridSize],
+  )
+
+  useEffect(() => {
+    if (!canvasRef.current) return
+    drawPixelCanvas(canvasRef.current, compositePixels, gridSize, showGrid)
+  }, [compositePixels, gridSize, showGrid])
+
+  function resetGrid(nextSize) {
+    if (nextSize === gridSize) return
+
+    const hasArtwork = frames.some((frame) =>
+      frame.layers.some((layer) => layer.pixels.some(Boolean)),
+    )
+
+    if (hasArtwork && !window.confirm('Changing grid size starts a new blank document. Continue?')) {
+      return
+    }
+
+    setGridSize(nextSize)
+    setFrames([createFrame(nextSize)])
+    setActiveFrame(0)
+    setActiveLayer(0)
+  }
+
   return (
     <main className="editor-shell" aria-label="Pixel art editor">
       <header className="topbar">
@@ -80,7 +224,7 @@ function App() {
 
             return (
               <button
-                className={item.id === 'pencil' ? 'tool-button active' : 'tool-button'}
+                className={item.id === selectedTool ? 'tool-button active' : 'tool-button'}
                 type="button"
                 key={item.id}
                 title={`${item.label} (${item.key})`}
@@ -97,22 +241,40 @@ function App() {
           <div className="stage-toolbar">
             <div>
               <p className="panel-kicker">Canvas</p>
-              <h2>32 x 32 sprite</h2>
+              <h2>
+                {gridSize} x {gridSize} sprite
+              </h2>
+              <p className="subtle-label">Editing {currentLayer.name}</p>
             </div>
             <div className="stage-controls">
-              <button type="button" className="chip active">
+              {[16, 32, 64].map((size) => (
+                <button
+                  type="button"
+                  className={gridSize === size ? 'chip active' : 'chip'}
+                  key={size}
+                  onClick={() => resetGrid(size)}
+                >
+                  {size}
+                </button>
+              ))}
+              <button
+                type="button"
+                className={showGrid ? 'chip active' : 'chip'}
+                onClick={() => setShowGrid((value) => !value)}
+              >
                 <Grid3X3 size={16} />
                 Grid
               </button>
-              <button type="button" className="chip">100%</button>
             </div>
           </div>
           <div className="canvas-wrap">
-            <div className="mock-canvas" role="img" aria-label="Empty pixel art canvas preview">
-              {Array.from({ length: 16 }).map((_, index) => (
-                <span key={index} className={index % 5 === 0 ? 'pixel lit' : 'pixel'} />
-              ))}
-            </div>
+            <canvas
+              ref={canvasRef}
+              className="pixel-canvas"
+              width={RENDER_SIZE}
+              height={RENDER_SIZE}
+              aria-label="Pixel drawing canvas"
+            />
           </div>
         </section>
 
@@ -151,12 +313,17 @@ function App() {
               <Layers size={20} />
             </div>
             <div className="layer-list">
-              {layerPreview.map((layer) => (
-                <div className="layer-row" key={layer.name}>
+              {currentFrame.layers.map((layer, index) => (
+                <button
+                  type="button"
+                  className={index === activeLayer ? 'layer-row active' : 'layer-row'}
+                  key={layer.id}
+                  onClick={() => setActiveLayer(index)}
+                >
                   {layer.visible ? <Eye size={17} /> : <EyeOff size={17} />}
                   <span>{layer.name}</span>
                   <small>{layer.opacity}%</small>
-                </div>
+                </button>
               ))}
             </div>
             <button type="button" className="secondary-button">
@@ -171,9 +338,14 @@ function App() {
         <button type="button" className="icon-button active" aria-label="Play animation preview">
           <Play size={17} />
         </button>
-        {Array.from({ length: 4 }).map((_, index) => (
-          <button type="button" className="frame-thumb" key={index}>
-            Frame {index + 1}
+        {frames.map((frame, index) => (
+          <button
+            type="button"
+            className={index === activeFrame ? 'frame-thumb active' : 'frame-thumb'}
+            key={frame.id}
+            onClick={() => setActiveFrame(index)}
+          >
+            {frame.name}
           </button>
         ))}
         <button type="button" className="secondary-button">
