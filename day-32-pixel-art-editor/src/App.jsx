@@ -8,6 +8,7 @@ import {
   Eraser,
   Eye,
   EyeOff,
+  FlipHorizontal2,
   Grid3X3,
   Layers,
   LocateFixed,
@@ -275,6 +276,19 @@ function floodFillPixels(pixels, gridSize, start, color) {
   return next
 }
 
+function withMirroredCells(cells, gridSize, enabled) {
+  if (!enabled) return cells
+
+  const unique = new Map()
+  cells.forEach((cell) => {
+    unique.set(`${cell.x}:${cell.y}`, cell)
+    const mirrored = { x: gridSize - 1 - cell.x, y: cell.y }
+    unique.set(`${mirrored.x}:${mirrored.y}`, mirrored)
+  })
+
+  return [...unique.values()]
+}
+
 function overlayPreview(pixels, gridSize, cells, color) {
   if (!cells.length) return pixels
 
@@ -285,13 +299,10 @@ function overlayPreview(pixels, gridSize, cells, color) {
   return next
 }
 
-function drawPixelCanvas(canvas, pixels, gridSize, showGrid) {
-  const context = canvas.getContext('2d')
+function paintPixels(context, pixels, gridSize, opacity = 1) {
   const cellSize = RENDER_SIZE / gridSize
-
-  context.clearRect(0, 0, RENDER_SIZE, RENDER_SIZE)
-  context.imageSmoothingEnabled = false
-
+  context.save()
+  context.globalAlpha = opacity
   pixels.forEach((color, index) => {
     if (!color) return
 
@@ -300,6 +311,18 @@ function drawPixelCanvas(canvas, pixels, gridSize, showGrid) {
     context.fillStyle = color
     context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
   })
+  context.restore()
+}
+
+function drawPixelCanvas(canvas, pixels, gridSize, showGrid, onionPixels = null) {
+  const context = canvas.getContext('2d')
+  const cellSize = RENDER_SIZE / gridSize
+
+  context.clearRect(0, 0, RENDER_SIZE, RENDER_SIZE)
+  context.imageSmoothingEnabled = false
+
+  if (onionPixels) paintPixels(context, onionPixels, gridSize, 0.28)
+  paintPixels(context, pixels, gridSize)
 
   if (showGrid) {
     context.strokeStyle = 'rgba(255, 255, 255, 0.16)'
@@ -333,6 +356,8 @@ function App() {
   const [customColor, setCustomColor] = useState('#fbf236')
   const [recentColors, setRecentColors] = useState(['#fbf236', '#99e550', '#5fcde4'])
   const [filledRectangle, setFilledRectangle] = useState(false)
+  const [mirrorMode, setMirrorMode] = useState(false)
+  const [onionSkin, setOnionSkin] = useState(true)
   const [shapeStart, setShapeStart] = useState(null)
   const [previewCells, setPreviewCells] = useState([])
   const [gridSize, setGridSize] = useState(32)
@@ -354,14 +379,24 @@ function App() {
     [currentFrame, gridSize],
   )
   const renderPixels = useMemo(
-    () => overlayPreview(compositePixels, gridSize, previewCells, currentColor),
-    [compositePixels, currentColor, gridSize, previewCells],
+    () =>
+      overlayPreview(
+        compositePixels,
+        gridSize,
+        withMirroredCells(previewCells, gridSize, mirrorMode),
+        currentColor,
+      ),
+    [compositePixels, currentColor, gridSize, mirrorMode, previewCells],
   )
+  const onionPixels = useMemo(() => {
+    if (!onionSkin || activeFrame === 0) return null
+    return composeLayers(frames[activeFrame - 1], gridSize)
+  }, [activeFrame, frames, gridSize, onionSkin])
 
   useEffect(() => {
     if (!canvasRef.current) return
-    drawPixelCanvas(canvasRef.current, renderPixels, gridSize, showGrid)
-  }, [gridSize, renderPixels, showGrid])
+    drawPixelCanvas(canvasRef.current, renderPixels, gridSize, showGrid, onionPixels)
+  }, [gridSize, onionPixels, renderPixels, showGrid])
 
   useEffect(() => {
     if (!previewCanvasRef.current) return
@@ -448,22 +483,24 @@ function App() {
   }
 
   function setPixel(cell, color) {
-    updateActiveLayerPixels((pixels) => {
-      const index = cell.y * gridSize + cell.x
-      if (pixels[index] === color) return pixels
+    const targetCells = withMirroredCells([cell], gridSize, mirrorMode)
 
+    updateActiveLayerPixels((pixels) => {
       const next = [...pixels]
-      next[index] = color
+      targetCells.forEach((targetCell) => {
+        next[targetCell.y * gridSize + targetCell.x] = color
+      })
       return next
     })
   }
 
   function setCells(cells, color) {
     if (!cells.length) return
+    const targetCells = withMirroredCells(cells, gridSize, mirrorMode)
 
     updateActiveLayerPixels((pixels) => {
       const next = [...pixels]
-      cells.forEach((cell) => {
+      targetCells.forEach((cell) => {
         next[cell.y * gridSize + cell.x] = color
       })
       return next
@@ -763,6 +800,22 @@ function App() {
                   Filled
                 </button>
               ) : null}
+              <button
+                type="button"
+                className={mirrorMode ? 'chip active' : 'chip'}
+                onClick={() => setMirrorMode((value) => !value)}
+              >
+                <FlipHorizontal2 size={16} />
+                Mirror
+              </button>
+              <button
+                type="button"
+                className={onionSkin ? 'chip active' : 'chip'}
+                onClick={() => setOnionSkin((value) => !value)}
+              >
+                <Eye size={16} />
+                Onion
+              </button>
             </div>
           </div>
           <div
