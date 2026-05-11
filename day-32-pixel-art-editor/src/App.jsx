@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Brush,
+  ChevronDown,
+  ChevronUp,
   Download,
   Eraser,
   Eye,
@@ -17,6 +19,7 @@ import {
   Plus,
   Redo2,
   Square,
+  Trash2,
   Undo2,
   ZoomIn,
   ZoomOut,
@@ -141,11 +144,38 @@ function composeLayers(frame, gridSize) {
     if (!layer.visible) return
 
     layer.pixels.forEach((color, index) => {
-      if (color) composite[index] = color
+      if (color) composite[index] = blendHex(composite[index], color, layer.opacity / 100)
     })
   })
 
   return composite
+}
+
+function hexToRgb(hex) {
+  const clean = hex.replace('#', '')
+  return {
+    r: Number.parseInt(clean.slice(0, 2), 16),
+    g: Number.parseInt(clean.slice(2, 4), 16),
+    b: Number.parseInt(clean.slice(4, 6), 16),
+  }
+}
+
+function rgbToHex({ r, g, b }) {
+  return `#${[r, g, b]
+    .map((channel) => clamp(Math.round(channel), 0, 255).toString(16).padStart(2, '0'))
+    .join('')}`
+}
+
+function blendHex(baseColor, topColor, alpha) {
+  if (!baseColor || alpha >= 1) return topColor
+
+  const base = hexToRgb(baseColor)
+  const top = hexToRgb(topColor)
+  return rgbToHex({
+    r: top.r * alpha + base.r * (1 - alpha),
+    g: top.g * alpha + base.g * (1 - alpha),
+    b: top.b * alpha + base.b * (1 - alpha),
+  })
 }
 
 function getLineCells(start, end) {
@@ -394,6 +424,56 @@ function App() {
       })
       return next
     })
+  }
+
+  function updateActiveFrame(updater) {
+    setFrames((currentFrames) =>
+      currentFrames.map((frame, frameIndex) =>
+        frameIndex === activeFrame ? updater(frame) : frame,
+      ),
+    )
+  }
+
+  function updateLayer(index, updates) {
+    updateActiveFrame((frame) => ({
+      ...frame,
+      layers: frame.layers.map((layer, layerIndex) =>
+        layerIndex === index ? { ...layer, ...updates } : layer,
+      ),
+    }))
+  }
+
+  function addLayer() {
+    if (currentFrame.layers.length >= 4) return
+
+    updateActiveFrame((frame) => ({
+      ...frame,
+      layers: [...frame.layers, createLayer(gridSize, `Layer ${frame.layers.length + 1}`)],
+    }))
+    setActiveLayer(currentFrame.layers.length)
+  }
+
+  function deleteLayer(index) {
+    if (currentFrame.layers.length === 1) return
+
+    updateActiveFrame((frame) => ({
+      ...frame,
+      layers: frame.layers.filter((_, layerIndex) => layerIndex !== index),
+    }))
+    setActiveLayer((value) => clamp(value >= index ? value - 1 : value, 0, currentFrame.layers.length - 2))
+  }
+
+  function moveLayer(index, direction) {
+    const targetIndex = index + direction
+    if (targetIndex < 0 || targetIndex >= currentFrame.layers.length) return
+
+    updateActiveFrame((frame) => {
+      const layers = [...frame.layers]
+      const [layer] = layers.splice(index, 1)
+      layers.splice(targetIndex, 0, layer)
+      return { ...frame, layers }
+    })
+    setActiveLayer(targetIndex)
   }
 
   function applyToolToCell(cell) {
@@ -702,19 +782,50 @@ function App() {
             </div>
             <div className="layer-list">
               {currentFrame.layers.map((layer, index) => (
-                <button
-                  type="button"
+                <div
                   className={index === activeLayer ? 'layer-row active' : 'layer-row'}
                   key={layer.id}
-                  onClick={() => setActiveLayer(index)}
                 >
-                  {layer.visible ? <Eye size={17} /> : <EyeOff size={17} />}
-                  <span>{layer.name}</span>
-                  <small>{layer.opacity}%</small>
-                </button>
+                  <button
+                    type="button"
+                    className="layer-visibility"
+                    onClick={() => updateLayer(index, { visible: !layer.visible })}
+                    aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
+                  >
+                    {layer.visible ? <Eye size={17} /> : <EyeOff size={17} />}
+                  </button>
+                  <button type="button" className="layer-name" onClick={() => setActiveLayer(index)}>
+                    {layer.name}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={layer.opacity}
+                    onChange={(event) => updateLayer(index, { opacity: Number(event.target.value) })}
+                    aria-label={`${layer.name} opacity`}
+                  />
+                  <span className="layer-opacity">{layer.opacity}%</span>
+                  <div className="layer-actions">
+                    <button type="button" onClick={() => moveLayer(index, -1)} aria-label={`Move ${layer.name} up`}>
+                      <ChevronUp size={15} />
+                    </button>
+                    <button type="button" onClick={() => moveLayer(index, 1)} aria-label={`Move ${layer.name} down`}>
+                      <ChevronDown size={15} />
+                    </button>
+                    <button type="button" onClick={() => deleteLayer(index)} aria-label={`Delete ${layer.name}`}>
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
-            <button type="button" className="secondary-button">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={addLayer}
+              disabled={currentFrame.layers.length >= 4}
+            >
               <Plus size={17} />
               Layer
             </button>
