@@ -171,7 +171,9 @@ function clamp(value, min, max) {
 function App() {
   const canvasRef = useRef(null)
   const panSession = useRef(null)
-  const [selectedTool] = useState('pencil')
+  const drawSession = useRef(null)
+  const [selectedTool, setSelectedTool] = useState('pencil')
+  const [currentColor, setCurrentColor] = useState('#fbf236')
   const [gridSize, setGridSize] = useState(32)
   const [showGrid, setShowGrid] = useState(true)
   const [zoom, setZoom] = useState(1)
@@ -227,6 +229,55 @@ function App() {
     }
   }
 
+  function updateActiveLayerPixels(updater) {
+    setFrames((currentFrames) =>
+      currentFrames.map((frame, frameIndex) => {
+        if (frameIndex !== activeFrame) return frame
+
+        return {
+          ...frame,
+          layers: frame.layers.map((layer, layerIndex) => {
+            if (layerIndex !== activeLayer) return layer
+
+            return {
+              ...layer,
+              pixels: updater(layer.pixels),
+            }
+          }),
+        }
+      }),
+    )
+  }
+
+  function setPixel(cell, color) {
+    updateActiveLayerPixels((pixels) => {
+      const index = cell.y * gridSize + cell.x
+      if (pixels[index] === color) return pixels
+
+      const next = [...pixels]
+      next[index] = color
+      return next
+    })
+  }
+
+  function applyToolToCell(cell) {
+    if (!cell) return
+
+    if (selectedTool === 'pencil') {
+      setPixel(cell, currentColor)
+    }
+
+    if (selectedTool === 'eraser') {
+      setPixel(cell, null)
+    }
+
+    if (selectedTool === 'picker') {
+      const sampledColor = compositePixels[cell.y * gridSize + cell.x]
+      if (sampledColor) setCurrentColor(sampledColor)
+      setSelectedTool('pencil')
+    }
+  }
+
   function handlePointerMove(event) {
     if (panSession.current) {
       const nextPan = {
@@ -238,24 +289,45 @@ function App() {
     }
 
     setCursorCell(getCanvasCell(event))
+
+    if (drawSession.current) {
+      const cell = getCanvasCell(event)
+      const cellKey = cell ? `${cell.x}:${cell.y}` : null
+      if (cellKey && drawSession.current.lastCell !== cellKey) {
+        drawSession.current.lastCell = cellKey
+        applyToolToCell(cell)
+      }
+    }
   }
 
   function handlePointerDown(event) {
-    if (event.button !== 1) return
+    if (event.button === 1) {
+      event.preventDefault()
+      event.currentTarget.setPointerCapture(event.pointerId)
+      panSession.current = {
+        start: { x: event.clientX, y: event.clientY },
+        origin: pan,
+      }
+      return
+    }
+
+    if (event.button !== 0) return
 
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
-    panSession.current = {
-      start: { x: event.clientX, y: event.clientY },
-      origin: pan,
+    const cell = getCanvasCell(event)
+    drawSession.current = {
+      lastCell: cell ? `${cell.x}:${cell.y}` : null,
     }
+    applyToolToCell(cell)
   }
 
   function handlePointerUp(event) {
-    if (panSession.current) {
+    if (panSession.current || drawSession.current) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
     panSession.current = null
+    drawSession.current = null
   }
 
   function handleWheel(event) {
@@ -305,6 +377,7 @@ function App() {
                 className={item.id === selectedTool ? 'tool-button active' : 'tool-button'}
                 type="button"
                 key={item.id}
+                onClick={() => setSelectedTool(item.id)}
                 title={`${item.label} (${item.key})`}
                 aria-label={`${item.label} tool`}
               >
@@ -396,8 +469,8 @@ function App() {
               <Palette size={20} />
             </div>
             <div className="current-color">
-              <span style={{ backgroundColor: '#fbf236' }} />
-              <strong>#fbf236</strong>
+              <span style={{ backgroundColor: currentColor }} />
+              <strong>{currentColor}</strong>
             </div>
             <div className="palette-grid">
               {palettePreview.map((color) => (
