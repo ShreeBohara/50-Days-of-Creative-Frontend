@@ -38,6 +38,7 @@ on:
       - "day-29-form-wizard/**"
       - "day-30-piano/**"
       - "day-31-saas-landing/**"
+      - "day-32-pixel-art-editor/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -79,6 +80,7 @@ jobs:
             day-29-form-wizard/package-lock.json
             day-30-piano/package-lock.json
             day-31-saas-landing/package-lock.json
+            day-32-pixel-art-editor/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -176,6 +178,14 @@ jobs:
         working-directory: day-31-saas-landing
         run: npm run build
 
+      - name: Install Day 32 app dependencies
+        working-directory: day-32-pixel-art-editor
+        run: npm ci
+
+      - name: Build Day 32 app
+        working-directory: day-32-pixel-art-editor
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -226,6 +236,8 @@ jobs:
           cp -R day-30-piano/dist/. _site/day-30-piano/
           mkdir -p _site/day-31-saas-landing
           cp -R day-31-saas-landing/dist/. _site/day-31-saas-landing/
+          mkdir -p _site/day-32-pixel-art-editor
+          cp -R day-32-pixel-art-editor/dist/. _site/day-32-pixel-art-editor/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

@@ -141,6 +141,12 @@ h2 {
   gap: 8px;
 }
 
+.topbar-actions,
+.stage-controls {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: 72px minmax(360px, 1fr) 320px;
@@ -523,9 +529,34 @@ h2 {
 
   .topbar-actions {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .primary-button {
     flex: 1;
+  }
+
+  .stage-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stage-controls {
+    justify-content: flex-start;
+  }
+
+  .canvas-status span:last-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
