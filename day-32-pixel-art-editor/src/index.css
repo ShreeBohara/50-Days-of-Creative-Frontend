@@ -240,6 +240,7 @@ h2 {
 }
 
 .canvas-wrap {
+  position: relative;
   display: grid;
   place-items: center;
   min-height: 460px;
@@ -250,6 +251,14 @@ h2 {
     linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.06) 75%);
   background-position: 0 0, 14px 14px;
   background-size: 28px 28px;
+  touch-action: none;
+  user-select: none;
+}
+
+.canvas-viewport {
+  transform-origin: center;
+  transition: transform 120ms ease;
+  will-change: transform;
 }
 
 .pixel-canvas {
@@ -265,6 +274,30 @@ h2 {
     0 0 0 12px rgba(18, 15, 29, 0.55),
     0 22px 60px rgba(0, 0, 0, 0.36);
   image-rendering: pixelated;
+}
+
+.canvas-status {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 24px);
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(13, 11, 22, 0.84);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.canvas-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .inspector {

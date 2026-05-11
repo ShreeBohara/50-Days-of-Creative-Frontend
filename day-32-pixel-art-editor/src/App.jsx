@@ -7,7 +7,9 @@ import {
   EyeOff,
   Grid3X3,
   Layers,
+  LocateFixed,
   MousePointer2,
+  Move,
   PaintBucket,
   Palette,
   Pencil,
@@ -16,9 +18,13 @@ import {
   Redo2,
   Square,
   Undo2,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react'
 
 const RENDER_SIZE = 768
+const MIN_ZOOM = 0.5
+const MAX_ZOOM = 6
 
 const toolbarItems = [
   { id: 'pencil', label: 'Pencil', key: 'P', icon: Pencil },
@@ -158,11 +164,19 @@ function drawPixelCanvas(canvas, pixels, gridSize, showGrid) {
   }
 }
 
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max)
+}
+
 function App() {
   const canvasRef = useRef(null)
+  const panSession = useRef(null)
   const [selectedTool] = useState('pencil')
   const [gridSize, setGridSize] = useState(32)
   const [showGrid, setShowGrid] = useState(true)
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [cursorCell, setCursorCell] = useState(null)
   const [activeFrame, setActiveFrame] = useState(0)
   const [activeLayer, setActiveLayer] = useState(0)
   const [frames, setFrames] = useState(() => [createFrame(32)])
@@ -194,6 +208,70 @@ function App() {
     setFrames([createFrame(nextSize)])
     setActiveFrame(0)
     setActiveLayer(0)
+    setZoom(1)
+    setPan({ x: 0, y: 0 })
+  }
+
+  function getCanvasCell(event) {
+    if (!canvasRef.current) return null
+
+    const rect = canvasRef.current.getBoundingClientRect()
+    const x = (event.clientX - rect.left) / rect.width
+    const y = (event.clientY - rect.top) / rect.height
+
+    if (x < 0 || y < 0 || x >= 1 || y >= 1) return null
+
+    return {
+      x: clamp(Math.floor(x * gridSize), 0, gridSize - 1),
+      y: clamp(Math.floor(y * gridSize), 0, gridSize - 1),
+    }
+  }
+
+  function handlePointerMove(event) {
+    if (panSession.current) {
+      const nextPan = {
+        x: panSession.current.origin.x + event.clientX - panSession.current.start.x,
+        y: panSession.current.origin.y + event.clientY - panSession.current.start.y,
+      }
+      setPan(nextPan)
+      return
+    }
+
+    setCursorCell(getCanvasCell(event))
+  }
+
+  function handlePointerDown(event) {
+    if (event.button !== 1) return
+
+    event.preventDefault()
+    event.currentTarget.setPointerCapture(event.pointerId)
+    panSession.current = {
+      start: { x: event.clientX, y: event.clientY },
+      origin: pan,
+    }
+  }
+
+  function handlePointerUp(event) {
+    if (panSession.current) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    panSession.current = null
+  }
+
+  function handleWheel(event) {
+    if (!event.ctrlKey && !event.metaKey) return
+
+    event.preventDefault()
+    setZoom((value) => clamp(value + (event.deltaY > 0 ? -0.15 : 0.15), MIN_ZOOM, MAX_ZOOM))
+  }
+
+  function setZoomStep(direction) {
+    setZoom((value) => clamp(value + direction * 0.25, MIN_ZOOM, MAX_ZOOM))
+  }
+
+  function resetViewport() {
+    setZoom(1)
+    setPan({ x: 0, y: 0 })
   }
 
   return (
@@ -265,16 +343,46 @@ function App() {
                 <Grid3X3 size={16} />
                 Grid
               </button>
+              <button type="button" className="icon-button" onClick={() => setZoomStep(-1)} aria-label="Zoom out">
+                <ZoomOut size={16} />
+              </button>
+              <button type="button" className="chip" onClick={resetViewport}>
+                <LocateFixed size={16} />
+                {Math.round(zoom * 100)}%
+              </button>
+              <button type="button" className="icon-button" onClick={() => setZoomStep(1)} aria-label="Zoom in">
+                <ZoomIn size={16} />
+              </button>
             </div>
           </div>
-          <div className="canvas-wrap">
-            <canvas
-              ref={canvasRef}
-              className="pixel-canvas"
-              width={RENDER_SIZE}
-              height={RENDER_SIZE}
-              aria-label="Pixel drawing canvas"
-            />
+          <div
+            className="canvas-wrap"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerLeave={() => setCursorCell(null)}
+            onPointerUp={handlePointerUp}
+            onWheel={handleWheel}
+          >
+            <div
+              className="canvas-viewport"
+              style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+            >
+              <canvas
+                ref={canvasRef}
+                className="pixel-canvas"
+                width={RENDER_SIZE}
+                height={RENDER_SIZE}
+                aria-label="Pixel drawing canvas"
+              />
+            </div>
+            <div className="canvas-status">
+              <span>
+                {cursorCell ? `X ${cursorCell.x + 1} / Y ${cursorCell.y + 1}` : 'Move over canvas'}
+              </span>
+              <span>
+                <Move size={14} /> Middle mouse drag to pan
+              </span>
+            </div>
           </div>
         </section>
 
