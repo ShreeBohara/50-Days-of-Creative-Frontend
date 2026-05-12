@@ -181,3 +181,30 @@ ul, ol {
   width: 100%;
   min-height: 100vh;
 }
+
+/* ---------- Mobile Responsive ---------- */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .section {
+    padding: 4rem 0;
+  }
+
+  /* ensure touch targets */
+  a, button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .text-display {
+    font-size: clamp(2.25rem, 10vw, 3.5rem);
+  }
+}
