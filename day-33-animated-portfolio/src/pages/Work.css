@@ -1,0 +1,131 @@
+/* ============================================================
+   Work Page Styles
+   ============================================================ */
+
+.work-page {
+  padding-top: 8rem;
+  padding-bottom: 4rem;
+}
+
+/* ---------- Header ---------- */
+.work-header {
+  margin-bottom: 4rem;
+}
+
+.work-header .text-label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.work-header .text-h1 {
+  margin-bottom: 1rem;
+}
+
+.work-subtitle {
+  max-width: 500px;
+  color: var(--color-secondary);
+}
+
+/* ---------- Grid ---------- */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+}
+
+/* ---------- Card ---------- */
+.work-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Thumbnail */
+.work-card-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.work-card-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+/* Hover overlay */
+.work-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 9, 11, 0.5);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+  transition: opacity 400ms var(--ease-out-expo),
+              clip-path 500ms var(--ease-out-expo);
+}
+
+.work-card:hover .work-card-overlay {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+}
+
+.work-card-view {
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 100px;
+  transition: background 250ms;
+}
+
+.work-card:hover .work-card-view {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Info */
+.work-card-info {
+  padding: 0 0.25rem;
+}
+
+.work-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.work-card-title {
+  margin-bottom: 0.25rem;
+  transition: color 250ms;
+}
+
+.work-card:hover .work-card-title {
+  color: var(--color-accent);
+}
+
+.work-card-desc {
+  color: var(--color-muted);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .work-page {
+    padding-top: 6rem;
+  }
+
+  .work-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
