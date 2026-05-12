@@ -1,0 +1,71 @@
+/* ============================================================
+   Loader Styles
+   ============================================================ */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* ---------- SVG text stroke draw ---------- */
+.loader-svg {
+  width: clamp(240px, 50vw, 400px);
+  height: 60px;
+}
+
+.loader-text {
+  font-family: var(--font-heading);
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  stroke: white;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: drawText 1.8s var(--ease-out-expo) forwards 0.2s;
+}
+
+@keyframes drawText {
+  0% {
+    stroke-dashoffset: 600;
+    fill: transparent;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    fill: transparent;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    fill: white;
+  }
+}
+
+/* ---------- Loading bar ---------- */
+.loader-bar-track {
+  width: clamp(120px, 20vw, 200px);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.loader-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: white;
+  transform-origin: left;
+  border-radius: 1px;
+}
