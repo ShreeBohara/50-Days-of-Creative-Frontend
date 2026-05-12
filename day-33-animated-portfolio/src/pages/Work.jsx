@@ -62,6 +62,7 @@ export default function Work() {
                     className="work-card-image"
                     layoutId={`project-image-${project.id}`}
                     style={{ background: project.gradient }}
+                    transition={{ layout: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
                   />
                   {/* hover overlay */}
                   <div className="work-card-overlay">

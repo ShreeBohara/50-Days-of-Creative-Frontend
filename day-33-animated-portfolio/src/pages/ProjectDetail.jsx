@@ -56,6 +56,7 @@ export default function ProjectDetail() {
           className="detail-hero-image"
           layoutId={`project-image-${project.id}`}
           style={{ background: project.gradient }}
+          transition={{ layout: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
         />
         <div className="detail-hero-overlay" />
         <div className="detail-hero-content container">
