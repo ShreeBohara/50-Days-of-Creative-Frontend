@@ -122,7 +122,14 @@ export default function ProjectDetail() {
             <span className="text-label">Tech Stack</span>
             <div className="detail-tech-pills">
               {project.tech.map((t) => (
-                <span key={t} className="detail-pill">{t}</span>
+                <motion.span
+                  key={t}
+                  className="detail-pill"
+                  whileHover={{ scale: 1.08, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                >
+                  {t}
+                </motion.span>
               ))}
             </div>
           </motion.div>

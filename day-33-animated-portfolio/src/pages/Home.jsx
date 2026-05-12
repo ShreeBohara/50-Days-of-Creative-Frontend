@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import MagneticButton from '../components/MagneticButton'
 import './Home.css'
 
 /* ---------- floating shapes ---------- */
@@ -123,27 +124,31 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 1.8 }}
         >
-          <Link to="/work" className="home-cta-btn">
-            <span>View Work</span>
-            <svg
-              className="home-cta-arrow"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </Link>
+          <MagneticButton as="button" className="home-cta-magnetic" onClick={() => {}} strength={0.25}>
+            <Link to="/work" className="home-cta-btn">
+              <span>View Work</span>
+              <svg
+                className="home-cta-arrow"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </Link>
+          </MagneticButton>
 
-          <Link to="/about" className="home-about-link">
-            About Me
-          </Link>
+          <MagneticButton as="button" className="home-cta-magnetic" strength={0.4}>
+            <Link to="/about" className="home-about-link">
+              About Me
+            </Link>
+          </MagneticButton>
         </motion.div>
 
         {/* scroll hint */}
