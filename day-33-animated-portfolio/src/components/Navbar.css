@@ -1,0 +1,147 @@
+/* ============================================================
+   Navbar Styles
+   ============================================================ */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-nav);
+  transition: background 300ms, backdrop-filter 300ms, box-shadow 300ms;
+}
+
+.navbar--scrolled {
+  background: rgba(250, 250, 250, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4rem;
+}
+
+/* ---------- Logo ---------- */
+.navbar-logo {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* ---------- Desktop Links ---------- */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navbar-link {
+  position: relative;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  padding: 0.25rem 0;
+  transition: color 250ms;
+  cursor: pointer;
+}
+
+.navbar-link:hover {
+  color: var(--color-text);
+}
+
+.navbar-link--active {
+  color: var(--color-text);
+}
+
+.navbar-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 1px;
+}
+
+/* ---------- Hamburger ---------- */
+.navbar-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  z-index: calc(var(--z-menu) + 1);
+}
+
+.navbar-burger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--color-text);
+  border-radius: 1px;
+  transition: transform 300ms var(--ease-out-expo), opacity 200ms;
+}
+
+.navbar-burger--open .navbar-burger-line:first-child {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.navbar-burger--open .navbar-burger-line:last-child {
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+/* ---------- Mobile Menu ---------- */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu);
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.mobile-menu-link {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 250ms;
+  cursor: pointer;
+}
+
+.mobile-menu-link:hover,
+.mobile-menu-link--active {
+  color: white;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .navbar-links {
+    display: none;
+  }
+
+  .navbar-burger {
+    display: flex;
+  }
+
+  .navbar-burger--open .navbar-burger-line {
+    background: white;
+  }
+}
