@@ -1,0 +1,55 @@
+/* ============================================================
+   Custom Cursor Styles
+   ============================================================ */
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  margin-top: -15px;
+  border-radius: 50%;
+  background: white;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+.custom-cursor--label {
+  background: var(--color-accent);
+  mix-blend-mode: normal;
+}
+
+.custom-cursor-text {
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: white;
+  white-space: nowrap;
+}
+
+/* hide default cursor on desktop */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+
+  a, button, input, textarea, select, [data-cursor] {
+    cursor: none;
+  }
+}
+
+/* ensure cursor is hidden on touch */
+@media (hover: none) {
+  .custom-cursor {
+    display: none !important;
+  }
+}

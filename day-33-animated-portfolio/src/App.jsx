@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, LayoutGroup } from 'framer-motion'
 import PageTransition from './components/PageTransition'
 import Navbar from './components/Navbar'
+import CustomCursor from './components/CustomCursor'
 import Home from './pages/Home'
 import Work from './pages/Work'
 import ProjectDetail from './pages/ProjectDetail'
@@ -12,6 +13,7 @@ function App() {
 
   return (
     <LayoutGroup>
+      <CustomCursor />
       <Navbar />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
