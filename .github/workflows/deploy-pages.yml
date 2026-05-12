@@ -39,6 +39,7 @@ on:
       - "day-30-piano/**"
       - "day-31-saas-landing/**"
       - "day-32-pixel-art-editor/**"
+      - "day-33-animated-portfolio/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -81,6 +82,7 @@ jobs:
             day-30-piano/package-lock.json
             day-31-saas-landing/package-lock.json
             day-32-pixel-art-editor/package-lock.json
+            day-33-animated-portfolio/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -186,6 +188,14 @@ jobs:
         working-directory: day-32-pixel-art-editor
         run: npm run build
 
+      - name: Install Day 33 app dependencies
+        working-directory: day-33-animated-portfolio
+        run: npm ci
+
+      - name: Build Day 33 app
+        working-directory: day-33-animated-portfolio
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -238,6 +248,8 @@ jobs:
           cp -R day-31-saas-landing/dist/. _site/day-31-saas-landing/
           mkdir -p _site/day-32-pixel-art-editor
           cp -R day-32-pixel-art-editor/dist/. _site/day-32-pixel-art-editor/
+          mkdir -p _site/day-33-animated-portfolio
+          cp -R day-33-animated-portfolio/dist/. _site/day-33-animated-portfolio/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
