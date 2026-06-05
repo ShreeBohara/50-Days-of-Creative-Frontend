@@ -1,11 +1,19 @@
 import { Canvas } from '@react-three/fiber'
 import { Suspense, useState } from 'react'
+import ControlPanel from './components/ControlPanel'
 import PlanetScene from './components/PlanetScene'
-import { DEFAULT_PLANET_SETTINGS } from './data/planetConfig'
+import { DEFAULT_PLANET_SETTINGS, randomPlanetSettings } from './data/planetConfig'
 import './App.css'
 
 export default function App() {
-  const [settings] = useState(DEFAULT_PLANET_SETTINGS)
+  const [settings, setSettings] = useState(DEFAULT_PLANET_SETTINGS)
+
+  const handleSettingChange = (key, value) => {
+    setSettings((currentSettings) => ({
+      ...currentSettings,
+      [key]: value,
+    }))
+  }
 
   return (
     <main className="app-shell">
@@ -33,6 +41,12 @@ export default function App() {
           <span>Elevation</span>
           <strong>{settings.sunElevation}°</strong>
         </div>
+        <ControlPanel
+          settings={settings}
+          onSettingChange={handleSettingChange}
+          onRandomize={() => setSettings(randomPlanetSettings())}
+          onReset={() => setSettings(DEFAULT_PLANET_SETTINGS)}
+        />
       </aside>
     </main>
   )
