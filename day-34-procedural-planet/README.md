@@ -1,16 +1,50 @@
-# React + Vite
+# Day 34 — Procedural Planet Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-screen React Three Fiber planet generator with custom GLSL terrain, clouds, atmosphere, night-side city lights, and live sun/seed controls.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Shader Terrain** — 128-segment sphere displaced with seeded simplex/fbm noise.
+- **Height Biomes** — Deep ocean, shallow water, beach, grass, forest, stone, snow, and polar snow blending.
+- **Water Specular** — Ocean areas pick up tight highlights while land stays matte.
+- **Atmosphere** — Transparent Fresnel shell with adjustable thickness and sun wrap.
+- **Cloud Layer** — Procedural animated noise clouds rotating above the surface.
+- **Day/Night** — Directional sun shading with warm city-light clusters on the dark side.
+- **Controls** — Seed input, ocean level, mountain height, cloud density, atmosphere thickness, rotation speed, sun azimuth/elevation, randomize, and reset.
+- **Responsive HUD** — Desktop side panel and mobile bottom sheet with touch-friendly controls.
+- **Accessibility** — Labeled inputs, visible focus states, and reduced-motion support.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite
+- React Three Fiber
+- Drei
+- Three.js
+- Custom GLSL shaders
+- Lucide React icons
 
-## Expanding the ESLint configuration
+## Design System
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Token | Value |
+| --- | --- |
+| Background | `#0B0B10` |
+| Text | `#F8FAFC` |
+| Accent | `#3B82F6` |
+| HUD Accent | `#00FFFF` |
+| Heading Font | Exo |
+| Body/Data Font | Roboto Mono |
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Output is in `dist/`, configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-34-procedural-planet/`.

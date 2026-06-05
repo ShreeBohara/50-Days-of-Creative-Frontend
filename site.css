@@ -18,6 +18,10 @@
   --day13: #00d4ff;
   --day27: #0d9488;
   --day29: #2563eb;
+  --day31: #8b5cf6;
+  --day32: #facc15;
+  --day33: #2563eb;
+  --day34: #38bdf8;
 }
 
 * {
@@ -125,6 +129,10 @@ a { color: inherit; }
 .project-card[data-day="13"]:hover { border-left-color: var(--day13); }
 .project-card[data-day="27"]:hover { border-left-color: var(--day27); }
 .project-card[data-day="29"]:hover { border-left-color: var(--day29); }
+.project-card[data-day="31"]:hover { border-left-color: var(--day31); }
+.project-card[data-day="32"]:hover { border-left-color: var(--day32); }
+.project-card[data-day="33"]:hover { border-left-color: var(--day33); }
+.project-card[data-day="34"]:hover { border-left-color: var(--day34); }
 
 .card-num {
   font-size: 0.72rem;

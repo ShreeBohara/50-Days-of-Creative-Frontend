@@ -40,6 +40,8 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 30 | Interactive Piano Studio | Three-octave Tone.js piano with QWERTY controls, sustain, recording, playback, and a falling-note canvas visualizer. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-30-piano/) | [day-30-piano](./day-30-piano/) |
 | 31 | GSAP SaaS Landing Page | Dark SaaS landing page with scroll-triggered GSAP reveals, animated pricing, testimonial carousel, sticky CTA, and a desktop custom cursor. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-31-saas-landing/) | [day-31-saas-landing](./day-31-saas-landing/) |
 | 32 | Pixel Art Editor | Canvas pixel editor with DB32 colors, layers, animation frames, onion skin, mirror mode, undo history, and PNG/GIF exports. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-32-pixel-art-editor/) | [day-32-pixel-art-editor](./day-32-pixel-art-editor/) |
+| 33 | Animated Portfolio | Designer portfolio with Framer Motion page transitions, layout morphing, custom cursor, and magnetic micro-interactions. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-33-animated-portfolio/) | [day-33-animated-portfolio](./day-33-animated-portfolio/) |
+| 34 | Procedural Planet | React Three Fiber planet generator with shader terrain, atmosphere, procedural clouds, city lights, and sun controls. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-34-procedural-planet/) | [day-34-procedural-planet](./day-34-procedural-planet/) |
 
 ## Adding a New Day
 
