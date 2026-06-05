@@ -570,6 +570,13 @@
     0 22px 54px rgba(249, 115, 22, 0.12);
 }
 
+.pricing-card.is-selected {
+  border-color: rgba(249, 115, 22, 0.55);
+  box-shadow:
+    0 0 0 2px rgba(249, 115, 22, 0.09),
+    0 26px 70px rgba(77, 26, 96, 0.16);
+}
+
 .pricing-card.is-featured::before {
   content: '';
   position: absolute;
@@ -762,4 +769,141 @@
   background: var(--accent);
   box-shadow: 0 16px 34px rgba(249, 115, 22, 0.22);
   transform: translateY(-2px);
+}
+
+.addons-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.addons-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.addon-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 104px;
+  padding: 18px;
+  border: 1px solid rgba(134, 25, 143, 0.13);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 14px 42px rgba(77, 26, 96, 0.07);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.addon-card:hover,
+.addon-card.is-active {
+  border-color: rgba(249, 115, 22, 0.34);
+  box-shadow: 0 20px 54px rgba(77, 26, 96, 0.12);
+  transform: translateY(-2px);
+}
+
+.addon-card input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+.addon-toggle {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(116, 97, 125, 0.22);
+  transition: background 200ms ease;
+}
+
+.addon-toggle::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 5px 12px rgba(31, 17, 71, 0.16);
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.addon-card.is-active .addon-toggle {
+  background: var(--accent);
+}
+
+.addon-card.is-active .addon-toggle::after {
+  transform: translateX(20px);
+}
+
+.addon-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.addon-copy strong {
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.addon-copy span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.addon-price {
+  display: grid;
+  justify-items: end;
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.addon-price small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.total-card {
+  position: sticky;
+  top: 92px;
+  align-self: start;
+  min-height: 100%;
+  padding: 24px;
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  border-radius: 28px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 237, 0.88)),
+    #fff;
+  box-shadow: var(--shadow);
+}
+
+.total-card > span {
+  color: var(--violet-strong);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.total-card strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 20px;
+  color: var(--ink);
+  font-size: clamp(3rem, 5vw, 4.6rem);
+  line-height: 0.92;
+}
+
+.total-card p {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.5;
 }

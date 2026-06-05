@@ -12,7 +12,7 @@ import {
 import gsap from 'gsap'
 import { Flip } from 'gsap/Flip'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { comparisonRows, faqItems, pricingPlans } from './content'
+import { addOns, comparisonRows, faqItems, getAddonPrice, pricingPlans } from './content'
 import './App.css'
 
 gsap.registerPlugin(Flip, ScrollTrigger)
@@ -139,11 +139,11 @@ function BillingToggle({ billingCycle, onChange }) {
   )
 }
 
-function PricingCard({ plan, billingCycle }) {
+function PricingCard({ plan, billingCycle, isSelected, onSelectPlan }) {
   const price = getPlanPrice(plan, billingCycle)
 
   return (
-    <article className={`pricing-card ${plan.featured ? 'is-featured' : ''}`}>
+    <article className={`pricing-card ${plan.featured ? 'is-featured' : ''} ${isSelected ? 'is-selected' : ''}`}>
       <div className="card-topline">
         <div className="card-kicker">{plan.tone}</div>
         {plan.featured && (
@@ -176,11 +176,64 @@ function PricingCard({ plan, billingCycle }) {
           </li>
         ))}
       </ul>
-      <button className="plan-cta" type="button">
-        {plan.cta}
+      <button className="plan-cta" type="button" aria-pressed={isSelected} onClick={() => onSelectPlan(plan.id)}>
+        {isSelected ? 'Selected plan' : plan.cta}
         <ArrowRight size={16} aria-hidden="true" />
       </button>
     </article>
+  )
+}
+
+function AddOnsPanel({ billingCycle, selectedPlan, selectedAddons, onToggleAddon }) {
+  const selectedAddonItems = addOns.filter((addon) => selectedAddons.includes(addon.id))
+  const planTotal = getPlanPrice(selectedPlan, billingCycle)
+  const addonTotal = selectedAddonItems.reduce(
+    (sum, addon) => sum + getAddonPrice(addon, billingCycle),
+    0,
+  )
+  const total = planTotal + addonTotal
+
+  return (
+    <div className="addons-layout">
+      <div className="addons-grid">
+        {addOns.map((addon) => {
+          const isChecked = selectedAddons.includes(addon.id)
+          const inputId = `addon-${addon.id}`
+
+          return (
+            <label className={`addon-card ${isChecked ? 'is-active' : ''}`} htmlFor={inputId} key={addon.id}>
+              <input
+                id={inputId}
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onToggleAddon(addon.id)}
+              />
+              <span className="addon-toggle" aria-hidden="true"></span>
+              <span className="addon-copy">
+                <strong>{addon.name}</strong>
+                <span>{addon.summary}</span>
+              </span>
+              <span className="addon-price">
+                {formatUsd(getAddonPrice(addon, billingCycle))}
+                <small>/mo</small>
+              </span>
+            </label>
+          )
+        })}
+      </div>
+
+      <aside className="total-card" aria-label="Selected plan total">
+        <span>Total for {selectedPlan.name}</span>
+        <strong>
+          <PriceRoller value={total} />
+        </strong>
+        <p>
+          {selectedAddonItems.length
+            ? `${selectedAddonItems.length} add-on${selectedAddonItems.length > 1 ? 's' : ''} included.`
+            : 'No add-ons selected yet.'}
+        </p>
+      </aside>
+    </div>
   )
 }
 
@@ -327,11 +380,20 @@ function FaqAccordion({ activeFaq, onChange }) {
 
 function App() {
   const [billingCycle, setBillingCycle] = useState('monthly')
+  const [selectedPlan, setSelectedPlan] = useState('pro')
+  const [selectedAddons, setSelectedAddons] = useState(['forecast'])
   const [activeFaq, setActiveFaq] = useState(0)
   const pricingGridRef = useRef(null)
   const orderedPlanIds =
     billingCycle === 'yearly' ? ['pro', 'starter', 'enterprise'] : ['starter', 'pro', 'enterprise']
   const orderedPlans = orderedPlanIds.map((id) => pricingPlans.find((plan) => plan.id === id))
+  const activePlan = pricingPlans.find((plan) => plan.id === selectedPlan)
+
+  const handleAddonToggle = (addonId) => {
+    setSelectedAddons((current) =>
+      current.includes(addonId) ? current.filter((id) => id !== addonId) : [...current, addonId],
+    )
+  }
 
   const handleBillingChange = (nextCycle) => {
     if (nextCycle === billingCycle) {
@@ -423,7 +485,13 @@ function App() {
           <BillingToggle billingCycle={billingCycle} onChange={handleBillingChange} />
           <div ref={pricingGridRef} className="pricing-grid">
             {orderedPlans.map((plan) => (
-              <PricingCard key={plan.id} plan={plan} billingCycle={billingCycle} />
+              <PricingCard
+                key={plan.id}
+                plan={plan}
+                billingCycle={billingCycle}
+                isSelected={plan.id === selectedPlan}
+                onSelectPlan={setSelectedPlan}
+              />
             ))}
           </div>
         </section>
@@ -433,7 +501,12 @@ function App() {
             <span>Add-ons</span>
             <h2 id="addons-title">Extend the workspace when your team needs more power.</h2>
           </div>
-          <div className="surface-placeholder"></div>
+          <AddOnsPanel
+            billingCycle={billingCycle}
+            selectedPlan={activePlan}
+            selectedAddons={selectedAddons}
+            onToggleAddon={handleAddonToggle}
+          />
         </section>
 
         <section id="compare" className="page-section compare-section" aria-labelledby="compare-title">

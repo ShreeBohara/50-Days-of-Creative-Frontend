@@ -107,6 +107,30 @@ export const comparisonRows = [
   },
 ]
 
+export const addOns = [
+  {
+    id: 'forecast',
+    name: 'Forecast Pulse',
+    summary: 'Weekly revenue drift snapshots and expansion-risk alerts.',
+    monthly: 12,
+  },
+  {
+    id: 'approvals',
+    name: 'Deal Approvals',
+    summary: 'Route discounts, custom terms, and annual upgrades for review.',
+    monthly: 19,
+  },
+  {
+    id: 'audit',
+    name: 'Audit Vault',
+    summary: 'Immutable invoice exports, contract snapshots, and audit trails.',
+    monthly: 29,
+  },
+]
+
+export const getAddonPrice = (addon, billingCycle) =>
+  billingCycle === 'yearly' ? Math.round(addon.monthly * 0.8) : addon.monthly
+
 export const faqItems = [
   {
     question: 'Can we change plans after launch?',
