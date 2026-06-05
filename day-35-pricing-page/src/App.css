@@ -133,7 +133,7 @@
 .hero-copy h1 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(3.2rem, 7vw, 6.8rem);
+  font-size: 6.4rem;
   line-height: 0.92;
   letter-spacing: 0;
   max-width: 760px;
@@ -143,7 +143,7 @@
   max-width: 610px;
   margin: 28px 0 0;
   color: var(--muted);
-  font-size: clamp(1rem, 2vw, 1.18rem);
+  font-size: 1.15rem;
   line-height: 1.75;
 }
 
@@ -307,7 +307,7 @@
 .section-heading h2 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(2rem, 4vw, 3.8rem);
+  font-size: 3.6rem;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -716,7 +716,7 @@
   display: inline-block;
   overflow: hidden;
   color: var(--ink);
-  font-size: clamp(2.8rem, 5vw, 4.25rem);
+  font-size: 4.1rem;
   line-height: 0.92;
   letter-spacing: 0;
 }
@@ -929,8 +929,222 @@
   overflow: hidden;
   margin-top: 20px;
   color: var(--ink);
-  font-size: clamp(3rem, 5vw, 4.6rem);
+  font-size: 4.4rem;
   line-height: 0.92;
+}
+
+.addon-card:has(input:focus-visible) {
+  outline: 3px solid rgba(249, 115, 22, 0.42);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1080px) {
+  .site-header,
+  .hero-section,
+  .trust-strip,
+  .page-section {
+    width: min(100% - 36px, 920px);
+  }
+
+  .hero-section {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    padding-top: 52px;
+  }
+
+  .hero-copy h1 {
+    max-width: 820px;
+    font-size: 5rem;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-card.is-featured {
+    margin: 0;
+  }
+
+  .addons-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .total-card {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 0;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+    border-radius: 18px;
+  }
+
+  .nav-links a {
+    white-space: nowrap;
+  }
+
+  .header-cta {
+    min-height: 40px;
+    padding-inline: 14px;
+  }
+
+  .hero-section {
+    padding: 34px 0 36px;
+  }
+
+  .hero-copy h1 {
+    font-size: 3.35rem;
+    line-height: 0.98;
+  }
+
+  .hero-text {
+    margin-top: 22px;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+  }
+
+  .console-visual {
+    min-height: auto;
+    border-radius: 24px;
+  }
+
+  .console-body {
+    padding: 18px;
+  }
+
+  .console-stat strong {
+    font-size: 2.55rem;
+  }
+
+  .trust-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .page-section {
+    padding-top: 54px;
+  }
+
+  .section-heading h2 {
+    font-size: 2.35rem;
+    line-height: 1.06;
+  }
+
+  .pricing-toolbar,
+  .billing-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .billing-toggle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .currency-selector {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    width: 100%;
+    border-radius: 18px;
+  }
+
+  .currency-selector select {
+    width: 100%;
+  }
+
+  .pricing-card {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .card-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .card-heading p {
+    min-height: auto;
+  }
+
+  .price-row strong {
+    font-size: 3.25rem;
+  }
+
+  .addon-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .addon-price {
+    grid-column: 2;
+    justify-items: start;
+  }
+
+  .total-card strong {
+    font-size: 3.25rem;
+  }
+
+  .faq-question {
+    min-height: 62px;
+    padding-inline: 18px;
+  }
+
+  .faq-panel p {
+    padding-inline: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-header,
+  .hero-section,
+  .trust-strip,
+  .page-section {
+    width: calc(100% - 28px);
+  }
+
+  .hero-copy h1 {
+    font-size: 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .pricing-card:hover,
+  .addon-card:hover,
+  .header-cta:hover,
+  .primary-button:hover,
+  .secondary-button:hover {
+    transform: none;
+  }
 }
 
 .total-card p {
