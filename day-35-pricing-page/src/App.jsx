@@ -9,8 +9,11 @@ import {
   X,
 } from 'lucide-react'
 import gsap from 'gsap'
+import { Flip } from 'gsap/Flip'
 import { pricingPlans } from './content'
 import './App.css'
+
+gsap.registerPlugin(Flip)
 
 const formatUsd = (value) =>
   new Intl.NumberFormat('en-US', {
@@ -173,6 +176,34 @@ function PricingCard({ plan, billingCycle }) {
 
 function App() {
   const [billingCycle, setBillingCycle] = useState('monthly')
+  const pricingGridRef = useRef(null)
+  const orderedPlanIds =
+    billingCycle === 'yearly' ? ['pro', 'starter', 'enterprise'] : ['starter', 'pro', 'enterprise']
+  const orderedPlans = orderedPlanIds.map((id) => pricingPlans.find((plan) => plan.id === id))
+
+  const handleBillingChange = (nextCycle) => {
+    if (nextCycle === billingCycle) {
+      return
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const cards = pricingGridRef.current?.querySelectorAll('.pricing-card')
+    const flipState = cards?.length && !reduceMotion ? Flip.getState(cards) : null
+
+    setBillingCycle(nextCycle)
+
+    if (flipState) {
+      requestAnimationFrame(() => {
+        Flip.from(flipState, {
+          duration: 0.72,
+          ease: 'power3.inOut',
+          absolute: true,
+          nested: true,
+          stagger: 0.04,
+        })
+      })
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -237,9 +268,9 @@ function App() {
             <span>Plans</span>
             <h2 id="pricing-title">Pick the plan that fits your growth curve.</h2>
           </div>
-          <BillingToggle billingCycle={billingCycle} onChange={setBillingCycle} />
-          <div className="pricing-grid">
-            {pricingPlans.map((plan) => (
+          <BillingToggle billingCycle={billingCycle} onChange={handleBillingChange} />
+          <div ref={pricingGridRef} className="pricing-grid">
+            {orderedPlans.map((plan) => (
               <PricingCard key={plan.id} plan={plan} billingCycle={billingCycle} />
             ))}
           </div>
