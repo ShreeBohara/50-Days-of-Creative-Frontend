@@ -2,6 +2,7 @@ import { OrbitControls, Stars } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import * as THREE from 'three'
+import Planet from './Planet'
 
 export default function PlanetScene() {
   const { scene } = useThree()
@@ -31,6 +32,8 @@ export default function PlanetScene() {
         <sphereGeometry args={[0.08, 24, 24]} />
         <meshBasicMaterial color="#fff7cc" toneMapped={false} />
       </mesh>
+
+      <Planet />
 
       <OrbitControls
         enableDamping
