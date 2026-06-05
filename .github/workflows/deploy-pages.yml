@@ -41,6 +41,7 @@ on:
       - "day-32-pixel-art-editor/**"
       - "day-33-animated-portfolio/**"
       - "day-34-procedural-planet/**"
+      - "day-35-pricing-page/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -85,6 +86,7 @@ jobs:
             day-32-pixel-art-editor/package-lock.json
             day-33-animated-portfolio/package-lock.json
             day-34-procedural-planet/package-lock.json
+            day-35-pricing-page/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -206,6 +208,14 @@ jobs:
         working-directory: day-34-procedural-planet
         run: npm run build
 
+      - name: Install Day 35 app dependencies
+        working-directory: day-35-pricing-page
+        run: npm ci
+
+      - name: Build Day 35 app
+        working-directory: day-35-pricing-page
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -262,6 +272,8 @@ jobs:
           cp -R day-33-animated-portfolio/dist/. _site/day-33-animated-portfolio/
           mkdir -p _site/day-34-procedural-planet
           cp -R day-34-procedural-planet/dist/. _site/day-34-procedural-planet/
+          mkdir -p _site/day-35-pricing-page
+          cp -R day-35-pricing-page/dist/. _site/day-35-pricing-page/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

@@ -1,16 +1,48 @@
-# React + Vite
+# Day 35 - Animated Pricing Page
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium React pricing page for HelioStack with GSAP Flip plan morphs, rolling price transitions, add-on pricing, currency conversion, a feature comparison matrix, and an animated FAQ.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Three pricing tiers: Starter, Pro, and Enterprise.
+- Monthly and yearly billing toggle with a 20% annual savings state.
+- GSAP Flip card reordering when yearly billing promotes Pro.
+- GSAP-driven rolling price values for plan, add-on, currency, and total changes.
+- Toggleable add-ons that update the selected plan total.
+- Currency selector for USD, EUR, and GBP with fixed conversion rates.
+- Feature comparison matrix with ScrollTrigger row reveals and checkmark pops.
+- Accessible FAQ accordion with smooth height animation.
+- Responsive mobile layout, visible focus states, and reduced-motion support.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite
+- GSAP with Flip and ScrollTrigger
+- Lucide React icons
+- Plain CSS
 
-## Expanding the ESLint configuration
+## Design System
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Token | Value |
+| --- | --- |
+| Background | `#ffffff`, `#fdf4ff` |
+| Text | `#1f1147` |
+| Muted Text | `#74617d` |
+| Accent | `#f97316` |
+| Violet | `#d946ef` |
+| Font | DM Sans |
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Output is in `dist/`, configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-35-pricing-page/`.

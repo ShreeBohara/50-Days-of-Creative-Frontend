@@ -477,7 +477,6 @@ function App() {
       <main id="top">
         <section className="hero-section" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <p className="hero-label">Day 35 pricing lab</p>
             <h1 id="hero-title">Pricing that moves as smoothly as your product.</h1>
             <p className="hero-text">
               HelioStack gives revenue teams a clean billing workspace with plans, add-ons,
