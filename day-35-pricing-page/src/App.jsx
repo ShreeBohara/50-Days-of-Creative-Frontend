@@ -142,7 +142,15 @@ function PricingCard({ plan, billingCycle }) {
 
   return (
     <article className={`pricing-card ${plan.featured ? 'is-featured' : ''}`}>
-      <div className="card-kicker">{plan.tone}</div>
+      <div className="card-topline">
+        <div className="card-kicker">{plan.tone}</div>
+        {plan.featured && (
+          <div className="popular-badge">
+            <Sparkles size={14} aria-hidden="true" />
+            Most Popular
+          </div>
+        )}
+      </div>
       <div className="card-heading">
         <h3>{plan.name}</h3>
         <p>{plan.summary}</p>

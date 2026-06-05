@@ -407,6 +407,8 @@
 }
 
 .pricing-card {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -415,7 +417,47 @@
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 18px 50px rgba(77, 26, 96, 0.08);
-  will-change: transform;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  will-change: transform, box-shadow;
+}
+
+.pricing-card:hover {
+  border-color: rgba(249, 115, 22, 0.32);
+  box-shadow: 0 26px 70px rgba(77, 26, 96, 0.14);
+  transform: translateY(-4px);
+}
+
+.pricing-card.is-featured {
+  margin-top: -12px;
+  margin-bottom: -8px;
+  padding-top: 30px;
+  border-color: rgba(249, 115, 22, 0.44);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(253, 244, 255, 0.82)),
+    rgba(255, 255, 255, 0.86);
+  box-shadow:
+    0 0 0 1px rgba(249, 115, 22, 0.1),
+    0 30px 90px rgba(217, 70, 239, 0.18),
+    0 22px 54px rgba(249, 115, 22, 0.12);
+}
+
+.pricing-card.is-featured::before {
+  content: '';
+  position: absolute;
+  inset: -80% auto auto -35%;
+  width: 46%;
+  height: 220%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  transform: rotate(18deg);
+  animation: card-shimmer 4.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .card-kicker {
@@ -426,6 +468,53 @@
   font-weight: 900;
   border-radius: 999px;
   background: rgba(217, 70, 239, 0.1);
+}
+
+.popular-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  padding: 7px 10px;
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 900;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.22);
+}
+
+.popular-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  transform: skewX(-18deg);
+  animation: badge-shimmer 2.8s ease-in-out infinite;
+}
+
+@keyframes card-shimmer {
+  0%,
+  52% {
+    transform: translateX(0) rotate(18deg);
+  }
+
+  100% {
+    transform: translateX(430%) rotate(18deg);
+  }
+}
+
+@keyframes badge-shimmer {
+  0%,
+  35% {
+    transform: translateX(0) skewX(-18deg);
+  }
+
+  100% {
+    transform: translateX(340%) skewX(-18deg);
+  }
 }
 
 .card-heading {
