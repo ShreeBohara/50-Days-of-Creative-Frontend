@@ -1,6 +1,5 @@
 import { OrbitControls, Stars } from '@react-three/drei'
-import { useThree } from '@react-three/fiber'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { DEFAULT_PLANET_SETTINGS, sunVectorFromAngles } from '../data/planetConfig'
 import Planet from './Planet'
@@ -22,20 +21,16 @@ function SunMarker({ position }) {
 }
 
 export default function PlanetScene({ settings = DEFAULT_PLANET_SETTINGS }) {
-  const { scene } = useThree()
   const sunDirection = useMemo(
     () => new THREE.Vector3(...sunVectorFromAngles(settings.sunAzimuth, settings.sunElevation)).normalize(),
     [settings.sunAzimuth, settings.sunElevation],
   )
   const sunPosition = useMemo(() => sunDirection.clone().multiplyScalar(5.8), [sunDirection])
 
-  useEffect(() => {
-    scene.background = new THREE.Color('#02040a')
-    scene.fog = new THREE.FogExp2('#02040a', 0.018)
-  }, [scene])
-
   return (
     <>
+      <color attach="background" args={['#02040a']} />
+      <fogExp2 attach="fog" args={['#02040a', 0.018]} />
       <ambientLight intensity={0.16} />
       <directionalLight position={sunPosition.toArray()} intensity={2.6} color="#f8fafc" />
       <pointLight position={[-5, -2, -3]} intensity={0.7} color="#38bdf8" />

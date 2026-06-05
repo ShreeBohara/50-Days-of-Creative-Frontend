@@ -233,6 +233,34 @@
   font-weight: 700;
 }
 
+.control-row__track {
+  display: grid;
+  grid-template-columns: 2rem 1fr 2rem;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.step-button {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  color: var(--accent-cyan);
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.step-button:hover {
+  color: #020617;
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
 .control-row input[type='range'] {
   width: 100%;
   height: 0.45rem;
@@ -266,6 +294,7 @@
 
 .seed-control input:focus-visible,
 .control-row input:focus-visible,
+.step-button:focus-visible,
 .control-actions button:focus-visible {
   outline: 2px solid var(--accent-cyan);
   outline-offset: 3px;
@@ -413,13 +442,6 @@
   .control-row input[type='range']::-moz-range-thumb {
     width: 1.15rem;
     height: 1.15rem;
-  }
-
-  .control-actions {
-    position: sticky;
-    bottom: 0;
-    padding-top: 0.15rem;
-    background: linear-gradient(180deg, rgba(8, 18, 34, 0), rgba(8, 18, 34, 0.94) 26%);
   }
 
   .control-actions button {

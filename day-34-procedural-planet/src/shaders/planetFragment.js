@@ -1,8 +1,6 @@
 import simplexNoise from './noise'
 
 const planetFragmentShader = /* glsl */ `
-  #extension GL_OES_standard_derivatives : enable
-
   uniform vec3 u_sunDirection;
   uniform float u_oceanLevel;
   uniform float u_seed;

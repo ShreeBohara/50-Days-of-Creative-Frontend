@@ -1,4 +1,4 @@
-import { RotateCcw, Shuffle } from 'lucide-react'
+import { Minus, Plus, RotateCcw, Shuffle } from 'lucide-react'
 import { PLANET_CONTROLS } from '../data/planetConfig'
 
 function formatControlValue(control, value) {
@@ -11,24 +11,49 @@ function formatControlValue(control, value) {
 function SliderControl({ control, value, onChange }) {
   const progress = ((value - control.min) / (control.max - control.min)) * 100
   const inputId = `planet-control-${control.key}`
+  const labelId = `${inputId}-label`
+  const precision = String(control.step).split('.')[1]?.length ?? 0
+  const adjustValue = (direction) => {
+    const nextValue = Math.min(control.max, Math.max(control.min, value + control.step * direction))
+    onChange(control.key, Number(nextValue.toFixed(precision)))
+  }
 
   return (
-    <label className="control-row" htmlFor={inputId}>
-      <span className="control-row__label">
+    <div className="control-row">
+      <label id={labelId} className="control-row__label" htmlFor={inputId}>
         {control.label}
         <strong>{formatControlValue(control, value)}</strong>
-      </span>
-      <input
-        id={inputId}
-        type="range"
-        min={control.min}
-        max={control.max}
-        step={control.step}
-        value={value}
-        style={{ '--range-progress': `${progress}%` }}
-        onChange={(event) => onChange(control.key, Number(event.target.value))}
-      />
-    </label>
+      </label>
+      <div className="control-row__track">
+        <button
+          type="button"
+          className="step-button"
+          aria-label={`Decrease ${control.label}`}
+          onClick={() => adjustValue(-1)}
+        >
+          <Minus size={14} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+        <input
+          id={inputId}
+          aria-labelledby={labelId}
+          type="range"
+          min={control.min}
+          max={control.max}
+          step={control.step}
+          value={value}
+          style={{ '--range-progress': `${progress}%` }}
+          onChange={(event) => onChange(control.key, Number(event.target.value))}
+        />
+        <button
+          type="button"
+          className="step-button"
+          aria-label={`Increase ${control.label}`}
+          onClick={() => adjustValue(1)}
+        >
+          <Plus size={14} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
   )
 }
 
