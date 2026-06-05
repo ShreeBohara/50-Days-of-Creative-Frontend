@@ -4,6 +4,8 @@ import * as THREE from 'three'
 import { DEFAULT_PLANET_SETTINGS, sunVectorFromAngles } from '../data/planetConfig'
 import planetFragmentShader from '../shaders/planetFragment'
 import planetVertexShader from '../shaders/planetVertex'
+import Atmosphere from './Atmosphere'
+import CloudLayer from './CloudLayer'
 
 export default function Planet({ settings = DEFAULT_PLANET_SETTINGS }) {
   const meshRef = useRef(null)
@@ -36,14 +38,18 @@ export default function Planet({ settings = DEFAULT_PLANET_SETTINGS }) {
   })
 
   return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[1.45, 128, 128]} />
-      <shaderMaterial
-        ref={materialRef}
-        uniforms={uniforms}
-        vertexShader={planetVertexShader}
-        fragmentShader={planetFragmentShader}
-      />
-    </mesh>
+    <group>
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[1.45, 128, 128]} />
+        <shaderMaterial
+          ref={materialRef}
+          uniforms={uniforms}
+          vertexShader={planetVertexShader}
+          fragmentShader={planetFragmentShader}
+        />
+      </mesh>
+      <CloudLayer settings={settings} />
+      <Atmosphere settings={settings} />
+    </group>
   )
 }
