@@ -5,15 +5,16 @@ const planetFragmentShader = /* glsl */ `
   varying vec3 vNormal;
   varying vec3 vObjectPosition;
   varying float vHeight;
+  varying float vOceanMask;
 
   vec3 colorRamp(float heightValue) {
     vec3 ocean = vec3(0.02, 0.12, 0.30);
     vec3 coast = vec3(0.05, 0.34, 0.58);
     vec3 land = vec3(0.12, 0.42, 0.28);
 
-    float waterBlend = smoothstep(-0.08, u_oceanLevel, heightValue + 0.46);
+    float waterBlend = smoothstep(0.0, u_oceanLevel, heightValue);
     vec3 water = mix(ocean, coast, waterBlend);
-    return mix(water, land, smoothstep(u_oceanLevel - 0.05, u_oceanLevel + 0.08, heightValue + 0.46));
+    return mix(water, land, smoothstep(u_oceanLevel - 0.04, u_oceanLevel + 0.08, heightValue));
   }
 
   void main() {
