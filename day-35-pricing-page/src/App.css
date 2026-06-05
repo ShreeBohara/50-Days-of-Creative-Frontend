@@ -312,11 +312,139 @@
   letter-spacing: 0;
 }
 
-.pricing-placeholder,
 .surface-placeholder {
   min-height: 220px;
   margin-top: 30px;
   border: 1px dashed rgba(134, 25, 143, 0.24);
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.56);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 24px;
+  border: 1px solid rgba(134, 25, 143, 0.13);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 18px 50px rgba(77, 26, 96, 0.08);
+}
+
+.card-kicker {
+  width: fit-content;
+  padding: 7px 10px;
+  color: var(--violet-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  border-radius: 999px;
+  background: rgba(217, 70, 239, 0.1);
+}
+
+.card-heading {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.card-heading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.card-heading p {
+  min-height: 72px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.price-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.price-row strong {
+  color: var(--ink);
+  font-size: clamp(2.8rem, 5vw, 4.25rem);
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+.price-row span {
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.feature-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.feature-list li.is-excluded {
+  color: rgba(116, 97, 125, 0.7);
+}
+
+.feature-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.is-excluded .feature-icon {
+  background: rgba(239, 68, 68, 0.09);
+  color: var(--danger);
+}
+
+.plan-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  margin-top: auto;
+  color: var(--ink);
+  font-weight: 900;
+  border: 1px solid rgba(134, 25, 143, 0.15);
+  border-radius: 16px;
+  background: #fff;
+  transition: transform 180ms ease, color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.plan-cta:hover {
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 16px 34px rgba(249, 115, 22, 0.22);
+  transform: translateY(-2px);
 }

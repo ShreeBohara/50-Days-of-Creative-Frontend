@@ -1,5 +1,21 @@
-import { ArrowRight, BarChart3, Layers3, ShieldCheck, Sparkles } from 'lucide-react'
+import {
+  ArrowRight,
+  BarChart3,
+  Check,
+  Layers3,
+  ShieldCheck,
+  Sparkles,
+  X,
+} from 'lucide-react'
+import { pricingPlans } from './content'
 import './App.css'
+
+const formatUsd = (value) =>
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value)
 
 function BillingConsoleVisual() {
   return (
@@ -40,6 +56,36 @@ function BillingConsoleVisual() {
         </div>
       </div>
     </div>
+  )
+}
+
+function PricingCard({ plan }) {
+  return (
+    <article className={`pricing-card ${plan.featured ? 'is-featured' : ''}`}>
+      <div className="card-kicker">{plan.tone}</div>
+      <div className="card-heading">
+        <h3>{plan.name}</h3>
+        <p>{plan.summary}</p>
+      </div>
+      <div className="price-row">
+        <strong>{formatUsd(plan.monthly)}</strong>
+        <span>/mo</span>
+      </div>
+      <ul className="feature-list" aria-label={`${plan.name} features`}>
+        {plan.features.map((feature) => (
+          <li key={feature.label} className={feature.included ? 'is-included' : 'is-excluded'}>
+            <span className="feature-icon" aria-hidden="true">
+              {feature.included ? <Check size={16} /> : <X size={16} />}
+            </span>
+            {feature.label}
+          </li>
+        ))}
+      </ul>
+      <button className="plan-cta" type="button">
+        {plan.cta}
+        <ArrowRight size={16} aria-hidden="true" />
+      </button>
+    </article>
   )
 }
 
@@ -107,7 +153,11 @@ function App() {
             <span>Plans</span>
             <h2 id="pricing-title">Pick the plan that fits your growth curve.</h2>
           </div>
-          <div className="pricing-placeholder" aria-hidden="true"></div>
+          <div className="pricing-grid">
+            {pricingPlans.map((plan) => (
+              <PricingCard key={plan.id} plan={plan} />
+            ))}
+          </div>
         </section>
 
         <section id="addons" className="page-section addons-section" aria-labelledby="addons-title">
