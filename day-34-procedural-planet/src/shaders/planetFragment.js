@@ -1,14 +1,20 @@
+import simplexNoise from './noise'
+
 const planetFragmentShader = /* glsl */ `
   #extension GL_OES_standard_derivatives : enable
 
   uniform vec3 u_sunDirection;
   uniform float u_oceanLevel;
+  uniform float u_seed;
+  uniform float u_time;
 
   varying vec3 vNormal;
   varying vec3 vWorldPosition;
   varying vec3 vObjectPosition;
   varying float vHeight;
   varying float vOceanMask;
+
+  ${simplexNoise}
 
   vec3 colorRamp(float heightValue) {
     vec3 deepOcean = vec3(0.004, 0.036, 0.105);
@@ -36,6 +42,20 @@ const planetFragmentShader = /* glsl */ `
     return normalize(mix(normalize(vNormal), derivativeNormal, 0.72));
   }
 
+  float cityLightMask(float darkSide) {
+    vec3 seedOffset = vec3(u_seed * 0.23, u_seed * 0.47, u_seed * 0.61);
+    float population = fbm(vObjectPosition * 14.0 + seedOffset);
+    float urbanDetail = fbm(vObjectPosition * 54.0 + seedOffset * 2.2);
+    float roadGrid = sin((vObjectPosition.x + population * 0.04) * 170.0)
+      * sin((vObjectPosition.y + urbanDetail * 0.03) * 150.0);
+    float clusters = smoothstep(0.14, 0.48, population) * smoothstep(0.32, 0.72, urbanDetail);
+    float roads = smoothstep(0.74, 0.96, abs(roadGrid));
+    float coastalBias = 1.0 - smoothstep(u_oceanLevel + 0.05, u_oceanLevel + 0.38, vHeight);
+    float landOnly = vOceanMask * smoothstep(u_oceanLevel + 0.015, u_oceanLevel + 0.08, vHeight);
+
+    return clusters * roads * coastalBias * landOnly * darkSide;
+  }
+
   void main() {
     vec3 normal = displacedNormal();
     vec3 sunDirection = normalize(u_sunDirection);
@@ -43,10 +63,14 @@ const planetFragmentShader = /* glsl */ `
     vec3 halfDirection = normalize(sunDirection + viewDirection);
 
     float diffuse = max(dot(normal, sunDirection), 0.0);
+    float sunFacing = dot(normal, sunDirection);
     float night = smoothstep(-0.28, 0.08, dot(normal, sunDirection));
+    float darkSide = 1.0 - smoothstep(-0.18, 0.16, sunFacing);
     float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.2);
     float waterMask = 1.0 - vOceanMask;
     float specular = pow(max(dot(normal, halfDirection), 0.0), 96.0) * waterMask * smoothstep(0.0, 0.45, diffuse);
+    float cityLights = cityLightMask(darkSide);
+    float twinkle = 0.78 + snoise(vObjectPosition * 90.0 + vec3(u_time * 0.45)) * 0.22;
 
     vec3 baseColor = colorRamp(vHeight);
     vec3 nightColor = vec3(0.006, 0.012, 0.035);
@@ -54,6 +78,7 @@ const planetFragmentShader = /* glsl */ `
     vec3 color = mix(nightColor, litColor, night);
 
     color += specular * vec3(0.72, 0.92, 1.0);
+    color += cityLights * twinkle * vec3(1.0, 0.72, 0.34);
     color += rim * vec3(0.018, 0.19, 0.34);
 
     gl_FragColor = vec4(color, 1.0);
