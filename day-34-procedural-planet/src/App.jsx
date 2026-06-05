@@ -1,14 +1,21 @@
+import { Canvas } from '@react-three/fiber'
+import { Suspense } from 'react'
+import PlanetScene from './components/PlanetScene'
 import './App.css'
 
 export default function App() {
   return (
     <main className="app-shell">
       <section className="scene-stage" aria-label="Procedural planet viewport">
-        <div className="scene-placeholder">
-          <span className="orbit-ring orbit-ring-a" aria-hidden="true" />
-          <span className="orbit-ring orbit-ring-b" aria-hidden="true" />
-          <div className="planet-core" aria-hidden="true" />
-        </div>
+        <Canvas
+          camera={{ position: [0, 0.45, 5.2], fov: 42, near: 0.1, far: 160 }}
+          dpr={[1, 2]}
+          gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+        >
+          <Suspense fallback={null}>
+            <PlanetScene />
+          </Suspense>
+        </Canvas>
       </section>
 
       <aside className="hud-panel" aria-label="Planet generator controls">

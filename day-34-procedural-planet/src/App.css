@@ -11,46 +11,13 @@
 .scene-stage {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-}
-
-.scene-placeholder {
-  position: relative;
-  width: min(56vw, 40rem);
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-}
-
-.planet-core {
-  width: 42%;
-  aspect-ratio: 1;
-  border-radius: 50%;
   background:
-    radial-gradient(circle at 28% 24%, rgba(248, 250, 252, 0.9), transparent 0.8rem),
-    radial-gradient(circle at 36% 32%, #38bdf8 0, #1d4ed8 38%, #082f49 72%, #020617 100%);
-  box-shadow:
-    0 0 4rem rgba(59, 130, 246, 0.45),
-    inset -2rem -2.5rem 3rem rgba(0, 0, 0, 0.64);
+    radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.12), transparent 31rem),
+    radial-gradient(circle at 50% 58%, rgba(2, 6, 23, 0), rgba(2, 6, 23, 0.86) 78%);
 }
 
-.orbit-ring {
-  position: absolute;
-  width: 74%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(125, 211, 252, 0.22);
-  border-radius: 50%;
-}
-
-.orbit-ring-a {
-  transform: rotateX(72deg) rotateZ(-24deg);
-}
-
-.orbit-ring-b {
-  width: 92%;
-  transform: rotateX(68deg) rotateZ(32deg);
-  border-color: rgba(59, 130, 246, 0.18);
+.scene-stage canvas {
+  display: block;
 }
 
 .hud-panel {
@@ -105,8 +72,4 @@
     width: auto;
   }
 
-  .scene-placeholder {
-    width: min(92vw, 32rem);
-    transform: translateY(-8vh);
-  }
 }
