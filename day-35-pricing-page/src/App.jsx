@@ -10,10 +10,11 @@ import {
 } from 'lucide-react'
 import gsap from 'gsap'
 import { Flip } from 'gsap/Flip'
-import { pricingPlans } from './content'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { comparisonRows, pricingPlans } from './content'
 import './App.css'
 
-gsap.registerPlugin(Flip)
+gsap.registerPlugin(Flip, ScrollTrigger)
 
 const formatUsd = (value) =>
   new Intl.NumberFormat('en-US', {
@@ -182,6 +183,97 @@ function PricingCard({ plan, billingCycle }) {
   )
 }
 
+function MatrixValue({ value }) {
+  if (typeof value === 'boolean') {
+    return (
+      <span className={`matrix-icon ${value ? 'matrix-check' : 'matrix-x'}`} aria-label={value ? 'Included' : 'Not included'}>
+        {value ? <Check size={17} aria-hidden="true" /> : <X size={17} aria-hidden="true" />}
+      </span>
+    )
+  }
+
+  return <span className="matrix-text">{value}</span>
+}
+
+function ComparisonMatrix() {
+  const matrixRef = useRef(null)
+
+  useEffect(() => {
+    const node = matrixRef.current
+    if (!node) {
+      return undefined
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) {
+      return undefined
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.from('.matrix-row', {
+        y: 28,
+        opacity: 0,
+        duration: 0.58,
+        ease: 'power3.out',
+        stagger: 0.08,
+        scrollTrigger: {
+          trigger: node,
+          start: 'top 78%',
+        },
+      })
+
+      gsap.from('.matrix-check', {
+        scale: 0,
+        opacity: 0,
+        duration: 0.38,
+        ease: 'back.out(1.8)',
+        stagger: 0.04,
+        scrollTrigger: {
+          trigger: node,
+          start: 'top 72%',
+        },
+      })
+    }, node)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div ref={matrixRef} className="comparison-shell">
+      <div className="comparison-grid" role="table" aria-label="Feature comparison by plan">
+        <div className="matrix-head matrix-feature" role="columnheader">
+          Feature
+        </div>
+        <div className="matrix-head" role="columnheader">
+          Starter
+        </div>
+        <div className="matrix-head" role="columnheader">
+          Pro
+        </div>
+        <div className="matrix-head" role="columnheader">
+          Enterprise
+        </div>
+        {comparisonRows.map((row) => (
+          <div className="matrix-row" role="row" key={row.feature}>
+            <div className="matrix-feature" role="cell">
+              {row.feature}
+            </div>
+            <div role="cell">
+              <MatrixValue value={row.starter} />
+            </div>
+            <div role="cell">
+              <MatrixValue value={row.pro} />
+            </div>
+            <div role="cell">
+              <MatrixValue value={row.enterprise} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [billingCycle, setBillingCycle] = useState('monthly')
   const pricingGridRef = useRef(null)
@@ -297,7 +389,7 @@ function App() {
             <span>Comparison</span>
             <h2 id="compare-title">Clear differences without a maze of footnotes.</h2>
           </div>
-          <div className="surface-placeholder"></div>
+          <ComparisonMatrix />
         </section>
 
         <section id="faq" className="page-section faq-section" aria-labelledby="faq-title">

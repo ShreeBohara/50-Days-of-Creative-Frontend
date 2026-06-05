@@ -398,6 +398,84 @@
   background: rgba(255, 255, 255, 0.56);
 }
 
+.comparison-shell {
+  margin-top: 30px;
+  overflow-x: auto;
+  border: 1px solid rgba(134, 25, 143, 0.14);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.35fr) repeat(3, minmax(150px, 1fr));
+  min-width: 760px;
+}
+
+.matrix-head,
+.matrix-row > div {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(134, 25, 143, 0.1);
+}
+
+.matrix-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: var(--violet-strong);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(253, 244, 255, 0.96);
+}
+
+.matrix-row {
+  display: contents;
+}
+
+.matrix-row > div {
+  color: var(--ink);
+  font-weight: 800;
+  transition: background 180ms ease;
+}
+
+.matrix-row:hover > div {
+  background: rgba(249, 115, 22, 0.07);
+}
+
+.matrix-feature {
+  justify-content: flex-start;
+}
+
+.matrix-icon {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+}
+
+.matrix-check {
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.13);
+}
+
+.matrix-x {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.09);
+}
+
+.matrix-text {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

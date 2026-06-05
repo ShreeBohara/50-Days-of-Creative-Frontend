@@ -55,3 +55,54 @@ export const pricingPlans = [
     ],
   },
 ]
+
+export const comparisonRows = [
+  {
+    feature: 'Billing workspace',
+    starter: 'Core',
+    pro: 'Advanced',
+    enterprise: 'Custom',
+  },
+  {
+    feature: 'Plan experiments',
+    starter: 'Monthly only',
+    pro: 'Monthly + yearly',
+    enterprise: 'Global price books',
+  },
+  {
+    feature: 'Forecast snapshots',
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    feature: 'Approval workflows',
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    feature: 'Custom contract terms',
+    starter: false,
+    pro: false,
+    enterprise: true,
+  },
+  {
+    feature: 'Usage anomaly alerts',
+    starter: 'Basic',
+    pro: 'Smart',
+    enterprise: 'Predictive',
+  },
+  {
+    feature: 'Audit-ready invoice archive',
+    starter: false,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    feature: 'Success support',
+    starter: 'Community',
+    pro: 'Priority',
+    enterprise: 'Dedicated',
+  },
+]
