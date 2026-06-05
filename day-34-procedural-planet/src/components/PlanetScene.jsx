@@ -59,8 +59,8 @@ export default function PlanetScene({ settings = DEFAULT_PLANET_SETTINGS }) {
         dampingFactor={0.06}
         minDistance={3}
         maxDistance={8}
-        autoRotate
-        autoRotateSpeed={0.35}
+        autoRotate={settings.rotationSpeed > 0}
+        autoRotateSpeed={settings.rotationSpeed > 0 ? 0.35 : 0}
       />
     </>
   )
