@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -8,6 +8,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
+import gsap from 'gsap'
 import { pricingPlans } from './content'
 import './App.css'
 
@@ -20,6 +21,47 @@ const formatUsd = (value) =>
 
 const getPlanPrice = (plan, billingCycle) =>
   billingCycle === 'yearly' ? Math.round(plan.monthly * 0.8) : plan.monthly
+
+function PriceRoller({ value }) {
+  const amountRef = useRef(null)
+  const previousValue = useRef(value)
+
+  useEffect(() => {
+    const node = amountRef.current
+    if (!node) {
+      return undefined
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const counter = { value: previousValue.current }
+    const tween = gsap.to(counter, {
+      value,
+      duration: reduceMotion ? 0 : 0.58,
+      ease: 'power3.out',
+      onUpdate: () => {
+        node.textContent = formatUsd(counter.value)
+      },
+    })
+    const lift = gsap.fromTo(
+      node,
+      { y: reduceMotion ? 0 : 16, opacity: reduceMotion ? 1 : 0.35 },
+      { y: 0, opacity: 1, duration: reduceMotion ? 0 : 0.42, ease: 'power3.out' },
+    )
+
+    previousValue.current = value
+
+    return () => {
+      tween.kill()
+      lift.kill()
+    }
+  }, [value])
+
+  return (
+    <span ref={amountRef} className="digit-roller">
+      {formatUsd(value)}
+    </span>
+  )
+}
 
 function BillingConsoleVisual() {
   return (
@@ -103,7 +145,9 @@ function PricingCard({ plan, billingCycle }) {
         <p>{plan.summary}</p>
       </div>
       <div className="price-row">
-        <strong>{formatUsd(price)}</strong>
+        <strong>
+          <PriceRoller value={price} />
+        </strong>
         <span>/mo</span>
       </div>
       <p className="billing-note">

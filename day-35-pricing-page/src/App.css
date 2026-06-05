@@ -455,10 +455,19 @@
 }
 
 .price-row strong {
+  display: inline-block;
+  overflow: hidden;
   color: var(--ink);
   font-size: clamp(2.8rem, 5vw, 4.25rem);
   line-height: 0.92;
   letter-spacing: 0;
+}
+
+.digit-roller {
+  display: inline-block;
+  min-width: 3.4ch;
+  font-variant-numeric: tabular-nums;
+  will-change: transform, opacity;
 }
 
 .price-row span {
