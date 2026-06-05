@@ -1,0 +1,44 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0b10;
+  --surface: rgba(8, 18, 34, 0.78);
+  --surface-strong: rgba(7, 13, 25, 0.92);
+  --border: rgba(125, 211, 252, 0.28);
+  --border-strong: rgba(56, 189, 248, 0.56);
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-cyan: #00ffff;
+  --success: #22c55e;
+  --warn: #f59e0b;
+  --font-heading: 'Exo', system-ui, sans-serif;
+  --font-body: 'Roboto Mono', ui-monospace, SFMono-Regular, monospace;
+
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
