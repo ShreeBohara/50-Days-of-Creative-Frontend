@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -16,6 +17,9 @@ const formatUsd = (value) =>
     currency: 'USD',
     maximumFractionDigits: 0,
   }).format(value)
+
+const getPlanPrice = (plan, billingCycle) =>
+  billingCycle === 'yearly' ? Math.round(plan.monthly * 0.8) : plan.monthly
 
 function BillingConsoleVisual() {
   return (
@@ -59,7 +63,38 @@ function BillingConsoleVisual() {
   )
 }
 
-function PricingCard({ plan }) {
+function BillingToggle({ billingCycle, onChange }) {
+  const isYearly = billingCycle === 'yearly'
+
+  return (
+    <div className="billing-controls" aria-label="Billing frequency">
+      <div className="billing-toggle" role="group" aria-label="Choose billing cycle">
+        <span className={`toggle-thumb ${isYearly ? 'is-yearly' : ''}`} aria-hidden="true"></span>
+        <button
+          type="button"
+          aria-pressed={!isYearly}
+          className={!isYearly ? 'is-active' : ''}
+          onClick={() => onChange('monthly')}
+        >
+          Monthly
+        </button>
+        <button
+          type="button"
+          aria-pressed={isYearly}
+          className={isYearly ? 'is-active' : ''}
+          onClick={() => onChange('yearly')}
+        >
+          Yearly
+        </button>
+      </div>
+      {isYearly && <span className="save-badge">Save 20%</span>}
+    </div>
+  )
+}
+
+function PricingCard({ plan, billingCycle }) {
+  const price = getPlanPrice(plan, billingCycle)
+
   return (
     <article className={`pricing-card ${plan.featured ? 'is-featured' : ''}`}>
       <div className="card-kicker">{plan.tone}</div>
@@ -68,9 +103,12 @@ function PricingCard({ plan }) {
         <p>{plan.summary}</p>
       </div>
       <div className="price-row">
-        <strong>{formatUsd(plan.monthly)}</strong>
+        <strong>{formatUsd(price)}</strong>
         <span>/mo</span>
       </div>
+      <p className="billing-note">
+        {billingCycle === 'yearly' ? 'Billed yearly with annual savings applied.' : 'Billed monthly. Change or cancel anytime.'}
+      </p>
       <ul className="feature-list" aria-label={`${plan.name} features`}>
         {plan.features.map((feature) => (
           <li key={feature.label} className={feature.included ? 'is-included' : 'is-excluded'}>
@@ -90,6 +128,8 @@ function PricingCard({ plan }) {
 }
 
 function App() {
+  const [billingCycle, setBillingCycle] = useState('monthly')
+
   return (
     <div className="app-shell">
       <header className="site-header" aria-label="HelioStack navigation">
@@ -153,9 +193,10 @@ function App() {
             <span>Plans</span>
             <h2 id="pricing-title">Pick the plan that fits your growth curve.</h2>
           </div>
+          <BillingToggle billingCycle={billingCycle} onChange={setBillingCycle} />
           <div className="pricing-grid">
             {pricingPlans.map((plan) => (
-              <PricingCard key={plan.id} plan={plan} />
+              <PricingCard key={plan.id} plan={plan} billingCycle={billingCycle} />
             ))}
           </div>
         </section>
