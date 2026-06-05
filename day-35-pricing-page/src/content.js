@@ -106,3 +106,26 @@ export const comparisonRows = [
     enterprise: 'Dedicated',
   },
 ]
+
+export const faqItems = [
+  {
+    question: 'Can we change plans after launch?',
+    answer:
+      'Yes. HelioStack previews the price impact before a plan switch, then keeps the old and new billing terms visible for finance review.',
+  },
+  {
+    question: 'How does yearly billing apply the savings?',
+    answer:
+      'Yearly mode shows the monthly-equivalent price after a 20% savings rate and labels the plan as billed yearly so the discount is clear.',
+  },
+  {
+    question: 'Do add-ons renew with the selected plan?',
+    answer:
+      'Add-ons follow the same billing cycle as the active plan. Toggle any add-on to see the total update before checkout.',
+  },
+  {
+    question: 'Are the currency conversions live?',
+    answer:
+      'This demo uses fixed USD, EUR, and GBP conversion rates so the experience stays deterministic and GitHub Pages friendly.',
+  },
+]

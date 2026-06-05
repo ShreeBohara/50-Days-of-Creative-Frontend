@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BarChart3,
   Check,
+  ChevronDown,
   Layers3,
   ShieldCheck,
   Sparkles,
@@ -11,7 +12,7 @@ import {
 import gsap from 'gsap'
 import { Flip } from 'gsap/Flip'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { comparisonRows, pricingPlans } from './content'
+import { comparisonRows, faqItems, pricingPlans } from './content'
 import './App.css'
 
 gsap.registerPlugin(Flip, ScrollTrigger)
@@ -274,8 +275,59 @@ function ComparisonMatrix() {
   )
 }
 
+function FaqAccordion({ activeFaq, onChange }) {
+  const faqRef = useRef(null)
+
+  useEffect(() => {
+    const node = faqRef.current
+    if (!node) {
+      return undefined
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const panels = node.querySelectorAll('.faq-panel')
+    const tweens = Array.from(panels).map((panel, index) =>
+      gsap.to(panel, {
+        height: index === activeFaq ? panel.scrollHeight : 0,
+        duration: reduceMotion ? 0 : 0.34,
+        ease: 'power2.out',
+      }),
+    )
+
+    return () => tweens.forEach((tween) => tween.kill())
+  }, [activeFaq])
+
+  return (
+    <div ref={faqRef} className="faq-list">
+      {faqItems.map((item, index) => {
+        const isOpen = index === activeFaq
+        const panelId = `faq-panel-${index}`
+
+        return (
+          <article className={`faq-item ${isOpen ? 'is-open' : ''}`} key={item.question}>
+            <button
+              type="button"
+              className="faq-question"
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              onClick={() => onChange(isOpen ? -1 : index)}
+            >
+              <span>{item.question}</span>
+              <ChevronDown size={20} aria-hidden="true" />
+            </button>
+            <div id={panelId} className="faq-panel" aria-hidden={!isOpen}>
+              <p>{item.answer}</p>
+            </div>
+          </article>
+        )
+      })}
+    </div>
+  )
+}
+
 function App() {
   const [billingCycle, setBillingCycle] = useState('monthly')
+  const [activeFaq, setActiveFaq] = useState(0)
   const pricingGridRef = useRef(null)
   const orderedPlanIds =
     billingCycle === 'yearly' ? ['pro', 'starter', 'enterprise'] : ['starter', 'pro', 'enterprise']
@@ -397,7 +449,7 @@ function App() {
             <span>FAQ</span>
             <h2 id="faq-title">Short answers for plan changes, currencies, and billing cycles.</h2>
           </div>
-          <div className="surface-placeholder"></div>
+          <FaqAccordion activeFaq={activeFaq} onChange={setActiveFaq} />
         </section>
       </main>
     </div>
