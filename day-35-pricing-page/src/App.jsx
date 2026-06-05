@@ -17,19 +17,36 @@ import './App.css'
 
 gsap.registerPlugin(Flip, ScrollTrigger)
 
-const formatUsd = (value) =>
+const currencyRates = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.78,
+}
+
+const currencyNames = {
+  USD: 'US Dollar',
+  EUR: 'Euro',
+  GBP: 'British Pound',
+}
+
+const formatConvertedCurrency = (value, currency) =>
   new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency,
     maximumFractionDigits: 0,
   }).format(value)
+
+const convertCurrency = (value, currency) => value * currencyRates[currency]
+
+const formatCurrency = (value, currency) =>
+  formatConvertedCurrency(convertCurrency(value, currency), currency)
 
 const getPlanPrice = (plan, billingCycle) =>
   billingCycle === 'yearly' ? Math.round(plan.monthly * 0.8) : plan.monthly
 
-function PriceRoller({ value }) {
+function PriceRoller({ value, currency }) {
   const amountRef = useRef(null)
-  const previousValue = useRef(value)
+  const previousValue = useRef(convertCurrency(value, currency))
 
   useEffect(() => {
     const node = amountRef.current
@@ -38,13 +55,14 @@ function PriceRoller({ value }) {
     }
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const displayValue = convertCurrency(value, currency)
     const counter = { value: previousValue.current }
     const tween = gsap.to(counter, {
-      value,
+      value: displayValue,
       duration: reduceMotion ? 0 : 0.58,
       ease: 'power3.out',
       onUpdate: () => {
-        node.textContent = formatUsd(counter.value)
+        node.textContent = formatConvertedCurrency(counter.value, currency)
       },
     })
     const lift = gsap.fromTo(
@@ -53,17 +71,17 @@ function PriceRoller({ value }) {
       { y: 0, opacity: 1, duration: reduceMotion ? 0 : 0.42, ease: 'power3.out' },
     )
 
-    previousValue.current = value
+    previousValue.current = displayValue
 
     return () => {
       tween.kill()
       lift.kill()
     }
-  }, [value])
+  }, [currency, value])
 
   return (
     <span ref={amountRef} className="digit-roller">
-      {formatUsd(value)}
+      {formatCurrency(value, currency)}
     </span>
   )
 }
@@ -139,7 +157,22 @@ function BillingToggle({ billingCycle, onChange }) {
   )
 }
 
-function PricingCard({ plan, billingCycle, isSelected, onSelectPlan }) {
+function CurrencySelector({ currency, onChange }) {
+  return (
+    <label className="currency-selector" htmlFor="currency">
+      <span>Currency</span>
+      <select id="currency" value={currency} onChange={(event) => onChange(event.target.value)}>
+        {Object.keys(currencyRates).map((code) => (
+          <option value={code} key={code}>
+            {code} - {currencyNames[code]}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+function PricingCard({ plan, billingCycle, currency, isSelected, onSelectPlan }) {
   const price = getPlanPrice(plan, billingCycle)
 
   return (
@@ -159,7 +192,7 @@ function PricingCard({ plan, billingCycle, isSelected, onSelectPlan }) {
       </div>
       <div className="price-row">
         <strong>
-          <PriceRoller value={price} />
+          <PriceRoller value={price} currency={currency} />
         </strong>
         <span>/mo</span>
       </div>
@@ -184,7 +217,7 @@ function PricingCard({ plan, billingCycle, isSelected, onSelectPlan }) {
   )
 }
 
-function AddOnsPanel({ billingCycle, selectedPlan, selectedAddons, onToggleAddon }) {
+function AddOnsPanel({ billingCycle, currency, selectedPlan, selectedAddons, onToggleAddon }) {
   const selectedAddonItems = addOns.filter((addon) => selectedAddons.includes(addon.id))
   const planTotal = getPlanPrice(selectedPlan, billingCycle)
   const addonTotal = selectedAddonItems.reduce(
@@ -214,7 +247,7 @@ function AddOnsPanel({ billingCycle, selectedPlan, selectedAddons, onToggleAddon
                 <span>{addon.summary}</span>
               </span>
               <span className="addon-price">
-                {formatUsd(getAddonPrice(addon, billingCycle))}
+                {formatCurrency(getAddonPrice(addon, billingCycle), currency)}
                 <small>/mo</small>
               </span>
             </label>
@@ -225,7 +258,7 @@ function AddOnsPanel({ billingCycle, selectedPlan, selectedAddons, onToggleAddon
       <aside className="total-card" aria-label="Selected plan total">
         <span>Total for {selectedPlan.name}</span>
         <strong>
-          <PriceRoller value={total} />
+          <PriceRoller value={total} currency={currency} />
         </strong>
         <p>
           {selectedAddonItems.length
@@ -380,6 +413,7 @@ function FaqAccordion({ activeFaq, onChange }) {
 
 function App() {
   const [billingCycle, setBillingCycle] = useState('monthly')
+  const [currency, setCurrency] = useState('USD')
   const [selectedPlan, setSelectedPlan] = useState('pro')
   const [selectedAddons, setSelectedAddons] = useState(['forecast'])
   const [activeFaq, setActiveFaq] = useState(0)
@@ -482,13 +516,17 @@ function App() {
             <span>Plans</span>
             <h2 id="pricing-title">Pick the plan that fits your growth curve.</h2>
           </div>
-          <BillingToggle billingCycle={billingCycle} onChange={handleBillingChange} />
+          <div className="pricing-toolbar">
+            <BillingToggle billingCycle={billingCycle} onChange={handleBillingChange} />
+            <CurrencySelector currency={currency} onChange={setCurrency} />
+          </div>
           <div ref={pricingGridRef} className="pricing-grid">
             {orderedPlans.map((plan) => (
               <PricingCard
                 key={plan.id}
                 plan={plan}
                 billingCycle={billingCycle}
+                currency={currency}
                 isSelected={plan.id === selectedPlan}
                 onSelectPlan={setSelectedPlan}
               />
@@ -503,6 +541,7 @@ function App() {
           </div>
           <AddOnsPanel
             billingCycle={billingCycle}
+            currency={currency}
             selectedPlan={activePlan}
             selectedAddons={selectedAddons}
             onToggleAddon={handleAddonToggle}
