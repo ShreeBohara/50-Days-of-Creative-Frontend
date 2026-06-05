@@ -59,6 +59,28 @@
   letter-spacing: 0;
 }
 
+.hud-readout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.hud-readout span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hud-readout strong {
+  color: var(--accent-cyan);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 @media (max-width: 720px) {
   body {
     overflow: auto;

@@ -1,9 +1,12 @@
 import { Canvas } from '@react-three/fiber'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import PlanetScene from './components/PlanetScene'
+import { DEFAULT_PLANET_SETTINGS } from './data/planetConfig'
 import './App.css'
 
 export default function App() {
+  const [settings] = useState(DEFAULT_PLANET_SETTINGS)
+
   return (
     <main className="app-shell">
       <section className="scene-stage" aria-label="Procedural planet viewport">
@@ -13,7 +16,7 @@ export default function App() {
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         >
           <Suspense fallback={null}>
-            <PlanetScene />
+            <PlanetScene settings={settings} />
           </Suspense>
         </Canvas>
       </section>
@@ -23,6 +26,12 @@ export default function App() {
           <p>Day 34</p>
           <h1>Procedural Planet</h1>
           <span>Shader terrain lab online</span>
+        </div>
+        <div className="hud-readout" aria-label="Current sun position">
+          <span>Sun azimuth</span>
+          <strong>{settings.sunAzimuth}°</strong>
+          <span>Elevation</span>
+          <strong>{settings.sunElevation}°</strong>
         </div>
       </aside>
     </main>
