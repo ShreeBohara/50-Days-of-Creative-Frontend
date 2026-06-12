@@ -1,5 +1,6 @@
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
-import { METRICS, formatMetricValue } from './data/metrics'
+import { MetricCard } from './components/MetricCard'
+import { METRICS } from './data/metrics'
 import { useMetricStream } from './hooks/useMetricStream'
 import './App.css'
 
@@ -19,7 +20,6 @@ function Panel({ className = '', title, meta, children }) {
 
 function App() {
   const stream = useMetricStream()
-  const currentSample = stream.history.at(-1)
 
   return (
     <>
@@ -57,11 +57,12 @@ function App() {
         <main id="dashboard" className="dashboard">
           <section className="metric-grid" aria-label="Live metric overview">
             {METRICS.map((metric) => (
-              <article className="metric-shell" key={metric.id}>
-                <span>{metric.label}</span>
-                <strong>{formatMetricValue(metric.id, currentSample[metric.id])}</strong>
-                <small>Live telemetry</small>
-              </article>
+              <MetricCard
+                history={stream.history}
+                key={metric.id}
+                metric={metric}
+                thresholds={stream.thresholds}
+              />
             ))}
           </section>
 
