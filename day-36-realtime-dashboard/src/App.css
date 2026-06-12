@@ -1213,6 +1213,10 @@
     display: none;
   }
 
+  .threshold-drawer form {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
   .threshold-list fieldset {
     grid-template-columns: 1fr 1fr;
   }

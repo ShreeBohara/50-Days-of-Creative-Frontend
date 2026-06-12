@@ -42,6 +42,7 @@ on:
       - "day-33-animated-portfolio/**"
       - "day-34-procedural-planet/**"
       - "day-35-pricing-page/**"
+      - "day-36-realtime-dashboard/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -87,6 +88,7 @@ jobs:
             day-33-animated-portfolio/package-lock.json
             day-34-procedural-planet/package-lock.json
             day-35-pricing-page/package-lock.json
+            day-36-realtime-dashboard/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -216,6 +218,14 @@ jobs:
         working-directory: day-35-pricing-page
         run: npm run build
 
+      - name: Install Day 36 app dependencies
+        working-directory: day-36-realtime-dashboard
+        run: npm ci
+
+      - name: Build Day 36 app
+        working-directory: day-36-realtime-dashboard
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -274,6 +284,8 @@ jobs:
           cp -R day-34-procedural-planet/dist/. _site/day-34-procedural-planet/
           mkdir -p _site/day-35-pricing-page
           cp -R day-35-pricing-page/dist/. _site/day-35-pricing-page/
+          mkdir -p _site/day-36-realtime-dashboard
+          cp -R day-36-realtime-dashboard/dist/. _site/day-36-realtime-dashboard/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

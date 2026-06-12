@@ -26,6 +26,7 @@ export function useMetricStream() {
       const previousSample = latestSampleRef.current
       const nextSample = createNextSample(previousSample, {
         chaosRemaining: Math.max(0, chaosUntilRef.current - Date.now()),
+        timestamp: previousSample.timestamp + BASE_INTERVAL / speed,
       })
       const crossings = createCrossingAlerts(previousSample, nextSample, thresholds)
 
