@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { RotateCcw, SlidersHorizontal, X } from 'lucide-react'
 import { DEFAULT_THRESHOLDS, METRICS } from '../data/metrics'
 
@@ -23,8 +23,22 @@ function getErrors(thresholds) {
 }
 
 export function ThresholdPanel({ onApply, onClose, thresholds }) {
+  const drawerRef = useRef(null)
   const [draft, setDraft] = useState(() => copyThresholds(thresholds))
   const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    const firstInput = drawerRef.current?.querySelector('input')
+    firstInput?.focus()
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
 
   const updateValue = (metricId, level, value) => {
     setDraft((current) => ({
@@ -50,6 +64,7 @@ export function ThresholdPanel({ onApply, onClose, thresholds }) {
     <div className="drawer-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section
         className="threshold-drawer"
+        ref={drawerRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="threshold-title"

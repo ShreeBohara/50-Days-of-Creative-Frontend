@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
 import { AlertLog } from './components/AlertLog'
 import { CapacityGauges } from './components/CapacityGauges'
@@ -28,7 +28,16 @@ function Panel({ className = '', title, meta, children }) {
 function App() {
   const stream = useMetricStream()
   const currentSample = stream.history.at(-1)
+  const setThresholds = stream.setThresholds
   const [thresholdsOpen, setThresholdsOpen] = useState(false)
+  const closeThresholds = useCallback(() => setThresholdsOpen(false), [])
+  const applyThresholds = useCallback(
+    (nextThresholds) => {
+      setThresholds(nextThresholds)
+      setThresholdsOpen(false)
+    },
+    [setThresholds],
+  )
 
   return (
     <>
@@ -53,7 +62,7 @@ function App() {
                 <Server size={15} aria-hidden="true" />
                 <span>US-WEST CLUSTER 04</span>
               </div>
-              <div className="connection-state">
+              <div className="connection-state" aria-live="polite">
                 <CircleDot size={14} aria-hidden="true" />
                 <span>{stream.isPaused ? 'STREAM PAUSED' : 'LIVE STREAM'}</span>
               </div>
@@ -126,11 +135,8 @@ function App() {
       {thresholdsOpen ? (
         <ThresholdPanel
           thresholds={stream.thresholds}
-          onApply={(nextThresholds) => {
-            stream.setThresholds(nextThresholds)
-            setThresholdsOpen(false)
-          }}
-          onClose={() => setThresholdsOpen(false)}
+          onApply={applyThresholds}
+          onClose={closeThresholds}
         />
       ) : null}
     </>

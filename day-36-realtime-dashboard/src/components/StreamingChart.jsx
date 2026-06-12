@@ -11,6 +11,7 @@ import {
   timeFormat,
 } from 'd3'
 import { CHART_METRIC_IDS, METRICS_BY_ID, formatMetricValue } from '../data/metrics'
+import { useReducedMotion } from '../hooks/useReducedMotion'
 
 const WIDTH = 980
 const HEIGHT = 300
@@ -22,6 +23,7 @@ const formatTime = timeFormat('%H:%M:%S')
 export function StreamingChart({ history }) {
   const wrapperRef = useRef(null)
   const pathRefs = useRef({})
+  const reducedMotion = useReducedMotion()
   const [visibleMetricIds, setVisibleMetricIds] = useState(() => new Set(CHART_METRIC_IDS))
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const [containerWidth, setContainerWidth] = useState(WIDTH)
@@ -75,11 +77,11 @@ export function StreamingChart({ history }) {
       select(path)
         .interrupt()
         .transition()
-        .duration(95)
+        .duration(reducedMotion ? 0 : 95)
         .ease(easeLinear)
         .attr('d', paths[metricId])
     })
-  }, [paths, visibleMetricIds])
+  }, [paths, reducedMotion, visibleMetricIds])
 
   const xTicks = scales.x.ticks(containerWidth < 760 ? 4 : 6)
   const percentTicks = scales.percent.ticks(4)
