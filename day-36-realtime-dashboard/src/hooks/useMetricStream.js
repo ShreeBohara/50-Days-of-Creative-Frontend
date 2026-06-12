@@ -11,8 +11,10 @@ export function useMetricStream() {
   const [alerts, setAlerts] = useState([])
   const [isPaused, setIsPaused] = useState(false)
   const [speed, setSpeed] = useState(1)
+  const [chaosActive, setChaosActive] = useState(false)
   const [thresholds, setThresholds] = useState(DEFAULT_THRESHOLDS)
   const chaosUntilRef = useRef(0)
+  const chaosTimerRef = useRef(null)
   const latestSampleRef = useRef(history.at(-1))
 
   useEffect(() => {
@@ -39,7 +41,17 @@ export function useMetricStream() {
 
   const activateChaos = useCallback(() => {
     chaosUntilRef.current = Date.now() + CHAOS_DURATION
+    setChaosActive(true)
+    window.clearTimeout(chaosTimerRef.current)
+    chaosTimerRef.current = window.setTimeout(() => setChaosActive(false), CHAOS_DURATION)
   }, [])
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(chaosTimerRef.current)
+    },
+    [],
+  )
 
   return {
     history,
@@ -48,6 +60,7 @@ export function useMetricStream() {
     setIsPaused,
     speed,
     setSpeed,
+    chaosActive,
     thresholds,
     setThresholds,
     activateChaos,

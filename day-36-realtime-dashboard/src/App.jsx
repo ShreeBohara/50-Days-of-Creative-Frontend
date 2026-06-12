@@ -3,6 +3,7 @@ import { AlertLog } from './components/AlertLog'
 import { CapacityGauges } from './components/CapacityGauges'
 import { MetricCard } from './components/MetricCard'
 import { LoadHeatmap } from './components/LoadHeatmap'
+import { StreamControls } from './components/StreamControls'
 import { StreamingChart } from './components/StreamingChart'
 import { METRICS } from './data/metrics'
 import { useMetricStream } from './hooks/useMetricStream'
@@ -43,19 +44,29 @@ function App() {
             </div>
           </div>
 
-          <div className="topbar-status" aria-label="System status">
-            <div>
-              <Server size={15} aria-hidden="true" />
-              <span>US-WEST CLUSTER 04</span>
+          <div className="topbar-right">
+            <div className="topbar-status" aria-label="System status">
+              <div>
+                <Server size={15} aria-hidden="true" />
+                <span>US-WEST CLUSTER 04</span>
+              </div>
+              <div className="connection-state">
+                <CircleDot size={14} aria-hidden="true" />
+                <span>{stream.isPaused ? 'STREAM PAUSED' : 'LIVE STREAM'}</span>
+              </div>
+              <div>
+                <ShieldCheck size={15} aria-hidden="true" />
+                <span>12 SERVICES HEALTHY</span>
+              </div>
             </div>
-            <div className="connection-state">
-              <CircleDot size={14} aria-hidden="true" />
-              <span>{stream.isPaused ? 'STREAM PAUSED' : 'LIVE STREAM'}</span>
-            </div>
-            <div>
-              <ShieldCheck size={15} aria-hidden="true" />
-              <span>12 SERVICES HEALTHY</span>
-            </div>
+            <StreamControls
+              chaosActive={stream.chaosActive}
+              isPaused={stream.isPaused}
+              onChaos={stream.activateChaos}
+              onPauseChange={stream.setIsPaused}
+              onSpeedChange={stream.setSpeed}
+              speed={stream.speed}
+            />
           </div>
         </header>
 

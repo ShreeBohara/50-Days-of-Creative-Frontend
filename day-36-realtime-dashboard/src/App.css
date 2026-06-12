@@ -35,10 +35,16 @@
 
 .brand,
 .brand > div,
+.topbar-right,
 .topbar-status,
 .topbar-status > div {
   display: flex;
   align-items: center;
+}
+
+.topbar-right {
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .brand {
@@ -94,6 +100,70 @@
 .topbar-status .connection-state {
   color: var(--normal);
   border-color: rgba(52, 211, 153, 0.28);
+}
+
+.stream-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.control-button,
+.speed-control {
+  min-height: 34px;
+  color: var(--muted);
+  background: rgba(15, 26, 46, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+}
+
+.control-button {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  transition:
+    color 160ms ease-out,
+    background 160ms ease-out,
+    border-color 160ms ease-out;
+}
+
+.control-button:hover {
+  color: var(--text);
+  background: var(--panel-hover);
+  border-color: var(--border-bright);
+}
+
+.chaos-button {
+  color: var(--warning);
+}
+
+.chaos-button.is-active {
+  color: var(--critical);
+  background: rgba(127, 29, 29, 0.18);
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
+.speed-control {
+  display: grid;
+  grid-template-columns: auto 70px 28px;
+  gap: 6px;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.speed-control input {
+  width: 70px;
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+
+.speed-control output {
+  color: var(--cyan);
+  text-align: right;
 }
 
 .dashboard {
