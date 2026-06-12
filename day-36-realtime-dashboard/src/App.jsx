@@ -1,4 +1,5 @@
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
+import { AlertLog } from './components/AlertLog'
 import { CapacityGauges } from './components/CapacityGauges'
 import { MetricCard } from './components/MetricCard'
 import { LoadHeatmap } from './components/LoadHeatmap'
@@ -84,11 +85,7 @@ function App() {
               title="Alert Log"
               meta="Threshold crossings and incidents"
             >
-              <div className="empty-state">
-                <ShieldCheck size={24} aria-hidden="true" />
-                <strong>No active incidents</strong>
-                <span>Monitoring all six signals</span>
-              </div>
+              <AlertLog alerts={stream.alerts} />
             </Panel>
           </section>
 
