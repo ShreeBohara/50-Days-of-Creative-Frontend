@@ -166,6 +166,216 @@
   text-align: right;
 }
 
+.drawer-backdrop {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(2, 6, 23, 0.68);
+  backdrop-filter: blur(4px);
+  animation: backdrop-enter 180ms ease-out both;
+}
+
+.threshold-drawer {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(440px, 100%);
+  height: 100%;
+  background: #081225;
+  border-left: 1px solid var(--border-bright);
+  box-shadow: -28px 0 80px rgba(0, 0, 0, 0.34);
+  animation: drawer-enter 220ms ease-out both;
+}
+
+.threshold-header,
+.threshold-header > div,
+.threshold-header > div > div {
+  display: flex;
+  align-items: center;
+}
+
+.threshold-header {
+  justify-content: space-between;
+  min-height: 68px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.threshold-header > div {
+  gap: 9px;
+}
+
+.threshold-header > div > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  border-radius: 6px;
+  place-items: center;
+}
+
+.threshold-header > div > div {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.threshold-header h2,
+.threshold-header p {
+  margin: 0;
+}
+
+.threshold-header h2 {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.threshold-header p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.threshold-header button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  place-items: center;
+}
+
+.threshold-drawer form {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+.threshold-columns {
+  display: grid;
+  grid-template-columns: 1fr 84px 84px;
+  gap: 8px;
+  padding: 10px 14px;
+  color: var(--faint);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Fira Code', monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.threshold-list {
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+.threshold-list fieldset {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 84px 84px;
+  gap: 8px;
+  padding: 8px;
+  margin: 0;
+  background: rgba(15, 26, 46, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.threshold-list legend {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  align-self: center;
+  width: 100%;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.threshold-list legend i {
+  width: 6px;
+  height: 6px;
+  background: var(--metric-color);
+  border-radius: 50%;
+}
+
+.threshold-list label span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.threshold-list input {
+  width: 100%;
+  height: 34px;
+  padding: 0 7px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+}
+
+.threshold-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--critical);
+  font-size: 9px;
+}
+
+.threshold-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.drawer-button {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.drawer-button.is-secondary {
+  color: var(--muted);
+  background: transparent;
+}
+
+.drawer-button.is-primary {
+  color: var(--bg);
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+
+@keyframes backdrop-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-enter {
+  from {
+    transform: translateX(24px);
+  }
+}
+
 .dashboard {
   display: grid;
   gap: 10px;

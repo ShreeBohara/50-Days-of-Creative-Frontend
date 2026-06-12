@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
 import { AlertLog } from './components/AlertLog'
 import { CapacityGauges } from './components/CapacityGauges'
 import { MetricCard } from './components/MetricCard'
 import { LoadHeatmap } from './components/LoadHeatmap'
 import { StreamControls } from './components/StreamControls'
+import { ThresholdPanel } from './components/ThresholdPanel'
 import { StreamingChart } from './components/StreamingChart'
 import { METRICS } from './data/metrics'
 import { useMetricStream } from './hooks/useMetricStream'
@@ -26,6 +28,7 @@ function Panel({ className = '', title, meta, children }) {
 function App() {
   const stream = useMetricStream()
   const currentSample = stream.history.at(-1)
+  const [thresholdsOpen, setThresholdsOpen] = useState(false)
 
   return (
     <>
@@ -64,6 +67,7 @@ function App() {
               isPaused={stream.isPaused}
               onChaos={stream.activateChaos}
               onPauseChange={stream.setIsPaused}
+              onOpenThresholds={() => setThresholdsOpen(true)}
               onSpeedChange={stream.setSpeed}
               speed={stream.speed}
             />
@@ -119,6 +123,16 @@ function App() {
           </section>
         </main>
       </div>
+      {thresholdsOpen ? (
+        <ThresholdPanel
+          thresholds={stream.thresholds}
+          onApply={(nextThresholds) => {
+            stream.setThresholds(nextThresholds)
+            setThresholdsOpen(false)
+          }}
+          onClose={() => setThresholdsOpen(false)}
+        />
+      ) : null}
     </>
   )
 }
