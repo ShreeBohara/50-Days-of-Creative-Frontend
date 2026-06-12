@@ -317,41 +317,75 @@
   border-radius: 7px;
 }
 
-.chart-placeholder {
-  position: relative;
-  height: 285px;
-  overflow: hidden;
-  background:
-    linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100% 25%,
-    linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0 / 12.5% 100%;
-  opacity: 0.55;
+.stream-chart-wrap {
+  min-width: 0;
+  padding: 10px 10px 4px;
 }
 
-.chart-placeholder span {
-  position: absolute;
-  inset: auto -2% 20% -2%;
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 8px;
+}
+
+.chart-legend span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  color: var(--muted);
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+}
+
+.chart-legend i {
+  width: 12px;
   height: 2px;
-  background: var(--cyan);
-  transform: rotate(-3deg);
-  transform-origin: center;
+  background: var(--series-color);
+  border-radius: 999px;
 }
 
-.chart-placeholder span:nth-child(2) {
-  bottom: 48%;
-  background: var(--violet);
-  transform: rotate(2deg);
+.stream-chart {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
 }
 
-.chart-placeholder span:nth-child(3) {
-  bottom: 35%;
-  background: var(--normal);
-  transform: rotate(-1deg);
+.chart-grid line {
+  stroke: var(--border);
+  stroke-dasharray: 2 5;
+  stroke-width: 0.8;
 }
 
-.chart-placeholder span:nth-child(4) {
-  bottom: 65%;
-  background: #818cf8;
-  transform: rotate(3deg);
+.chart-axis text {
+  fill: var(--faint);
+  font-family: 'Fira Code', monospace;
+  font-size: 8px;
+  dominant-baseline: middle;
+}
+
+.chart-axis-left text {
+  text-anchor: end;
+}
+
+.chart-axis-right text {
+  text-anchor: start;
+}
+
+.chart-axis-bottom text {
+  text-anchor: middle;
+}
+
+.stream-line {
+  fill: none;
+  stroke: var(--series-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
 }
 
 .empty-state {

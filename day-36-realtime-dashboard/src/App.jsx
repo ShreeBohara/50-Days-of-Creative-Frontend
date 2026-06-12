@@ -1,5 +1,6 @@
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
 import { MetricCard } from './components/MetricCard'
+import { StreamingChart } from './components/StreamingChart'
 import { METRICS } from './data/metrics'
 import { useMetricStream } from './hooks/useMetricStream'
 import './App.css'
@@ -72,12 +73,7 @@ function App() {
               title="Traffic Stream"
               meta="Rolling 200-sample telemetry window"
             >
-              <div className="panel-placeholder chart-placeholder" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+              <StreamingChart history={stream.history} />
             </Panel>
 
             <Panel
