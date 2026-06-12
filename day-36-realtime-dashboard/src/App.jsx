@@ -1,4 +1,5 @@
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
+import { CapacityGauges } from './components/CapacityGauges'
 import { MetricCard } from './components/MetricCard'
 import { LoadHeatmap } from './components/LoadHeatmap'
 import { StreamingChart } from './components/StreamingChart'
@@ -22,6 +23,7 @@ function Panel({ className = '', title, meta, children }) {
 
 function App() {
   const stream = useMetricStream()
+  const currentSample = stream.history.at(-1)
 
   return (
     <>
@@ -104,11 +106,7 @@ function App() {
               title="Capacity Gauges"
               meta="Core resource saturation"
             >
-              <div className="gauge-placeholder" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+              <CapacityGauges sample={currentSample} thresholds={stream.thresholds} />
             </Panel>
           </section>
         </main>
