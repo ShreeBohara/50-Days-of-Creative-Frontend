@@ -331,13 +331,33 @@
   padding: 0 8px;
 }
 
-.chart-legend span {
+.chart-legend button {
   display: inline-flex;
   gap: 5px;
   align-items: center;
+  min-height: 27px;
+  padding: 0 7px;
   color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
   font-family: 'Fira Code', monospace;
   font-size: 9px;
+  opacity: 0.48;
+  transition:
+    opacity 160ms ease-out,
+    background 160ms ease-out,
+    border-color 160ms ease-out;
+}
+
+.chart-legend button:hover,
+.chart-legend button.is-visible {
+  opacity: 1;
+}
+
+.chart-legend button.is-visible {
+  background: rgba(30, 45, 72, 0.32);
+  border-color: var(--border);
 }
 
 .chart-legend i {
@@ -352,6 +372,12 @@
   width: 100%;
   min-width: 620px;
   height: auto;
+}
+
+.stream-chart-scroll {
+  overflow-x: auto;
+  scrollbar-color: var(--border-bright) transparent;
+  scrollbar-width: thin;
 }
 
 .chart-grid line {
@@ -386,6 +412,54 @@
   stroke-linejoin: round;
   stroke-width: 1.8;
   vector-effect: non-scaling-stroke;
+}
+
+.chart-hit-area {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.chart-crosshair line {
+  stroke: #cbd5e1;
+  stroke-dasharray: 3 3;
+  stroke-width: 0.8;
+}
+
+.chart-crosshair circle {
+  fill: var(--panel);
+  stroke: var(--series-color);
+  stroke-width: 1.5;
+}
+
+.chart-tooltip {
+  pointer-events: none;
+}
+
+.chart-tooltip > rect {
+  fill: rgba(2, 6, 23, 0.94);
+  stroke: var(--border-bright);
+  stroke-width: 0.8;
+}
+
+.chart-tooltip text {
+  fill: var(--muted);
+  font-family: 'Fira Code', monospace;
+  font-size: 7px;
+}
+
+.chart-tooltip .tooltip-time {
+  fill: var(--text);
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.chart-tooltip circle {
+  fill: var(--series-color);
+}
+
+.chart-tooltip .tooltip-value {
+  fill: var(--text);
+  text-anchor: end;
 }
 
 .empty-state {
