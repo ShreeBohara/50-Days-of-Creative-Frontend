@@ -1,5 +1,6 @@
 import { Activity, CircleDot, Server, ShieldCheck } from 'lucide-react'
 import { MetricCard } from './components/MetricCard'
+import { LoadHeatmap } from './components/LoadHeatmap'
 import { StreamingChart } from './components/StreamingChart'
 import { METRICS } from './data/metrics'
 import { useMetricStream } from './hooks/useMetricStream'
@@ -95,7 +96,7 @@ function App() {
               title="Historical Load"
               meta="Hourly utilization across the last seven days"
             >
-              <div className="panel-placeholder heatmap-placeholder" aria-hidden="true"></div>
+              <LoadHeatmap />
             </Panel>
 
             <Panel
