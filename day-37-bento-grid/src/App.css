@@ -709,6 +709,228 @@
   70% { opacity: 0; transform: translateY(180px); }
 }
 
+.github-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.github-topline,
+.commit-total span,
+.github-footer,
+.spotify-card,
+.player-controls,
+.track-time {
+  display: flex;
+  align-items: center;
+}
+
+.github-topline {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.github-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--signal-ink);
+  border-radius: 12px;
+  background: var(--signal);
+}
+
+.github-topline a {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.commit-total span {
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.commit-total strong {
+  display: block;
+  margin-top: 5px;
+  font-family: 'Archivo', sans-serif;
+  font-size: clamp(3.2rem, 5vw, 5.2rem);
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+}
+
+.commit-total em {
+  color: var(--signal);
+  font-style: normal;
+}
+
+.heatmap {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.heatmap span {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: rgba(183, 255, 60, 0.06);
+}
+
+.heatmap span[data-level='1'] { background: rgba(183, 255, 60, 0.18); }
+.heatmap span[data-level='2'] { background: rgba(183, 255, 60, 0.36); }
+.heatmap span[data-level='3'] { background: rgba(183, 255, 60, 0.62); }
+.heatmap span[data-level='4'] { background: var(--signal); }
+
+.github-footer {
+  gap: 16px;
+  color: var(--faint);
+  font-size: 0.62rem;
+}
+
+.github-footer strong {
+  color: var(--ink);
+}
+
+.spotify-card {
+  position: relative;
+  gap: 20px;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(94, 234, 212, 0.15), transparent 16rem),
+    var(--card);
+}
+
+.album-art {
+  position: relative;
+  display: grid;
+  flex: 0 0 132px;
+  aspect-ratio: 1;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 19px;
+  background:
+    repeating-radial-gradient(circle, transparent 0 7px, rgba(183, 255, 60, 0.17) 8px 9px),
+    #10241d;
+}
+
+.album-ring {
+  position: absolute;
+  width: 76%;
+  aspect-ratio: 1;
+  border: 1px solid var(--signal);
+  border-radius: 50%;
+  animation: album-spin 8s linear infinite;
+}
+
+.album-ring::before {
+  position: absolute;
+  top: -3px;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--signal);
+  content: '';
+}
+
+.album-core {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 42px;
+  aspect-ratio: 1;
+  place-items: center;
+  color: var(--signal-ink);
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.now-playing {
+  flex: 1;
+  min-width: 0;
+}
+
+.now-playing strong {
+  display: block;
+  overflow: hidden;
+  margin: 11px 0 2px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 1.55rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.now-playing p {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.track-progress {
+  height: 3px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--line);
+}
+
+.track-progress span {
+  display: block;
+  width: 48%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--signal);
+}
+
+.track-time {
+  justify-content: space-between;
+  margin-top: 6px;
+  color: var(--faint);
+  font-size: 0.55rem;
+}
+
+.player-controls {
+  gap: 8px;
+  color: var(--muted);
+}
+
+.player-controls span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--signal-ink);
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.audio-bars {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  display: flex;
+  gap: 2px;
+  align-items: end;
+  height: 18px;
+}
+
+.audio-bars span {
+  width: 2px;
+  height: calc(4px + (var(--bar) % 5) * 3px);
+  border-radius: 99px;
+  background: var(--cyan);
+  animation: audio-jump calc(500ms + var(--bar) * 40ms) ease-in-out infinite alternate;
+}
+
+@keyframes album-spin { to { transform: rotate(360deg); } }
+@keyframes audio-jump { to { height: calc(18px - (var(--bar) % 3) * 2px); } }
+
 @media (max-width: 1020px) {
   .bento-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

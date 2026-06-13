@@ -1,8 +1,10 @@
 import BentoCard from './components/BentoCard'
 import ClockCard from './components/ClockCard'
 import FeaturedProjectCard from './components/FeaturedProjectCard'
+import GithubCard from './components/GithubCard'
 import LocationCard from './components/LocationCard'
 import NameCard from './components/NameCard'
+import SpotifyCard from './components/SpotifyCard'
 import TechStackCard from './components/TechStackCard'
 import { cardLabels, identity } from './data/portfolioData'
 import './App.css'
@@ -42,9 +44,11 @@ function App() {
           <NameCard />
           <ClockCard />
           <FeaturedProjectCard />
+          <GithubCard />
           <LocationCard />
+          <SpotifyCard />
           <TechStackCard />
-          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'featured', 'location', 'stack'].includes(area)).map((area, index) => (
+          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'featured', 'github', 'location', 'spotify', 'stack'].includes(area)).map((area, index) => (
             <PlaceholderCard area={area} index={index + 1} key={area} />
           ))}
         </section>
