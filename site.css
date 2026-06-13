@@ -22,6 +22,7 @@
   --day32: #facc15;
   --day33: #2563eb;
   --day34: #38bdf8;
+  --day37: #b7ff3c;
 }
 
 * {
@@ -133,6 +134,7 @@ a { color: inherit; }
 .project-card[data-day="32"]:hover { border-left-color: var(--day32); }
 .project-card[data-day="33"]:hover { border-left-color: var(--day33); }
 .project-card[data-day="34"]:hover { border-left-color: var(--day34); }
+.project-card[data-day="37"]:hover { border-left-color: var(--day37); }
 
 .card-num {
   font-size: 0.72rem;

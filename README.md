@@ -44,6 +44,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 34 | Procedural Planet | React Three Fiber planet generator with shader terrain, atmosphere, procedural clouds, city lights, and sun controls. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-34-procedural-planet/) | [day-34-procedural-planet](./day-34-procedural-planet/) |
 | 35 | Animated Pricing Page | HelioStack pricing page with GSAP Flip plan morphs, rolling prices, add-ons, currency conversion, comparison matrix, and FAQ. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-35-pricing-page/) | [day-35-pricing-page](./day-35-pricing-page/) |
 | 36 | PulseGrid Real-Time Dashboard | Infrastructure command center with simulated streaming telemetry, D3 charts, gauges, heatmap, incident alerts, and configurable thresholds. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-36-realtime-dashboard/) | [day-36-realtime-dashboard](./day-36-realtime-dashboard/) |
+| 37 | Animated Bento Grid Portfolio | Creative operating-system portfolio with twelve interactive modules, a live clock, project modal, GitHub heatmap, synthetic portrait, and persisted themes. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-37-bento-grid/) | [day-37-bento-grid](./day-37-bento-grid/) |
 
 ## Adding a New Day
 

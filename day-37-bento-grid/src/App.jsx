@@ -35,16 +35,16 @@ function App() {
         <section className="bento-grid" aria-label="Interactive portfolio modules">
           <NameCard />
           <ClockCard />
-          <ContactCard />
-          <ExperienceCard />
-          <FeaturedProjectCard />
-          <GithubCard />
-          <LocationCard />
-          <PhotoCard />
-          <QuoteCard />
-          <SpotifyCard />
-          <TechStackCard />
           <ThemeCard />
+          <FeaturedProjectCard />
+          <TechStackCard />
+          <LocationCard />
+          <GithubCard />
+          <ExperienceCard />
+          <SpotifyCard />
+          <QuoteCard />
+          <PhotoCard />
+          <ContactCard />
         </section>
       </main>
     </div>

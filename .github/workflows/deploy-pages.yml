@@ -43,6 +43,7 @@ on:
       - "day-34-procedural-planet/**"
       - "day-35-pricing-page/**"
       - "day-36-realtime-dashboard/**"
+      - "day-37-bento-grid/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -89,6 +90,7 @@ jobs:
             day-34-procedural-planet/package-lock.json
             day-35-pricing-page/package-lock.json
             day-36-realtime-dashboard/package-lock.json
+            day-37-bento-grid/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -226,6 +228,14 @@ jobs:
         working-directory: day-36-realtime-dashboard
         run: npm run build
 
+      - name: Install Day 37 app dependencies
+        working-directory: day-37-bento-grid
+        run: npm ci
+
+      - name: Build Day 37 app
+        working-directory: day-37-bento-grid
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -286,6 +296,8 @@ jobs:
           cp -R day-35-pricing-page/dist/. _site/day-35-pricing-page/
           mkdir -p _site/day-36-realtime-dashboard
           cp -R day-36-realtime-dashboard/dist/. _site/day-36-realtime-dashboard/
+          mkdir -p _site/day-37-bento-grid
+          cp -R day-37-bento-grid/dist/. _site/day-37-bento-grid/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

@@ -1,7 +1,7 @@
 import { ScanFace } from 'lucide-react'
 import BentoCard from './BentoCard'
 import { useTilt } from '../hooks/useTilt'
-import portrait from '../assets/editorial-portrait.png'
+import portrait from '../assets/editorial-portrait.jpg'
 
 function PhotoCard() {
   const tilt = useTilt(13)

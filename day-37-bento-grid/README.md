@@ -1,16 +1,49 @@
-# React + Vite
+# Day 37 - Animated Bento Grid Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A privacy-conscious, Shree-inspired creative developer portfolio arranged as a twelve-module bento grid. Every card has its own interaction language, from a live analog clock and generated contribution heatmap to an accessible project modal and pointer-driven editorial portrait.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Explicit asymmetric four-column bento grid with tablet and mobile layouts.
+- Animated identity card, live Pacific-time analog clock, and fictional map location.
+- Official technology icons with individual wobble interactions.
+- Featured 50 Days project preview with a keyboard-managed details modal.
+- Deterministic GitHub activity heatmap and animated commit count.
+- Fictional Spotify now-playing module with progress and visualizer animations.
+- Rotating original quotes and a privacy-safe synthetic editorial portrait.
+- Creative-experience timeline and GitHub contact CTA.
+- Persisted system-aware light/dark mode.
+- Staggered entry choreography, unique card hovers, touch handling, and reduced-motion support.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite
+- Framer Motion
+- Lucide React and React Icons
+- CSS Grid and plain CSS
 
-## Expanding the ESLint configuration
+## Design System
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Token | Dark | Light |
+| --- | --- | --- |
+| Page | `#08110f` | `#edf2e8` |
+| Card | `#111e1a` | `#f8fbf5` |
+| Text | `#f8fafc` | `#142019` |
+| Signal | `#b7ff3c` | `#77c913` |
+| Typography | Archivo + Space Grotesk | Archivo + Space Grotesk |
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+## Verify
+
+```bash
+npm run lint
+npm run build
+```
+
+The production build is configured for GitHub Pages at `/50-Days-of-Creative-Frontend/day-37-bento-grid/`.
