@@ -1,4 +1,5 @@
 import BentoCard from './components/BentoCard'
+import NameCard from './components/NameCard'
 import { cardLabels, identity } from './data/portfolioData'
 import './App.css'
 
@@ -34,7 +35,8 @@ function App() {
           <p>12 live modules / Pacific time</p>
         </div>
         <section className="bento-grid" aria-label="Interactive portfolio modules">
-          {Object.keys(cardLabels).map((area, index) => (
+          <NameCard />
+          {Object.keys(cardLabels).filter((area) => area !== 'name').map((area, index) => (
             <PlaceholderCard area={area} index={index + 1} key={area} />
           ))}
         </section>

@@ -150,6 +150,88 @@
   color: var(--muted);
 }
 
+.name-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 260px;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(183, 255, 60, 0.14), transparent 16rem),
+    var(--card-strong);
+}
+
+.name-topline,
+.name-link,
+.eyebrow {
+  display: flex;
+  align-items: center;
+}
+
+.name-topline {
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.eyebrow {
+  gap: 7px;
+}
+
+.name-availability {
+  color: var(--faint);
+  font-size: 0.7rem;
+}
+
+.name-copy h1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.25em;
+  max-width: 720px;
+  margin: 26px 0 12px;
+  font-family: 'Archivo', sans-serif;
+  font-size: clamp(3.1rem, 7vw, 6.8rem);
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+}
+
+.name-copy h1 span {
+  color: transparent;
+  background: linear-gradient(110deg, var(--ink) 10%, var(--signal) 50%, var(--cyan) 90%);
+  background-size: 180% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: name-gradient 7s ease-in-out infinite alternate;
+}
+
+.name-copy p {
+  max-width: 520px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.name-link {
+  align-self: flex-start;
+  gap: 7px;
+  margin-top: 24px;
+  color: var(--signal);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.name-link svg {
+  transition: transform 200ms ease;
+}
+
+.name-link:hover svg {
+  transform: translate(3px, -3px);
+}
+
+@keyframes name-gradient {
+  to { background-position: 100% 50%; }
+}
+
 @media (max-width: 1020px) {
   .bento-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
