@@ -232,6 +232,165 @@
   to { background-position: 100% 50%; }
 }
 
+.clock-card {
+  display: grid;
+  place-items: center;
+  background: var(--card-soft);
+}
+
+.clock-heading {
+  position: absolute;
+  top: 20px;
+  left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.clock-heading strong {
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.clock-face {
+  position: relative;
+  width: 130px;
+  aspect-ratio: 1;
+  margin-top: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--card-strong) 0 48%, transparent 49%),
+    rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 0 28px rgba(183, 255, 60, 0.05);
+}
+
+.clock-tick {
+  position: absolute;
+  top: 7px;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--faint);
+  transform: rotate(calc(var(--tick) * 30deg));
+  transform-origin: 1px 58px;
+}
+
+.clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: calc(50% - 1px);
+  width: 2px;
+  border-radius: 99px;
+  background: var(--ink);
+  transform-origin: bottom center;
+}
+
+.clock-hour { height: 31px; }
+.clock-minute { height: 43px; background: var(--muted); }
+.clock-second { width: 1px; height: 48px; background: var(--signal); }
+
+.clock-pin {
+  position: absolute;
+  top: calc(50% - 4px);
+  left: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--card);
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.location-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: #0a1512;
+}
+
+.map-grid {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(183, 255, 60, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(183, 255, 60, 0.05) 1px, transparent 1px);
+  background-size: 25px 25px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+.map-road {
+  position: absolute;
+  width: 160%;
+  height: 1px;
+  background: rgba(226, 232, 240, 0.18);
+  transform-origin: left;
+}
+
+.map-road-one { top: 24%; left: -10%; transform: rotate(22deg); }
+.map-road-two { top: 62%; left: -14%; transform: rotate(-15deg); }
+.map-road-three { top: 8%; left: 47%; transform: rotate(72deg); }
+
+.map-coast {
+  position: absolute;
+  top: -30%;
+  right: -28%;
+  width: 64%;
+  height: 150%;
+  border-left: 2px solid rgba(94, 234, 212, 0.25);
+  border-radius: 50%;
+  background: rgba(94, 234, 212, 0.035);
+  transform: rotate(8deg);
+}
+
+.map-pin {
+  position: absolute;
+  top: 34%;
+  left: 52%;
+  color: var(--signal);
+  filter: drop-shadow(0 0 10px rgba(183, 255, 60, 0.5));
+  animation: map-float 2.2s ease-in-out infinite;
+}
+
+.map-pulse {
+  position: absolute;
+  top: calc(34% + 16px);
+  left: calc(52% + 8px);
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--signal);
+  border-radius: 50%;
+  animation: map-pulse 2s ease-out infinite;
+}
+
+.location-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.location-copy strong {
+  display: block;
+  margin: 8px 0;
+  font-family: 'Archivo', sans-serif;
+  font-size: 1.45rem;
+}
+
+.location-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+@keyframes map-float {
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes map-pulse {
+  to { opacity: 0; transform: scale(7); }
+}
+
 @media (max-width: 1020px) {
   .bento-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
