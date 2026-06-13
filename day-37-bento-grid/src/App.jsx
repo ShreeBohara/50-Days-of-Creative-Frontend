@@ -1,5 +1,6 @@
 import BentoCard from './components/BentoCard'
 import ClockCard from './components/ClockCard'
+import FeaturedProjectCard from './components/FeaturedProjectCard'
 import LocationCard from './components/LocationCard'
 import NameCard from './components/NameCard'
 import TechStackCard from './components/TechStackCard'
@@ -40,9 +41,10 @@ function App() {
         <section className="bento-grid" aria-label="Interactive portfolio modules">
           <NameCard />
           <ClockCard />
+          <FeaturedProjectCard />
           <LocationCard />
           <TechStackCard />
-          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'location', 'stack'].includes(area)).map((area, index) => (
+          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'featured', 'location', 'stack'].includes(area)).map((area, index) => (
             <PlaceholderCard area={area} index={index + 1} key={area} />
           ))}
         </section>
