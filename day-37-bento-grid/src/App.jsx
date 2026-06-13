@@ -2,6 +2,7 @@ import BentoCard from './components/BentoCard'
 import ClockCard from './components/ClockCard'
 import LocationCard from './components/LocationCard'
 import NameCard from './components/NameCard'
+import TechStackCard from './components/TechStackCard'
 import { cardLabels, identity } from './data/portfolioData'
 import './App.css'
 
@@ -40,7 +41,8 @@ function App() {
           <NameCard />
           <ClockCard />
           <LocationCard />
-          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'location'].includes(area)).map((area, index) => (
+          <TechStackCard />
+          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'location', 'stack'].includes(area)).map((area, index) => (
             <PlaceholderCard area={area} index={index + 1} key={area} />
           ))}
         </section>

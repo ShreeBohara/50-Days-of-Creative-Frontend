@@ -391,6 +391,63 @@
   to { opacity: 0; transform: scale(7); }
 }
 
+.stack-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.stack-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stack-heading strong {
+  color: var(--signal);
+  font-family: 'Archivo', sans-serif;
+  font-size: 0.75rem;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.tech-item {
+  display: grid;
+  min-width: 0;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.tech-item:hover {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tech-item svg {
+  width: clamp(21px, 2.2vw, 29px);
+  height: clamp(21px, 2.2vw, 29px);
+  filter: saturate(0.82);
+}
+
+.tech-item span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 @media (max-width: 1020px) {
   .bento-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
