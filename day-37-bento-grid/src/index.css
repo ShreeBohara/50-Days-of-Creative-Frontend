@@ -25,6 +25,25 @@
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
 }
 
+:root[data-theme='light'] {
+  color-scheme: light;
+  --page: #edf2e8;
+  --page-soft: #e3eadc;
+  --card: #f8fbf5;
+  --card-strong: #ffffff;
+  --card-soft: #eef4ea;
+  --line: rgba(30, 41, 35, 0.13);
+  --line-strong: rgba(30, 41, 35, 0.24);
+  --ink: #142019;
+  --muted: #50635a;
+  --faint: #718077;
+  --signal: #77c913;
+  --signal-ink: #142400;
+  --cyan: #0f9487;
+  --orange: #d75d11;
+  --shadow: 0 22px 60px rgba(35, 57, 42, 0.1);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -44,6 +63,7 @@ body {
     radial-gradient(circle at 12% 8%, rgba(183, 255, 60, 0.09), transparent 26rem),
     radial-gradient(circle at 86% 18%, rgba(94, 234, 212, 0.08), transparent 30rem),
     var(--page);
+  transition: color 260ms ease, background-color 260ms ease;
 }
 
 button,

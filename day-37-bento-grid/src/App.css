@@ -105,6 +105,7 @@
     linear-gradient(145deg, rgba(255, 255, 255, 0.025), transparent 42%),
     var(--card);
   box-shadow: var(--shadow);
+  transition: color 260ms ease, border-color 260ms ease, background-color 260ms ease, box-shadow 260ms ease;
 }
 
 .bento-card::after {
@@ -1191,6 +1192,79 @@
   right: 24%;
   width: 120px;
   height: 120px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
+  color: var(--ink);
+  text-align: left;
+  background: var(--card-soft);
+}
+
+.theme-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.theme-heading strong {
+  color: var(--signal);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.theme-orbit {
+  position: relative;
+  display: grid;
+  width: 112px;
+  height: 74px;
+  margin: 12px auto;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 0 24px rgba(183, 255, 60, 0.06);
+}
+
+.theme-sun,
+.theme-moon {
+  position: absolute;
+  display: grid;
+  place-items: center;
+}
+
+.theme-sun { color: var(--signal); }
+.theme-moon { color: var(--cyan); }
+
+.theme-hint {
+  color: var(--faint);
+  font-size: 0.62rem;
+  text-align: center;
+}
+
+:root[data-theme='light'] .name-card,
+:root[data-theme='light'] .featured-card,
+:root[data-theme='light'] .contact-card,
+:root[data-theme='light'] .project-modal {
+  background-color: var(--card-strong);
+}
+
+:root[data-theme='light'] .location-card,
+:root[data-theme='light'] .project-browser {
+  background-color: #17231e;
+}
+
+:root[data-theme='light'] .modal-backdrop {
+  background: rgba(224, 235, 226, 0.8);
+}
+
+:root[data-theme='light'] .quote-card {
+  background: var(--signal);
 }
 
 @media (max-width: 1020px) {

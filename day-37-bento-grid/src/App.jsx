@@ -1,4 +1,3 @@
-import BentoCard from './components/BentoCard'
 import ClockCard from './components/ClockCard'
 import ContactCard from './components/ContactCard'
 import ExperienceCard from './components/ExperienceCard'
@@ -10,20 +9,9 @@ import PhotoCard from './components/PhotoCard'
 import QuoteCard from './components/QuoteCard'
 import SpotifyCard from './components/SpotifyCard'
 import TechStackCard from './components/TechStackCard'
-import { cardLabels, identity } from './data/portfolioData'
+import ThemeCard from './components/ThemeCard'
+import { identity } from './data/portfolioData'
 import './App.css'
-
-function PlaceholderCard({ area, index }) {
-  return (
-    <BentoCard area={area} className="placeholder-card" label={cardLabels[area]}>
-      <span className="card-index">0{index}</span>
-      <div>
-        <span className="eyebrow">{cardLabels[area]}</span>
-        <p>Interactive module loading.</p>
-      </div>
-    </BentoCard>
-  )
-}
 
 function App() {
   return (
@@ -56,9 +44,7 @@ function App() {
           <QuoteCard />
           <SpotifyCard />
           <TechStackCard />
-          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'contact', 'experience', 'featured', 'github', 'location', 'photo', 'quote', 'spotify', 'stack'].includes(area)).map((area, index) => (
-            <PlaceholderCard area={area} index={index + 1} key={area} />
-          ))}
+          <ThemeCard />
         </section>
       </main>
     </div>
