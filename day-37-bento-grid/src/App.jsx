@@ -4,6 +4,8 @@ import FeaturedProjectCard from './components/FeaturedProjectCard'
 import GithubCard from './components/GithubCard'
 import LocationCard from './components/LocationCard'
 import NameCard from './components/NameCard'
+import PhotoCard from './components/PhotoCard'
+import QuoteCard from './components/QuoteCard'
 import SpotifyCard from './components/SpotifyCard'
 import TechStackCard from './components/TechStackCard'
 import { cardLabels, identity } from './data/portfolioData'
@@ -46,9 +48,11 @@ function App() {
           <FeaturedProjectCard />
           <GithubCard />
           <LocationCard />
+          <PhotoCard />
+          <QuoteCard />
           <SpotifyCard />
           <TechStackCard />
-          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'featured', 'github', 'location', 'spotify', 'stack'].includes(area)).map((area, index) => (
+          {Object.keys(cardLabels).filter((area) => !['name', 'clock', 'featured', 'github', 'location', 'photo', 'quote', 'spotify', 'stack'].includes(area)).map((area, index) => (
             <PlaceholderCard area={area} index={index + 1} key={area} />
           ))}
         </section>
