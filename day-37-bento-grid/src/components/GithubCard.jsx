@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { GitCommitHorizontal, Github } from 'lucide-react'
+import { GitCommitHorizontal } from 'lucide-react'
+import { SiGithub } from 'react-icons/si'
 import BentoCard from './BentoCard'
 import { githubStats, links } from '../data/portfolioData'
 
@@ -27,7 +28,7 @@ function GithubCard() {
   return (
     <BentoCard area="github" className="github-card" label={`${githubStats.commits} GitHub commits`}>
       <div className="github-topline">
-        <span className="github-icon"><Github size={21} aria-hidden="true" /></span>
+        <span className="github-icon"><SiGithub size={21} aria-hidden="true" /></span>
         <a href={links.github} target="_blank" rel="noreferrer">@ShreeBohara</a>
       </div>
       <div className="commit-total">

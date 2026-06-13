@@ -1373,6 +1373,14 @@
       'quote photo'
       'contact contact';
   }
+
+  .featured-card {
+    min-height: 420px;
+  }
+
+  .experience-card {
+    min-height: 400px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1382,6 +1390,15 @@
 
   .modal-copy {
     padding: 10px 6px 12px;
+  }
+
+  .modal-backdrop {
+    align-items: start;
+    padding: 12px;
+  }
+
+  .modal-visual {
+    min-height: 220px;
   }
 }
 
@@ -1410,5 +1427,94 @@
 
   .bento-card {
     min-height: 210px;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .name-card {
+    min-height: 340px;
+  }
+
+  .name-topline,
+  .contact-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .name-availability {
+    display: none;
+  }
+
+  .name-copy h1 {
+    font-size: clamp(3.5rem, 20vw, 5.4rem);
+  }
+
+  .featured-card {
+    min-height: 430px;
+  }
+
+  .featured-card > .project-visual {
+    right: -20%;
+    bottom: -8%;
+    width: 92%;
+  }
+
+  .spotify-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .album-art {
+    flex-basis: 108px;
+  }
+
+  .player-controls {
+    position: absolute;
+    right: 18px;
+    bottom: 16px;
+  }
+
+  .audio-bars {
+    display: none;
+  }
+
+  .contact-card {
+    justify-content: space-between;
+    min-height: 300px;
+  }
+
+  .contact-copy h2 {
+    font-size: clamp(2.7rem, 13vw, 4rem);
+  }
+
+  .project-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (hover: none) {
+  .bento-card:hover::before {
+    opacity: 0;
+  }
+
+  .featured-card:hover .project-browser,
+  .spotify-card:hover .album-art,
+  .quote-card:hover blockquote {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .photo-frame {
+    transform: none !important;
   }
 }

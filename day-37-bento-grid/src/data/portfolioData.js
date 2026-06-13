@@ -1,5 +1,5 @@
 import {
-  SiCss3,
+  SiCss,
   SiFigma,
   SiFramer,
   SiGithub,
@@ -36,7 +36,7 @@ export const featuredProject = {
 export const technologies = [
   { name: 'React', icon: SiReact, color: '#61dafb' },
   { name: 'JavaScript', icon: SiJavascript, color: '#f7df1e' },
-  { name: 'CSS', icon: SiCss3, color: '#1572b6' },
+  { name: 'CSS', icon: SiCss, color: '#1572b6' },
   { name: 'Framer', icon: SiFramer, color: '#a78bfa' },
   { name: 'Three.js', icon: SiThreedotjs, color: '#f8fafc' },
   { name: 'Vite', icon: SiVite, color: '#fbbf24' },
