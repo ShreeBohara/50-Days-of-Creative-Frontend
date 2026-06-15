@@ -10,9 +10,15 @@ const COLORS = {
   weightMark: '#8196a5',
   start: '#22c55e',
   end: '#f05252',
-  visited: '#5c6ff5',
+  visitedStart: [168, 85, 247],
+  visitedEnd: [56, 189, 248],
   path: '#f8c44f',
   cursor: '#f4f8fb',
+}
+
+function mixRgb(start, end, progress) {
+  const values = start.map((value, index) => Math.round(value + ((end[index] - value) * progress)))
+  return `rgb(${values.join(' ')})`
 }
 
 function roundedRect(context, x, y, width, height, radius) {
@@ -59,6 +65,7 @@ function GridCanvas({
   label = 'Pathfinding terrain grid',
   onApplyCell,
   disabled = false,
+  isAnimating = false,
 }) {
   const canvasRef = useRef(null)
   const frameRef = useRef(0)
@@ -114,10 +121,30 @@ function GridCanvas({
           }
 
           if (visited.has(key)) {
-            context.fillStyle = COLORS.visited
-            context.globalAlpha = 0.78
-            context.fillRect(left + inset, top + inset, cellWidth - (inset * 2), cellHeight - (inset * 2))
+            const order = visited.get(key) ?? 0
+            const progress = order / Math.max(1, visited.size - 1)
+            context.fillStyle = mixRgb(COLORS.visitedStart, COLORS.visitedEnd, progress)
+            context.globalAlpha = 0.8
+            roundedRect(context, left + inset, top + inset, cellWidth - (inset * 2), cellHeight - (inset * 2), 2)
+            context.fill()
             context.globalAlpha = 1
+
+            if (isAnimating && order >= visited.size - 5) {
+              const pulse = ((performance.now() / 420) + ((visited.size - order) * 0.13)) % 1
+              context.strokeStyle = mixRgb(COLORS.visitedEnd, [244, 248, 251], pulse)
+              context.globalAlpha = 1 - pulse
+              context.lineWidth = Math.max(1, Math.min(cellWidth, cellHeight) * 0.1)
+              context.beginPath()
+              context.arc(
+                left + (cellWidth / 2),
+                top + (cellHeight / 2),
+                Math.max(1, pulse * Math.min(cellWidth, cellHeight) * 0.65),
+                0,
+                Math.PI * 2,
+              )
+              context.stroke()
+              context.globalAlpha = 1
+            }
           }
 
           if (path.has(key)) {
@@ -160,6 +187,10 @@ function GridCanvas({
           cellHeight - 2,
         )
       }
+
+      if (isAnimating) {
+        frameRef.current = requestAnimationFrame(render)
+      }
     }
 
     const scheduleRender = () => {
@@ -173,7 +204,7 @@ function GridCanvas({
       observer.disconnect()
       cancelAnimationFrame(frameRef.current)
     }
-  }, [cursor, keyboardCursor, path, terrain, visited])
+  }, [cursor, isAnimating, keyboardCursor, path, terrain, visited])
 
   const cellFromPointer = (event) => {
     const rect = canvasRef.current.getBoundingClientRect()

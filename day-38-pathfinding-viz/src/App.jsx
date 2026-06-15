@@ -75,6 +75,7 @@ function RoutePanel({
           terrain={terrain}
           onApplyCell={onApplyCell}
           disabled={visualizer.isRunning}
+          isAnimating={visualizer.isRunning}
           path={visualizer.path}
           visited={visualizer.visited}
         />
