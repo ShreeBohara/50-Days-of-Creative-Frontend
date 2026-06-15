@@ -275,7 +275,8 @@ kbd {
   border-radius: 9px;
 }
 
-.preset-control select {
+.preset-control select,
+.maze-control select {
   min-height: 40px;
   padding: 0 12px;
   color: var(--muted);

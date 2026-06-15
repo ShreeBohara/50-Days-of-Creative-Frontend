@@ -14,6 +14,7 @@ import GridCanvas from './components/GridCanvas'
 import { applyTool, createTerrain, GRID_PRESETS } from './data/grid'
 import { ALGORITHMS } from './algorithms/pathfinding'
 import { useVisualizer } from './hooks/useVisualizer'
+import { generateMaze, MAZE_TYPES } from './data/mazes'
 import './App.css'
 
 const TOOLS = [
@@ -102,6 +103,7 @@ function App() {
   const [speed, setSpeed] = useState(12)
   const [primaryAlgorithm, setPrimaryAlgorithm] = useState('astar-manhattan')
   const [secondaryAlgorithm, setSecondaryAlgorithm] = useState('dijkstra')
+  const [mazeType, setMazeType] = useState('random')
   const primaryVisualizer = useVisualizer(terrain, primaryAlgorithm, speed)
   const secondaryVisualizer = useVisualizer(terrain, secondaryAlgorithm, speed)
   const isRunning = primaryVisualizer.isRunning || secondaryVisualizer.isRunning
@@ -118,6 +120,12 @@ function App() {
     setTerrain((current) => applyTool(current, x, y, tool))
     primaryVisualizer.reset()
     secondaryVisualizer.reset()
+  }
+
+  const handleGenerateMaze = () => {
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
+    setTerrain((current) => generateMaze(current, mazeType))
   }
 
   return (
@@ -170,7 +178,15 @@ function App() {
           </div>
 
           <div className="control-group action-group">
-            <button className="control-button" type="button">
+            <label className="maze-control">
+              <span className="sr-only">Maze generator</span>
+              <select value={mazeType} onChange={(event) => setMazeType(event.target.value)}>
+                {MAZE_TYPES.map((maze) => (
+                  <option value={maze.id} key={maze.id}>{maze.label}</option>
+                ))}
+              </select>
+            </label>
+            <button className="control-button" disabled={isRunning} onClick={handleGenerateMaze} type="button">
               <Sparkles aria-hidden="true" />
               Generate maze
             </button>
