@@ -1,5 +1,5 @@
-import { memo, useEffect, useRef } from 'react'
-import { CELL, cellIndex, cellKey } from '../data/grid'
+import { memo, useEffect, useRef, useState } from 'react'
+import { CELL, cellIndex, cellKey, interpolateCells } from '../data/grid'
 
 const COLORS = {
   empty: '#0a1721',
@@ -57,9 +57,14 @@ function GridCanvas({
   path = new Set(),
   cursor = null,
   label = 'Pathfinding terrain grid',
+  onApplyCell,
+  disabled = false,
 }) {
   const canvasRef = useRef(null)
   const frameRef = useRef(0)
+  const drawingRef = useRef(false)
+  const lastCellRef = useRef(null)
+  const [keyboardCursor, setKeyboardCursor] = useState(cursor ?? terrain.start)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -144,12 +149,13 @@ function GridCanvas({
       drawEndpoint(context, terrain.start.x * cellWidth, terrain.start.y * cellHeight, cellWidth, cellHeight, COLORS.start, true)
       drawEndpoint(context, terrain.end.x * cellWidth, terrain.end.y * cellHeight, cellWidth, cellHeight, COLORS.end, false)
 
-      if (cursor) {
+      const activeCursor = cursor ?? keyboardCursor
+      if (activeCursor) {
         context.strokeStyle = COLORS.cursor
         context.lineWidth = 2
         context.strokeRect(
-          (cursor.x * cellWidth) + 1,
-          (cursor.y * cellHeight) + 1,
+          (activeCursor.x * cellWidth) + 1,
+          (activeCursor.y * cellHeight) + 1,
           cellWidth - 2,
           cellHeight - 2,
         )
@@ -167,12 +173,68 @@ function GridCanvas({
       observer.disconnect()
       cancelAnimationFrame(frameRef.current)
     }
-  }, [cursor, path, terrain, visited])
+  }, [cursor, keyboardCursor, path, terrain, visited])
+
+  const cellFromPointer = (event) => {
+    const rect = canvasRef.current.getBoundingClientRect()
+    return {
+      x: Math.max(0, Math.min(terrain.cols - 1, Math.floor(((event.clientX - rect.left) / rect.width) * terrain.cols))),
+      y: Math.max(0, Math.min(terrain.rows - 1, Math.floor(((event.clientY - rect.top) / rect.height) * terrain.rows))),
+    }
+  }
+
+  const applyPointer = (event) => {
+    const cell = cellFromPointer(event)
+    const stroke = lastCellRef.current ? interpolateCells(lastCellRef.current, cell) : [cell]
+    stroke.forEach((item) => onApplyCell?.(item.x, item.y))
+    lastCellRef.current = cell
+    setKeyboardCursor(cell)
+  }
+
+  const handlePointerDown = (event) => {
+    if (disabled) return
+    event.currentTarget.setPointerCapture(event.pointerId)
+    drawingRef.current = true
+    lastCellRef.current = null
+    applyPointer(event)
+  }
+
+  const stopDrawing = () => {
+    drawingRef.current = false
+    lastCellRef.current = null
+  }
+
+  const handleKeyDown = (event) => {
+    const moves = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    }
+    if (moves[event.key]) {
+      event.preventDefault()
+      const [deltaX, deltaY] = moves[event.key]
+      setKeyboardCursor((current) => ({
+        x: Math.max(0, Math.min(terrain.cols - 1, current.x + deltaX)),
+        y: Math.max(0, Math.min(terrain.rows - 1, current.y + deltaY)),
+      }))
+    } else if (event.key === 'Enter' && !disabled) {
+      event.preventDefault()
+      onApplyCell?.(keyboardCursor.x, keyboardCursor.y)
+    }
+  }
 
   return (
     <canvas
       aria-label={label}
       className="grid-canvas"
+      onKeyDown={handleKeyDown}
+      onPointerCancel={stopDrawing}
+      onPointerDown={handlePointerDown}
+      onPointerMove={(event) => {
+        if (drawingRef.current) applyPointer(event)
+      }}
+      onPointerUp={stopDrawing}
       ref={canvasRef}
       role="img"
       tabIndex="0"

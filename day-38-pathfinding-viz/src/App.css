@@ -314,6 +314,36 @@ kbd {
   cursor: crosshair;
 }
 
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 10px;
+  color: var(--faint);
+  font: 500 0.58rem 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.legend-start { background: var(--green-strong); }
+.legend-end { background: var(--red); }
+.legend-wall { background: #647887; }
+.legend-weight { background: #2b4050; border: 1px solid #8196a5; }
+.legend-visited { background: linear-gradient(135deg, var(--purple), var(--blue)); }
+.legend-path { background: var(--gold); }
+
 .panel-footer {
   justify-content: space-between;
   gap: 12px;

@@ -8,9 +8,10 @@ import {
   Play,
   Route,
   Sparkles,
+  Eraser,
 } from 'lucide-react'
 import GridCanvas from './components/GridCanvas'
-import { createTerrain, GRID_PRESETS } from './data/grid'
+import { applyTool, createTerrain, GRID_PRESETS } from './data/grid'
 import './App.css'
 
 const TOOLS = [
@@ -18,6 +19,7 @@ const TOOLS = [
   ['weight', Gauge, 'Weights'],
   ['start', MousePointer2, 'Start'],
   ['end', Map, 'End'],
+  ['erase', Eraser, 'Erase'],
 ]
 
 const STATS = [
@@ -40,7 +42,7 @@ function Stats() {
   )
 }
 
-function RoutePanel({ secondary = false, terrain }) {
+function RoutePanel({ secondary = false, terrain, onApplyCell }) {
   return (
     <article className="route-panel">
       <header className="panel-header">
@@ -61,7 +63,16 @@ function RoutePanel({ secondary = false, terrain }) {
         <GridCanvas
           label={`${secondary ? 'Comparison' : 'Primary'} pathfinding terrain`}
           terrain={terrain}
+          onApplyCell={onApplyCell}
         />
+      </div>
+      <div className="legend" aria-label="Grid legend">
+        <span><i className="legend-start" /> Start</span>
+        <span><i className="legend-end" /> End</span>
+        <span><i className="legend-wall" /> Wall</span>
+        <span><i className="legend-weight" /> Weight ×5</span>
+        <span><i className="legend-visited" /> Visited</span>
+        <span><i className="legend-path" /> Path</span>
       </div>
       <footer className="panel-footer">
         <span className="status-pill"><i /> Ready</span>
@@ -73,10 +84,15 @@ function RoutePanel({ secondary = false, terrain }) {
 
 function App() {
   const [terrain, setTerrain] = useState(() => createTerrain())
+  const [tool, setTool] = useState('wall')
 
   const handlePresetChange = (event) => {
     const [cols, rows] = event.target.value.split('x').map(Number)
     setTerrain(createTerrain(cols, rows))
+  }
+
+  const handleApplyCell = (x, y) => {
+    setTerrain((current) => applyTool(current, x, y, tool))
   }
 
   return (
@@ -103,8 +119,14 @@ function App() {
               <small>Paint the shared map</small>
             </div>
             <div className="segmented">
-              {TOOLS.map(([id, Icon, label], index) => (
-                <button className={index === 0 ? 'is-active' : ''} type="button" key={id}>
+              {TOOLS.map(([id, Icon, label]) => (
+                <button
+                  aria-pressed={tool === id}
+                  className={tool === id ? 'is-active' : ''}
+                  onClick={() => setTool(id)}
+                  type="button"
+                  key={id}
+                >
                   <Icon aria-hidden="true" />
                   <span>{label}</span>
                 </button>
@@ -140,8 +162,8 @@ function App() {
         </section>
 
         <section className="panel-grid" aria-label="Pathfinding visualization panels">
-          <RoutePanel terrain={terrain} />
-          <RoutePanel secondary terrain={terrain} />
+          <RoutePanel terrain={terrain} onApplyCell={handleApplyCell} />
+          <RoutePanel secondary terrain={terrain} onApplyCell={handleApplyCell} />
         </section>
       </main>
     </div>
