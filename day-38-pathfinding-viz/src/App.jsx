@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Activity,
   Boxes,
@@ -9,6 +9,8 @@ import {
   Route,
   Sparkles,
   Eraser,
+  RotateCcw,
+  Trash2,
 } from 'lucide-react'
 import GridCanvas from './components/GridCanvas'
 import { applyTool, createTerrain, GRID_PRESETS } from './data/grid'
@@ -129,6 +131,23 @@ function App() {
     setTerrain((current) => generateMaze(current, mazeType))
   }
 
+  const handleClearPath = () => {
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
+  }
+
+  const handleClearAll = () => {
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
+    setTerrain((current) => createTerrain(current.cols, current.rows))
+  }
+
+  const handleRandomMaze = () => {
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
+    setTerrain((current) => generateMaze(current, 'random'))
+  }
+
   const handleVisualize = () => {
     if (isRunning) {
       primaryVisualizer.cancel()
@@ -148,6 +167,22 @@ function App() {
     setCompareMode((current) => !current)
   }
 
+  useEffect(() => {
+    const handleShortcut = (event) => {
+      if (['INPUT', 'SELECT', 'BUTTON', 'TEXTAREA'].includes(event.target.tagName)) return
+      if (event.code === 'Space') {
+        event.preventDefault()
+        handleVisualize()
+      } else if (event.key.toLowerCase() === 'c') {
+        handleClearPath()
+      } else if (event.key.toLowerCase() === 'r') {
+        handleRandomMaze()
+      }
+    }
+    window.addEventListener('keydown', handleShortcut)
+    return () => window.removeEventListener('keydown', handleShortcut)
+  })
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -159,7 +194,7 @@ function App() {
           </div>
         </div>
         <div className="topbar-status">
-          <span><Activity aria-hidden="true" /> Engine idle</span>
+          <span><Activity aria-hidden="true" /> {isRunning ? 'Engine running' : 'Engine idle'}</span>
           <span>Day 38 / 50</span>
         </div>
       </header>
@@ -206,7 +241,7 @@ function App() {
                 ))}
               </select>
             </label>
-            <button className="control-button" disabled={isRunning} onClick={handleGenerateMaze} type="button">
+            <button className="control-button" onClick={handleGenerateMaze} type="button">
               <Sparkles aria-hidden="true" />
               Generate maze
             </button>
@@ -218,6 +253,12 @@ function App() {
             >
               <Boxes aria-hidden="true" />
               {compareMode ? 'Compare on' : 'Compare mode'}
+            </button>
+            <button className="icon-control" aria-label="Clear path (C)" onClick={handleClearPath} type="button">
+              <RotateCcw aria-hidden="true" />
+            </button>
+            <button className="icon-control" aria-label="Clear all" onClick={handleClearAll} type="button">
+              <Trash2 aria-hidden="true" />
             </button>
             <label className="speed-control">
               <span>Speed <strong>{speed === 0 ? 'Instant' : `${speed} ms`}</strong></span>

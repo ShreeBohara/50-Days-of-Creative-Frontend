@@ -24,6 +24,7 @@
 .action-group,
 .control-button,
 .run-button,
+.icon-control,
 .panel-header,
 .panel-footer,
 .status-pill {
@@ -140,7 +141,8 @@
 
 .segmented button,
 .control-button,
-.run-button {
+.run-button,
+.icon-control {
   gap: 7px;
   min-height: 40px;
   padding: 0 12px;
@@ -165,7 +167,8 @@
 
 .segmented svg,
 .control-button svg,
-.run-button svg {
+.run-button svg,
+.icon-control svg {
   width: 16px;
 }
 
@@ -176,6 +179,20 @@
 .control-button {
   border-color: var(--line);
   background: var(--surface-soft);
+}
+
+.icon-control {
+  justify-content: center;
+  width: 40px;
+  padding: 0;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border-color: var(--line);
+}
+
+.icon-control:hover {
+  color: var(--text);
+  border-color: var(--line-strong);
 }
 
 .control-button.is-active {
