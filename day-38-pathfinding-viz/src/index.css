@@ -2,26 +2,71 @@
 
 :root {
   font-family: 'IBM Plex Sans', sans-serif;
-  color: #f8fafc;
+  color: #f4f8fb;
   background: #071018;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  --page: #071018;
+  --page-soft: #0a151f;
+  --surface: rgba(13, 27, 39, 0.88);
+  --surface-strong: #102230;
+  --surface-soft: #0b1924;
+  --line: rgba(181, 207, 226, 0.12);
+  --line-strong: rgba(181, 207, 226, 0.24);
+  --text: #f4f8fb;
+  --muted: #91a4b5;
+  --faint: #617788;
+  --green: #51e38a;
+  --green-strong: #22c55e;
+  --green-ink: #052711;
+  --gold: #f8c44f;
+  --red: #f05252;
+  --purple: #a855f7;
+  --blue: #38bdf8;
+  --radius: 18px;
+  --shadow: 0 22px 64px rgba(0, 0, 0, 0.32);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  min-width: 320px;
+  background: var(--page);
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 197, 94, 0.1), transparent 30rem),
+    radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.08), transparent 32rem),
+    var(--page);
 }
 
 button,
 select,
 input {
   font: inherit;
+}
+
+button,
+select {
+  cursor: pointer;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
