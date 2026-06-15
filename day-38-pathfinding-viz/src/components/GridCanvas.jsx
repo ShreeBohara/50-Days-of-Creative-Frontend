@@ -158,6 +158,26 @@ function GridCanvas({
         }
       }
 
+      if (path.size > 1) {
+        context.save()
+        context.strokeStyle = COLORS.path
+        context.lineWidth = Math.max(2, Math.min(cellWidth, cellHeight) * 0.28)
+        context.lineCap = 'round'
+        context.lineJoin = 'round'
+        context.shadowBlur = Math.min(cellWidth, cellHeight) * 1.2
+        context.shadowColor = COLORS.path
+        context.beginPath()
+        Array.from(path.keys()).forEach((key, index) => {
+          const [x, y] = key.split(':').map(Number)
+          const centerX = (x * cellWidth) + (cellWidth / 2)
+          const centerY = (y * cellHeight) + (cellHeight / 2)
+          if (index === 0) context.moveTo(centerX, centerY)
+          else context.lineTo(centerX, centerY)
+        })
+        context.stroke()
+        context.restore()
+      }
+
       context.strokeStyle = COLORS.line
       context.lineWidth = 1
       context.beginPath()

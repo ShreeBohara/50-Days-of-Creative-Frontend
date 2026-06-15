@@ -77,11 +77,37 @@ export function useVisualizer(terrain, algorithm, speed) {
     }
 
     if (tokenRef.current !== token) return
-    const path = new Map(result.path.map((point, index) => [cellKey(point.x, point.y), index]))
+    if (!result.found) {
+      setState((current) => ({
+        ...current,
+        status: 'no-path',
+        stats: { ...current.stats, visited: result.visited.length },
+      }))
+      return
+    }
+
+    const path = new Map()
+    const traceDelay = speed === 0 ? 0 : Math.max(10, Math.round(speed * 1.4))
+    for (let index = 0; index < result.path.length; index += 1) {
+      if (tokenRef.current !== token) return
+      const point = result.path[index]
+      path.set(cellKey(point.x, point.y), index)
+      setState((current) => ({
+        ...current,
+        path: new Map(path),
+        stats: {
+          ...current.stats,
+          pathLength: Math.min(index, result.pathLength),
+          cost: index === result.path.length - 1 ? result.cost : current.stats.cost,
+        },
+      }))
+      if (traceDelay) await wait(traceDelay)
+    }
+
+    if (tokenRef.current !== token) return
     setState((current) => ({
       ...current,
-      status: result.found ? 'complete' : 'no-path',
-      path,
+      status: 'complete',
       stats: {
         visited: result.visited.length,
         pathLength: result.pathLength,
@@ -103,4 +129,3 @@ export function useVisualizer(terrain, algorithm, speed) {
     start,
   }
 }
-
