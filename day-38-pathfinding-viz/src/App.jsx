@@ -65,7 +65,11 @@ function RoutePanel({
         </div>
         <label className="select-control">
           <span>Algorithm</span>
-          <select value={algorithm} onChange={(event) => onAlgorithmChange(event.target.value)}>
+          <select
+            disabled={visualizer.isRunning}
+            value={algorithm}
+            onChange={(event) => onAlgorithmChange(event.target.value)}
+          >
             {ALGORITHMS.map((item) => (
               <option value={item.id} key={item.id}>{item.label}</option>
             ))}

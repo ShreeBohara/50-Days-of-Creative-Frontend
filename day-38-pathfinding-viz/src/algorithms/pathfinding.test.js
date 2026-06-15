@@ -44,5 +44,14 @@ describe('pathfinding algorithms', () => {
     expect(result.pathLength).toBe(0)
     expect(result.cost).toBe(0)
   })
-})
 
+  it('follows the only available narrow corridor', () => {
+    let terrain = createTerrain(10, 7)
+    for (let y = 0; y < terrain.rows; y += 1) {
+      if (y !== 3) terrain = applyTool(terrain, 5, y, 'wall')
+    }
+    const result = runAlgorithm(terrain, 'astar-euclidean')
+    expect(result.found).toBe(true)
+    expect(result.path.every((point) => point.y === 3)).toBe(true)
+  })
+})

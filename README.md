@@ -45,6 +45,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 35 | Animated Pricing Page | HelioStack pricing page with GSAP Flip plan morphs, rolling prices, add-ons, currency conversion, comparison matrix, and FAQ. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-35-pricing-page/) | [day-35-pricing-page](./day-35-pricing-page/) |
 | 36 | PulseGrid Real-Time Dashboard | Infrastructure command center with simulated streaming telemetry, D3 charts, gauges, heatmap, incident alerts, and configurable thresholds. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-36-realtime-dashboard/) | [day-36-realtime-dashboard](./day-36-realtime-dashboard/) |
 | 37 | Animated Bento Grid Portfolio | Creative operating-system portfolio with twelve interactive modules, a live clock, project modal, GitHub heatmap, synthetic portrait, and persisted themes. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-37-bento-grid/) | [day-37-bento-grid](./day-37-bento-grid/) |
+| 38 | Route Lab Pathfinding Visualizer | Canvas pathfinding workspace with terrain painting, six search algorithms, maze generation, animated routes, and synchronized comparison mode. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-38-pathfinding-viz/) | [day-38-pathfinding-viz](./day-38-pathfinding-viz/) |
 
 ## Adding a New Day
 

@@ -481,14 +481,20 @@ kbd {
   box-shadow: 0 0 12px var(--red);
 }
 
-@media (max-width: 1180px) {
-  .control-deck,
-  .panel-grid {
+@media (max-width: 1480px) {
+  .control-deck {
     grid-template-columns: 1fr;
   }
 
   .action-group {
     justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 1180px) {
+  .panel-grid {
+    grid-template-columns: 1fr;
   }
 }
 
