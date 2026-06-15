@@ -1,0 +1,31 @@
+.scaffold {
+  display: grid;
+  place-content: center;
+  min-height: 100vh;
+  text-align: center;
+  background: radial-gradient(circle at center, #132a35, #071018 62%);
+}
+
+.scaffold svg {
+  width: 52px;
+  height: 52px;
+  margin: auto;
+  color: #22c55e;
+}
+
+.scaffold p,
+.scaffold span {
+  color: #91a4b5;
+}
+
+.scaffold p {
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+}
+
+.scaffold h1 {
+  margin: 0;
+  font: 700 clamp(4rem, 12vw, 9rem) / 1 'JetBrains Mono', monospace;
+  letter-spacing: -0.09em;
+}
+
