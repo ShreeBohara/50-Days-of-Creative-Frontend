@@ -190,6 +190,31 @@
   background: #72ee9d;
 }
 
+.speed-control {
+  display: grid;
+  gap: 4px;
+  min-width: 126px;
+  color: var(--faint);
+  font: 500 0.58rem 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.speed-control span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.speed-control strong {
+  color: var(--green);
+}
+
+.speed-control input {
+  width: 100%;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
 kbd {
   padding: 2px 5px;
   color: rgba(5, 39, 17, 0.7);
@@ -363,6 +388,18 @@ kbd {
   background: var(--green);
   border-radius: 50%;
   box-shadow: 0 0 12px var(--green);
+}
+
+.status-pill.is-exploring i,
+.status-pill.is-tracing i {
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold);
+}
+
+.status-pill.is-no-path i,
+.status-pill.is-cancelled i {
+  background: var(--red);
+  box-shadow: 0 0 12px var(--red);
 }
 
 @media (max-width: 1180px) {

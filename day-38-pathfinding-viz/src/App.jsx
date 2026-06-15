@@ -12,6 +12,8 @@ import {
 } from 'lucide-react'
 import GridCanvas from './components/GridCanvas'
 import { applyTool, createTerrain, GRID_PRESETS } from './data/grid'
+import { ALGORITHMS } from './algorithms/pathfinding'
+import { useVisualizer } from './hooks/useVisualizer'
 import './App.css'
 
 const TOOLS = [
@@ -22,17 +24,16 @@ const TOOLS = [
   ['erase', Eraser, 'Erase'],
 ]
 
-const STATS = [
-  ['Visited', '0'],
-  ['Path', '0'],
-  ['Cost', '0'],
-  ['Compute', '0 ms'],
-]
-
-function Stats() {
+function Stats({ stats }) {
+  const values = [
+    ['Visited', stats.visited],
+    ['Path', stats.pathLength],
+    ['Cost', stats.cost],
+    ['Compute', `${stats.computationMs.toFixed(2)} ms`],
+  ]
   return (
     <dl className="stats-grid">
-      {STATS.map(([label, value]) => (
+      {values.map(([label, value]) => (
         <div key={label}>
           <dt>{label}</dt>
           <dd>{value}</dd>
@@ -42,28 +43,40 @@ function Stats() {
   )
 }
 
-function RoutePanel({ secondary = false, terrain, onApplyCell }) {
+function RoutePanel({
+  secondary = false,
+  terrain,
+  onApplyCell,
+  algorithm,
+  onAlgorithmChange,
+  visualizer,
+}) {
+  const algorithmLabel = ALGORITHMS.find((item) => item.id === algorithm)?.label
   return (
     <article className="route-panel">
       <header className="panel-header">
         <div>
           <span className="kicker">{secondary ? 'Comparison channel' : 'Primary channel'}</span>
-          <h2>{secondary ? 'Dijkstra' : 'A* Manhattan'}</h2>
+          <h2>{algorithmLabel}</h2>
         </div>
         <label className="select-control">
           <span>Algorithm</span>
-          <select defaultValue={secondary ? 'dijkstra' : 'astar-manhattan'}>
-            <option value="astar-manhattan">A* Manhattan</option>
-            <option value="dijkstra">Dijkstra</option>
+          <select value={algorithm} onChange={(event) => onAlgorithmChange(event.target.value)}>
+            {ALGORITHMS.map((item) => (
+              <option value={item.id} key={item.id}>{item.label}</option>
+            ))}
           </select>
         </label>
       </header>
-      <Stats />
+      <Stats stats={visualizer.stats} />
       <div className="grid-stage">
         <GridCanvas
           label={`${secondary ? 'Comparison' : 'Primary'} pathfinding terrain`}
           terrain={terrain}
           onApplyCell={onApplyCell}
+          disabled={visualizer.isRunning}
+          path={visualizer.path}
+          visited={visualizer.visited}
         />
       </div>
       <div className="legend" aria-label="Grid legend">
@@ -75,7 +88,7 @@ function RoutePanel({ secondary = false, terrain, onApplyCell }) {
         <span><i className="legend-path" /> Path</span>
       </div>
       <footer className="panel-footer">
-        <span className="status-pill"><i /> Ready</span>
+        <span className={`status-pill is-${visualizer.status}`}><i /> {visualizer.status}</span>
         <span>{terrain.cols} × {terrain.rows} / Shared terrain</span>
       </footer>
     </article>
@@ -85,14 +98,25 @@ function RoutePanel({ secondary = false, terrain, onApplyCell }) {
 function App() {
   const [terrain, setTerrain] = useState(() => createTerrain())
   const [tool, setTool] = useState('wall')
+  const [speed, setSpeed] = useState(12)
+  const [primaryAlgorithm, setPrimaryAlgorithm] = useState('astar-manhattan')
+  const [secondaryAlgorithm, setSecondaryAlgorithm] = useState('dijkstra')
+  const primaryVisualizer = useVisualizer(terrain, primaryAlgorithm, speed)
+  const secondaryVisualizer = useVisualizer(terrain, secondaryAlgorithm, speed)
+  const isRunning = primaryVisualizer.isRunning || secondaryVisualizer.isRunning
 
   const handlePresetChange = (event) => {
     const [cols, rows] = event.target.value.split('x').map(Number)
     setTerrain(createTerrain(cols, rows))
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
   }
 
   const handleApplyCell = (x, y) => {
+    if (isRunning) return
     setTerrain((current) => applyTool(current, x, y, tool))
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
   }
 
   return (
@@ -153,17 +177,51 @@ function App() {
               <Boxes aria-hidden="true" />
               Compare mode
             </button>
-            <button className="run-button" type="button">
+            <label className="speed-control">
+              <span>Speed <strong>{speed === 0 ? 'Instant' : `${speed} ms`}</strong></span>
+              <input
+                aria-label="Visualization delay in milliseconds"
+                max="50"
+                min="0"
+                onChange={(event) => setSpeed(Number(event.target.value))}
+                type="range"
+                value={speed}
+              />
+            </label>
+            <button
+              className="run-button"
+              onClick={isRunning ? primaryVisualizer.cancel : primaryVisualizer.start}
+              type="button"
+            >
               <Play aria-hidden="true" fill="currentColor" />
-              Visualize
+              {isRunning ? 'Cancel' : 'Visualize'}
               <kbd>Space</kbd>
             </button>
           </div>
         </section>
 
         <section className="panel-grid" aria-label="Pathfinding visualization panels">
-          <RoutePanel terrain={terrain} onApplyCell={handleApplyCell} />
-          <RoutePanel secondary terrain={terrain} onApplyCell={handleApplyCell} />
+          <RoutePanel
+            algorithm={primaryAlgorithm}
+            onAlgorithmChange={(algorithm) => {
+              primaryVisualizer.reset()
+              setPrimaryAlgorithm(algorithm)
+            }}
+            onApplyCell={handleApplyCell}
+            terrain={terrain}
+            visualizer={primaryVisualizer}
+          />
+          <RoutePanel
+            algorithm={secondaryAlgorithm}
+            onAlgorithmChange={(algorithm) => {
+              secondaryVisualizer.reset()
+              setSecondaryAlgorithm(algorithm)
+            }}
+            onApplyCell={handleApplyCell}
+            secondary
+            terrain={terrain}
+            visualizer={secondaryVisualizer}
+          />
         </section>
       </main>
     </div>
