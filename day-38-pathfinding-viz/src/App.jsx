@@ -17,6 +17,7 @@ import { applyTool, createTerrain, GRID_PRESETS } from './data/grid'
 import { ALGORITHMS } from './algorithms/pathfinding'
 import { useVisualizer } from './hooks/useVisualizer'
 import { generateMaze, MAZE_TYPES } from './data/mazes'
+import { useReducedMotion } from './hooks/useReducedMotion'
 import './App.css'
 
 const TOOLS = [
@@ -72,16 +73,18 @@ function RoutePanel({
         </label>
       </header>
       <Stats stats={visualizer.stats} />
-      <div className="grid-stage">
-        <GridCanvas
-          label={`${secondary ? 'Comparison' : 'Primary'} pathfinding terrain`}
-          terrain={terrain}
-          onApplyCell={onApplyCell}
-          disabled={visualizer.isRunning}
-          isAnimating={visualizer.isRunning}
-          path={visualizer.path}
-          visited={visualizer.visited}
-        />
+      <div className="grid-scroll">
+        <div className="grid-stage">
+          <GridCanvas
+            label={`${secondary ? 'Comparison' : 'Primary'} pathfinding terrain`}
+            terrain={terrain}
+            onApplyCell={onApplyCell}
+            disabled={visualizer.isRunning}
+            isAnimating={visualizer.isRunning}
+            path={visualizer.path}
+            visited={visualizer.visited}
+          />
+        </div>
       </div>
       <div className="legend" aria-label="Grid legend">
         <span><i className="legend-start" /> Start</span>
@@ -92,7 +95,7 @@ function RoutePanel({
         <span><i className="legend-path" /> Path</span>
       </div>
       <footer className="panel-footer">
-        <span className={`status-pill is-${visualizer.status}`}><i /> {visualizer.status}</span>
+        <span aria-live="polite" className={`status-pill is-${visualizer.status}`}><i /> {visualizer.status}</span>
         <span>{terrain.cols} × {terrain.rows} / Shared terrain</span>
       </footer>
     </article>
@@ -107,8 +110,10 @@ function App() {
   const [secondaryAlgorithm, setSecondaryAlgorithm] = useState('dijkstra')
   const [mazeType, setMazeType] = useState('random')
   const [compareMode, setCompareMode] = useState(false)
-  const primaryVisualizer = useVisualizer(terrain, primaryAlgorithm, speed)
-  const secondaryVisualizer = useVisualizer(terrain, secondaryAlgorithm, speed)
+  const reducedMotion = useReducedMotion()
+  const animationSpeed = reducedMotion ? 0 : speed
+  const primaryVisualizer = useVisualizer(terrain, primaryAlgorithm, animationSpeed)
+  const secondaryVisualizer = useVisualizer(terrain, secondaryAlgorithm, animationSpeed)
   const isRunning = primaryVisualizer.isRunning || secondaryVisualizer.isRunning
 
   const handlePresetChange = (event) => {
@@ -185,6 +190,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#workspace">Skip to pathfinding workspace</a>
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark"><Route aria-hidden="true" /></span>
@@ -199,7 +205,7 @@ function App() {
         </div>
       </header>
 
-      <main className="workspace">
+      <main className="workspace" id="workspace">
         <section className="control-deck" aria-label="Pathfinding controls">
           <div className="control-group tool-group">
             <div className="control-heading">
@@ -282,6 +288,10 @@ function App() {
             </button>
           </div>
         </section>
+        <p className="keyboard-hint">
+          <kbd>Space</kbd> visualize <kbd>C</kbd> clear path <kbd>R</kbd> random walls
+          <span>{reducedMotion ? 'Reduced motion active / instant visualization' : 'Canvas: arrows + Enter'}</span>
+        </p>
 
         <section
           className={`panel-grid ${compareMode ? '' : 'is-single'}`}

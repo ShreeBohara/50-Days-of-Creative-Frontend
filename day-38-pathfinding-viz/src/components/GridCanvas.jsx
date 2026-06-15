@@ -196,7 +196,13 @@ function GridCanvas({
       drawEndpoint(context, terrain.start.x * cellWidth, terrain.start.y * cellHeight, cellWidth, cellHeight, COLORS.start, true)
       drawEndpoint(context, terrain.end.x * cellWidth, terrain.end.y * cellHeight, cellWidth, cellHeight, COLORS.end, false)
 
-      const activeCursor = cursor ?? keyboardCursor
+      const requestedCursor = cursor ?? keyboardCursor
+      const activeCursor = requestedCursor
+        ? {
+            x: Math.min(requestedCursor.x, terrain.cols - 1),
+            y: Math.min(requestedCursor.y, terrain.rows - 1),
+          }
+        : null
       if (activeCursor) {
         context.strokeStyle = COLORS.cursor
         context.lineWidth = 2
@@ -271,13 +277,17 @@ function GridCanvas({
       }))
     } else if (event.key === 'Enter' && !disabled) {
       event.preventDefault()
-      onApplyCell?.(keyboardCursor.x, keyboardCursor.y)
+      onApplyCell?.(
+        Math.min(keyboardCursor.x, terrain.cols - 1),
+        Math.min(keyboardCursor.y, terrain.rows - 1),
+      )
     }
   }
 
   return (
     <canvas
       aria-label={label}
+      aria-description="Use arrow keys to move the grid cursor and Enter to apply the selected terrain tool."
       className="grid-canvas"
       onKeyDown={handleKeyDown}
       onPointerCancel={stopDrawing}
