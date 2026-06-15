@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Activity,
   Boxes,
@@ -8,6 +9,8 @@ import {
   Route,
   Sparkles,
 } from 'lucide-react'
+import GridCanvas from './components/GridCanvas'
+import { createTerrain, GRID_PRESETS } from './data/grid'
 import './App.css'
 
 const TOOLS = [
@@ -37,7 +40,7 @@ function Stats() {
   )
 }
 
-function RoutePanel({ secondary = false }) {
+function RoutePanel({ secondary = false, terrain }) {
   return (
     <article className="route-panel">
       <header className="panel-header">
@@ -54,20 +57,28 @@ function RoutePanel({ secondary = false }) {
         </label>
       </header>
       <Stats />
-      <div className="grid-placeholder">
-        <Route aria-hidden="true" />
-        <strong>Navigation surface</strong>
-        <span>Canvas renderer online next</span>
+      <div className="grid-stage">
+        <GridCanvas
+          label={`${secondary ? 'Comparison' : 'Primary'} pathfinding terrain`}
+          terrain={terrain}
+        />
       </div>
       <footer className="panel-footer">
         <span className="status-pill"><i /> Ready</span>
-        <span>50 × 25 / Shared terrain</span>
+        <span>{terrain.cols} × {terrain.rows} / Shared terrain</span>
       </footer>
     </article>
   )
 }
 
 function App() {
+  const [terrain, setTerrain] = useState(() => createTerrain())
+
+  const handlePresetChange = (event) => {
+    const [cols, rows] = event.target.value.split('x').map(Number)
+    setTerrain(createTerrain(cols, rows))
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -99,6 +110,16 @@ function App() {
                 </button>
               ))}
             </div>
+            <label className="preset-control">
+              <span className="sr-only">Grid size</span>
+              <select defaultValue="50x25" onChange={handlePresetChange}>
+                {GRID_PRESETS.map((preset) => (
+                  <option value={`${preset.cols}x${preset.rows}`} key={preset.label}>
+                    {preset.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           <div className="control-group action-group">
@@ -119,8 +140,8 @@ function App() {
         </section>
 
         <section className="panel-grid" aria-label="Pathfinding visualization panels">
-          <RoutePanel />
-          <RoutePanel secondary />
+          <RoutePanel terrain={terrain} />
+          <RoutePanel secondary terrain={terrain} />
         </section>
       </main>
     </div>
