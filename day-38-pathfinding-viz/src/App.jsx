@@ -104,6 +104,7 @@ function App() {
   const [primaryAlgorithm, setPrimaryAlgorithm] = useState('astar-manhattan')
   const [secondaryAlgorithm, setSecondaryAlgorithm] = useState('dijkstra')
   const [mazeType, setMazeType] = useState('random')
+  const [compareMode, setCompareMode] = useState(false)
   const primaryVisualizer = useVisualizer(terrain, primaryAlgorithm, speed)
   const secondaryVisualizer = useVisualizer(terrain, secondaryAlgorithm, speed)
   const isRunning = primaryVisualizer.isRunning || secondaryVisualizer.isRunning
@@ -126,6 +127,25 @@ function App() {
     primaryVisualizer.reset()
     secondaryVisualizer.reset()
     setTerrain((current) => generateMaze(current, mazeType))
+  }
+
+  const handleVisualize = () => {
+    if (isRunning) {
+      primaryVisualizer.cancel()
+      secondaryVisualizer.cancel()
+      return
+    }
+    if (compareMode) {
+      void Promise.all([primaryVisualizer.start(), secondaryVisualizer.start()])
+    } else {
+      void primaryVisualizer.start()
+    }
+  }
+
+  const handleCompareChange = () => {
+    primaryVisualizer.reset()
+    secondaryVisualizer.reset()
+    setCompareMode((current) => !current)
   }
 
   return (
@@ -190,9 +210,14 @@ function App() {
               <Sparkles aria-hidden="true" />
               Generate maze
             </button>
-            <button className="control-button" type="button">
+            <button
+              aria-pressed={compareMode}
+              className={`control-button ${compareMode ? 'is-active' : ''}`}
+              onClick={handleCompareChange}
+              type="button"
+            >
               <Boxes aria-hidden="true" />
-              Compare mode
+              {compareMode ? 'Compare on' : 'Compare mode'}
             </button>
             <label className="speed-control">
               <span>Speed <strong>{speed === 0 ? 'Instant' : `${speed} ms`}</strong></span>
@@ -207,7 +232,7 @@ function App() {
             </label>
             <button
               className="run-button"
-              onClick={isRunning ? primaryVisualizer.cancel : primaryVisualizer.start}
+              onClick={handleVisualize}
               type="button"
             >
               <Play aria-hidden="true" fill="currentColor" />
@@ -217,7 +242,10 @@ function App() {
           </div>
         </section>
 
-        <section className="panel-grid" aria-label="Pathfinding visualization panels">
+        <section
+          className={`panel-grid ${compareMode ? '' : 'is-single'}`}
+          aria-label="Pathfinding visualization panels"
+        >
           <RoutePanel
             algorithm={primaryAlgorithm}
             onAlgorithmChange={(algorithm) => {
@@ -228,17 +256,19 @@ function App() {
             terrain={terrain}
             visualizer={primaryVisualizer}
           />
-          <RoutePanel
-            algorithm={secondaryAlgorithm}
-            onAlgorithmChange={(algorithm) => {
-              secondaryVisualizer.reset()
-              setSecondaryAlgorithm(algorithm)
-            }}
-            onApplyCell={handleApplyCell}
-            secondary
-            terrain={terrain}
-            visualizer={secondaryVisualizer}
-          />
+          {compareMode ? (
+            <RoutePanel
+              algorithm={secondaryAlgorithm}
+              onAlgorithmChange={(algorithm) => {
+                secondaryVisualizer.reset()
+                setSecondaryAlgorithm(algorithm)
+              }}
+              onApplyCell={handleApplyCell}
+              secondary
+              terrain={terrain}
+              visualizer={secondaryVisualizer}
+            />
+          ) : null}
         </section>
       </main>
     </div>

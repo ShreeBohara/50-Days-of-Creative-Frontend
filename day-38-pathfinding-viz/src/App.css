@@ -178,6 +178,12 @@
   background: var(--surface-soft);
 }
 
+.control-button.is-active {
+  color: var(--green);
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(81, 227, 138, 0.24);
+}
+
 .run-button {
   color: var(--green-ink);
   background: var(--green);
@@ -228,6 +234,15 @@ kbd {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin-top: 16px;
+}
+
+.panel-grid.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.panel-grid.is-single .route-panel {
+  width: min(1320px, 100%);
+  margin: 0 auto;
 }
 
 .route-panel {
