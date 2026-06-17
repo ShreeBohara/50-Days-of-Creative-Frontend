@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createFreehandElement, getNextZIndex } from '../utils/elements'
+import { drawElements } from '../utils/drawing'
+import { pointDistance } from '../utils/geometry'
 import {
   DEFAULT_VIEWPORT,
+  screenToWorld,
   translateViewport,
   zoomViewport,
 } from '../utils/viewport'
@@ -33,9 +37,15 @@ function WhiteboardCanvas() {
   const canvasRef = useRef(null)
   const frameRef = useRef(0)
   const panRef = useRef(null)
+  const draftRef = useRef(null)
   const [isPanning, setIsPanning] = useState(false)
+  const [draftElement, setDraftElement] = useState(null)
+  const activeTool = useWhiteboardStore((state) => state.activeTool)
+  const elements = useWhiteboardStore((state) => state.elements)
+  const style = useWhiteboardStore((state) => state.style)
   const viewport = useWhiteboardStore((state) => state.viewport)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
+  const addElement = useWhiteboardStore((state) => state.addElement)
   const setViewport = useWhiteboardStore((state) => state.setViewport)
 
   const render = useCallback(() => {
@@ -65,6 +75,12 @@ function WhiteboardCanvas() {
       drawGrid(context, rect, viewport)
     }
 
+    context.save()
+    context.translate(viewport.x, viewport.y)
+    context.scale(viewport.scale, viewport.scale)
+    drawElements(context, elements, draftElement)
+    context.restore()
+
     context.strokeStyle = 'rgba(249, 115, 22, 0.35)'
     context.lineWidth = 1
     context.strokeRect(
@@ -73,7 +89,7 @@ function WhiteboardCanvas() {
       160 * viewport.scale,
       160 * viewport.scale,
     )
-  }, [showGrid, viewport])
+  }, [draftElement, elements, showGrid, viewport])
 
   const scheduleRender = useCallback(() => {
     cancelAnimationFrame(frameRef.current)
@@ -106,6 +122,10 @@ function WhiteboardCanvas() {
     }
   }, [])
 
+  const worldPointFromEvent = useCallback((event) => {
+    return screenToWorld(pointFromEvent(event), viewport)
+  }, [pointFromEvent, viewport])
+
   const handleWheel = useCallback((event) => {
     event.preventDefault()
     const point = pointFromEvent(event)
@@ -115,25 +135,64 @@ function WhiteboardCanvas() {
   }, [pointFromEvent, setViewport, viewport])
 
   const handlePointerDown = useCallback((event) => {
-    if (event.button !== 1) {
+    if (event.button === 1) {
+      event.preventDefault()
+      event.currentTarget.setPointerCapture(event.pointerId)
+      panRef.current = {
+        pointerId: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        viewport,
+      }
+      setIsPanning(true)
+      return
+    }
+
+    if (event.button !== 0 || activeTool !== 'draw') {
       return
     }
 
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
-    panRef.current = {
+
+    const point = worldPointFromEvent(event)
+    const stroke = createFreehandElement(
+      [{ ...point, pressure: event.pressure || 0.5 }],
+      style,
+      getNextZIndex(elements),
+    )
+
+    draftRef.current = {
       pointerId: event.pointerId,
-      x: event.clientX,
-      y: event.clientY,
-      viewport,
+      element: stroke,
     }
-    setIsPanning(true)
-  }, [viewport])
+    setDraftElement(stroke)
+  }, [activeTool, elements, style, viewport, worldPointFromEvent])
 
   const handlePointerMove = useCallback((event) => {
     const pan = panRef.current
 
     if (!pan || pan.pointerId !== event.pointerId) {
+      const draft = draftRef.current
+
+      if (!draft || draft.pointerId !== event.pointerId) {
+        return
+      }
+
+      const point = worldPointFromEvent(event)
+      const points = draft.element.points
+      const previous = points[points.length - 1]
+
+      if (previous && pointDistance(previous, point) < 1.25 / viewport.scale) {
+        return
+      }
+
+      draft.element = {
+        ...draft.element,
+        points: [...points, { ...point, pressure: event.pressure || 0.5 }],
+        updatedAt: Date.now(),
+      }
+      setDraftElement(draft.element)
       return
     }
 
@@ -141,14 +200,35 @@ function WhiteboardCanvas() {
       x: event.clientX - pan.x,
       y: event.clientY - pan.y,
     }))
-  }, [setViewport])
+  }, [setViewport, viewport.scale, worldPointFromEvent])
 
   const stopPanning = useCallback((event) => {
     if (panRef.current?.pointerId === event.pointerId) {
       panRef.current = null
       setIsPanning(false)
     }
-  }, [])
+
+    if (draftRef.current?.pointerId === event.pointerId) {
+      const element = draftRef.current.element
+      const finalElement = element.points.length > 1
+        ? element
+        : {
+            ...element,
+            points: [
+              element.points[0],
+              {
+                x: element.points[0].x + 0.01,
+                y: element.points[0].y + 0.01,
+                pressure: element.points[0].pressure,
+              },
+            ],
+          }
+
+      addElement(finalElement)
+      draftRef.current = null
+      setDraftElement(null)
+    }
+  }, [addElement])
 
   const resetViewport = useCallback(() => {
     setViewport(DEFAULT_VIEWPORT)
@@ -158,7 +238,7 @@ function WhiteboardCanvas() {
     <div className={isPanning ? 'canvas-shell is-panning' : 'canvas-shell'}>
       <canvas
         ref={canvasRef}
-        className="whiteboard-canvas"
+        className={`whiteboard-canvas tool-${activeTool}`}
         aria-label="Infinite whiteboard canvas"
         onDoubleClick={resetViewport}
         onPointerCancel={stopPanning}

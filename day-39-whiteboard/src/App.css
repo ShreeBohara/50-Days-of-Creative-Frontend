@@ -233,6 +233,14 @@
   cursor: crosshair;
 }
 
+.whiteboard-canvas.tool-select {
+  cursor: default;
+}
+
+.whiteboard-canvas.tool-draw {
+  cursor: crosshair;
+}
+
 .canvas-shell.is-panning .whiteboard-canvas {
   cursor: grabbing;
 }
