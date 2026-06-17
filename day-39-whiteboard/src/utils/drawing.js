@@ -1,4 +1,5 @@
 import { orderElements } from './elements'
+import { boundsFromElement } from './geometry'
 
 function applyStrokeStyle(context, element) {
   context.globalAlpha = element.opacity ?? 1
@@ -193,4 +194,45 @@ export function drawElements(context, elements, draftElement = null) {
     drawElement(context, element)
     context.restore()
   })
+}
+
+export function drawSelection(context, elements, selectedIds) {
+  const selected = new Set(selectedIds)
+
+  elements.filter((element) => selected.has(element.id)).forEach((element) => {
+    const bounds = boundsFromElement(element)
+    const handleSize = Math.max(6, 8 / context.getTransform().a)
+
+    context.save()
+    context.setLineDash([6, 4])
+    context.strokeStyle = '#f97316'
+    context.lineWidth = Math.max(1, 1.5 / context.getTransform().a)
+    context.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height)
+    context.setLineDash([])
+    context.fillStyle = '#ffffff'
+    context.strokeStyle = '#f97316'
+
+    getSelectionHandles(bounds).forEach((handle) => {
+      context.beginPath()
+      context.rect(
+        handle.x - (handleSize / 2),
+        handle.y - (handleSize / 2),
+        handleSize,
+        handleSize,
+      )
+      context.fill()
+      context.stroke()
+    })
+
+    context.restore()
+  })
+}
+
+export function getSelectionHandles(bounds) {
+  return [
+    { id: 'nw', x: bounds.x, y: bounds.y },
+    { id: 'ne', x: bounds.x + bounds.width, y: bounds.y },
+    { id: 'se', x: bounds.x + bounds.width, y: bounds.y + bounds.height },
+    { id: 'sw', x: bounds.x, y: bounds.y + bounds.height },
+  ]
 }

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { DEFAULT_STYLE } from '../data/whiteboardConfig'
+import { translateElement } from '../utils/geometry'
 import { DEFAULT_VIEWPORT } from '../utils/viewport'
 
 function updateElementById(elements, id, updater) {
@@ -54,6 +55,12 @@ export const useWhiteboardStore = create((set, get) => ({
     }))
   },
 
+  replaceElement: (nextElement) => {
+    set((state) => ({
+      elements: updateElementById(state.elements, nextElement.id, () => nextElement),
+    }))
+  },
+
   setElements: (elements) => {
     set({ elements, selectedIds: [] })
   },
@@ -69,6 +76,50 @@ export const useWhiteboardStore = create((set, get) => ({
 
   setSelectedIds: (selectedIds) => set({ selectedIds }),
   clearSelection: () => set({ selectedIds: [] }),
+
+  moveSelected: (delta) => {
+    const selected = new Set(get().selectedIds)
+
+    if (!selected.size) {
+      return
+    }
+
+    set((state) => ({
+      elements: state.elements.map((element) => (
+        selected.has(element.id)
+          ? { ...translateElement(element, delta), updatedAt: Date.now() }
+          : element
+      )),
+    }))
+  },
+
+  deleteSelected: () => {
+    get().removeElements(get().selectedIds)
+  },
+
+  bringForward: () => {
+    const selected = new Set(get().selectedIds)
+
+    set((state) => ({
+      elements: state.elements.map((element) => (
+        selected.has(element.id)
+          ? { ...element, zIndex: element.zIndex + 1, updatedAt: Date.now() }
+          : element
+      )),
+    }))
+  },
+
+  sendBackward: () => {
+    const selected = new Set(get().selectedIds)
+
+    set((state) => ({
+      elements: state.elements.map((element) => (
+        selected.has(element.id)
+          ? { ...element, zIndex: Math.max(1, element.zIndex - 1), updatedAt: Date.now() }
+          : element
+      )),
+    }))
+  },
 
   resetBoard: () => {
     set({

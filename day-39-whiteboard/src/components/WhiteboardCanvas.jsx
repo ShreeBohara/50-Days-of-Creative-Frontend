@@ -7,8 +7,13 @@ import {
   getNextZIndex,
   updateShapeGeometry,
 } from '../utils/elements'
-import { drawElements } from '../utils/drawing'
-import { boundsFromElement, pointDistance } from '../utils/geometry'
+import { drawElements, drawSelection, getSelectionHandles } from '../utils/drawing'
+import {
+  boundsFromElement,
+  normalizeRect,
+  pointDistance,
+  resizeElementToBounds,
+} from '../utils/geometry'
 import { findElementAtPoint } from '../utils/hitTest'
 import {
   DEFAULT_VIEWPORT,
@@ -48,16 +53,23 @@ function WhiteboardCanvas() {
   const frameRef = useRef(0)
   const panRef = useRef(null)
   const draftRef = useRef(null)
+  const moveRef = useRef(null)
+  const resizeRef = useRef(null)
   const editorRef = useRef(null)
   const [isPanning, setIsPanning] = useState(false)
   const [draftElement, setDraftElement] = useState(null)
   const [editing, setEditing] = useState(null)
   const activeTool = useWhiteboardStore((state) => state.activeTool)
   const elements = useWhiteboardStore((state) => state.elements)
+  const selectedIds = useWhiteboardStore((state) => state.selectedIds)
   const style = useWhiteboardStore((state) => state.style)
   const viewport = useWhiteboardStore((state) => state.viewport)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const addElement = useWhiteboardStore((state) => state.addElement)
+  const clearSelection = useWhiteboardStore((state) => state.clearSelection)
+  const moveSelected = useWhiteboardStore((state) => state.moveSelected)
+  const replaceElement = useWhiteboardStore((state) => state.replaceElement)
+  const setSelectedIds = useWhiteboardStore((state) => state.setSelectedIds)
   const updateElement = useWhiteboardStore((state) => state.updateElement)
   const setViewport = useWhiteboardStore((state) => state.setViewport)
 
@@ -99,6 +111,7 @@ function WhiteboardCanvas() {
     context.translate(viewport.x, viewport.y)
     context.scale(viewport.scale, viewport.scale)
     drawElements(context, elements, draftElement)
+    drawSelection(context, elements, selectedIds)
     context.restore()
 
     context.strokeStyle = 'rgba(249, 115, 22, 0.35)'
@@ -109,7 +122,7 @@ function WhiteboardCanvas() {
       160 * viewport.scale,
       160 * viewport.scale,
     )
-  }, [draftElement, elements, showGrid, viewport])
+  }, [draftElement, elements, selectedIds, showGrid, viewport])
 
   const scheduleRender = useCallback(() => {
     cancelAnimationFrame(frameRef.current)
@@ -154,6 +167,36 @@ function WhiteboardCanvas() {
     setViewport(zoomViewport(viewport, point, viewport.scale * zoomDirection))
   }, [pointFromEvent, setViewport, viewport])
 
+  const getResizeHandleAtPoint = useCallback((point) => {
+    if (selectedIds.length !== 1) {
+      return null
+    }
+
+    const element = elements.find((item) => item.id === selectedIds[0])
+
+    if (!element) {
+      return null
+    }
+
+    const bounds = boundsFromElement(element)
+    const tolerance = 9 / viewport.scale
+
+    return getSelectionHandles(bounds).find((handle) => (
+      pointDistance(point, handle) <= tolerance
+    )) ?? null
+  }, [elements, selectedIds, viewport.scale])
+
+  const boundsFromHandleDrag = useCallback((handle, originalBounds, point) => {
+    const opposite = {
+      nw: { x: originalBounds.x + originalBounds.width, y: originalBounds.y + originalBounds.height },
+      ne: { x: originalBounds.x, y: originalBounds.y + originalBounds.height },
+      se: { x: originalBounds.x, y: originalBounds.y },
+      sw: { x: originalBounds.x + originalBounds.width, y: originalBounds.y },
+    }[handle.id]
+
+    return normalizeRect(opposite, point)
+  }, [])
+
   const handlePointerDown = useCallback((event) => {
     if (event.button === 1) {
       event.preventDefault()
@@ -168,7 +211,7 @@ function WhiteboardCanvas() {
       return
     }
 
-    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool) && activeTool !== 'text' && activeTool !== 'sticky')) {
+    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool) && activeTool !== 'text' && activeTool !== 'sticky' && activeTool !== 'select')) {
       return
     }
 
@@ -177,6 +220,39 @@ function WhiteboardCanvas() {
 
     const point = worldPointFromEvent(event)
     const zIndex = getNextZIndex(elements)
+
+    if (activeTool === 'select') {
+      const resizeHandle = getResizeHandleAtPoint(point)
+
+      if (resizeHandle) {
+        const selectedElement = elements.find((element) => element.id === selectedIds[0])
+        const originalBounds = boundsFromElement(selectedElement)
+
+        resizeRef.current = {
+          pointerId: event.pointerId,
+          handle: resizeHandle,
+          originalElement: selectedElement,
+          originalBounds,
+        }
+        event.currentTarget.setPointerCapture(event.pointerId)
+        return
+      }
+
+      const hitElement = findElementAtPoint(elements, point, 8 / viewport.scale)
+
+      if (hitElement) {
+        setSelectedIds([hitElement.id])
+        moveRef.current = {
+          pointerId: event.pointerId,
+          lastPoint: point,
+        }
+        event.currentTarget.setPointerCapture(event.pointerId)
+      } else {
+        clearSelection()
+      }
+
+      return
+    }
 
     if (activeTool === 'text' || activeTool === 'sticky') {
       const element = activeTool === 'text'
@@ -202,12 +278,44 @@ function WhiteboardCanvas() {
       element,
     }
     setDraftElement(element)
-  }, [activeTool, addElement, elements, style, viewport, worldPointFromEvent])
+  }, [
+    activeTool,
+    addElement,
+    clearSelection,
+    elements,
+    getResizeHandleAtPoint,
+    selectedIds,
+    setSelectedIds,
+    style,
+    viewport.scale,
+    worldPointFromEvent,
+  ])
 
   const handlePointerMove = useCallback((event) => {
     const pan = panRef.current
 
     if (!pan || pan.pointerId !== event.pointerId) {
+      const resize = resizeRef.current
+
+      if (resize?.pointerId === event.pointerId) {
+        const point = worldPointFromEvent(event)
+        const nextBounds = boundsFromHandleDrag(resize.handle, resize.originalBounds, point)
+        replaceElement(resizeElementToBounds(resize.originalElement, resize.originalBounds, nextBounds))
+        return
+      }
+
+      const move = moveRef.current
+
+      if (move?.pointerId === event.pointerId) {
+        const point = worldPointFromEvent(event)
+        moveSelected({
+          x: point.x - move.lastPoint.x,
+          y: point.y - move.lastPoint.y,
+        })
+        move.lastPoint = point
+        return
+      }
+
       const draft = draftRef.current
 
       if (!draft || draft.pointerId !== event.pointerId) {
@@ -241,7 +349,14 @@ function WhiteboardCanvas() {
       x: event.clientX - pan.x,
       y: event.clientY - pan.y,
     }))
-  }, [setViewport, viewport.scale, worldPointFromEvent])
+  }, [
+    boundsFromHandleDrag,
+    moveSelected,
+    replaceElement,
+    setViewport,
+    viewport.scale,
+    worldPointFromEvent,
+  ])
 
   const stopPanning = useCallback((event) => {
     if (panRef.current?.pointerId === event.pointerId) {
@@ -274,6 +389,14 @@ function WhiteboardCanvas() {
 
       draftRef.current = null
       setDraftElement(null)
+    }
+
+    if (moveRef.current?.pointerId === event.pointerId) {
+      moveRef.current = null
+    }
+
+    if (resizeRef.current?.pointerId === event.pointerId) {
+      resizeRef.current = null
     }
   }, [addElement])
 

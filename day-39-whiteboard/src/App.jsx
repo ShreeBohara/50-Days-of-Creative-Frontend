@@ -7,6 +7,7 @@ import {
   FileUp,
   Grid3X3,
   Minus,
+  MoveDown,
   MousePointer2,
   MoveUp,
   PenLine,
@@ -60,10 +61,14 @@ function IconButton({ icon, label, shortcut, active = false, onClick }) {
 function App() {
   const activeTool = useWhiteboardStore((state) => state.activeTool)
   const elements = useWhiteboardStore((state) => state.elements)
+  const selectedIds = useWhiteboardStore((state) => state.selectedIds)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const style = useWhiteboardStore((state) => state.style)
   const viewport = useWhiteboardStore((state) => state.viewport)
   const setActiveTool = useWhiteboardStore((state) => state.setActiveTool)
+  const bringForward = useWhiteboardStore((state) => state.bringForward)
+  const deleteSelected = useWhiteboardStore((state) => state.deleteSelected)
+  const sendBackward = useWhiteboardStore((state) => state.sendBackward)
   const toggleGrid = useWhiteboardStore((state) => state.toggleGrid)
   const updateStyle = useWhiteboardStore((state) => state.updateStyle)
   const activeToolLabel = TOOL_BY_ID[activeTool]?.label ?? 'Select'
@@ -169,9 +174,31 @@ function App() {
             <Grid3X3 aria-hidden="true" size={16} />
             Grid
           </button>
-          <button className="flat-button" type="button">
+          <button
+            className="flat-button"
+            type="button"
+            disabled={!selectedIds.length}
+            onClick={bringForward}
+          >
             <MoveUp aria-hidden="true" size={16} />
-            Layer
+            Forward
+          </button>
+          <button
+            className="flat-button"
+            type="button"
+            disabled={!selectedIds.length}
+            onClick={sendBackward}
+          >
+            <MoveDown aria-hidden="true" size={16} />
+            Back
+          </button>
+          <button
+            className="flat-button danger"
+            type="button"
+            disabled={!selectedIds.length}
+            onClick={deleteSelected}
+          >
+            Delete
           </button>
         </div>
 
@@ -181,6 +208,7 @@ function App() {
           <span>Tool: {activeToolLabel}</span>
           <span>Zoom: {Math.round(viewport.scale * 100)}%</span>
           <span>{elements.length} elements</span>
+          <span>{selectedIds.length} selected</span>
           <span>Pan: {Math.round(viewport.x)}, {Math.round(viewport.y)}</span>
         </footer>
       </section>

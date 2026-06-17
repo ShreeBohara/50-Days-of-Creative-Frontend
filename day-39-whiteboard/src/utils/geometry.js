@@ -87,3 +87,57 @@ export function translateElement(element, delta) {
     y: element.y + delta.y,
   }
 }
+
+export function scalePointFromBounds(point, fromBounds, toBounds) {
+  const fromWidth = fromBounds.width || 1
+  const fromHeight = fromBounds.height || 1
+  const xRatio = (point.x - fromBounds.x) / fromWidth
+  const yRatio = (point.y - fromBounds.y) / fromHeight
+
+  return {
+    x: toBounds.x + (xRatio * toBounds.width),
+    y: toBounds.y + (yRatio * toBounds.height),
+  }
+}
+
+export function resizeElementToBounds(element, fromBounds, toBounds) {
+  if (element.type === 'draw') {
+    return {
+      ...element,
+      points: element.points.map((point) => ({
+        ...point,
+        ...scalePointFromBounds(point, fromBounds, toBounds),
+      })),
+    }
+  }
+
+  if (element.type === 'line' || element.type === 'arrow') {
+    const start = scalePointFromBounds({ x: element.x1, y: element.y1 }, fromBounds, toBounds)
+    const end = scalePointFromBounds({ x: element.x2, y: element.y2 }, fromBounds, toBounds)
+
+    return {
+      ...element,
+      x1: start.x,
+      y1: start.y,
+      x2: end.x,
+      y2: end.y,
+    }
+  }
+
+  if (element.type === 'text') {
+    return {
+      ...element,
+      x: toBounds.x,
+      y: toBounds.y + element.fontSize,
+      width: Math.max(80, toBounds.width),
+    }
+  }
+
+  return {
+    ...element,
+    x: toBounds.x,
+    y: toBounds.y,
+    width: Math.max(8, toBounds.width),
+    height: Math.max(8, toBounds.height),
+  }
+}
