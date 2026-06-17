@@ -1,121 +1,143 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import {
+  ArrowUpRight,
+  Brush,
+  Circle,
+  Eraser,
+  FileDown,
+  FileUp,
+  Grid3X3,
+  Minus,
+  MousePointer2,
+  MoveUp,
+  PenLine,
+  Redo2,
+  Square,
+  StickyNote,
+  Type,
+  Undo2,
+} from 'lucide-react'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const tools = [
+  { id: 'select', label: 'Select', shortcut: '1', icon: MousePointer2 },
+  { id: 'draw', label: 'Draw', shortcut: '2', icon: Brush },
+  { id: 'line', label: 'Line', shortcut: '3', icon: Minus },
+  { id: 'rectangle', label: 'Rectangle', shortcut: '4', icon: Square },
+  { id: 'ellipse', label: 'Ellipse', shortcut: '5', icon: Circle },
+  { id: 'arrow', label: 'Arrow', shortcut: '6', icon: ArrowUpRight },
+  { id: 'text', label: 'Text', shortcut: '7', icon: Type },
+  { id: 'sticky', label: 'Sticky', shortcut: '8', icon: StickyNote },
+  { id: 'eraser', label: 'Eraser', shortcut: '9', icon: Eraser },
+]
 
+const colors = [
+  '#0f766e',
+  '#14b8a6',
+  '#f97316',
+  '#ef4444',
+  '#a855f7',
+  '#2563eb',
+  '#0f172a',
+  '#64748b',
+  '#facc15',
+  '#84cc16',
+  '#f9a8d4',
+  '#ffffff',
+]
+
+function IconButton({ icon: Icon, label, shortcut, active = false }) {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <button
+      className={active ? 'icon-button is-active' : 'icon-button'}
+      type="button"
+      aria-label={`${label}${shortcut ? `, shortcut ${shortcut}` : ''}`}
+      title={`${label}${shortcut ? ` (${shortcut})` : ''}`}
+    >
+      <Icon aria-hidden="true" size={18} strokeWidth={2.2} />
+      {shortcut ? <span>{shortcut}</span> : null}
+    </button>
+  )
+}
+
+function App() {
+  return (
+    <main className="whiteboard-app">
+      <aside className="toolbar" aria-label="Whiteboard tools">
+        <div className="brand-mark" aria-label="Day 39 Whiteboard">
+          <PenLine aria-hidden="true" size={20} />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+
+        <div className="tool-group" role="toolbar" aria-label="Drawing tools">
+          {tools.map((tool, index) => (
+            <IconButton key={tool.id} {...tool} active={index === 0} />
+          ))}
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+
+        <div className="tool-group compact" role="toolbar" aria-label="History and file actions">
+          <IconButton icon={Undo2} label="Undo" />
+          <IconButton icon={Redo2} label="Redo" />
+          <IconButton icon={FileDown} label="Export PNG" />
+          <IconButton icon={FileUp} label="Load JSON" />
+        </div>
+      </aside>
+
+      <section className="workspace" aria-label="Collaborative whiteboard workspace">
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Day 39</p>
+            <h1>Realtime whiteboard</h1>
+          </div>
+          <div className="presence-strip" aria-label="Collaboration status">
+            <span className="presence-dot"></span>
+            <span>Local tab ready</span>
+          </div>
+        </header>
+
+        <div className="stylebar" aria-label="Style controls">
+          <div className="swatches" aria-label="Color palette">
+            {colors.map((color) => (
+              <button
+                key={color}
+                className={color === colors[0] ? 'swatch is-active' : 'swatch'}
+                type="button"
+                aria-label={`Use color ${color}`}
+                style={{ '--swatch': color }}
+              />
+            ))}
+          </div>
+          <div className="segmented-control" aria-label="Stroke width">
+            <button type="button" className="is-active">2</button>
+            <button type="button">4</button>
+            <button type="button">8</button>
+            <button type="button">16</button>
+          </div>
+          <button className="flat-button" type="button">
+            <Grid3X3 aria-hidden="true" size={16} />
+            Grid
+          </button>
+          <button className="flat-button" type="button">
+            <MoveUp aria-hidden="true" size={16} />
+            Layer
+          </button>
+        </div>
+
+        <div className="canvas-shell">
+          <div className="canvas-placeholder" aria-label="Infinite canvas placeholder">
+            <div className="placeholder-crosshair"></div>
+          </div>
+          <div className="minimap-card" aria-label="Minimap preview">
+            <span></span>
+          </div>
+        </div>
+
+        <footer className="statusbar" aria-label="Whiteboard status">
+          <span>Tool: Select</span>
+          <span>Zoom: 100%</span>
+          <span>0 elements</span>
+          <span>Broadcast: waiting</span>
+        </footer>
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
