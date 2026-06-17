@@ -39,6 +39,8 @@ export const useWhiteboardStore = create((set, get) => ({
   viewport: DEFAULT_VIEWPORT,
   showGrid: true,
   remoteCursors: {},
+  collaborationStatus: 'offline',
+  broadcastCursor: () => {},
   historyPast: [],
   historyFuture: [],
   error: '',
@@ -49,6 +51,41 @@ export const useWhiteboardStore = create((set, get) => ({
   setShowGrid: (showGrid) => set({ showGrid }),
   setError: (error) => set({ error }),
   clearError: () => set({ error: '' }),
+  setCollaborationStatus: (collaborationStatus) => set({ collaborationStatus }),
+  setBroadcastCursor: (broadcastCursor) => set({ broadcastCursor }),
+
+  upsertRemoteCursor: (cursor) => {
+    set((state) => ({
+      remoteCursors: {
+        ...state.remoteCursors,
+        [cursor.id]: {
+          ...cursor,
+          lastSeen: Date.now(),
+        },
+      },
+    }))
+  },
+
+  removeRemoteCursor: (id) => {
+    set((state) => {
+      const nextCursors = { ...state.remoteCursors }
+      delete nextCursors[id]
+
+      return { remoteCursors: nextCursors }
+    })
+  },
+
+  pruneRemoteCursors: () => {
+    const now = Date.now()
+
+    set((state) => {
+      const nextCursors = Object.fromEntries(
+        Object.entries(state.remoteCursors).filter(([, cursor]) => now - cursor.lastSeen < 6000),
+      )
+
+      return { remoteCursors: nextCursors }
+    })
+  },
 
   loadProject: ({ elements, viewport }) => {
     set((state) => withHistory(state, {

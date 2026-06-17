@@ -82,10 +82,12 @@ function WhiteboardCanvas() {
   const activeTool = useWhiteboardStore((state) => state.activeTool)
   const elements = useWhiteboardStore((state) => state.elements)
   const selectedIds = useWhiteboardStore((state) => state.selectedIds)
+  const remoteCursors = useWhiteboardStore((state) => state.remoteCursors)
   const style = useWhiteboardStore((state) => state.style)
   const viewport = useWhiteboardStore((state) => state.viewport)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const addElement = useWhiteboardStore((state) => state.addElement)
+  const broadcastCursor = useWhiteboardStore((state) => state.broadcastCursor)
   const checkpointHistory = useWhiteboardStore((state) => state.checkpointHistory)
   const clearSelection = useWhiteboardStore((state) => state.clearSelection)
   const moveSelected = useWhiteboardStore((state) => state.moveSelected)
@@ -398,6 +400,8 @@ function WhiteboardCanvas() {
   ])
 
   const handlePointerMove = useCallback((event) => {
+    broadcastCursor(worldPointFromEvent(event))
+
     const pan = panRef.current
 
     if (!pan || pan.pointerId !== event.pointerId) {
@@ -473,6 +477,7 @@ function WhiteboardCanvas() {
     }))
   }, [
     boundsFromHandleDrag,
+    broadcastCursor,
     moveSelected,
     replaceElement,
     removeElements,
@@ -575,6 +580,23 @@ function WhiteboardCanvas() {
         onPointerUp={stopPanning}
         onWheel={handleWheel}
       />
+      {Object.values(remoteCursors).map((cursor) => {
+        const point = worldToScreen(cursor, viewport)
+
+        return (
+          <div
+            key={cursor.id}
+            className="remote-cursor"
+            style={{
+              left: `${point.x}px`,
+              top: `${point.y}px`,
+              '--cursor-color': cursor.color,
+            }}
+          >
+            <span>{cursor.name}</span>
+          </div>
+        )
+      })}
       {editingElement && editorBounds && editorPoint ? (
         <textarea
           ref={editorRef}

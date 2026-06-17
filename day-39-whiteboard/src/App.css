@@ -323,6 +323,36 @@
   resize: both;
 }
 
+.remote-cursor {
+  position: absolute;
+  z-index: 7;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.remote-cursor::before {
+  content: '';
+  position: absolute;
+  border-top: 13px solid var(--cursor-color);
+  border-right: 8px solid transparent;
+  transform: rotate(-14deg);
+}
+
+.remote-cursor span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  border-radius: 999px;
+  background: var(--cursor-color);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 5px 7px;
+  white-space: nowrap;
+}
+
 .text-editor-overlay.is-sticky {
   background: #fef3c7;
   padding: 14px;

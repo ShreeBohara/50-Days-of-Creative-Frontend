@@ -27,6 +27,7 @@ import {
   TOOL_BY_ID,
   TOOLS,
 } from './data/whiteboardConfig'
+import { useBroadcastWhiteboard } from './hooks/useBroadcastWhiteboard'
 import { useWhiteboardStore } from './store/useWhiteboardStore'
 import { exportElementsAsPng } from './utils/exportImage'
 import { downloadTextFile, parseProject, serializeProject } from './utils/serialization'
@@ -65,12 +66,16 @@ function IconButton({ icon, label, shortcut, active = false, disabled = false, o
 }
 
 function App() {
+  useBroadcastWhiteboard()
+
   const fileInputRef = useRef(null)
   const activeTool = useWhiteboardStore((state) => state.activeTool)
+  const collaborationStatus = useWhiteboardStore((state) => state.collaborationStatus)
   const elements = useWhiteboardStore((state) => state.elements)
   const error = useWhiteboardStore((state) => state.error)
   const historyFuture = useWhiteboardStore((state) => state.historyFuture)
   const historyPast = useWhiteboardStore((state) => state.historyPast)
+  const remoteCursors = useWhiteboardStore((state) => state.remoteCursors)
   const selectedIds = useWhiteboardStore((state) => state.selectedIds)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const style = useWhiteboardStore((state) => state.style)
@@ -88,6 +93,7 @@ function App() {
   const undo = useWhiteboardStore((state) => state.undo)
   const updateStyle = useWhiteboardStore((state) => state.updateStyle)
   const activeToolLabel = TOOL_BY_ID[activeTool]?.label ?? 'Select'
+  const remoteCount = Object.keys(remoteCursors).length
 
   const handleExportPng = () => {
     exportElementsAsPng(elements)
@@ -204,7 +210,11 @@ function App() {
           </div>
           <div className="presence-strip" aria-label="Collaboration status">
             <span className="presence-dot"></span>
-            <span>Local tab ready</span>
+            <span>
+              {collaborationStatus === 'unsupported'
+                ? 'Local only'
+                : `${remoteCount} remote ${remoteCount === 1 ? 'tab' : 'tabs'}`}
+            </span>
           </div>
         </header>
         <div className={error ? 'error-banner' : 'error-banner is-hidden'} role="alert">
@@ -309,6 +319,7 @@ function App() {
           <span>Zoom: {Math.round(viewport.scale * 100)}%</span>
           <span>{elements.length} elements</span>
           <span>{selectedIds.length} selected</span>
+          <span>Broadcast: {collaborationStatus}</span>
           <span>Pan: {Math.round(viewport.x)}, {Math.round(viewport.y)}</span>
         </footer>
       </section>
