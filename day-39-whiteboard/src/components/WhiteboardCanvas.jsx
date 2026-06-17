@@ -53,6 +53,7 @@ function WhiteboardCanvas() {
   const frameRef = useRef(0)
   const panRef = useRef(null)
   const draftRef = useRef(null)
+  const eraserRef = useRef(null)
   const moveRef = useRef(null)
   const resizeRef = useRef(null)
   const editorRef = useRef(null)
@@ -66,9 +67,11 @@ function WhiteboardCanvas() {
   const viewport = useWhiteboardStore((state) => state.viewport)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const addElement = useWhiteboardStore((state) => state.addElement)
+  const checkpointHistory = useWhiteboardStore((state) => state.checkpointHistory)
   const clearSelection = useWhiteboardStore((state) => state.clearSelection)
   const moveSelected = useWhiteboardStore((state) => state.moveSelected)
   const replaceElement = useWhiteboardStore((state) => state.replaceElement)
+  const removeElements = useWhiteboardStore((state) => state.removeElements)
   const setSelectedIds = useWhiteboardStore((state) => state.setSelectedIds)
   const updateElement = useWhiteboardStore((state) => state.updateElement)
   const setViewport = useWhiteboardStore((state) => state.setViewport)
@@ -211,7 +214,7 @@ function WhiteboardCanvas() {
       return
     }
 
-    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool) && activeTool !== 'text' && activeTool !== 'sticky' && activeTool !== 'select')) {
+    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool) && activeTool !== 'text' && activeTool !== 'sticky' && activeTool !== 'select' && activeTool !== 'eraser')) {
       return
     }
 
@@ -234,6 +237,7 @@ function WhiteboardCanvas() {
           originalElement: selectedElement,
           originalBounds,
         }
+        checkpointHistory()
         event.currentTarget.setPointerCapture(event.pointerId)
         return
       }
@@ -246,9 +250,28 @@ function WhiteboardCanvas() {
           pointerId: event.pointerId,
           lastPoint: point,
         }
+        checkpointHistory()
         event.currentTarget.setPointerCapture(event.pointerId)
       } else {
         clearSelection()
+      }
+
+      return
+    }
+
+    if (activeTool === 'eraser') {
+      checkpointHistory()
+      eraserRef.current = {
+        pointerId: event.pointerId,
+        erasedIds: new Set(),
+      }
+      event.currentTarget.setPointerCapture(event.pointerId)
+
+      const hitElement = findElementAtPoint(elements, point, 10 / viewport.scale)
+
+      if (hitElement) {
+        eraserRef.current.erasedIds.add(hitElement.id)
+        removeElements([hitElement.id], false)
       }
 
       return
@@ -281,9 +304,11 @@ function WhiteboardCanvas() {
   }, [
     activeTool,
     addElement,
+    checkpointHistory,
     clearSelection,
     elements,
     getResizeHandleAtPoint,
+    removeElements,
     selectedIds,
     setSelectedIds,
     style,
@@ -319,6 +344,22 @@ function WhiteboardCanvas() {
       const draft = draftRef.current
 
       if (!draft || draft.pointerId !== event.pointerId) {
+        const eraser = eraserRef.current
+
+        if (eraser?.pointerId === event.pointerId) {
+          const point = worldPointFromEvent(event)
+          const hitElement = findElementAtPoint(
+            useWhiteboardStore.getState().elements,
+            point,
+            10 / viewport.scale,
+          )
+
+          if (hitElement && !eraser.erasedIds.has(hitElement.id)) {
+            eraser.erasedIds.add(hitElement.id)
+            removeElements([hitElement.id], false)
+          }
+        }
+
         return
       }
 
@@ -353,6 +394,7 @@ function WhiteboardCanvas() {
     boundsFromHandleDrag,
     moveSelected,
     replaceElement,
+    removeElements,
     setViewport,
     viewport.scale,
     worldPointFromEvent,
@@ -397,6 +439,10 @@ function WhiteboardCanvas() {
 
     if (resizeRef.current?.pointerId === event.pointerId) {
       resizeRef.current = null
+    }
+
+    if (eraserRef.current?.pointerId === event.pointerId) {
+      eraserRef.current = null
     }
   }, [addElement])
 

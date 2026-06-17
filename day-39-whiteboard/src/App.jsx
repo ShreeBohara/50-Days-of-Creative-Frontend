@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   ArrowUpRight,
   Brush,
@@ -26,6 +27,7 @@ import {
   TOOLS,
 } from './data/whiteboardConfig'
 import { useWhiteboardStore } from './store/useWhiteboardStore'
+import { DEFAULT_VIEWPORT, clampScale } from './utils/viewport'
 import './App.css'
 
 const iconMap = {
@@ -40,7 +42,7 @@ const iconMap = {
   eraser: Eraser,
 }
 
-function IconButton({ icon, label, shortcut, active = false, onClick }) {
+function IconButton({ icon, label, shortcut, active = false, disabled = false, onClick }) {
   const Icon = typeof icon === 'string' ? iconMap[icon] : icon
 
   return (
@@ -49,6 +51,7 @@ function IconButton({ icon, label, shortcut, active = false, onClick }) {
       type="button"
       aria-label={`${label}${shortcut ? `, shortcut ${shortcut}` : ''}`}
       aria-pressed={active}
+      disabled={disabled}
       onClick={onClick}
       title={`${label}${shortcut ? ` (${shortcut})` : ''}`}
     >
@@ -61,17 +64,79 @@ function IconButton({ icon, label, shortcut, active = false, onClick }) {
 function App() {
   const activeTool = useWhiteboardStore((state) => state.activeTool)
   const elements = useWhiteboardStore((state) => state.elements)
+  const historyFuture = useWhiteboardStore((state) => state.historyFuture)
+  const historyPast = useWhiteboardStore((state) => state.historyPast)
   const selectedIds = useWhiteboardStore((state) => state.selectedIds)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const style = useWhiteboardStore((state) => state.style)
   const viewport = useWhiteboardStore((state) => state.viewport)
   const setActiveTool = useWhiteboardStore((state) => state.setActiveTool)
   const bringForward = useWhiteboardStore((state) => state.bringForward)
+  const clearSelection = useWhiteboardStore((state) => state.clearSelection)
   const deleteSelected = useWhiteboardStore((state) => state.deleteSelected)
+  const redo = useWhiteboardStore((state) => state.redo)
   const sendBackward = useWhiteboardStore((state) => state.sendBackward)
+  const setViewport = useWhiteboardStore((state) => state.setViewport)
   const toggleGrid = useWhiteboardStore((state) => state.toggleGrid)
+  const undo = useWhiteboardStore((state) => state.undo)
   const updateStyle = useWhiteboardStore((state) => state.updateStyle)
   const activeToolLabel = TOOL_BY_ID[activeTool]?.label ?? 'Select'
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const tagName = event.target?.tagName
+      const isTyping = tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT' || event.target?.isContentEditable
+
+      if (isTyping) {
+        return
+      }
+
+      const matchingTool = TOOLS.find((tool) => tool.shortcut === event.key)
+
+      if (matchingTool) {
+        event.preventDefault()
+        setActiveTool(matchingTool.id)
+        return
+      }
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault()
+        if (event.shiftKey) redo()
+        else undo()
+        return
+      }
+
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        event.preventDefault()
+        deleteSelected()
+        return
+      }
+
+      if (event.key === 'Escape') {
+        clearSelection()
+        return
+      }
+
+      if (event.key === '+' || event.key === '=') {
+        const current = useWhiteboardStore.getState().viewport
+        setViewport({ ...current, scale: clampScale(current.scale * 1.12) })
+        return
+      }
+
+      if (event.key === '-' || event.key === '_') {
+        const current = useWhiteboardStore.getState().viewport
+        setViewport({ ...current, scale: clampScale(current.scale * 0.88) })
+        return
+      }
+
+      if (event.key === '0') {
+        setViewport(DEFAULT_VIEWPORT)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [clearSelection, deleteSelected, redo, setActiveTool, setViewport, undo])
 
   return (
     <main className="whiteboard-app">
@@ -92,8 +157,8 @@ function App() {
         </div>
 
         <div className="tool-group compact" role="toolbar" aria-label="History and file actions">
-          <IconButton icon={Undo2} label="Undo" />
-          <IconButton icon={Redo2} label="Redo" />
+          <IconButton icon={Undo2} label="Undo" disabled={!historyPast.length} onClick={undo} />
+          <IconButton icon={Redo2} label="Redo" disabled={!historyFuture.length} onClick={redo} />
           <IconButton icon={FileDown} label="Export PNG" />
           <IconButton icon={FileUp} label="Load JSON" />
         </div>

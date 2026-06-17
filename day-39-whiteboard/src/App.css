@@ -80,6 +80,11 @@
   color: #0f766e;
 }
 
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
 .workspace {
   display: grid;
   min-width: 0;
@@ -277,6 +282,10 @@
 
 .whiteboard-canvas.tool-draw {
   cursor: crosshair;
+}
+
+.whiteboard-canvas.tool-eraser {
+  cursor: cell;
 }
 
 .canvas-shell.is-panning .whiteboard-canvas {

@@ -16,6 +16,21 @@ function updateElementById(elements, id, updater) {
   })
 }
 
+function snapshot(state) {
+  return {
+    elements: state.elements,
+    selectedIds: state.selectedIds,
+  }
+}
+
+function withHistory(state, patch) {
+  return {
+    ...patch,
+    historyPast: [...state.historyPast, snapshot(state)].slice(-80),
+    historyFuture: [],
+  }
+}
+
 export const useWhiteboardStore = create((set, get) => ({
   activeTool: 'select',
   elements: [],
@@ -24,6 +39,8 @@ export const useWhiteboardStore = create((set, get) => ({
   viewport: DEFAULT_VIEWPORT,
   showGrid: true,
   remoteCursors: {},
+  historyPast: [],
+  historyFuture: [],
   error: '',
 
   setActiveTool: (activeTool) => set({ activeTool }),
@@ -43,14 +60,14 @@ export const useWhiteboardStore = create((set, get) => ({
   },
 
   addElement: (element) => {
-    set((state) => ({
+    set((state) => withHistory(state, {
       elements: [...state.elements, element],
       selectedIds: [element.id],
     }))
   },
 
   updateElement: (id, updater) => {
-    set((state) => ({
+    set((state) => withHistory(state, {
       elements: updateElementById(state.elements, id, updater),
     }))
   },
@@ -61,17 +78,25 @@ export const useWhiteboardStore = create((set, get) => ({
     }))
   },
 
-  setElements: (elements) => {
-    set({ elements, selectedIds: [] })
+  setElements: (elements, record = true) => {
+    set((state) => (
+      record
+        ? withHistory(state, { elements, selectedIds: [] })
+        : { elements, selectedIds: [] }
+    ))
   },
 
-  removeElements: (ids) => {
+  removeElements: (ids, record = true) => {
     const idSet = new Set(ids)
 
-    set((state) => ({
-      elements: state.elements.filter((element) => !idSet.has(element.id)),
-      selectedIds: state.selectedIds.filter((id) => !idSet.has(id)),
-    }))
+    set((state) => {
+      const patch = {
+        elements: state.elements.filter((element) => !idSet.has(element.id)),
+        selectedIds: state.selectedIds.filter((id) => !idSet.has(id)),
+      }
+
+      return record ? withHistory(state, patch) : patch
+    })
   },
 
   setSelectedIds: (selectedIds) => set({ selectedIds }),
@@ -100,7 +125,7 @@ export const useWhiteboardStore = create((set, get) => ({
   bringForward: () => {
     const selected = new Set(get().selectedIds)
 
-    set((state) => ({
+    set((state) => withHistory(state, {
       elements: state.elements.map((element) => (
         selected.has(element.id)
           ? { ...element, zIndex: element.zIndex + 1, updatedAt: Date.now() }
@@ -112,7 +137,7 @@ export const useWhiteboardStore = create((set, get) => ({
   sendBackward: () => {
     const selected = new Set(get().selectedIds)
 
-    set((state) => ({
+    set((state) => withHistory(state, {
       elements: state.elements.map((element) => (
         selected.has(element.id)
           ? { ...element, zIndex: Math.max(1, element.zIndex - 1), updatedAt: Date.now() }
@@ -121,13 +146,51 @@ export const useWhiteboardStore = create((set, get) => ({
     }))
   },
 
+  checkpointHistory: () => {
+    set((state) => withHistory(state, {}))
+  },
+
+  undo: () => {
+    set((state) => {
+      const previous = state.historyPast.at(-1)
+
+      if (!previous) {
+        return state
+      }
+
+      return {
+        elements: previous.elements,
+        selectedIds: previous.selectedIds,
+        historyPast: state.historyPast.slice(0, -1),
+        historyFuture: [snapshot(state), ...state.historyFuture].slice(0, 80),
+      }
+    })
+  },
+
+  redo: () => {
+    set((state) => {
+      const next = state.historyFuture[0]
+
+      if (!next) {
+        return state
+      }
+
+      return {
+        elements: next.elements,
+        selectedIds: next.selectedIds,
+        historyPast: [...state.historyPast, snapshot(state)].slice(-80),
+        historyFuture: state.historyFuture.slice(1),
+      }
+    })
+  },
+
   resetBoard: () => {
-    set({
+    set((state) => withHistory(state, {
       elements: [],
       selectedIds: [],
       viewport: DEFAULT_VIEWPORT,
       error: '',
-    })
+    }))
   },
 
   getSelectedElements: () => {
