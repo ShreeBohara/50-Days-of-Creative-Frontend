@@ -8,6 +8,13 @@ A mini Excalidraw-style infinite canvas built with React, Zustand, Canvas API, a
 - Freehand drawing, lines, rectangles, ellipses, arrows, text, sticky notes, eraser, selection, resizing, and layers.
 - Undo/redo, keyboard shortcuts, PNG export, JSON save/load, and same-browser multi-tab sync.
 
+## Shortcuts
+
+- `1-9` switches tools.
+- `Delete` removes the current selection.
+- `Ctrl/Cmd+Z` and `Ctrl/Cmd+Shift+Z` undo and redo.
+- `+`, `-`, and `0` control zoom.
+
 ## Scripts
 
 ```bash

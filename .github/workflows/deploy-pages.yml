@@ -45,6 +45,7 @@ on:
       - "day-36-realtime-dashboard/**"
       - "day-37-bento-grid/**"
       - "day-38-pathfinding-viz/**"
+      - "day-39-whiteboard/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -93,6 +94,7 @@ jobs:
             day-36-realtime-dashboard/package-lock.json
             day-37-bento-grid/package-lock.json
             day-38-pathfinding-viz/package-lock.json
+            day-39-whiteboard/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -246,6 +248,14 @@ jobs:
         working-directory: day-38-pathfinding-viz
         run: npm run build
 
+      - name: Install Day 39 app dependencies
+        working-directory: day-39-whiteboard
+        run: npm ci
+
+      - name: Build Day 39 app
+        working-directory: day-39-whiteboard
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -310,6 +320,8 @@ jobs:
           cp -R day-37-bento-grid/dist/. _site/day-37-bento-grid/
           mkdir -p _site/day-38-pathfinding-viz
           cp -R day-38-pathfinding-viz/dist/. _site/day-38-pathfinding-viz/
+          mkdir -p _site/day-39-whiteboard
+          cp -R day-39-whiteboard/dist/. _site/day-39-whiteboard/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4

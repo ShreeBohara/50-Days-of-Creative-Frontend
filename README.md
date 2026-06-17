@@ -46,6 +46,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 36 | PulseGrid Real-Time Dashboard | Infrastructure command center with simulated streaming telemetry, D3 charts, gauges, heatmap, incident alerts, and configurable thresholds. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-36-realtime-dashboard/) | [day-36-realtime-dashboard](./day-36-realtime-dashboard/) |
 | 37 | Animated Bento Grid Portfolio | Creative operating-system portfolio with twelve interactive modules, a live clock, project modal, GitHub heatmap, synthetic portrait, and persisted themes. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-37-bento-grid/) | [day-37-bento-grid](./day-37-bento-grid/) |
 | 38 | Route Lab Pathfinding Visualizer | Canvas pathfinding workspace with terrain painting, six search algorithms, maze generation, animated routes, and synchronized comparison mode. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-38-pathfinding-viz/) | [day-38-pathfinding-viz](./day-38-pathfinding-viz/) |
+| 39 | Realtime Collaborative Whiteboard | Infinite canvas whiteboard with drawing tools, shapes, sticky notes, undo history, minimap, JSON/PNG export, and BroadcastChannel multi-tab sync. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-39-whiteboard/) | [day-39-whiteboard](./day-39-whiteboard/) |
 
 ## Adding a New Day
 
