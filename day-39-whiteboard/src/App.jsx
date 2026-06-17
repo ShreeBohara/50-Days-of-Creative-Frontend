@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react'
 import {
   ArrowUpRight,
   Brush,
@@ -18,41 +17,37 @@ import {
   Undo2,
 } from 'lucide-react'
 import WhiteboardCanvas from './components/WhiteboardCanvas'
+import {
+  BRUSH_SIZES,
+  COLORS,
+  TOOL_BY_ID,
+  TOOLS,
+} from './data/whiteboardConfig'
+import { useWhiteboardStore } from './store/useWhiteboardStore'
 import './App.css'
 
-const tools = [
-  { id: 'select', label: 'Select', shortcut: '1', icon: MousePointer2 },
-  { id: 'draw', label: 'Draw', shortcut: '2', icon: Brush },
-  { id: 'line', label: 'Line', shortcut: '3', icon: Minus },
-  { id: 'rectangle', label: 'Rectangle', shortcut: '4', icon: Square },
-  { id: 'ellipse', label: 'Ellipse', shortcut: '5', icon: Circle },
-  { id: 'arrow', label: 'Arrow', shortcut: '6', icon: ArrowUpRight },
-  { id: 'text', label: 'Text', shortcut: '7', icon: Type },
-  { id: 'sticky', label: 'Sticky', shortcut: '8', icon: StickyNote },
-  { id: 'eraser', label: 'Eraser', shortcut: '9', icon: Eraser },
-]
+const iconMap = {
+  select: MousePointer2,
+  draw: Brush,
+  line: Minus,
+  rectangle: Square,
+  ellipse: Circle,
+  arrow: ArrowUpRight,
+  text: Type,
+  sticky: StickyNote,
+  eraser: Eraser,
+}
 
-const colors = [
-  '#0f766e',
-  '#14b8a6',
-  '#f97316',
-  '#ef4444',
-  '#a855f7',
-  '#2563eb',
-  '#0f172a',
-  '#64748b',
-  '#facc15',
-  '#84cc16',
-  '#f9a8d4',
-  '#ffffff',
-]
+function IconButton({ icon, label, shortcut, active = false, onClick }) {
+  const Icon = typeof icon === 'string' ? iconMap[icon] : icon
 
-function IconButton({ icon: Icon, label, shortcut, active = false }) {
   return (
     <button
       className={active ? 'icon-button is-active' : 'icon-button'}
       type="button"
       aria-label={`${label}${shortcut ? `, shortcut ${shortcut}` : ''}`}
+      aria-pressed={active}
+      onClick={onClick}
       title={`${label}${shortcut ? ` (${shortcut})` : ''}`}
     >
       <Icon aria-hidden="true" size={18} strokeWidth={2.2} />
@@ -62,11 +57,15 @@ function IconButton({ icon: Icon, label, shortcut, active = false }) {
 }
 
 function App() {
-  const [showGrid, setShowGrid] = useState(true)
-  const [viewport, setViewport] = useState({ x: 0, y: 0, scale: 1 })
-  const handleViewportChange = useCallback((nextViewport) => {
-    setViewport(nextViewport)
-  }, [])
+  const activeTool = useWhiteboardStore((state) => state.activeTool)
+  const elements = useWhiteboardStore((state) => state.elements)
+  const showGrid = useWhiteboardStore((state) => state.showGrid)
+  const style = useWhiteboardStore((state) => state.style)
+  const viewport = useWhiteboardStore((state) => state.viewport)
+  const setActiveTool = useWhiteboardStore((state) => state.setActiveTool)
+  const toggleGrid = useWhiteboardStore((state) => state.toggleGrid)
+  const updateStyle = useWhiteboardStore((state) => state.updateStyle)
+  const activeToolLabel = TOOL_BY_ID[activeTool]?.label ?? 'Select'
 
   return (
     <main className="whiteboard-app">
@@ -76,8 +75,13 @@ function App() {
         </div>
 
         <div className="tool-group" role="toolbar" aria-label="Drawing tools">
-          {tools.map((tool, index) => (
-            <IconButton key={tool.id} {...tool} active={index === 0} />
+          {TOOLS.map((tool) => (
+            <IconButton
+              key={tool.id}
+              {...tool}
+              active={activeTool === tool.id}
+              onClick={() => setActiveTool(tool.id)}
+            />
           ))}
         </div>
 
@@ -103,27 +107,34 @@ function App() {
 
         <div className="stylebar" aria-label="Style controls">
           <div className="swatches" aria-label="Color palette">
-            {colors.map((color) => (
+            {COLORS.map((color) => (
               <button
                 key={color}
-                className={color === colors[0] ? 'swatch is-active' : 'swatch'}
+                className={color === style.stroke ? 'swatch is-active' : 'swatch'}
                 type="button"
                 aria-label={`Use color ${color}`}
+                onClick={() => updateStyle({ stroke: color })}
                 style={{ '--swatch': color }}
               />
             ))}
           </div>
           <div className="segmented-control" aria-label="Stroke width">
-            <button type="button" className="is-active">2</button>
-            <button type="button">4</button>
-            <button type="button">8</button>
-            <button type="button">16</button>
+            {BRUSH_SIZES.map((size) => (
+              <button
+                key={size}
+                type="button"
+                className={size === style.strokeWidth ? 'is-active' : ''}
+                onClick={() => updateStyle({ strokeWidth: size })}
+              >
+                {size}
+              </button>
+            ))}
           </div>
           <button
             className={showGrid ? 'flat-button is-active' : 'flat-button'}
             type="button"
             aria-pressed={showGrid}
-            onClick={() => setShowGrid((current) => !current)}
+            onClick={toggleGrid}
           >
             <Grid3X3 aria-hidden="true" size={16} />
             Grid
@@ -134,12 +145,12 @@ function App() {
           </button>
         </div>
 
-        <WhiteboardCanvas showGrid={showGrid} onViewportChange={handleViewportChange} />
+        <WhiteboardCanvas />
 
         <footer className="statusbar" aria-label="Whiteboard status">
-          <span>Tool: Select</span>
+          <span>Tool: {activeToolLabel}</span>
           <span>Zoom: {Math.round(viewport.scale * 100)}%</span>
-          <span>0 elements</span>
+          <span>{elements.length} elements</span>
           <span>Pan: {Math.round(viewport.x)}, {Math.round(viewport.y)}</span>
         </footer>
       </section>

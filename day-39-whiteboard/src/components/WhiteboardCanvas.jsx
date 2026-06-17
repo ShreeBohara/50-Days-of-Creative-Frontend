@@ -4,6 +4,7 @@ import {
   translateViewport,
   zoomViewport,
 } from '../utils/viewport'
+import { useWhiteboardStore } from '../store/useWhiteboardStore'
 
 const GRID_SIZE = 32
 
@@ -28,12 +29,14 @@ function drawGrid(context, rect, viewport) {
   }
 }
 
-function WhiteboardCanvas({ showGrid = true, onViewportChange }) {
+function WhiteboardCanvas() {
   const canvasRef = useRef(null)
   const frameRef = useRef(0)
   const panRef = useRef(null)
-  const [viewport, setViewport] = useState(DEFAULT_VIEWPORT)
   const [isPanning, setIsPanning] = useState(false)
+  const viewport = useWhiteboardStore((state) => state.viewport)
+  const showGrid = useWhiteboardStore((state) => state.showGrid)
+  const setViewport = useWhiteboardStore((state) => state.setViewport)
 
   const render = useCallback(() => {
     const canvas = canvasRef.current
@@ -92,8 +95,7 @@ function WhiteboardCanvas({ showGrid = true, onViewportChange }) {
 
   useEffect(() => {
     scheduleRender()
-    onViewportChange?.(viewport)
-  }, [onViewportChange, scheduleRender, viewport])
+  }, [scheduleRender, viewport])
 
   const pointFromEvent = useCallback((event) => {
     const rect = canvasRef.current.getBoundingClientRect()
@@ -109,8 +111,8 @@ function WhiteboardCanvas({ showGrid = true, onViewportChange }) {
     const point = pointFromEvent(event)
     const zoomDirection = event.deltaY > 0 ? 0.9 : 1.1
 
-    setViewport((current) => zoomViewport(current, point, current.scale * zoomDirection))
-  }, [pointFromEvent])
+    setViewport(zoomViewport(viewport, point, viewport.scale * zoomDirection))
+  }, [pointFromEvent, setViewport, viewport])
 
   const handlePointerDown = useCallback((event) => {
     if (event.button !== 1) {
@@ -139,7 +141,7 @@ function WhiteboardCanvas({ showGrid = true, onViewportChange }) {
       x: event.clientX - pan.x,
       y: event.clientY - pan.y,
     }))
-  }, [])
+  }, [setViewport])
 
   const stopPanning = useCallback((event) => {
     if (panRef.current?.pointerId === event.pointerId) {
@@ -150,7 +152,7 @@ function WhiteboardCanvas({ showGrid = true, onViewportChange }) {
 
   const resetViewport = useCallback(() => {
     setViewport(DEFAULT_VIEWPORT)
-  }, [])
+  }, [setViewport])
 
   return (
     <div className={isPanning ? 'canvas-shell is-panning' : 'canvas-shell'}>
