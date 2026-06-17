@@ -50,6 +50,15 @@ export const useWhiteboardStore = create((set, get) => ({
   setError: (error) => set({ error }),
   clearError: () => set({ error: '' }),
 
+  loadProject: ({ elements, viewport }) => {
+    set((state) => withHistory(state, {
+      elements,
+      viewport,
+      selectedIds: [],
+      error: '',
+    }))
+  },
+
   updateStyle: (patch) => {
     set((state) => ({
       style: {

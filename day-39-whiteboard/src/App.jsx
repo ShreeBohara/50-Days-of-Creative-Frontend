@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   ArrowUpRight,
   Brush,
@@ -13,6 +13,7 @@ import {
   MoveUp,
   PenLine,
   Redo2,
+  Save,
   Square,
   StickyNote,
   Type,
@@ -27,6 +28,8 @@ import {
   TOOLS,
 } from './data/whiteboardConfig'
 import { useWhiteboardStore } from './store/useWhiteboardStore'
+import { exportElementsAsPng } from './utils/exportImage'
+import { downloadTextFile, parseProject, serializeProject } from './utils/serialization'
 import { DEFAULT_VIEWPORT, clampScale } from './utils/viewport'
 import './App.css'
 
@@ -62,8 +65,10 @@ function IconButton({ icon, label, shortcut, active = false, disabled = false, o
 }
 
 function App() {
+  const fileInputRef = useRef(null)
   const activeTool = useWhiteboardStore((state) => state.activeTool)
   const elements = useWhiteboardStore((state) => state.elements)
+  const error = useWhiteboardStore((state) => state.error)
   const historyFuture = useWhiteboardStore((state) => state.historyFuture)
   const historyPast = useWhiteboardStore((state) => state.historyPast)
   const selectedIds = useWhiteboardStore((state) => state.selectedIds)
@@ -73,7 +78,9 @@ function App() {
   const setActiveTool = useWhiteboardStore((state) => state.setActiveTool)
   const bringForward = useWhiteboardStore((state) => state.bringForward)
   const clearSelection = useWhiteboardStore((state) => state.clearSelection)
+  const setError = useWhiteboardStore((state) => state.setError)
   const deleteSelected = useWhiteboardStore((state) => state.deleteSelected)
+  const loadProject = useWhiteboardStore((state) => state.loadProject)
   const redo = useWhiteboardStore((state) => state.redo)
   const sendBackward = useWhiteboardStore((state) => state.sendBackward)
   const setViewport = useWhiteboardStore((state) => state.setViewport)
@@ -81,6 +88,30 @@ function App() {
   const undo = useWhiteboardStore((state) => state.undo)
   const updateStyle = useWhiteboardStore((state) => state.updateStyle)
   const activeToolLabel = TOOL_BY_ID[activeTool]?.label ?? 'Select'
+
+  const handleExportPng = () => {
+    exportElementsAsPng(elements)
+  }
+
+  const handleSaveJson = () => {
+    downloadTextFile('day-39-whiteboard.json', serializeProject({ elements, viewport }))
+  }
+
+  const handleLoadJson = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    try {
+      loadProject(parseProject(await file.text()))
+    } catch (loadError) {
+      setError(loadError.message)
+    } finally {
+      event.target.value = ''
+    }
+  }
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -159,8 +190,9 @@ function App() {
         <div className="tool-group compact" role="toolbar" aria-label="History and file actions">
           <IconButton icon={Undo2} label="Undo" disabled={!historyPast.length} onClick={undo} />
           <IconButton icon={Redo2} label="Redo" disabled={!historyFuture.length} onClick={redo} />
-          <IconButton icon={FileDown} label="Export PNG" />
-          <IconButton icon={FileUp} label="Load JSON" />
+          <IconButton icon={FileDown} label="Export PNG" onClick={handleExportPng} />
+          <IconButton icon={Save} label="Save JSON" onClick={handleSaveJson} />
+          <IconButton icon={FileUp} label="Load JSON" onClick={() => fileInputRef.current?.click()} />
         </div>
       </aside>
 
@@ -175,6 +207,9 @@ function App() {
             <span>Local tab ready</span>
           </div>
         </header>
+        <div className={error ? 'error-banner' : 'error-banner is-hidden'} role="alert">
+          {error}
+        </div>
 
         <div className="stylebar" aria-label="Style controls">
           <div className="swatches" aria-label="Color palette">
@@ -277,6 +312,13 @@ function App() {
           <span>Pan: {Math.round(viewport.x)}, {Math.round(viewport.y)}</span>
         </footer>
       </section>
+      <input
+        ref={fileInputRef}
+        className="visually-hidden"
+        type="file"
+        accept="application/json,.json"
+        onChange={handleLoadJson}
+      />
     </main>
   )
 }

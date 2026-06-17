@@ -48,9 +48,28 @@ function drawGrid(context, rect, viewport) {
   }
 }
 
+function unionBounds(boundsList) {
+  if (!boundsList.length) {
+    return { x: -500, y: -340, width: 1000, height: 680 }
+  }
+
+  const minX = Math.min(...boundsList.map((bounds) => bounds.x))
+  const minY = Math.min(...boundsList.map((bounds) => bounds.y))
+  const maxX = Math.max(...boundsList.map((bounds) => bounds.x + bounds.width))
+  const maxY = Math.max(...boundsList.map((bounds) => bounds.y + bounds.height))
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  }
+}
+
 function WhiteboardCanvas() {
   const canvasRef = useRef(null)
   const frameRef = useRef(0)
+  const minimapRef = useRef(null)
   const panRef = useRef(null)
   const draftRef = useRef(null)
   const eraserRef = useRef(null)
@@ -124,6 +143,68 @@ function WhiteboardCanvas() {
       viewport.y - 80,
       160 * viewport.scale,
       160 * viewport.scale,
+    )
+
+    const minimap = minimapRef.current
+    const minimapContext = minimap?.getContext('2d')
+
+    if (!minimap || !minimapContext) {
+      return
+    }
+
+    const minimapRect = minimap.getBoundingClientRect()
+    const minimapRatio = window.devicePixelRatio || 1
+    const minimapWidth = Math.max(1, Math.round(minimapRect.width * minimapRatio))
+    const minimapHeight = Math.max(1, Math.round(minimapRect.height * minimapRatio))
+
+    if (minimap.width !== minimapWidth || minimap.height !== minimapHeight) {
+      minimap.width = minimapWidth
+      minimap.height = minimapHeight
+    }
+
+    const viewportWorldBounds = normalizeRect(
+      screenToWorld({ x: 0, y: 0 }, viewport),
+      screenToWorld({ x: rect.width, y: rect.height }, viewport),
+    )
+    const worldBounds = unionBounds([
+      viewportWorldBounds,
+      ...elements.map(boundsFromElement),
+    ])
+    const padding = 18
+    const scale = Math.min(
+      (minimapRect.width - (padding * 2)) / Math.max(1, worldBounds.width),
+      (minimapRect.height - (padding * 2)) / Math.max(1, worldBounds.height),
+    )
+    const toMini = (point) => ({
+      x: padding + ((point.x - worldBounds.x) * scale),
+      y: padding + ((point.y - worldBounds.y) * scale),
+    })
+
+    minimapContext.setTransform(minimapRatio, 0, 0, minimapRatio, 0, 0)
+    minimapContext.clearRect(0, 0, minimapRect.width, minimapRect.height)
+    minimapContext.fillStyle = 'rgba(255, 255, 255, 0.94)'
+    minimapContext.fillRect(0, 0, minimapRect.width, minimapRect.height)
+    minimapContext.fillStyle = 'rgba(13, 148, 136, 0.25)'
+
+    elements.forEach((element) => {
+      const bounds = boundsFromElement(element)
+      const topLeft = toMini(bounds)
+      minimapContext.fillRect(
+        topLeft.x,
+        topLeft.y,
+        Math.max(2, bounds.width * scale),
+        Math.max(2, bounds.height * scale),
+      )
+    })
+
+    const viewportPoint = toMini(viewportWorldBounds)
+    minimapContext.strokeStyle = '#f97316'
+    minimapContext.lineWidth = 2
+    minimapContext.strokeRect(
+      viewportPoint.x,
+      viewportPoint.y,
+      Math.max(8, viewportWorldBounds.width * scale),
+      Math.max(8, viewportWorldBounds.height * scale),
     )
   }, [draftElement, elements, selectedIds, showGrid, viewport])
 
@@ -523,6 +604,11 @@ function WhiteboardCanvas() {
           }}
         />
       ) : null}
+      <canvas
+        ref={minimapRef}
+        className="minimap-canvas"
+        aria-label="Minimap viewport indicator"
+      />
     </div>
   )
 }
