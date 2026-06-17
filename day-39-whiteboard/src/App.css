@@ -274,6 +274,26 @@
   cursor: grabbing;
 }
 
+.text-editor-overlay {
+  position: absolute;
+  z-index: 8;
+  min-width: 120px;
+  min-height: 42px;
+  border: 2px solid #f97316;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #134e4a;
+  line-height: 1.25;
+  outline: none;
+  padding: 8px;
+  resize: both;
+}
+
+.text-editor-overlay.is-sticky {
+  background: #fef3c7;
+  padding: 14px;
+}
+
 .statusbar {
   border-top: 1px solid #b7e7df;
   border-bottom: 0;

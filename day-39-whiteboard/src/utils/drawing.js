@@ -112,6 +112,65 @@ export function drawEllipse(context, element) {
   context.stroke()
 }
 
+function drawWrappedText(context, text, x, y, maxWidth, lineHeight) {
+  const lines = String(text || '').split('\n')
+  let cursorY = y
+
+  lines.forEach((line) => {
+    const words = line.split(' ')
+    let currentLine = ''
+
+    words.forEach((word) => {
+      const nextLine = currentLine ? `${currentLine} ${word}` : word
+
+      if (context.measureText(nextLine).width > maxWidth && currentLine) {
+        context.fillText(currentLine, x, cursorY)
+        currentLine = word
+        cursorY += lineHeight
+      } else {
+        currentLine = nextLine
+      }
+    })
+
+    context.fillText(currentLine, x, cursorY)
+    cursorY += lineHeight
+  })
+}
+
+export function drawTextElement(context, element) {
+  context.globalAlpha = element.opacity ?? 1
+  context.fillStyle = element.fill === 'transparent' ? element.stroke : element.fill
+  context.font = `${element.fontSize}px "Plus Jakarta Sans", sans-serif`
+  context.textBaseline = 'alphabetic'
+  drawWrappedText(context, element.text, element.x, element.y, element.width ?? 220, element.fontSize * 1.25)
+}
+
+export function drawStickyElement(context, element) {
+  const radius = 8
+  const textPadding = 16
+
+  context.globalAlpha = element.opacity ?? 1
+  context.fillStyle = element.fill
+  context.strokeStyle = 'rgba(15, 118, 110, 0.22)'
+  context.lineWidth = 1
+  context.beginPath()
+  context.roundRect(element.x, element.y, element.width, element.height, radius)
+  context.fill()
+  context.stroke()
+
+  context.fillStyle = '#134e4a'
+  context.font = `${element.fontSize}px "Plus Jakarta Sans", sans-serif`
+  context.textBaseline = 'top'
+  drawWrappedText(
+    context,
+    element.text,
+    element.x + textPadding,
+    element.y + textPadding,
+    element.width - (textPadding * 2),
+    element.fontSize * 1.25,
+  )
+}
+
 export function drawElement(context, element) {
   if (element.type === 'draw') {
     drawFreehand(context, element)
@@ -121,6 +180,10 @@ export function drawElement(context, element) {
     drawRectangle(context, element)
   } else if (element.type === 'ellipse') {
     drawEllipse(context, element)
+  } else if (element.type === 'text') {
+    drawTextElement(context, element)
+  } else if (element.type === 'sticky') {
+    drawStickyElement(context, element)
   }
 }
 

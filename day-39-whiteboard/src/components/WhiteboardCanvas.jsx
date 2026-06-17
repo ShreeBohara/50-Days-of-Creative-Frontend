@@ -2,15 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   createFreehandElement,
   createShapeElement,
+  createStickyElement,
+  createTextElement,
   getNextZIndex,
   updateShapeGeometry,
 } from '../utils/elements'
 import { drawElements } from '../utils/drawing'
-import { pointDistance } from '../utils/geometry'
+import { boundsFromElement, pointDistance } from '../utils/geometry'
+import { findElementAtPoint } from '../utils/hitTest'
 import {
   DEFAULT_VIEWPORT,
   screenToWorld,
   translateViewport,
+  worldToScreen,
   zoomViewport,
 } from '../utils/viewport'
 import { useWhiteboardStore } from '../store/useWhiteboardStore'
@@ -44,15 +48,25 @@ function WhiteboardCanvas() {
   const frameRef = useRef(0)
   const panRef = useRef(null)
   const draftRef = useRef(null)
+  const editorRef = useRef(null)
   const [isPanning, setIsPanning] = useState(false)
   const [draftElement, setDraftElement] = useState(null)
+  const [editing, setEditing] = useState(null)
   const activeTool = useWhiteboardStore((state) => state.activeTool)
   const elements = useWhiteboardStore((state) => state.elements)
   const style = useWhiteboardStore((state) => state.style)
   const viewport = useWhiteboardStore((state) => state.viewport)
   const showGrid = useWhiteboardStore((state) => state.showGrid)
   const addElement = useWhiteboardStore((state) => state.addElement)
+  const updateElement = useWhiteboardStore((state) => state.updateElement)
   const setViewport = useWhiteboardStore((state) => state.setViewport)
+
+  useEffect(() => {
+    if (editing) {
+      editorRef.current?.focus()
+      editorRef.current?.select()
+    }
+  }, [editing])
 
   const render = useCallback(() => {
     const canvas = canvasRef.current
@@ -154,7 +168,7 @@ function WhiteboardCanvas() {
       return
     }
 
-    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool))) {
+    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool) && activeTool !== 'text' && activeTool !== 'sticky')) {
       return
     }
 
@@ -163,6 +177,17 @@ function WhiteboardCanvas() {
 
     const point = worldPointFromEvent(event)
     const zIndex = getNextZIndex(elements)
+
+    if (activeTool === 'text' || activeTool === 'sticky') {
+      const element = activeTool === 'text'
+        ? createTextElement(point, 'Text label', style, zIndex)
+        : createStickyElement(point, 'New note', style, zIndex)
+
+      addElement(element)
+      setEditing({ elementId: element.id, value: element.text })
+      return
+    }
+
     const element = activeTool === 'draw'
       ? createFreehandElement(
           [{ ...point, pressure: event.pressure || 0.5 }],
@@ -177,7 +202,7 @@ function WhiteboardCanvas() {
       element,
     }
     setDraftElement(element)
-  }, [activeTool, elements, style, viewport, worldPointFromEvent])
+  }, [activeTool, addElement, elements, style, viewport, worldPointFromEvent])
 
   const handlePointerMove = useCallback((event) => {
     const pan = panRef.current
@@ -256,19 +281,79 @@ function WhiteboardCanvas() {
     setViewport(DEFAULT_VIEWPORT)
   }, [setViewport])
 
+  const handleDoubleClick = useCallback((event) => {
+    const point = worldPointFromEvent(event)
+    const element = findElementAtPoint(elements, point, 8 / viewport.scale)
+
+    if (element?.type === 'text' || element?.type === 'sticky') {
+      setEditing({ elementId: element.id, value: element.text })
+      return
+    }
+
+    resetViewport()
+  }, [elements, resetViewport, viewport.scale, worldPointFromEvent])
+
+  const commitEditing = useCallback(() => {
+    if (!editing) {
+      return
+    }
+
+    const text = editing.value.trim() || ' '
+    updateElement(editing.elementId, (element) => ({
+      ...element,
+      text,
+    }))
+    setEditing(null)
+  }, [editing, updateElement])
+
+  const editingElement = editing
+    ? elements.find((element) => element.id === editing.elementId)
+    : null
+  const editorBounds = editingElement ? boundsFromElement(editingElement) : null
+  const editorPoint = editorBounds ? worldToScreen(editorBounds, viewport) : null
+
   return (
     <div className={isPanning ? 'canvas-shell is-panning' : 'canvas-shell'}>
       <canvas
         ref={canvasRef}
         className={`whiteboard-canvas tool-${activeTool}`}
         aria-label="Infinite whiteboard canvas"
-        onDoubleClick={resetViewport}
+        onDoubleClick={handleDoubleClick}
         onPointerCancel={stopPanning}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={stopPanning}
         onWheel={handleWheel}
       />
+      {editingElement && editorBounds && editorPoint ? (
+        <textarea
+          ref={editorRef}
+          className={`text-editor-overlay is-${editingElement.type}`}
+          value={editing.value}
+          aria-label={`Edit ${editingElement.type}`}
+          onBlur={commitEditing}
+          onChange={(event) => setEditing((current) => ({
+            ...current,
+            value: event.target.value,
+          }))}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              setEditing(null)
+            }
+
+            if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+              commitEditing()
+            }
+          }}
+          style={{
+            left: `${editorPoint.x}px`,
+            top: `${editorPoint.y}px`,
+            width: `${Math.max(120, editorBounds.width * viewport.scale)}px`,
+            height: `${Math.max(42, editorBounds.height * viewport.scale)}px`,
+            fontSize: `${editingElement.fontSize * viewport.scale}px`,
+          }}
+        />
+      ) : null}
     </div>
   )
 }
