@@ -19,7 +19,7 @@ export function useBroadcastWhiteboard() {
   const elements = useWhiteboardStore((state) => state.elements)
   const channelRef = useRef(null)
   const suppressNextStatePostRef = useRef(false)
-  const client = useMemo(createClient, [])
+  const client = useMemo(() => createClient(), [])
 
   useEffect(() => {
     const setStatus = useWhiteboardStore.getState().setCollaborationStatus

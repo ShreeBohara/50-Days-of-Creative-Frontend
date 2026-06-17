@@ -437,6 +437,11 @@ input:focus-visible {
     flex-direction: column;
   }
 
+  .stylebar {
+    max-height: 152px;
+    overflow-y: auto;
+  }
+
   .whiteboard-canvas {
     min-height: 520px;
   }
@@ -446,5 +451,16 @@ input:focus-visible {
     bottom: 82px;
     width: 124px;
     height: 86px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

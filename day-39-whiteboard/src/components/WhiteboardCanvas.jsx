@@ -76,6 +76,8 @@ function WhiteboardCanvas() {
   const moveRef = useRef(null)
   const resizeRef = useRef(null)
   const editorRef = useRef(null)
+  const pinchRef = useRef(null)
+  const touchPointsRef = useRef(new Map())
   const [isPanning, setIsPanning] = useState(false)
   const [draftElement, setDraftElement] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -284,6 +286,32 @@ function WhiteboardCanvas() {
   }, [])
 
   const handlePointerDown = useCallback((event) => {
+    if (event.pointerType === 'touch') {
+      touchPointsRef.current.set(event.pointerId, {
+        clientX: event.clientX,
+        clientY: event.clientY,
+      })
+
+      if (touchPointsRef.current.size === 2) {
+        const touches = Array.from(touchPointsRef.current.values())
+        const distance = Math.hypot(
+          touches[0].clientX - touches[1].clientX,
+          touches[0].clientY - touches[1].clientY,
+        )
+        const rect = canvasRef.current.getBoundingClientRect()
+        const center = {
+          x: ((touches[0].clientX + touches[1].clientX) / 2) - rect.left,
+          y: ((touches[0].clientY + touches[1].clientY) / 2) - rect.top,
+        }
+
+        pinchRef.current = { distance, center, viewport }
+        draftRef.current = null
+        setDraftElement(null)
+        event.currentTarget.setPointerCapture(event.pointerId)
+        return
+      }
+    }
+
     if (event.button === 1) {
       event.preventDefault()
       event.currentTarget.setPointerCapture(event.pointerId)
@@ -395,11 +423,42 @@ function WhiteboardCanvas() {
     selectedIds,
     setSelectedIds,
     style,
-    viewport.scale,
+    viewport,
     worldPointFromEvent,
   ])
 
   const handlePointerMove = useCallback((event) => {
+    if (event.pointerType === 'touch' && touchPointsRef.current.has(event.pointerId)) {
+      touchPointsRef.current.set(event.pointerId, {
+        clientX: event.clientX,
+        clientY: event.clientY,
+      })
+
+      if (pinchRef.current && touchPointsRef.current.size >= 2) {
+        const touches = Array.from(touchPointsRef.current.values()).slice(0, 2)
+        const distance = Math.hypot(
+          touches[0].clientX - touches[1].clientX,
+          touches[0].clientY - touches[1].clientY,
+        )
+        const rect = canvasRef.current.getBoundingClientRect()
+        const center = {
+          x: ((touches[0].clientX + touches[1].clientX) / 2) - rect.left,
+          y: ((touches[0].clientY + touches[1].clientY) / 2) - rect.top,
+        }
+        const zoomed = zoomViewport(
+          pinchRef.current.viewport,
+          pinchRef.current.center,
+          pinchRef.current.viewport.scale * (distance / Math.max(1, pinchRef.current.distance)),
+        )
+
+        setViewport(translateViewport(zoomed, {
+          x: center.x - pinchRef.current.center.x,
+          y: center.y - pinchRef.current.center.y,
+        }))
+        return
+      }
+    }
+
     broadcastCursor(worldPointFromEvent(event))
 
     const pan = panRef.current
@@ -529,6 +588,13 @@ function WhiteboardCanvas() {
 
     if (eraserRef.current?.pointerId === event.pointerId) {
       eraserRef.current = null
+    }
+
+    if (event.pointerType === 'touch') {
+      touchPointsRef.current.delete(event.pointerId)
+      if (touchPointsRef.current.size < 2) {
+        pinchRef.current = null
+      }
     }
   }, [addElement])
 
