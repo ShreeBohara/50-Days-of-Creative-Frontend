@@ -193,6 +193,12 @@
   border-right: 1px solid #d7f3ef;
 }
 
+.segmented-control.wide button {
+  min-width: 62px;
+  padding-inline: 10px;
+  text-transform: capitalize;
+}
+
 .segmented-control button:last-child {
   border-right: 0;
 }
@@ -215,6 +221,29 @@
   border-radius: 8px;
   background: #ffffff;
   padding: 0 11px;
+}
+
+.color-input-label {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #b7e7df;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 8px 0 11px;
+  color: #134e4a;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.color-input-label input {
+  width: 26px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
 }
 
 .canvas-shell {

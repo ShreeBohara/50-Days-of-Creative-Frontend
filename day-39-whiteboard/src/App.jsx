@@ -20,6 +20,7 @@ import WhiteboardCanvas from './components/WhiteboardCanvas'
 import {
   BRUSH_SIZES,
   COLORS,
+  STROKE_STYLES,
   TOOL_BY_ID,
   TOOLS,
 } from './data/whiteboardConfig'
@@ -127,6 +128,35 @@ function App() {
                 onClick={() => updateStyle({ strokeWidth: size })}
               >
                 {size}
+              </button>
+            ))}
+          </div>
+          <label className="color-input-label">
+            <span>Custom</span>
+            <input
+              type="color"
+              value={style.stroke}
+              aria-label="Custom stroke color"
+              onChange={(event) => updateStyle({ stroke: event.target.value })}
+            />
+          </label>
+          <button
+            className={style.fillEnabled ? 'flat-button is-active' : 'flat-button'}
+            type="button"
+            aria-pressed={style.fillEnabled}
+            onClick={() => updateStyle({ fillEnabled: !style.fillEnabled })}
+          >
+            Fill
+          </button>
+          <div className="segmented-control wide" aria-label="Stroke style">
+            {STROKE_STYLES.map((strokeStyle) => (
+              <button
+                key={strokeStyle}
+                type="button"
+                className={strokeStyle === style.strokeStyle ? 'is-active' : ''}
+                onClick={() => updateStyle({ strokeStyle })}
+              >
+                {strokeStyle}
               </button>
             ))}
           </div>

@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createFreehandElement, getNextZIndex } from '../utils/elements'
+import {
+  createFreehandElement,
+  createShapeElement,
+  getNextZIndex,
+  updateShapeGeometry,
+} from '../utils/elements'
 import { drawElements } from '../utils/drawing'
 import { pointDistance } from '../utils/geometry'
 import {
@@ -11,6 +16,7 @@ import {
 import { useWhiteboardStore } from '../store/useWhiteboardStore'
 
 const GRID_SIZE = 32
+const SHAPE_TOOLS = new Set(['line', 'rectangle', 'ellipse', 'arrow'])
 
 function drawGrid(context, rect, viewport) {
   const scaledGrid = GRID_SIZE * viewport.scale
@@ -148,7 +154,7 @@ function WhiteboardCanvas() {
       return
     }
 
-    if (event.button !== 0 || activeTool !== 'draw') {
+    if (event.button !== 0 || (activeTool !== 'draw' && !SHAPE_TOOLS.has(activeTool))) {
       return
     }
 
@@ -156,17 +162,21 @@ function WhiteboardCanvas() {
     event.currentTarget.setPointerCapture(event.pointerId)
 
     const point = worldPointFromEvent(event)
-    const stroke = createFreehandElement(
-      [{ ...point, pressure: event.pressure || 0.5 }],
-      style,
-      getNextZIndex(elements),
-    )
+    const zIndex = getNextZIndex(elements)
+    const element = activeTool === 'draw'
+      ? createFreehandElement(
+          [{ ...point, pressure: event.pressure || 0.5 }],
+          style,
+          zIndex,
+        )
+      : createShapeElement(activeTool, point, point, style, zIndex)
 
     draftRef.current = {
       pointerId: event.pointerId,
-      element: stroke,
+      start: point,
+      element,
     }
-    setDraftElement(stroke)
+    setDraftElement(element)
   }, [activeTool, elements, style, viewport, worldPointFromEvent])
 
   const handlePointerMove = useCallback((event) => {
@@ -180,18 +190,24 @@ function WhiteboardCanvas() {
       }
 
       const point = worldPointFromEvent(event)
-      const points = draft.element.points
-      const previous = points[points.length - 1]
 
-      if (previous && pointDistance(previous, point) < 1.25 / viewport.scale) {
-        return
+      if (draft.element.type === 'draw') {
+        const points = draft.element.points
+        const previous = points[points.length - 1]
+
+        if (previous && pointDistance(previous, point) < 1.25 / viewport.scale) {
+          return
+        }
+
+        draft.element = {
+          ...draft.element,
+          points: [...points, { ...point, pressure: event.pressure || 0.5 }],
+          updatedAt: Date.now(),
+        }
+      } else {
+        draft.element = updateShapeGeometry(draft.element, draft.start, point)
       }
 
-      draft.element = {
-        ...draft.element,
-        points: [...points, { ...point, pressure: event.pressure || 0.5 }],
-        updatedAt: Date.now(),
-      }
       setDraftElement(draft.element)
       return
     }
@@ -210,9 +226,8 @@ function WhiteboardCanvas() {
 
     if (draftRef.current?.pointerId === event.pointerId) {
       const element = draftRef.current.element
-      const finalElement = element.points.length > 1
-        ? element
-        : {
+      const finalElement = element.type === 'draw' && element.points.length <= 1
+        ? {
             ...element,
             points: [
               element.points[0],
@@ -223,8 +238,15 @@ function WhiteboardCanvas() {
               },
             ],
           }
+        : element
+      const isTinyShape = !finalElement.points
+        && Math.abs((finalElement.x2 ?? finalElement.width ?? 0) - (finalElement.x1 ?? 0)) < 1
+        && Math.abs((finalElement.y2 ?? finalElement.height ?? 0) - (finalElement.y1 ?? 0)) < 1
 
-      addElement(finalElement)
+      if (!isTinyShape) {
+        addElement(finalElement)
+      }
+
       draftRef.current = null
       setDraftElement(null)
     }

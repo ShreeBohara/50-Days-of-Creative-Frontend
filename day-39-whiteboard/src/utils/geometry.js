@@ -50,6 +50,13 @@ export function boundsFromElement(element) {
     }
   }
 
+  if (element.type === 'line' || element.type === 'arrow') {
+    return normalizeRect(
+      { x: element.x1, y: element.y1 },
+      { x: element.x2, y: element.y2 },
+    )
+  }
+
   return {
     x: element.x,
     y: element.y,

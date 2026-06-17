@@ -30,9 +30,38 @@ export function createFreehandElement(points, style, zIndex) {
 }
 
 export function createShapeElement(type, start, end, style, zIndex) {
+  if (type === 'line' || type === 'arrow') {
+    return {
+      ...createBaseElement(type, style, zIndex),
+      x1: start.x,
+      y1: start.y,
+      x2: end.x,
+      y2: end.y,
+    }
+  }
+
   return {
     ...createBaseElement(type, style, zIndex),
     ...normalizeRect(start, end),
+  }
+}
+
+export function updateShapeGeometry(element, start, end) {
+  if (element.type === 'line' || element.type === 'arrow') {
+    return {
+      ...element,
+      x1: start.x,
+      y1: start.y,
+      x2: end.x,
+      y2: end.y,
+      updatedAt: Date.now(),
+    }
+  }
+
+  return {
+    ...element,
+    ...normalizeRect(start, end),
+    updatedAt: Date.now(),
   }
 }
 
