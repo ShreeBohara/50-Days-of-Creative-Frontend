@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react'
 import {
   ArrowUpRight,
   Brush,
@@ -16,6 +17,7 @@ import {
   Type,
   Undo2,
 } from 'lucide-react'
+import WhiteboardCanvas from './components/WhiteboardCanvas'
 import './App.css'
 
 const tools = [
@@ -60,6 +62,12 @@ function IconButton({ icon: Icon, label, shortcut, active = false }) {
 }
 
 function App() {
+  const [showGrid, setShowGrid] = useState(true)
+  const [viewport, setViewport] = useState({ x: 0, y: 0, scale: 1 })
+  const handleViewportChange = useCallback((nextViewport) => {
+    setViewport(nextViewport)
+  }, [])
+
   return (
     <main className="whiteboard-app">
       <aside className="toolbar" aria-label="Whiteboard tools">
@@ -111,7 +119,12 @@ function App() {
             <button type="button">8</button>
             <button type="button">16</button>
           </div>
-          <button className="flat-button" type="button">
+          <button
+            className={showGrid ? 'flat-button is-active' : 'flat-button'}
+            type="button"
+            aria-pressed={showGrid}
+            onClick={() => setShowGrid((current) => !current)}
+          >
             <Grid3X3 aria-hidden="true" size={16} />
             Grid
           </button>
@@ -121,20 +134,13 @@ function App() {
           </button>
         </div>
 
-        <div className="canvas-shell">
-          <div className="canvas-placeholder" aria-label="Infinite canvas placeholder">
-            <div className="placeholder-crosshair"></div>
-          </div>
-          <div className="minimap-card" aria-label="Minimap preview">
-            <span></span>
-          </div>
-        </div>
+        <WhiteboardCanvas showGrid={showGrid} onViewportChange={handleViewportChange} />
 
         <footer className="statusbar" aria-label="Whiteboard status">
           <span>Tool: Select</span>
-          <span>Zoom: 100%</span>
+          <span>Zoom: {Math.round(viewport.scale * 100)}%</span>
           <span>0 elements</span>
-          <span>Broadcast: waiting</span>
+          <span>Pan: {Math.round(viewport.x)}, {Math.round(viewport.y)}</span>
         </footer>
       </section>
     </main>

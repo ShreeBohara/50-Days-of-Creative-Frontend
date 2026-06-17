@@ -201,7 +201,8 @@
 .segmented-control button:focus-visible,
 .segmented-control .is-active,
 .flat-button:hover,
-.flat-button:focus-visible {
+.flat-button:focus-visible,
+.flat-button.is-active {
   background: #ccfbf1;
   color: #0f766e;
 }
@@ -220,68 +221,20 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
+  background: #f8fffd;
+  touch-action: none;
 }
 
-.canvas-placeholder {
+.whiteboard-canvas {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 460px;
-  background-color: #f8fffd;
-  background-image: radial-gradient(circle, rgba(13, 148, 136, 0.18) 1px, transparent 1px);
-  background-position: center;
-  background-size: 26px 26px;
+  cursor: crosshair;
 }
 
-.placeholder-crosshair {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 180px;
-  height: 180px;
-  border: 1px solid rgba(13, 148, 136, 0.28);
-  border-radius: 8px;
-  transform: translate(-50%, -50%);
-}
-
-.placeholder-crosshair::before,
-.placeholder-crosshair::after {
-  content: '';
-  position: absolute;
-  background: rgba(249, 115, 22, 0.8);
-}
-
-.placeholder-crosshair::before {
-  top: 50%;
-  left: -24px;
-  width: calc(100% + 48px);
-  height: 2px;
-}
-
-.placeholder-crosshair::after {
-  top: -24px;
-  left: 50%;
-  width: 2px;
-  height: calc(100% + 48px);
-}
-
-.minimap-card {
-  position: absolute;
-  right: 18px;
-  bottom: 18px;
-  width: 170px;
-  height: 112px;
-  border: 1px solid #b7e7df;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  padding: 9px;
-}
-
-.minimap-card span {
-  display: block;
-  width: 52%;
-  height: 58%;
-  border: 2px solid #f97316;
-  border-radius: 6px;
-  background: rgba(249, 115, 22, 0.08);
+.canvas-shell.is-panning .whiteboard-canvas {
+  cursor: grabbing;
 }
 
 .statusbar {
@@ -342,12 +295,7 @@ input:focus-visible {
     flex-direction: column;
   }
 
-  .canvas-placeholder {
+  .whiteboard-canvas {
     min-height: 520px;
-  }
-
-  .minimap-card {
-    width: 124px;
-    height: 86px;
   }
 }
