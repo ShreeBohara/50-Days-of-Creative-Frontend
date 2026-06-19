@@ -56,7 +56,7 @@ function Marker({ city, isSelected, onSelect }) {
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {(isHovered || isSelected) && (
+      {isHovered && (
         <Html center distanceFactor={5.8} position={[0, markerScale * 6.2, 0]} zIndexRange={[40, 10]}>
           <div className="city-tooltip">
             <strong>{city.name}</strong>

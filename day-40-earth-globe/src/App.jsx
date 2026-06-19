@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { Activity, Globe2, RadioTower, Search, SlidersHorizontal, SunMedium } from 'lucide-react'
+import { Activity, Globe2, Minus, Plus, RadioTower, Search, SlidersHorizontal, SunMedium } from 'lucide-react'
 import { Suspense, useMemo, useState } from 'react'
 import GlobeScene from './components/GlobeScene'
 import { countryByIso } from './data/countries'
@@ -11,7 +11,7 @@ import './App.css'
 
 function App() {
   const [datasetKey, setDatasetKey] = useState('flightRoutes')
-  const [focusCityId, setFocusCityId] = useState('new-york')
+  const [focusCityId, setFocusCityId] = useState(null)
   const [sceneReady, setSceneReady] = useState(false)
   const [heatmapEnabled, setHeatmapEnabled] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,7 +20,7 @@ function App() {
   const [timeOfDay, setTimeOfDay] = useState(18)
   const prefersReducedMotion = usePrefersReducedMotion()
   const datasetSummary = summarizeDataset(datasetKey)
-  const focusCity = getCityById(focusCityId)
+  const focusCity = focusCityId ? getCityById(focusCityId) : null
   const searchMatches = useMemo(() => findCityMatches(searchQuery), [searchQuery])
   const selectedCity = getCityById(selectedCityId)
   const selectedCityRoutes = getCityRoutes(selectedCityId, datasetKey)
@@ -39,11 +39,15 @@ function App() {
     handleCitySelect(firstMatch.id)
   }
 
+  const adjustTime = (delta) => {
+    setTimeOfDay((currentTime) => (currentTime + delta + 25) % 25)
+  }
+
   return (
     <main className="app-shell">
       <section className="globe-stage" aria-label="Interactive Earth globe viewport">
         <Canvas
-          camera={{ position: [0, 0.6, 4.4], fov: 42, near: 0.1, far: 160 }}
+          camera={{ position: [0, 0.55, 5.6], fov: 42, near: 0.1, far: 160 }}
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
           onCreated={() => setSceneReady(true)}
@@ -154,14 +158,22 @@ function App() {
               <SunMedium size={15} aria-hidden="true" />
               Local Time - {String(timeOfDay).padStart(2, '0')}:00
             </span>
-            <input
-              type="range"
-              min="0"
-              max="24"
-              value={timeOfDay}
-              onChange={(event) => setTimeOfDay(Number(event.target.value))}
-              aria-label="Local Time"
-            />
+            <div className="time-control-grid">
+              <button aria-label="Decrease local time" onClick={() => adjustTime(-1)} type="button">
+                <Minus size={15} aria-hidden="true" />
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="24"
+                value={timeOfDay}
+                onChange={(event) => setTimeOfDay(Number(event.target.value))}
+                aria-label="Local Time"
+              />
+              <button aria-label="Increase local time" onClick={() => adjustTime(1)} type="button">
+                <Plus size={15} aria-hidden="true" />
+              </button>
+            </div>
           </label>
         </section>
 

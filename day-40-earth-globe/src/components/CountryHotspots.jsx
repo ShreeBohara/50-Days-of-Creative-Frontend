@@ -48,7 +48,7 @@ function Hotspot({ country, isSelected, onSelectCountry, visible }) {
         <ringGeometry args={[0.055, 0.073, 34]} />
         <meshBasicMaterial color={color} transparent opacity={0.45} side={THREE.DoubleSide} />
       </mesh>
-      {(isHovered || isSelected) && (
+      {isHovered && (
         <Html center distanceFactor={5.6} position={[0, 0.2, 0]} zIndexRange={[35, 10]}>
           <div className="city-tooltip country-tooltip">
             <strong>{country.name}</strong>

@@ -264,6 +264,28 @@
   gap: 0.45rem;
 }
 
+.time-control-grid {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.time-control-grid button {
+  display: inline-grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  color: var(--cyan);
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(125, 211, 252, 0.2);
+}
+
+.time-control-grid button:hover {
+  color: #020617;
+  background: var(--cyan);
+}
+
 .slider-row input {
   width: 100%;
   accent-color: var(--cyan);
