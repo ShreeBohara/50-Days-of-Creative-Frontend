@@ -242,6 +242,32 @@
   font-weight: 700;
 }
 
+.country-readout {
+  display: grid;
+  gap: 0.18rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(125, 211, 252, 0.18);
+}
+
+.country-readout span,
+.country-readout small {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.country-readout span {
+  font-family: var(--font-code);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.country-readout strong {
+  color: var(--amber);
+  font-size: 0.95rem;
+}
+
 .city-tooltip {
   display: grid;
   min-width: 8.5rem;
@@ -263,6 +289,10 @@
 .city-tooltip small {
   color: var(--text-muted);
   font-size: 0.68rem;
+}
+
+.country-tooltip strong {
+  color: var(--amber);
 }
 
 .mission-strip {

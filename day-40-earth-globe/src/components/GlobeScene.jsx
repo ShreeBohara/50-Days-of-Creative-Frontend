@@ -4,8 +4,10 @@ import * as THREE from 'three'
 import { sunDirectionFromTime } from '../utils/geo'
 import CameraRig from './CameraRig'
 import CityMarkers from './CityMarkers'
+import CountryHotspots from './CountryHotspots'
 import DataArcs from './DataArcs'
 import EarthGlobe from './EarthGlobe'
+import HeatmapOverlay from './HeatmapOverlay'
 import Terminator from './Terminator'
 
 function SunMarker({ position }) {
@@ -26,8 +28,11 @@ function SunMarker({ position }) {
 
 export default function GlobeScene({
   datasetKey = 'flightRoutes',
+  heatmapEnabled = false,
+  onSelectCountry,
   onSelectCity,
   reducedMotion = false,
+  selectedCountryIso,
   selectedCityId,
   timeOfDay = 18,
 }) {
@@ -47,7 +52,13 @@ export default function GlobeScene({
       <Stars radius={90} depth={48} count={4200} factor={4.2} saturation={0.18} fade speed={0.25} />
       <SunMarker position={sunPosition} />
       <EarthGlobe reducedMotion={reducedMotion} sunDirection={sunDirection} />
+      <HeatmapOverlay visible={heatmapEnabled} />
       <DataArcs datasetKey={datasetKey} reducedMotion={reducedMotion} />
+      <CountryHotspots
+        heatmapEnabled={heatmapEnabled}
+        onSelectCountry={onSelectCountry}
+        selectedCountryIso={selectedCountryIso}
+      />
       <CityMarkers onSelectCity={onSelectCity} selectedCityId={selectedCityId} />
       <Terminator sunDirection={sunDirection} />
       <CameraRig />

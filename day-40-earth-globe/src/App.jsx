@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { Activity, Globe2, RadioTower, Search, SlidersHorizontal, SunMedium } from 'lucide-react'
 import { Suspense, useState } from 'react'
 import GlobeScene from './components/GlobeScene'
+import { countryByIso } from './data/countries'
 import { getCityById } from './utils/data'
 import { formatPopulation } from './utils/geo'
 import usePrefersReducedMotion from './hooks/usePrefersReducedMotion'
@@ -11,10 +12,13 @@ const DATASETS = ['Flight Routes', 'Trade Volume', 'Internet Traffic']
 
 function App() {
   const [sceneReady, setSceneReady] = useState(false)
+  const [heatmapEnabled, setHeatmapEnabled] = useState(false)
   const [selectedCityId, setSelectedCityId] = useState('new-york')
+  const [selectedCountryIso, setSelectedCountryIso] = useState('USA')
   const [timeOfDay, setTimeOfDay] = useState(18)
   const prefersReducedMotion = usePrefersReducedMotion()
   const selectedCity = getCityById(selectedCityId)
+  const selectedCountry = countryByIso.get(selectedCountryIso)
 
   return (
     <main className="app-shell">
@@ -27,8 +31,11 @@ function App() {
         >
           <Suspense fallback={null}>
             <GlobeScene
+              heatmapEnabled={heatmapEnabled}
+              onSelectCountry={setSelectedCountryIso}
               onSelectCity={setSelectedCityId}
               reducedMotion={prefersReducedMotion}
+              selectedCountryIso={selectedCountryIso}
               selectedCityId={selectedCityId}
               timeOfDay={timeOfDay}
             />
@@ -76,7 +83,11 @@ function App() {
           </div>
           <label className="toggle-row">
             <span>Heatmap</span>
-            <input type="checkbox" />
+            <input
+              checked={heatmapEnabled}
+              onChange={(event) => setHeatmapEnabled(event.target.checked)}
+              type="checkbox"
+            />
           </label>
           <label className="slider-row">
             <span>
@@ -113,6 +124,16 @@ function App() {
               <dd>{selectedCity.stats.signal}%</dd>
             </div>
           </dl>
+          {selectedCountry && (
+            <div className="country-readout">
+              <span>Country Region</span>
+              <strong>{selectedCountry.name}</strong>
+              <small>
+                Heat {selectedCountry.score} · GDP {selectedCountry.gdpIndex} · Population{' '}
+                {selectedCountry.populationIndex}
+              </small>
+            </div>
+          )}
         </section>
       </aside>
 

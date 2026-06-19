@@ -1,6 +1,7 @@
 import { geoEquirectangular, geoGraticule10, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
 import countryTopology from 'world-atlas/countries-110m.json'
+import { countryMetrics } from '../data/countries'
 
 const countries = feature(countryTopology, countryTopology.objects.countries).features
 const graticule = geoGraticule10()
@@ -147,6 +148,31 @@ export function createCloudCanvas({ width = 2048, height = 1024 } = {}) {
   ctx.fillStyle = fade
   ctx.fillRect(0, 0, width, height)
   ctx.globalCompositeOperation = 'source-over'
+
+  return canvas
+}
+
+export function createHeatmapCanvas({ width = 2048, height = 1024, metrics = countryMetrics } = {}) {
+  const canvas = createCanvas(width, height)
+  const ctx = canvas.getContext('2d')
+
+  ctx.clearRect(0, 0, width, height)
+  metrics.forEach((metric) => {
+    const x = ((metric.centroid.lng + 180) / 360) * width
+    const y = ((90 - metric.centroid.lat) / 180) * height
+    const radius = 58 + metric.score * 2.1
+    const alpha = 0.1 + metric.score / 180
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
+    const hotColor = metric.score > 84 ? '239, 68, 68' : metric.score > 72 ? '245, 158, 11' : '34, 197, 94'
+
+    gradient.addColorStop(0, `rgba(${hotColor}, ${alpha})`)
+    gradient.addColorStop(0.42, `rgba(34, 211, 238, ${alpha * 0.55})`)
+    gradient.addColorStop(1, 'rgba(34, 211, 238, 0)')
+    ctx.fillStyle = gradient
+    ctx.beginPath()
+    ctx.arc(x, y, radius, 0, Math.PI * 2)
+    ctx.fill()
+  })
 
   return canvas
 }
