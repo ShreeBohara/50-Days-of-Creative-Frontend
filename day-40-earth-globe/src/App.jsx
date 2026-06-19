@@ -1,121 +1,105 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { Activity, Globe2, RadioTower, Search, SlidersHorizontal, SunMedium } from 'lucide-react'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const DATASETS = ['Flight Routes', 'Trade Volume', 'Internet Traffic']
 
+function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="app-shell">
+      <section className="globe-stage" aria-label="Interactive Earth globe viewport">
+        <div className="starfield" aria-hidden="true" />
+        <div className="globe-placeholder" aria-hidden="true">
+          <span className="globe-orbit globe-orbit--wide" />
+          <span className="globe-orbit globe-orbit--tilt" />
+          <Globe2 size={96} strokeWidth={1.1} />
+        </div>
+        <div className="loading-overlay" aria-live="polite">
+          Initializing orbital dataset
+        </div>
+      </section>
+
+      <aside className="hud-panel" aria-label="Earth globe controls">
+        <header className="hud-header">
+          <p>Day 40</p>
+          <h1>Earth Globe</h1>
+          <span>Global route telemetry live</span>
+        </header>
+
+        <form className="search-shell" role="search">
+          <Search size={18} strokeWidth={1.8} aria-hidden="true" />
+          <label className="sr-only" htmlFor="city-search">
+            Search city
+          </label>
+          <input id="city-search" type="search" placeholder="Search city" />
+        </form>
+
+        <section className="hud-section" aria-labelledby="dataset-label">
+          <div className="section-heading">
+            <RadioTower size={16} aria-hidden="true" />
+            <h2 id="dataset-label">Dataset</h2>
+          </div>
+          <div className="segmented-control" role="group" aria-label="Dataset">
+            {DATASETS.map((dataset, index) => (
+              <button className={index === 0 ? 'is-active' : ''} type="button" key={dataset}>
+                {dataset}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="hud-section" aria-labelledby="control-label">
+          <div className="section-heading">
+            <SlidersHorizontal size={16} aria-hidden="true" />
+            <h2 id="control-label">Controls</h2>
+          </div>
+          <label className="toggle-row">
+            <span>Heatmap</span>
+            <input type="checkbox" />
+          </label>
+          <label className="slider-row">
+            <span>
+              <SunMedium size={15} aria-hidden="true" />
+              Local Time
+            </span>
+            <input type="range" min="0" max="24" defaultValue="18" />
+          </label>
+        </section>
+
+        <section className="selected-node" aria-labelledby="selected-node-label">
+          <div className="section-heading">
+            <Activity size={16} aria-hidden="true" />
+            <h2 id="selected-node-label">Selected Node</h2>
+          </div>
+          <strong>New York</strong>
+          <span>United States · 40.71, -74.01</span>
+          <dl>
+            <div>
+              <dt>Population</dt>
+              <dd>18.8M</dd>
+            </div>
+            <div>
+              <dt>Signal</dt>
+              <dd>92%</dd>
+            </div>
+          </dl>
+        </section>
+      </aside>
+
+      <footer className="mission-strip" aria-label="Mission telemetry">
+        <div>
+          <span>Status</span>
+          <strong>Orbit stable</strong>
         </div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <span>Nodes</span>
+          <strong>30 cities</strong>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div>
+          <span>Motion</span>
+          <strong>Adaptive</strong>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      </footer>
+    </main>
   )
 }
 
