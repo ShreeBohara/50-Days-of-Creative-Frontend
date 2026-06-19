@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { sunDirectionFromTime } from '../utils/geo'
 import CameraRig from './CameraRig'
 import CityMarkers from './CityMarkers'
+import DataArcs from './DataArcs'
 import EarthGlobe from './EarthGlobe'
 import Terminator from './Terminator'
 
@@ -23,7 +24,13 @@ function SunMarker({ position }) {
   )
 }
 
-export default function GlobeScene({ onSelectCity, reducedMotion = false, selectedCityId, timeOfDay = 18 }) {
+export default function GlobeScene({
+  datasetKey = 'flightRoutes',
+  onSelectCity,
+  reducedMotion = false,
+  selectedCityId,
+  timeOfDay = 18,
+}) {
   const sunDirection = useMemo(() => sunDirectionFromTime(timeOfDay), [timeOfDay])
   const sunPosition = useMemo(
     () => [sunDirection.x * 6.4, sunDirection.y * 6.4, sunDirection.z * 6.4],
@@ -40,6 +47,7 @@ export default function GlobeScene({ onSelectCity, reducedMotion = false, select
       <Stars radius={90} depth={48} count={4200} factor={4.2} saturation={0.18} fade speed={0.25} />
       <SunMarker position={sunPosition} />
       <EarthGlobe reducedMotion={reducedMotion} sunDirection={sunDirection} />
+      <DataArcs datasetKey={datasetKey} reducedMotion={reducedMotion} />
       <CityMarkers onSelectCity={onSelectCity} selectedCityId={selectedCityId} />
       <Terminator sunDirection={sunDirection} />
       <CameraRig />
