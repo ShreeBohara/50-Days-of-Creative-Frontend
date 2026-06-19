@@ -1,4 +1,3 @@
-import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { createEarthCanvases } from '../utils/textures'
@@ -9,7 +8,6 @@ import CloudLayer from './CloudLayer'
 export const GLOBE_RADIUS = 1.55
 
 export default function EarthGlobe({ reducedMotion = false, sunDirection }) {
-  const groupRef = useRef(null)
   const materialRef = useRef(null)
   const { mapTexture, bumpTexture } = useMemo(() => {
     const { mapCanvas, bumpCanvas } = createEarthCanvases()
@@ -30,13 +28,8 @@ export default function EarthGlobe({ reducedMotion = false, sunDirection }) {
     }
   }, [bumpTexture, mapTexture])
 
-  useFrame((_, delta) => {
-    if (!groupRef.current || reducedMotion) return
-    groupRef.current.rotation.y += delta * 0.055
-  })
-
   return (
-    <group ref={groupRef}>
+    <group>
       <mesh>
         <sphereGeometry args={[GLOBE_RADIUS, 160, 160]} />
         <meshStandardMaterial

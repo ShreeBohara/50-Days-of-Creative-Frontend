@@ -2,6 +2,8 @@ import { Canvas } from '@react-three/fiber'
 import { Activity, Globe2, RadioTower, Search, SlidersHorizontal, SunMedium } from 'lucide-react'
 import { Suspense, useState } from 'react'
 import GlobeScene from './components/GlobeScene'
+import { getCityById } from './utils/data'
+import { formatPopulation } from './utils/geo'
 import usePrefersReducedMotion from './hooks/usePrefersReducedMotion'
 import './App.css'
 
@@ -9,8 +11,10 @@ const DATASETS = ['Flight Routes', 'Trade Volume', 'Internet Traffic']
 
 function App() {
   const [sceneReady, setSceneReady] = useState(false)
+  const [selectedCityId, setSelectedCityId] = useState('new-york')
   const [timeOfDay, setTimeOfDay] = useState(18)
   const prefersReducedMotion = usePrefersReducedMotion()
+  const selectedCity = getCityById(selectedCityId)
 
   return (
     <main className="app-shell">
@@ -22,7 +26,12 @@ function App() {
           onCreated={() => setSceneReady(true)}
         >
           <Suspense fallback={null}>
-            <GlobeScene reducedMotion={prefersReducedMotion} timeOfDay={timeOfDay} />
+            <GlobeScene
+              onSelectCity={setSelectedCityId}
+              reducedMotion={prefersReducedMotion}
+              selectedCityId={selectedCityId}
+              timeOfDay={timeOfDay}
+            />
           </Suspense>
         </Canvas>
         <div className={`loading-overlay ${sceneReady ? 'is-hidden' : ''}`} aria-live="polite">
@@ -90,16 +99,18 @@ function App() {
             <Activity size={16} aria-hidden="true" />
             <h2 id="selected-node-label">Selected Node</h2>
           </div>
-          <strong>New York</strong>
-          <span>United States · 40.71, -74.01</span>
+          <strong>{selectedCity.name}</strong>
+          <span>
+            {selectedCity.country} · {selectedCity.lat.toFixed(2)}, {selectedCity.lng.toFixed(2)}
+          </span>
           <dl>
             <div>
               <dt>Population</dt>
-              <dd>18.8M</dd>
+              <dd>{formatPopulation(selectedCity.population)}</dd>
             </div>
             <div>
               <dt>Signal</dt>
-              <dd>92%</dd>
+              <dd>{selectedCity.stats.signal}%</dd>
             </div>
           </dl>
         </section>
