@@ -1,5 +1,5 @@
 import { OrbitControls, Stars } from '@react-three/drei'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { sunDirectionFromTime } from '../utils/geo'
 import CameraRig from './CameraRig'
@@ -28,6 +28,7 @@ function SunMarker({ position }) {
 
 export default function GlobeScene({
   datasetKey = 'flightRoutes',
+  focusCity,
   heatmapEnabled = false,
   onSelectCountry,
   onSelectCity,
@@ -36,6 +37,7 @@ export default function GlobeScene({
   selectedCityId,
   timeOfDay = 18,
 }) {
+  const controlsRef = useRef(null)
   const sunDirection = useMemo(() => sunDirectionFromTime(timeOfDay), [timeOfDay])
   const sunPosition = useMemo(
     () => [sunDirection.x * 6.4, sunDirection.y * 6.4, sunDirection.z * 6.4],
@@ -61,8 +63,9 @@ export default function GlobeScene({
       />
       <CityMarkers onSelectCity={onSelectCity} selectedCityId={selectedCityId} />
       <Terminator sunDirection={sunDirection} />
-      <CameraRig />
+      <CameraRig controlsRef={controlsRef} focusCity={focusCity} reducedMotion={reducedMotion} />
       <OrbitControls
+        ref={controlsRef}
         enableDamping
         dampingFactor={0.06}
         minDistance={2.5}

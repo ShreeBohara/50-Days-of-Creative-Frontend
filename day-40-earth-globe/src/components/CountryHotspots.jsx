@@ -53,7 +53,7 @@ function Hotspot({ country, isSelected, onSelectCountry, visible }) {
           <div className="city-tooltip country-tooltip">
             <strong>{country.name}</strong>
             <span>Heat score {country.score}</span>
-            <small>GDP {country.gdpIndex} · Pop {country.populationIndex}</small>
+            <small>GDP {country.gdpIndex} - Pop {country.populationIndex}</small>
           </div>
         </Html>
       )}
