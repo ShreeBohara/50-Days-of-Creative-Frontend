@@ -5,7 +5,7 @@ import { cities } from '../data/cities'
 import { latLngToVector3 } from '../utils/geo'
 import { GLOBE_RADIUS } from './EarthGlobe'
 
-function CityLight({ city, sunDirection }) {
+function CityLight({ city, reducedMotion, sunDirection }) {
   const meshRef = useRef(null)
   const materialRef = useRef(null)
   const worldPosition = useMemo(() => new THREE.Vector3(), [])
@@ -25,7 +25,8 @@ function CityLight({ city, sunDirection }) {
 
     const sunFacing = worldPosition.dot(sunVector)
     const nightOpacity = THREE.MathUtils.clamp((0.12 - sunFacing) / 0.5, 0, 1)
-    materialRef.current.opacity = nightOpacity * (0.55 + Math.sin(clock.elapsedTime * 2.5 + city.lng) * 0.12)
+    const twinkle = reducedMotion ? 0.62 : 0.55 + Math.sin(clock.elapsedTime * 2.5 + city.lng) * 0.12
+    materialRef.current.opacity = nightOpacity * twinkle
   })
 
   return (
@@ -44,11 +45,11 @@ function CityLight({ city, sunDirection }) {
   )
 }
 
-export default function CityLights({ sunDirection }) {
+export default function CityLights({ reducedMotion = false, sunDirection }) {
   return (
     <group>
       {cities.map((city) => (
-        <CityLight city={city} key={city.id} sunDirection={sunDirection} />
+        <CityLight city={city} key={city.id} reducedMotion={reducedMotion} sunDirection={sunDirection} />
       ))}
     </group>
   )

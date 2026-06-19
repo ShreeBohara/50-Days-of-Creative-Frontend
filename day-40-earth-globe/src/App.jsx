@@ -91,7 +91,7 @@ function App() {
             />
           </form>
           {searchMatches.length > 0 && (
-            <div className="search-results" aria-label="City search results">
+            <div className="search-results" aria-label="City search results" aria-live="polite">
               {searchMatches.map((city) => (
                 <button key={city.id} onClick={() => handleCitySelect(city.id)} type="button">
                   <span>{city.name}</span>
@@ -111,6 +111,7 @@ function App() {
             {datasetKeys.map((key) => (
               <button
                 className={datasetKey === key ? 'is-active' : ''}
+                aria-pressed={datasetKey === key}
                 onClick={() => setDatasetKey(key)}
                 type="button"
                 key={key}

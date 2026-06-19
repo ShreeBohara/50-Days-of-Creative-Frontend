@@ -51,7 +51,7 @@ export default function GlobeScene({
       <ambientLight intensity={0.16} />
       <directionalLight position={sunPosition} intensity={2.8} color="#f8fafc" />
       <pointLight position={[-4, -2, -3]} intensity={0.9} color="#22d3ee" />
-      <Stars radius={90} depth={48} count={4200} factor={4.2} saturation={0.18} fade speed={0.25} />
+      <Stars radius={90} depth={48} count={4200} factor={4.2} saturation={0.18} fade speed={reducedMotion ? 0 : 0.25} />
       <SunMarker position={sunPosition} />
       <EarthGlobe reducedMotion={reducedMotion} sunDirection={sunDirection} />
       <HeatmapOverlay visible={heatmapEnabled} />

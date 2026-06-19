@@ -193,6 +193,13 @@
     background 180ms ease;
 }
 
+.segmented-control button,
+.search-results button,
+.toggle-row input,
+.slider-row input {
+  min-width: 44px;
+}
+
 .segmented-control button:hover,
 .segmented-control button.is-active {
   color: var(--text);
@@ -407,8 +414,40 @@
     width: 100%;
   }
 
+  .hud-panel {
+    max-height: none;
+  }
+
   .mission-strip {
     margin-top: 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-shell {
+    padding-inline: 0.75rem;
+  }
+
+  .hud-panel {
+    padding: 0.8rem;
+  }
+
+  .hud-header h1 {
+    font-size: 2.15rem;
+  }
+
+  .segmented-control,
+  .route-summary,
+  .mission-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .selected-node dl {
+    grid-template-columns: 1fr;
+  }
+
+  .search-results button {
+    display: grid;
   }
 }
 

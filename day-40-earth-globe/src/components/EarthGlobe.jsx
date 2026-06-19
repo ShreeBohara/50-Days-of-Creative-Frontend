@@ -43,7 +43,7 @@ export default function EarthGlobe({ reducedMotion = false, sunDirection }) {
           emissive="#020617"
         />
       </mesh>
-      <CityLights sunDirection={sunDirection} />
+      <CityLights reducedMotion={reducedMotion} sunDirection={sunDirection} />
       <CloudLayer reducedMotion={reducedMotion} />
       <Atmosphere />
     </group>
