@@ -1,19 +1,31 @@
+import { Canvas } from '@react-three/fiber'
 import { Activity, Globe2, RadioTower, Search, SlidersHorizontal, SunMedium } from 'lucide-react'
+import { Suspense, useState } from 'react'
+import GlobeScene from './components/GlobeScene'
+import usePrefersReducedMotion from './hooks/usePrefersReducedMotion'
 import './App.css'
 
 const DATASETS = ['Flight Routes', 'Trade Volume', 'Internet Traffic']
 
 function App() {
+  const [sceneReady, setSceneReady] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
+
   return (
     <main className="app-shell">
       <section className="globe-stage" aria-label="Interactive Earth globe viewport">
-        <div className="starfield" aria-hidden="true" />
-        <div className="globe-placeholder" aria-hidden="true">
-          <span className="globe-orbit globe-orbit--wide" />
-          <span className="globe-orbit globe-orbit--tilt" />
-          <Globe2 size={96} strokeWidth={1.1} />
-        </div>
-        <div className="loading-overlay" aria-live="polite">
+        <Canvas
+          camera={{ position: [0, 0.6, 4.4], fov: 42, near: 0.1, far: 160 }}
+          dpr={[1, 2]}
+          gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+          onCreated={() => setSceneReady(true)}
+        >
+          <Suspense fallback={null}>
+            <GlobeScene reducedMotion={prefersReducedMotion} />
+          </Suspense>
+        </Canvas>
+        <div className={`loading-overlay ${sceneReady ? 'is-hidden' : ''}`} aria-live="polite">
+          <Globe2 size={16} strokeWidth={1.8} aria-hidden="true" />
           Initializing orbital dataset
         </div>
       </section>
@@ -96,7 +108,7 @@ function App() {
         </div>
         <div>
           <span>Motion</span>
-          <strong>Adaptive</strong>
+          <strong>{prefersReducedMotion ? 'Reduced' : 'Adaptive'}</strong>
         </div>
       </footer>
     </main>
