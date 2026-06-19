@@ -9,6 +9,7 @@ const DATASETS = ['Flight Routes', 'Trade Volume', 'Internet Traffic']
 
 function App() {
   const [sceneReady, setSceneReady] = useState(false)
+  const [timeOfDay, setTimeOfDay] = useState(18)
   const prefersReducedMotion = usePrefersReducedMotion()
 
   return (
@@ -21,7 +22,7 @@ function App() {
           onCreated={() => setSceneReady(true)}
         >
           <Suspense fallback={null}>
-            <GlobeScene reducedMotion={prefersReducedMotion} />
+            <GlobeScene reducedMotion={prefersReducedMotion} timeOfDay={timeOfDay} />
           </Suspense>
         </Canvas>
         <div className={`loading-overlay ${sceneReady ? 'is-hidden' : ''}`} aria-live="polite">
@@ -73,7 +74,14 @@ function App() {
               <SunMedium size={15} aria-hidden="true" />
               Local Time
             </span>
-            <input type="range" min="0" max="24" defaultValue="18" />
+            <input
+              type="range"
+              min="0"
+              max="24"
+              value={timeOfDay}
+              onChange={(event) => setTimeOfDay(Number(event.target.value))}
+              aria-label="Local Time"
+            />
           </label>
         </section>
 

@@ -3,11 +3,12 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { createEarthCanvases } from '../utils/textures'
 import Atmosphere from './Atmosphere'
+import CityLights from './CityLights'
 import CloudLayer from './CloudLayer'
 
 export const GLOBE_RADIUS = 1.55
 
-export default function EarthGlobe({ reducedMotion = false }) {
+export default function EarthGlobe({ reducedMotion = false, sunDirection }) {
   const groupRef = useRef(null)
   const materialRef = useRef(null)
   const { mapTexture, bumpTexture } = useMemo(() => {
@@ -49,6 +50,7 @@ export default function EarthGlobe({ reducedMotion = false }) {
           emissive="#020617"
         />
       </mesh>
+      <CityLights sunDirection={sunDirection} />
       <CloudLayer reducedMotion={reducedMotion} />
       <Atmosphere />
     </group>

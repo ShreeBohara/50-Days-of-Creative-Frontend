@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { sunDirectionFromTime } from '../utils/geo'
 import CameraRig from './CameraRig'
 import EarthGlobe from './EarthGlobe'
+import Terminator from './Terminator'
 
 function SunMarker({ position }) {
   return (
@@ -37,7 +38,8 @@ export default function GlobeScene({ reducedMotion = false, timeOfDay = 18 }) {
       <pointLight position={[-4, -2, -3]} intensity={0.9} color="#22d3ee" />
       <Stars radius={90} depth={48} count={4200} factor={4.2} saturation={0.18} fade speed={0.25} />
       <SunMarker position={sunPosition} />
-      <EarthGlobe reducedMotion={reducedMotion} />
+      <EarthGlobe reducedMotion={reducedMotion} sunDirection={sunDirection} />
+      <Terminator sunDirection={sunDirection} />
       <CameraRig />
       <OrbitControls
         enableDamping
