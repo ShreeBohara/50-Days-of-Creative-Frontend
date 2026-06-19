@@ -108,3 +108,45 @@ export function createEarthCanvases({ width = 2048, height = 1024 } = {}) {
 
   return { mapCanvas, bumpCanvas, countries }
 }
+
+export function createCloudCanvas({ width = 2048, height = 1024 } = {}) {
+  const canvas = createCanvas(width, height)
+  const ctx = canvas.getContext('2d')
+
+  ctx.clearRect(0, 0, width, height)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0)'
+  ctx.fillRect(0, 0, width, height)
+
+  for (let band = 0; band < 18; band += 1) {
+    const y = (band / 18) * height + Math.sin(band * 1.7) * 36
+    const cloudCount = 12 + (band % 4) * 3
+
+    for (let index = 0; index < cloudCount; index += 1) {
+      const x = ((index / cloudCount) * width + Math.sin(index * 31.7 + band) * 220 + width) % width
+      const radiusX = 64 + ((band * index + 17) % 110)
+      const radiusY = 10 + ((band + index * 3) % 28)
+      const alpha = 0.12 + ((band + index) % 5) * 0.025
+      const gradient = ctx.createRadialGradient(x, y, radiusY * 0.2, x, y, radiusX)
+
+      gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha})`)
+      gradient.addColorStop(0.5, `rgba(226, 232, 240, ${alpha * 0.72})`)
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+      ctx.fillStyle = gradient
+      ctx.beginPath()
+      ctx.ellipse(x, y, radiusX, radiusY, Math.sin(index) * 0.4, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+
+  ctx.globalCompositeOperation = 'destination-in'
+  const fade = ctx.createLinearGradient(0, 0, 0, height)
+  fade.addColorStop(0, 'rgba(255, 255, 255, 0.55)')
+  fade.addColorStop(0.18, 'rgba(255, 255, 255, 1)')
+  fade.addColorStop(0.82, 'rgba(255, 255, 255, 1)')
+  fade.addColorStop(1, 'rgba(255, 255, 255, 0.55)')
+  ctx.fillStyle = fade
+  ctx.fillRect(0, 0, width, height)
+  ctx.globalCompositeOperation = 'source-over'
+
+  return canvas
+}

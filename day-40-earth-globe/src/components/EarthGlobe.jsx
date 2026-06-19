@@ -2,6 +2,8 @@ import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { createEarthCanvases } from '../utils/textures'
+import Atmosphere from './Atmosphere'
+import CloudLayer from './CloudLayer'
 
 export const GLOBE_RADIUS = 1.55
 
@@ -47,6 +49,8 @@ export default function EarthGlobe({ reducedMotion = false }) {
           emissive="#020617"
         />
       </mesh>
+      <CloudLayer reducedMotion={reducedMotion} />
+      <Atmosphere />
     </group>
   )
 }
