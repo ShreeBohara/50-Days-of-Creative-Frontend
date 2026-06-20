@@ -1,6 +1,8 @@
 /* ------------------------------------------------------------------ math */
 export const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x)
+export const clamp = (x, lo, hi) => (x < lo ? lo : x > hi ? hi : x)
 export const lerp = (a, b, t) => a + (b - a) * t
+const TAU = Math.PI * 2
 export const smoothstep = (x) => {
   x = clamp01(x)
   return x * x * (3 - 2 * x)
@@ -31,6 +33,7 @@ const resetGlyph = (g) => {
   g.rot = 0
   g.scale = 1
   g.opacity = 1
+  g.node.style.textShadow = 'none'
 }
 
 // Magnet — glyphs nearest the cursor gain weight, optical size and softness.
@@ -106,7 +109,77 @@ const gravity = {
   },
 }
 
-export const BEHAVIORS = [magnet, gravity]
+// Ripple — concentric weight waves radiate outward from the cursor over time.
+const ripple = {
+  id: 'ripple',
+  label: 'Ripple',
+  hint: 'Weight waves pulse out from the cursor',
+  reset: resetGlyph,
+  step(g, ctx) {
+    const dist = Math.hypot(g.cx - ctx.px, g.cy - ctx.py)
+    const wavelength = 230
+    const speed = 360
+    const phase = ((dist - ctx.t * speed) / wavelength) * TAU
+    const crest = Math.max(0, Math.cos(phase))
+    const atten = Math.max(0, 1 - dist / (ctx.radius * 2.4))
+    const target = crest * crest * atten * ctx.intensity
+
+    g.scale = lerp(g.scale, 1, 0.3) // (unused channel kept neutral)
+    const infl = target
+    const wght = lerp(ctx.baseWeight, 880, infl)
+    g.node.style.fontVariationSettings = fvs({
+      opsz: lerp(48, 144, infl),
+      wght,
+      SOFT: infl * 70,
+    })
+    g.node.style.transform =
+      `translate3d(0, ${(-infl * 9).toFixed(2)}px, 0) scale(${(1 + infl * 0.2).toFixed(3)})`
+    g.node.style.opacity = '1'
+  },
+}
+
+// Glitch — letters near the cursor jitter, flicker weight and split into
+// chromatic-aberration ghosts.
+const glitch = {
+  id: 'glitch',
+  label: 'Glitch',
+  hint: 'Letters tear and split near the cursor',
+  reset: resetGlyph,
+  step(g, ctx) {
+    const dist = Math.hypot(g.cx - ctx.px, g.cy - ctx.py)
+    const j = smoothstep(1 - dist / ctx.radius) * ctx.intensity
+
+    const rx = (Math.random() * 2 - 1) * 6 * j
+    const ry = (Math.random() * 2 - 1) * 6 * j
+    const sk = (Math.random() * 2 - 1) * 9 * j
+    const wght = clamp(
+      lerp(ctx.baseWeight, 860, j) + (Math.random() * 2 - 1) * 140 * j,
+      100,
+      900,
+    )
+
+    g.node.style.fontVariationSettings = fvs({
+      opsz: lerp(40, 144, j),
+      wght,
+      SOFT: j * 40,
+    })
+    g.node.style.transform =
+      `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0) ` +
+      `skewX(${sk.toFixed(1)}deg) scale(${(1 + 0.1 * j).toFixed(3)})`
+
+    if (j > 0.08) {
+      const o = 2.6 * j
+      g.node.style.textShadow =
+        `${o.toFixed(1)}px 0 rgba(255,61,0,0.9), ` +
+        `${(-o).toFixed(1)}px 0 rgba(27,43,232,0.9)`
+    } else {
+      g.node.style.textShadow = 'none'
+    }
+    g.node.style.opacity = '1'
+  },
+}
+
+export const BEHAVIORS = [magnet, gravity, ripple, glitch]
 
 export const getBehavior = (id) =>
   BEHAVIORS.find((b) => b.id === id) || BEHAVIORS[0]
