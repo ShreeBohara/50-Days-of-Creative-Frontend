@@ -106,13 +106,98 @@
   overflow: hidden;
 }
 
-.stage-placeholder {
+/* Floating headline editor — excluded from the exported poster. */
+.edit-bar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  max-width: min(80%, 30rem);
+  padding: 0.4em 0.7em;
+  background: var(--paper);
+  border: var(--border);
+}
+
+.edit-bar-tag {
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.edit-bar-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--hud-lg);
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.edit-bar-input:focus {
+  outline: none;
+}
+.edit-bar-input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* -------------------------------------------------------------- Poster */
+.poster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.6rem, 1.6vh, 1.4rem);
+  width: min(94%, 62rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+}
+
+.poster-kicker,
+.poster-footline {
   margin: 0;
   font-family: var(--font-mono);
   font-size: var(--hud);
-  letter-spacing: 0.4em;
+  letter-spacing: var(--label-track);
   text-transform: uppercase;
-  color: var(--ink-faint);
+}
+.poster-kicker {
+  color: var(--accent);
+}
+.poster-footline {
+  color: var(--ink-soft);
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.75rem, 11vw, 8.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  font-variation-settings: 'opsz' 144, 'wght' 360, 'SOFT' 0, 'WONK' 0;
+}
+
+.headline-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.headline-space {
+  display: inline-block;
+  width: 0.26em;
+}
+
+.glyph {
+  display: inline-block;
+  transform-origin: 50% 60%;
+  will-change: transform, font-variation-settings;
 }
 
 /* Registration / crop marks */

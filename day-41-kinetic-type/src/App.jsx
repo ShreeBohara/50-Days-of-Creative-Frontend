@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react'
+import Stage from './components/Stage.jsx'
 import './App.css'
 
 function Masthead() {
@@ -20,7 +22,7 @@ function Masthead() {
   )
 }
 
-function Hud() {
+function Hud({ headline }) {
   return (
     <footer className="hud" aria-hidden="true">
       <span className="hud-cell">
@@ -30,30 +32,29 @@ function Hud() {
         <i>axes</i> wght · opsz · SOFT · WONK
       </span>
       <span className="hud-cell">
-        <i>pointer</i> ——.— / ——.—
+        <i>glyphs</i> {Array.from(headline).filter((c) => c.trim()).length}
       </span>
       <span className="hud-cell">
         <i>behavior</i> magnet
       </span>
-      <span className="hud-cell hud-sig">
-        50 Days of Creative Frontend
-      </span>
+      <span className="hud-cell hud-sig">50 Days of Creative Frontend</span>
     </footer>
   )
 }
 
 export default function App() {
+  const [headline, setHeadline] = useState('Bend the type')
+  const stageRef = useRef(null)
+
   return (
     <div className="studio">
       <Masthead />
-      <main className="stage-frame">
-        <div className="crop crop-tl" aria-hidden="true" />
-        <div className="crop crop-tr" aria-hidden="true" />
-        <div className="crop crop-bl" aria-hidden="true" />
-        <div className="crop crop-br" aria-hidden="true" />
-        <p className="stage-placeholder">STAGE</p>
-      </main>
-      <Hud />
+      <Stage
+        headline={headline}
+        onHeadlineChange={setHeadline}
+        stageRef={stageRef}
+      />
+      <Hud headline={headline} />
     </div>
   )
 }
