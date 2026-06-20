@@ -4,6 +4,7 @@ import ControlPanel from './components/ControlPanel.jsx'
 import PresetBar from './components/PresetBar.jsx'
 import { useKineticEngine } from './hooks/useKineticEngine.js'
 import { useReducedMotion } from './hooks/useReducedMotion.js'
+import { downloadPoster, copyPoster } from './utils/exportPoster.js'
 import { getBehavior } from './lib/behaviors.js'
 import {
   SCENES,
@@ -69,12 +70,40 @@ export default function App() {
 
   const scene = getScene(sceneId)
 
+  const [exportStatus, setExportStatus] = useState('')
+
   const applyScene = (id) => {
     const s = getScene(id)
     setSceneId(id)
     setHeadline(s.headline)
     setBehaviorId(s.behavior)
     setParams(s.params)
+  }
+
+  const flash = (msg) => {
+    setExportStatus(msg)
+    window.clearTimeout(flash._t)
+    flash._t = window.setTimeout(() => setExportStatus(''), 2000)
+  }
+
+  const handleDownload = async () => {
+    try {
+      flash('Rendering…')
+      await downloadPoster(stageRef.current, `typeforge-${sceneId}`)
+      flash('Saved ✓')
+    } catch {
+      flash('Export failed')
+    }
+  }
+
+  const handleCopy = async () => {
+    try {
+      flash('Rendering…')
+      await copyPoster(stageRef.current)
+      flash('Copied ✓')
+    } catch (err) {
+      flash(err?.message === 'clipboard-unsupported' ? 'Copy unsupported' : 'Copy failed')
+    }
   }
 
   // Refs the rAF engine reads each frame; kept in sync with React state.
@@ -139,6 +168,9 @@ export default function App() {
           onBehavior={setBehaviorId}
           params={params}
           onParams={setParams}
+          onDownload={handleDownload}
+          onCopy={handleCopy}
+          exportStatus={exportStatus}
         />
       </div>
       <Hud

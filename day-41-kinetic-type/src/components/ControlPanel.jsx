@@ -23,7 +23,15 @@ function Slider({ label, unit, value, min, max, step, onChange, format }) {
   )
 }
 
-export default function ControlPanel({ behaviorId, onBehavior, params, onParams }) {
+export default function ControlPanel({
+  behaviorId,
+  onBehavior,
+  params,
+  onParams,
+  onDownload,
+  onCopy,
+  exportStatus,
+}) {
   const active = getBehavior(behaviorId)
   const set = (key) => (val) => onParams({ ...params, [key]: val })
 
@@ -92,6 +100,21 @@ export default function ControlPanel({ behaviorId, onBehavior, params, onParams 
           onChange={set('size')}
           format={(v) => v.toFixed(2)}
         />
+      </section>
+
+      <section className="panel-block">
+        <h2 className="panel-title">Export</h2>
+        <div className="export-row">
+          <button type="button" className="export-btn primary" onClick={onDownload}>
+            Download PNG
+          </button>
+          <button type="button" className="export-btn" onClick={onCopy}>
+            Copy
+          </button>
+        </div>
+        <p className="panel-hint" role="status" aria-live="polite">
+          {exportStatus || 'Snapshot the current frame as a poster.'}
+        </p>
       </section>
     </aside>
   )

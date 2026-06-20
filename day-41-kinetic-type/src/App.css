@@ -433,6 +433,39 @@
   border: 1.5px solid var(--ink);
 }
 
+/* Export */
+.export-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 0.5rem;
+}
+
+.export-btn {
+  padding: 0.7em 0.6em;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.export-btn:hover {
+  background: var(--paper-3);
+}
+.export-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper);
+}
+.export-btn.primary:hover {
+  filter: brightness(1.08);
+}
+
 /* -------------------------------------------------------------------- HUD */
 .hud {
   display: flex;
