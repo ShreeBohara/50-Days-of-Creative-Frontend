@@ -142,15 +142,6 @@ export default function App() {
     requestMeasure()
   }, [params.size, requestMeasure])
 
-  // DEV-only console helper for previewing behaviors.
-  useEffect(() => {
-    if (!import.meta.env.DEV) return
-    window.__forge = {
-      setBehavior: (id) => setBehaviorId(id),
-      params: paramsRef.current,
-    }
-  }, [])
-
   return (
     <div className="studio" style={{ '--hsize': params.size }}>
       <Masthead />

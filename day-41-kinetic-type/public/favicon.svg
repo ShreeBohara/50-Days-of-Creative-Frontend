@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" fill="#15140f" />
-  <text x="16" y="23" font-family="Georgia, serif" font-size="22" font-weight="700"
-        text-anchor="middle" fill="#ff3d00">T</text>
+  <text x="15" y="24" font-family="Georgia, 'Times New Roman', serif" font-size="24"
+        font-weight="700" text-anchor="middle" fill="#ece7d9">T</text>
+  <rect x="21.2" y="5.2" width="6" height="6" fill="#ff3d00" transform="rotate(45 24.2 8.2)" />
 </svg>

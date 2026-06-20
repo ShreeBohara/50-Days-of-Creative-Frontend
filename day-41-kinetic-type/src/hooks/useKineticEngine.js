@@ -109,14 +109,16 @@ export function useKineticEngine({ behaviorRef, paramsRef, reducedMotion }) {
 
   useEffect(() => {
     if (reducedMotion) {
-      // Static, legible specimen — no animation loop.
-      if (needMeasure.current) measure()
-      for (const g of glyphList.current) {
-        g.node.style.transform = 'none'
-        g.node.style.fontVariationSettings =
-          '"opsz" 110, "wght" 440, "SOFT" 0, "WONK" 0'
-      }
-      return
+      // Static, legible specimen — paint once, no animation loop.
+      const once = requestAnimationFrame(() => {
+        if (needMeasure.current) measure()
+        for (const g of glyphList.current) {
+          g.node.style.transform = 'none'
+          g.node.style.fontVariationSettings =
+            '"opsz" 110, "wght" 440, "SOFT" 0, "WONK" 0'
+        }
+      })
+      return () => cancelAnimationFrame(once)
     }
 
     let raf = 0
