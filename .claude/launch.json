@@ -55,6 +55,13 @@
       "runtimeExecutable": "/opt/homebrew/bin/node",
       "runtimeArgs": ["/opt/homebrew/bin/npx", "serve", "day-17-isometric-city", "-l", "3017"],
       "port": 3017
+    },
+    {
+      "name": "day-41",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "3041"],
+      "port": 3041,
+      "cwd": "day-41-kinetic-type"
     }
   ]
 }
