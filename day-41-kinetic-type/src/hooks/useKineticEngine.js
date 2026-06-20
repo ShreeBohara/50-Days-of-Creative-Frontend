@@ -165,5 +165,9 @@ export function useKineticEngine({ behaviorRef, paramsRef, reducedMotion }) {
     return () => cancelAnimationFrame(raf)
   }, [behaviorRef, paramsRef, reducedMotion, measure])
 
-  return { registerGlyph, pointer }
+  const requestMeasure = useCallback(() => {
+    needMeasure.current = true
+  }, [])
+
+  return { registerGlyph, requestMeasure, pointer }
 }

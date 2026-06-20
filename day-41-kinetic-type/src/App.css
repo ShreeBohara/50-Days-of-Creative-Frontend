@@ -94,6 +94,14 @@
   }
 }
 
+/* -------------------------------------------------------------- Workbench */
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(248px, 23vw, 320px);
+  gap: var(--gutter);
+  min-height: 0;
+}
+
 /* ------------------------------------------------------------- Stage frame */
 .stage-frame {
   position: relative;
@@ -178,7 +186,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.75rem, 11vw, 8.5rem);
+  font-size: calc(var(--hsize, 1) * clamp(2.5rem, 9.5vw, 7.5rem));
   line-height: 0.94;
   letter-spacing: -0.01em;
   text-wrap: balance;
@@ -231,6 +239,129 @@
   right: 8px;
   border-bottom: var(--border);
   border-right: var(--border);
+}
+
+/* ------------------------------------------------------------------ Panel */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding: 1.1rem;
+  border: var(--border);
+  background: var(--paper);
+  overflow-y: auto;
+}
+
+.panel-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.panel-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  font-weight: 700;
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+  color: var(--ink);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.behavior-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--ink);
+}
+
+.behavior-btn {
+  padding: 0.62rem 0.4rem;
+  border: none;
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--paper);
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.behavior-grid .behavior-btn:nth-child(2n) {
+  border-right: none;
+}
+.behavior-grid .behavior-btn:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+.behavior-btn:hover {
+  background: var(--paper-3);
+  color: var(--ink);
+}
+.behavior-btn.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.panel-hint {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  line-height: 1.5;
+  color: var(--ink-faint);
+  min-height: 2.1em;
+}
+
+/* Sliders */
+.ctl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ctl-field-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  text-transform: uppercase;
+}
+.ctl-field-label {
+  letter-spacing: var(--label-track);
+  color: var(--ink-soft);
+}
+.ctl-field-value {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.ctl-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--ink);
+  cursor: pointer;
+}
+.ctl-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border: 1.5px solid var(--ink);
+}
+.ctl-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  background: var(--accent);
+  border: 1.5px solid var(--ink);
 }
 
 /* -------------------------------------------------------------------- HUD */
