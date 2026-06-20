@@ -1,3 +1,36 @@
+:root {
+  /* --- Ink & paper: brutalist type-specimen palette --- */
+  --paper: #ece7d9;
+  --paper-2: #e1dbc8;
+  --paper-3: #d6cfb8;
+  --ink: #15140f;
+  --ink-soft: #4a463b;
+  --ink-faint: #837c69;
+  --accent: #ff3d00; /* signal red-orange */
+  --accent-2: #1b2be8; /* cobalt */
+  --hairline: rgba(21, 20, 15, 0.16);
+  --hairline-strong: rgba(21, 20, 15, 0.4);
+
+  /* --- Type --- */
+  --font-display: 'Fraunces Variable', 'Times New Roman', serif;
+  --font-grotesque: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* --- HUD type scale --- */
+  --hud: 0.6875rem;
+  --hud-lg: 0.8125rem;
+  --label-track: 0.16em;
+
+  /* --- Geometry --- */
+  --gutter: clamp(0.75rem, 2.4vw, 1.5rem);
+  --border: 1.5px solid var(--ink);
+  --z-hud: 30;
+  --z-panel: 40;
+  --z-overlay: 60;
+
+  color-scheme: light;
+}
+
 *,
 *::before,
 *::after {
@@ -12,5 +45,57 @@ body,
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+/* Paper grain — a faint tactile texture under everything. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Brutalist scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink);
+  border: 2px solid var(--paper-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

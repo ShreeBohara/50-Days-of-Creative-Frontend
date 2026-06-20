@@ -1,6 +1,193 @@
-.app-shell {
+.studio {
+  position: relative;
+  z-index: 2;
   display: grid;
-  place-content: center;
-  min-height: 100vh;
-  text-align: center;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--gutter);
+  gap: var(--gutter);
+}
+
+/* ---------------------------------------------------------------- Masthead */
+.masthead {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: calc(var(--gutter) - 4px);
+  border-bottom: var(--border);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 0.34em;
+  font-family: var(--font-grotesque);
+  font-weight: 800;
+  font-size: clamp(1.1rem, 3.2vw, 1.6rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wordmark-mark {
+  width: 0.56em;
+  height: 0.56em;
+  background: var(--accent);
+  transform: rotate(45deg);
+  margin: 0 0.06em;
+}
+
+.masthead-sub {
+  margin: 0;
+  justify-self: center;
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.masthead-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.masthead-no {
+  padding: 0.28em 0.55em;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+}
+
+/* ------------------------------------------------------------- Stage frame */
+.stage-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border: var(--border);
+  background:
+    linear-gradient(var(--hairline) 1px, transparent 1px) 0 0 / 100% 2.5rem,
+    var(--paper-2);
+  overflow: hidden;
+}
+
+.stage-placeholder {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* Registration / crop marks */
+.crop {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  z-index: 5;
+}
+.crop-tl {
+  top: 8px;
+  left: 8px;
+  border-top: var(--border);
+  border-left: var(--border);
+}
+.crop-tr {
+  top: 8px;
+  right: 8px;
+  border-top: var(--border);
+  border-right: var(--border);
+}
+.crop-bl {
+  bottom: 8px;
+  left: 8px;
+  border-bottom: var(--border);
+  border-left: var(--border);
+}
+.crop-br {
+  bottom: 8px;
+  right: 8px;
+  border-bottom: var(--border);
+  border-right: var(--border);
+}
+
+/* -------------------------------------------------------------------- HUD */
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.4rem;
+  padding-top: calc(var(--gutter) - 6px);
+  border-top: var(--border);
+  font-family: var(--font-mono);
+  font-size: var(--hud);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hud-cell {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  white-space: nowrap;
+}
+
+.hud-cell i {
+  font-style: normal;
+  color: var(--ink-faint);
+  letter-spacing: var(--label-track);
+}
+
+.hud-sig {
+  margin-left: auto;
+  color: var(--ink-faint);
+}
+
+@media (max-width: 640px) {
+  .masthead {
+    grid-template-columns: 1fr auto;
+  }
+  .masthead-sub {
+    display: none;
+  }
+  .hud-sig {
+    display: none;
+  }
 }
