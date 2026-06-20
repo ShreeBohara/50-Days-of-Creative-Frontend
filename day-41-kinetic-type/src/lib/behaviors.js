@@ -33,6 +33,7 @@ const resetGlyph = (g) => {
   g.rot = 0
   g.scale = 1
   g.opacity = 1
+  g.enter = null
   g.node.style.textShadow = 'none'
 }
 
@@ -179,7 +180,68 @@ const glitch = {
   },
 }
 
-export const BEHAVIORS = [magnet, gravity, ripple, glitch]
+// Spotlight — a pool of focus follows the cursor; everything else fades to a
+// faint hairline.
+const spotlight = {
+  id: 'spotlight',
+  label: 'Spotlight',
+  hint: 'A focus pool follows the cursor',
+  reset: resetGlyph,
+  step(g, ctx) {
+    const dist = Math.hypot(g.cx - ctx.px, g.cy - ctx.py)
+    const infl = smoothstep(1 - dist / (ctx.radius * 0.85))
+
+    const wght = lerp(150, lerp(640, 860, ctx.intensity - 0.5), infl)
+    const opsz = lerp(16, 144, infl)
+    const op = lerp(0.1, 1, infl)
+    const scale = 1 + infl * 0.07
+
+    const e = 0.22
+    g.wght = lerp(g.wght, wght, e)
+    g.opsz = lerp(g.opsz, opsz, e)
+    g.opacity = lerp(g.opacity, op, e)
+    g.scale = lerp(g.scale, scale, e)
+
+    g.node.style.fontVariationSettings = fvs({
+      opsz: g.opsz,
+      wght: g.wght,
+      SOFT: infl * 60,
+    })
+    g.node.style.transform = `scale(${g.scale.toFixed(3)})`
+    g.node.style.opacity = g.opacity.toFixed(3)
+  },
+}
+
+// Stagger — letters reveal one-by-one on entry, then breathe gently; the cursor
+// adds a soft local emphasis.
+const stagger = {
+  id: 'stagger',
+  label: 'Reveal',
+  hint: 'Letters reveal in sequence, then breathe',
+  reset: resetGlyph,
+  step(g, ctx) {
+    if (g.enter == null) g.enter = ctx.t
+    const local = ctx.t - g.enter
+    const delay = g.index * 0.05
+    const p = smoothstep(clamp01((local - delay) / 0.7))
+
+    const dist = Math.hypot(g.cx - ctx.px, g.cy - ctx.py)
+    const near = smoothstep(1 - dist / ctx.radius) * ctx.intensity
+    const breathe = (Math.sin(ctx.t * 1.1 + g.index * 0.4) * 0.5 + 0.5) * 0.35
+
+    const settled = lerp(lerp(320, 470, breathe), 840, near)
+    const wght = lerp(190, settled, p)
+    const opsz = lerp(28, lerp(72, 144, near), p)
+    const ty = lerp(36, -near * 6, p)
+    const scale = lerp(0.95, 1 + near * 0.09, p)
+
+    g.node.style.fontVariationSettings = fvs({ opsz, wght, SOFT: near * 50 })
+    g.node.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(3)})`
+    g.node.style.opacity = p.toFixed(3)
+  },
+}
+
+export const BEHAVIORS = [magnet, gravity, ripple, glitch, spotlight, stagger]
 
 export const getBehavior = (id) =>
   BEHAVIORS.find((b) => b.id === id) || BEHAVIORS[0]
