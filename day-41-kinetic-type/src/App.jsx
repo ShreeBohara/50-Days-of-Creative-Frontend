@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import Stage from './components/Stage.jsx'
 import ControlPanel from './components/ControlPanel.jsx'
+import PresetBar from './components/PresetBar.jsx'
 import { useKineticEngine } from './hooks/useKineticEngine.js'
 import { useReducedMotion } from './hooks/useReducedMotion.js'
 import { getBehavior } from './lib/behaviors.js'
+import {
+  SCENES,
+  getScene,
+  fontStack,
+  fontLabel,
+  fontName,
+} from './lib/presets.js'
 import './App.css'
-
-const DEFAULT_PARAMS = { radius: 300, intensity: 1, baseWeight: 340, size: 1 }
 
 function Masthead() {
   return (
@@ -28,13 +34,13 @@ function Masthead() {
   )
 }
 
-function Hud({ headline, behaviorId, params }) {
+function Hud({ headline, behaviorId, params, fontName: font }) {
   const behavior = getBehavior(behaviorId)
   const glyphCount = Array.from(headline).filter((c) => c.trim()).length
   return (
     <footer className="hud" aria-hidden="true">
       <span className="hud-cell">
-        <i>font</i> Fraunces Variable
+        <i>font</i> {fontName(font)}
       </span>
       <span className="hud-cell">
         <i>behavior</i> {behavior.label}
@@ -54,11 +60,22 @@ function Hud({ headline, behaviorId, params }) {
 }
 
 export default function App() {
-  const [headline, setHeadline] = useState('Bend the type')
-  const [behaviorId, setBehaviorId] = useState('magnet')
-  const [params, setParams] = useState(DEFAULT_PARAMS)
+  const [sceneId, setSceneId] = useState(SCENES[0].id)
+  const [headline, setHeadline] = useState(SCENES[0].headline)
+  const [behaviorId, setBehaviorId] = useState(SCENES[0].behavior)
+  const [params, setParams] = useState(SCENES[0].params)
   const stageRef = useRef(null)
   const reducedMotion = useReducedMotion()
+
+  const scene = getScene(sceneId)
+
+  const applyScene = (id) => {
+    const s = getScene(id)
+    setSceneId(id)
+    setHeadline(s.headline)
+    setBehaviorId(s.behavior)
+    setParams(s.params)
+  }
 
   // Refs the rAF engine reads each frame; kept in sync with React state.
   const behaviorRef = useRef(getBehavior(behaviorId))
@@ -78,6 +95,19 @@ export default function App() {
     paramsRef.current = params
   }, [params])
 
+  // Apply the active scene's palette + display font to :root.
+  useEffect(() => {
+    const root = document.documentElement
+    const p = scene.palette
+    root.style.setProperty('--paper', p.paper)
+    root.style.setProperty('--ink', p.ink)
+    root.style.setProperty('--accent', p.accent)
+    root.style.setProperty('--accent-2', p.accent2)
+    root.style.setProperty('--font-display', fontStack(scene.font))
+    root.style.colorScheme = scene.dark ? 'dark' : 'light'
+    requestMeasure()
+  }, [scene, requestMeasure])
+
   // Headline size changes layout — re-measure rest positions.
   useEffect(() => {
     requestMeasure()
@@ -95,12 +125,14 @@ export default function App() {
   return (
     <div className="studio" style={{ '--hsize': params.size }}>
       <Masthead />
+      <PresetBar sceneId={sceneId} onScene={applyScene} />
       <div className="workbench">
         <Stage
           headline={headline}
           onHeadlineChange={setHeadline}
           registerGlyph={registerGlyph}
           stageRef={stageRef}
+          fontLabel={fontLabel(scene.font)}
         />
         <ControlPanel
           behaviorId={behaviorId}
@@ -109,7 +141,12 @@ export default function App() {
           onParams={setParams}
         />
       </div>
-      <Hud headline={headline} behaviorId={behaviorId} params={params} />
+      <Hud
+        headline={headline}
+        behaviorId={behaviorId}
+        params={params}
+        fontName={scene.font}
+      />
     </div>
   )
 }

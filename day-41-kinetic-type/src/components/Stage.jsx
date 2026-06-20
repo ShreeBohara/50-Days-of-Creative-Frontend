@@ -5,7 +5,13 @@ import KineticHeadline from './KineticHeadline.jsx'
  * kinetic headline, and a baseline footline. The reactivity engine attaches to
  * the headline glyphs in later commits.
  */
-export default function Stage({ headline, onHeadlineChange, registerGlyph, stageRef }) {
+export default function Stage({
+  headline,
+  onHeadlineChange,
+  registerGlyph,
+  stageRef,
+  fontLabel,
+}) {
   return (
     <div className="stage-frame">
       <div className="crop crop-tl" aria-hidden="true" />
@@ -30,9 +36,7 @@ export default function Stage({ headline, onHeadlineChange, registerGlyph, stage
       <article className="poster" ref={stageRef}>
         <p className="poster-kicker">Specimen № 41 — Variable</p>
         <KineticHeadline text={headline} registerGlyph={registerGlyph} />
-        <p className="poster-footline">
-          Fraunces Variable · opsz 9–144 · wght 100–900
-        </p>
+        <p className="poster-footline">{fontLabel}</p>
       </article>
     </div>
   )

@@ -1,15 +1,17 @@
 :root {
-  /* --- Ink & paper: brutalist type-specimen palette --- */
+  /* --- Base palette — scenes override just these four --- */
   --paper: #ece7d9;
-  --paper-2: #e1dbc8;
-  --paper-3: #d6cfb8;
   --ink: #15140f;
-  --ink-soft: #4a463b;
-  --ink-faint: #837c69;
   --accent: #ff3d00; /* signal red-orange */
   --accent-2: #1b2be8; /* cobalt */
-  --hairline: rgba(21, 20, 15, 0.16);
-  --hairline-strong: rgba(21, 20, 15, 0.4);
+
+  /* --- Derived tokens (recompute when the four above change) --- */
+  --paper-2: color-mix(in srgb, var(--paper) 90%, var(--ink));
+  --paper-3: color-mix(in srgb, var(--paper) 82%, var(--ink));
+  --ink-soft: color-mix(in srgb, var(--ink) 70%, var(--paper));
+  --ink-faint: color-mix(in srgb, var(--ink) 46%, var(--paper));
+  --hairline: color-mix(in srgb, var(--ink) 16%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--ink) 40%, transparent);
 
   /* --- Type --- */
   --font-display: 'Fraunces Variable', 'Times New Roman', serif;
@@ -52,6 +54,9 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow: hidden;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
 }
 
 /* Paper grain — a faint tactile texture under everything. */
