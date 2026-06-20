@@ -37,7 +37,7 @@ export default function KineticHeadline({ text, registerGlyph }) {
                   data-glyph={i}
                   ref={
                     registerGlyph
-                      ? (node) => registerGlyph(node, { index: i, char: ch })
+                      ? (node) => registerGlyph(i, node, ch)
                       : undefined
                   }
                 >

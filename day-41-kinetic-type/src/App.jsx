@@ -1,5 +1,8 @@
 import { useRef, useState } from 'react'
 import Stage from './components/Stage.jsx'
+import { useKineticEngine } from './hooks/useKineticEngine.js'
+import { useReducedMotion } from './hooks/useReducedMotion.js'
+import { getBehavior } from './lib/behaviors.js'
 import './App.css'
 
 function Masthead() {
@@ -45,6 +48,17 @@ function Hud({ headline }) {
 export default function App() {
   const [headline, setHeadline] = useState('Bend the type')
   const stageRef = useRef(null)
+  const reducedMotion = useReducedMotion()
+
+  // Refs the rAF engine reads each frame; UI controls mutate them in place.
+  const behaviorRef = useRef(getBehavior('magnet'))
+  const paramsRef = useRef({ radius: 300, intensity: 1, baseWeight: 340 })
+
+  const { registerGlyph } = useKineticEngine({
+    behaviorRef,
+    paramsRef,
+    reducedMotion,
+  })
 
   return (
     <div className="studio">
@@ -52,6 +66,7 @@ export default function App() {
       <Stage
         headline={headline}
         onHeadlineChange={setHeadline}
+        registerGlyph={registerGlyph}
         stageRef={stageRef}
       />
       <Hud headline={headline} />
