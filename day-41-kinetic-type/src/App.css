@@ -499,6 +499,26 @@
   color: var(--ink-faint);
 }
 
+/* Tablet / stacked — panel drops below the stage, page scrolls. */
+@media (max-width: 880px) {
+  body {
+    overflow-y: auto;
+  }
+  .studio {
+    height: auto;
+    min-height: 100dvh;
+  }
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+  .stage-frame {
+    min-height: 54vh;
+  }
+  .panel {
+    max-height: none;
+  }
+}
+
 @media (max-width: 640px) {
   .masthead {
     grid-template-columns: 1fr auto;
@@ -508,5 +528,30 @@
   }
   .hud-sig {
     display: none;
+  }
+  .edit-bar {
+    max-width: calc(100% - 28px);
+  }
+  .behavior-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .behavior-grid .behavior-btn:nth-child(2n) {
+    border-right: 1px solid var(--hairline);
+  }
+  .behavior-grid .behavior-btn:nth-child(3n) {
+    border-right: none;
+  }
+  .behavior-grid .behavior-btn:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .behavior-grid .behavior-btn:nth-last-child(-n + 3) {
+    border-bottom: none;
+  }
+}
+
+/* Coarse pointers: don't fight page scroll, but still react to drags. */
+@media (hover: none) {
+  .stage-frame {
+    touch-action: pan-y;
   }
 }
