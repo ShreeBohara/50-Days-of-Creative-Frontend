@@ -13,6 +13,7 @@ export function useKineticEngine({ behaviorRef, paramsRef, reducedMotion }) {
   const glyphList = useRef([])
   const posterEl = useRef(null)
   const needMeasure = useRef(true)
+  const lastBehavior = useRef(null)
   const pointer = useRef({
     x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
     y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0,
@@ -129,6 +130,13 @@ export function useKineticEngine({ behaviorRef, paramsRef, reducedMotion }) {
         const p = pointer.current
         const beh = behaviorRef.current
         const params = paramsRef.current
+
+        // On behavior change, reset glyph state so the new motion starts clean.
+        if (beh.id !== lastBehavior.current) {
+          lastBehavior.current = beh.id
+          for (const g of list) beh.reset?.(g)
+        }
+
         const ctx = {
           px: p.x,
           py: p.y,

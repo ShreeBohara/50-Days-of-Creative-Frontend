@@ -22,11 +22,23 @@ export const fvs = ({ opsz = 144, wght = 360, SOFT = 0, WONK = 0 } = {}) =>
  * ctx = { px, py, active, t, dt, radius, intensity, baseWeight, w, h, count }
  */
 
+// Zero a glyph's physics/smoothing state — called when a behavior takes over.
+const resetGlyph = (g) => {
+  g.tx = 0
+  g.ty = 0
+  g.vx = 0
+  g.vy = 0
+  g.rot = 0
+  g.scale = 1
+  g.opacity = 1
+}
+
 // Magnet — glyphs nearest the cursor gain weight, optical size and softness.
 const magnet = {
   id: 'magnet',
   label: 'Magnet',
   hint: 'Glyphs swell toward the cursor',
+  reset: resetGlyph,
   step(g, ctx) {
     const dist = Math.hypot(ctx.px - g.cx, ctx.py - g.cy)
     const infl = smoothstep(1 - dist / ctx.radius) * ctx.intensity
@@ -54,7 +66,47 @@ const magnet = {
   },
 }
 
-export const BEHAVIORS = [magnet]
+// Gravity — letters hang under gravity; the cursor knocks them loose and they
+// spring back. A damped spring toward the rest line keeps the motion lively.
+const gravity = {
+  id: 'gravity',
+  label: 'Gravity',
+  hint: 'Cursor scatters letters; they fall and settle',
+  reset: resetGlyph,
+  step(g, ctx) {
+    const dx = g.cx - ctx.px
+    const dy = g.cy - ctx.py
+    const dist = Math.hypot(dx, dy) || 1
+    const push = Math.max(0, 1 - dist / ctx.radius)
+
+    // Cursor repulsion (outward) + constant downward pull.
+    const f = push * push * 1000 * ctx.intensity
+    const ax = (dx / dist) * f
+    const ay = (dy / dist) * f + 1150
+
+    // Damped spring back to the rest line (0, 0).
+    const k = 95
+    const damp = 9
+    g.vx += (ax - k * g.tx - damp * g.vx) * ctx.dt
+    g.vy += (ay - k * g.ty - damp * g.vy) * ctx.dt
+    g.tx = Math.max(-220, Math.min(220, g.tx + g.vx * ctx.dt))
+    g.ty = Math.max(-200, Math.min(260, g.ty + g.vy * ctx.dt))
+    g.rot = lerp(g.rot, Math.max(-20, Math.min(20, g.vx * 0.02)), 0.18)
+
+    const wght = lerp(ctx.baseWeight, 820, push)
+    g.node.style.fontVariationSettings = fvs({
+      opsz: lerp(42, 144, push),
+      wght,
+      SOFT: push * 55,
+    })
+    g.node.style.transform =
+      `translate3d(${g.tx.toFixed(2)}px, ${g.ty.toFixed(2)}px, 0) ` +
+      `rotate(${g.rot.toFixed(2)}deg)`
+    g.node.style.opacity = '1'
+  },
+}
+
+export const BEHAVIORS = [magnet, gravity]
 
 export const getBehavior = (id) =>
   BEHAVIORS.find((b) => b.id === id) || BEHAVIORS[0]

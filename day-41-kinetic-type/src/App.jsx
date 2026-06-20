@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Stage from './components/Stage.jsx'
 import { useKineticEngine } from './hooks/useKineticEngine.js'
 import { useReducedMotion } from './hooks/useReducedMotion.js'
@@ -59,6 +59,15 @@ export default function App() {
     paramsRef,
     reducedMotion,
   })
+
+  // DEV-only console helper for previewing behaviors before the controls UI.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    window.__forge = {
+      setBehavior: (id) => (behaviorRef.current = getBehavior(id)),
+      params: paramsRef.current,
+    }
+  }, [])
 
   return (
     <div className="studio">
