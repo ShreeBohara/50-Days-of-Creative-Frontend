@@ -286,7 +286,7 @@
 
 .seed-form input,
 .seed-form button {
-  min-height: 42px;
+  min-height: 44px;
   border: 1px solid var(--rule-strong);
 }
 
