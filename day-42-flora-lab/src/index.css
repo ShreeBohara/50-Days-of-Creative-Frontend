@@ -1,17 +1,99 @@
 :root {
-  font-family: ManropeVariable, sans-serif;
+  font-family: 'Manrope Variable', Manrope, sans-serif;
   color: #1b1d18;
   background: #f3ebdd;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  --paper: #f3ebdd;
+  --paper-deep: #e9dfcd;
+  --paper-light: #fbf7ef;
+  --ink: #1b1d18;
+  --ink-soft: #5e6257;
+  --moss: #2f5d3a;
+  --moss-deep: #1f4229;
+  --specimen-red: #b4483e;
+  --ochre: #c89540;
+  --rule: rgba(27, 29, 24, 0.2);
+  --rule-strong: rgba(27, 29, 24, 0.48);
+  --focus: #8e352d;
+  --font-editorial: Newsreader, Georgia, serif;
+  --font-ui: 'Manrope Variable', Manrope, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --shadow-paper: 0 18px 60px rgba(45, 38, 27, 0.12);
+  color-scheme: light;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  min-width: 320px;
+  background: var(--paper);
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.42), transparent 32rem),
+    repeating-linear-gradient(97deg, rgba(67, 55, 35, 0.018) 0 1px, transparent 1px 5px),
+    var(--paper);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--paper-light);
+  background: var(--moss);
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: var(--space-3);
+  left: var(--space-3);
+  padding: 0.7rem 1rem;
+  color: var(--paper-light);
+  background: var(--ink);
+  transform: translateY(-160%);
+  transition: transform 180ms ease-out;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
 }

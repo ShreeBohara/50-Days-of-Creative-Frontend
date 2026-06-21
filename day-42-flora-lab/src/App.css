@@ -1,0 +1,326 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-header {
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: minmax(210px, 1fr) minmax(260px, 1.5fr) minmax(210px, 1fr);
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4) clamp(1rem, 2.6vw, 2.75rem);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.brand {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  gap: 3px;
+  padding: 5px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.brand-mark i {
+  width: 100%;
+  display: block;
+  background: var(--moss);
+  border-radius: 100% 100% 0 0;
+}
+
+.brand-mark i:nth-child(1) { height: 55%; }
+.brand-mark i:nth-child(2) { height: 90%; }
+.brand-mark i:nth-child(3) { height: 68%; }
+
+.brand-wordmark {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+}
+
+.header-description {
+  max-width: 32rem;
+  margin: 0 auto;
+  color: var(--ink-soft);
+  font-family: var(--font-editorial);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  font-style: italic;
+  text-align: center;
+}
+
+.header-tools,
+.history-tools {
+  display: flex;
+  align-items: center;
+}
+
+.header-tools {
+  justify-self: end;
+  gap: var(--space-4);
+}
+
+.history-tools {
+  border: 1px solid var(--rule);
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.icon-button + .icon-button {
+  border-left: 1px solid var(--rule);
+}
+
+.icon-button svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 1.5;
+}
+
+.icon-button:not(:disabled):hover {
+  color: var(--paper-light);
+  background: var(--moss);
+}
+
+.icon-button:disabled {
+  color: rgba(27, 29, 24, 0.25);
+}
+
+.day-counter,
+.section-index,
+.stage-meta,
+.specimen-caption {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.day-counter {
+  color: var(--specimen-red);
+}
+
+.lab-grid {
+  min-height: calc(100vh - 79px);
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(460px, 1.7fr) minmax(260px, 0.9fr);
+}
+
+.lab-rail {
+  min-width: 0;
+  padding: clamp(1.25rem, 2vw, 2rem);
+}
+
+.trait-rail {
+  border-right: 1px solid var(--rule-strong);
+}
+
+.collection-rail {
+  border-left: 1px solid var(--rule-strong);
+}
+
+.rail-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-index {
+  color: var(--specimen-red);
+  padding-top: 0.28rem;
+}
+
+.rail-heading h2 {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.rail-heading p {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+}
+
+.empty-rail {
+  min-height: 16rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-3);
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.empty-rail svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.25;
+}
+
+.empty-rail p {
+  max-width: 13rem;
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.stage-column {
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 2rem) clamp(1rem, 3vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
+}
+
+.stage-meta,
+.specimen-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink-soft);
+}
+
+.stage-meta {
+  margin-bottom: var(--space-3);
+}
+
+.stage-meta span:last-child::before {
+  width: 5px;
+  height: 5px;
+  content: '';
+  display: inline-block;
+  margin-right: 0.5rem;
+  background: var(--moss);
+  border-radius: 50%;
+  vertical-align: 0.08rem;
+}
+
+.specimen-frame {
+  position: relative;
+  width: min(100%, 700px);
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  background:
+    linear-gradient(var(--rule), var(--rule)) center / 1px 100% no-repeat,
+    linear-gradient(90deg, var(--rule), var(--rule)) center / 100% 1px no-repeat,
+    var(--paper-light);
+  border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow-paper);
+}
+
+.stage-placeholder svg {
+  width: clamp(120px, 21vw, 260px);
+  height: clamp(120px, 21vw, 260px);
+  color: var(--moss);
+}
+
+.registration-mark {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--specimen-red);
+  pointer-events: none;
+}
+
+.registration-mark--tl { top: 11px; left: 11px; border-top: 1px solid; border-left: 1px solid; }
+.registration-mark--tr { top: 11px; right: 11px; border-top: 1px solid; border-right: 1px solid; }
+.registration-mark--bl { bottom: 11px; left: 11px; border-bottom: 1px solid; border-left: 1px solid; }
+.registration-mark--br { right: 11px; bottom: 11px; border-right: 1px solid; border-bottom: 1px solid; }
+
+.specimen-caption {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-3);
+  left: var(--space-4);
+}
+
+@media (max-width: 1080px) {
+  .app-header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .header-description {
+    display: none;
+  }
+
+  .lab-grid {
+    grid-template-columns: minmax(220px, 0.75fr) minmax(440px, 1.5fr);
+  }
+
+  .collection-rail {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--rule-strong);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-header {
+    position: relative;
+    min-height: 68px;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .day-counter {
+    display: none;
+  }
+
+  .lab-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stage-column {
+    order: -1;
+    padding: var(--space-4);
+  }
+
+  .trait-rail,
+  .collection-rail {
+    border: 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .specimen-frame {
+    width: min(100%, 540px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
