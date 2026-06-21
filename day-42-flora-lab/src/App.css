@@ -118,6 +118,64 @@
   text-transform: uppercase;
 }
 
+.export-toolbar {
+  width: min(100%, 700px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: var(--space-4) auto 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.export-toolbar > span {
+  color: var(--ink-soft);
+  font-family: var(--font-editorial);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.export-toolbar > div {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.export-toolbar button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.export-toolbar button:hover:not(:disabled) {
+  color: var(--paper-light);
+  background: var(--moss);
+  border-color: var(--moss);
+}
+
+.export-toolbar button:disabled {
+  opacity: 0.5;
+}
+
+.export-toolbar button svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.5;
+}
+
 .day-counter {
   color: var(--specimen-red);
 }

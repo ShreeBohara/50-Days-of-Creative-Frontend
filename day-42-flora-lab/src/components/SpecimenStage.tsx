@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import type { PlantGenomeV1 } from '../domain/genome'
 import { generatePlantScene } from '../domain/growth'
 import { PLANT_PALETTES } from '../domain/palettes'
 import { PlantArtwork } from './PlantArtwork'
+import { ExportToolbar } from './ExportToolbar'
 
 interface SpecimenStageProps {
   genome: PlantGenomeV1
@@ -16,6 +17,7 @@ function specimenName(seed: string) {
 export function SpecimenStage({ genome }: SpecimenStageProps) {
   const scene = useMemo(() => generatePlantScene(genome), [genome])
   const palette = PLANT_PALETTES[genome.palette]
+  const artworkRef = useRef<SVGSVGElement>(null)
 
   return (
     <section className="stage-column" id="specimen-stage" tabIndex={-1}>
@@ -28,7 +30,7 @@ export function SpecimenStage({ genome }: SpecimenStageProps) {
         <div className="registration-mark registration-mark--tr" />
         <div className="registration-mark registration-mark--bl" />
         <div className="registration-mark registration-mark--br" />
-        <PlantArtwork key={JSON.stringify(genome)} genome={genome} className="specimen-artwork" />
+        <PlantArtwork ref={artworkRef} key={JSON.stringify(genome)} genome={genome} className="specimen-artwork" />
         <div className="taxonomy-label" aria-hidden="true">
           <span>F.42</span>
           <i />
@@ -39,6 +41,7 @@ export function SpecimenStage({ genome }: SpecimenStageProps) {
           <span>{palette.label} · SVG</span>
         </div>
       </div>
+      <ExportToolbar genome={genome} artworkRef={artworkRef} />
     </section>
   )
 }
