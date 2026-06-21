@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
+
+let motionQuery: MediaQueryList | null = null
+
+function getMotionQuery() {
+  if (typeof window === 'undefined') return null
+  motionQuery ??= window.matchMedia('(prefers-reduced-motion: reduce)')
+  return motionQuery
+}
+
+function subscribe(callback: () => void) {
+  const query = getMotionQuery()
+  query?.addEventListener('change', callback)
+  return () => query?.removeEventListener('change', callback)
+}
+
+function getSnapshot() {
+  return getMotionQuery()?.matches ?? false
+}
 
 export function useReducedMotion() {
-  const [reducedMotion, setReducedMotion] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
-
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const handleChange = () => setReducedMotion(media.matches)
-    media.addEventListener('change', handleChange)
-    return () => media.removeEventListener('change', handleChange)
-  }, [])
-
-  return reducedMotion
+  return useSyncExternalStore(subscribe, getSnapshot, () => false)
 }

@@ -25,10 +25,10 @@ export function AppHeader({ canUndo, canRedo, onUndo, onRedo }: AppHeaderProps) 
 
       <div className="header-tools">
         <div className="history-tools" aria-label="History controls">
-          <button className="icon-button" type="button" aria-label="Undo" disabled={!canUndo} onClick={onUndo}>
+          <button className="icon-button" type="button" aria-label="Undo" aria-keyshortcuts="Control+Z Meta+Z" disabled={!canUndo} onClick={onUndo}>
             <RotateCcw aria-hidden="true" />
           </button>
-          <button className="icon-button" type="button" aria-label="Redo" disabled={!canRedo} onClick={onRedo}>
+          <button className="icon-button" type="button" aria-label="Redo" aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z" disabled={!canRedo} onClick={onRedo}>
             <RotateCw aria-hidden="true" />
           </button>
         </div>

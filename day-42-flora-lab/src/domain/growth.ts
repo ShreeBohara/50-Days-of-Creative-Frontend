@@ -82,7 +82,7 @@ export function generatePlantScene(genome: PlantGenomeV1): PlantScene {
     x: 400,
     y: 910,
     angle: -90,
-    length: 238,
+    length: 272,
     width: 15,
     level: 0,
   }]

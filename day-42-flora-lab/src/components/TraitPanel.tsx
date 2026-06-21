@@ -60,6 +60,7 @@ export function TraitPanel() {
           />
         </div>
       </details>
+      <p className="shortcut-note"><kbd>R</kbd> new seed · <kbd>M</kbd> mutate · <kbd>⌘Z</kbd> undo</p>
     </div>
   )
 }

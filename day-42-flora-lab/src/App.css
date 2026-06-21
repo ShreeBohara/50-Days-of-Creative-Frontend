@@ -392,6 +392,23 @@
   padding: 0.35rem 0 var(--space-5);
 }
 
+.shortcut-note {
+  margin: var(--space-4) 0 0;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.51rem;
+  line-height: 1.7;
+}
+
+.shortcut-note kbd {
+  padding: 0.08rem 0.28rem;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  font: inherit;
+}
+
 .range-control,
 .select-control {
   display: grid;
@@ -584,7 +601,7 @@
 }
 
 .archive-item-actions button {
-  width: 36px;
+  width: 44px;
   height: 44px;
   display: grid;
   place-items: center;
@@ -782,7 +799,7 @@
 }
 
 .offspring-card button {
-  min-height: 36px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1019,12 +1036,84 @@
 
   .trait-rail,
   .collection-rail {
+    padding: var(--space-5) 1.25rem;
     border: 0;
     border-top: 1px solid var(--rule-strong);
   }
 
   .specimen-frame {
     width: min(100%, 540px);
+  }
+
+  .export-toolbar {
+    align-items: flex-start;
+  }
+
+  .export-toolbar > div {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .export-toolbar button {
+    min-width: 0;
+    min-height: 44px;
+    padding-inline: 0.58rem;
+  }
+
+  .offspring-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .offspring-card {
+    grid-template-columns: 76px minmax(0, 1fr) 84px;
+    align-items: center;
+  }
+
+  .offspring-artwork {
+    width: 76px;
+  }
+
+  .offspring-card button {
+    align-self: stretch;
+  }
+
+  .archive-item-copy strong,
+  .genome-readout dd {
+    font-size: 0.95rem;
+  }
+
+  .archive-item-copy span,
+  .genome-readout dt,
+  .parent-selectors label span {
+    font-size: 0.58rem;
+  }
+}
+
+@media (max-width: 410px) {
+  .brand-wordmark {
+    font-size: 0.67rem;
+  }
+
+  .header-tools {
+    gap: var(--space-2);
+  }
+
+  .export-toolbar > span {
+    max-width: 3.2rem;
+  }
+
+  .export-toolbar button {
+    flex: 1;
+    padding-inline: 0.35rem;
+    font-size: 0.49rem;
+  }
+
+  .offspring-card {
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+
+  .offspring-card button {
+    grid-column: 1 / -1;
   }
 }
 

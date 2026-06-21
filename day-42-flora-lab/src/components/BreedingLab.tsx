@@ -17,6 +17,15 @@ export function BreedingLab() {
     [parentA, parentB],
   )
 
+  const cultivate = (genome: (typeof offspring)[number]) => {
+    cultivateOffspring(genome)
+    const stage = document.getElementById('specimen-stage')
+    stage?.focus({ preventScroll: true })
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      stage?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <section className="breeding-lab" aria-labelledby="breeding-title">
       <div className="subsection-heading">
@@ -62,7 +71,7 @@ export function BreedingLab() {
                     <strong>Hybrid {String(index + 1).padStart(2, '0')}</strong>
                     <span>{child.architecture.symmetry} / {child.foliage.shape}</span>
                   </div>
-                  <button type="button" onClick={() => cultivateOffspring(child)}>
+                  <button type="button" onClick={() => cultivate(child)}>
                     <Sprout aria-hidden="true" /> Cultivate
                   </button>
                 </article>

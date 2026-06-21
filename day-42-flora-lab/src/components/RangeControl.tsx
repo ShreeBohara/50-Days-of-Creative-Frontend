@@ -25,6 +25,7 @@ export function RangeControl({ id, label, value, min, max, step, valueLabel, onC
         max={max}
         step={step}
         value={value}
+        aria-valuetext={valueLabel ?? value.toFixed(step < 1 ? 2 : 0)}
         style={{ '--range-progress': `${progress}%` } as React.CSSProperties}
         onChange={(event) => onChange(Number(event.target.value))}
       />
