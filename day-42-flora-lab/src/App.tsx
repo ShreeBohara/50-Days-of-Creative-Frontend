@@ -1,14 +1,24 @@
-import { Dna, FlaskConical } from 'lucide-react'
 import { AppHeader } from './components/AppHeader'
+import { GenomeReadout } from './components/GenomeReadout'
 import { SpecimenStage } from './components/SpecimenStage'
-import { DEFAULT_GENOME } from './domain/genome'
+import { TraitPanel } from './components/TraitPanel'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { useFloraStore } from './store/useFloraStore'
 import './App.css'
 
 function App() {
+  const genome = useFloraStore((state) => state.genome)
+  const canUndo = useFloraStore((state) => state.past.length > 0)
+  const canRedo = useFloraStore((state) => state.future.length > 0)
+  const undo = useFloraStore((state) => state.undo)
+  const redo = useFloraStore((state) => state.redo)
+  const announcement = useFloraStore((state) => state.announcement)
+  useKeyboardShortcuts()
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#specimen-stage">Skip to specimen</a>
-      <AppHeader />
+      <AppHeader canUndo={canUndo} canRedo={canRedo} onUndo={undo} onRedo={redo} />
 
       <main className="lab-grid">
         <aside className="lab-rail trait-rail" aria-label="Plant traits">
@@ -19,13 +29,10 @@ function App() {
               <p>Shape the living system.</p>
             </div>
           </div>
-          <div className="empty-rail">
-            <Dna aria-hidden="true" />
-            <p>The genome controls will grow here.</p>
-          </div>
+          <TraitPanel />
         </aside>
 
-        <SpecimenStage genome={DEFAULT_GENOME} />
+        <SpecimenStage genome={genome} />
 
         <aside className="lab-rail collection-rail" aria-label="Specimen collection">
           <div className="rail-heading">
@@ -35,12 +42,10 @@ function App() {
               <p>Save, compare, cultivate.</p>
             </div>
           </div>
-          <div className="empty-rail">
-            <FlaskConical aria-hidden="true" />
-            <p>Saved specimens and breeding tools will live here.</p>
-          </div>
+          <GenomeReadout />
         </aside>
       </main>
+      <div className="sr-live" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>
   )
 }
