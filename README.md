@@ -49,6 +49,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 39 | Realtime Collaborative Whiteboard | Infinite canvas whiteboard with drawing tools, shapes, sticky notes, undo history, minimap, JSON/PNG export, and BroadcastChannel multi-tab sync. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-39-whiteboard/) | [day-39-whiteboard](./day-39-whiteboard/) |
 | 40 | WebGL Earth Globe | Interactive 3D Earth with generated map textures, animated data arcs, city markers, country heatmaps, and time-of-day lighting. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-40-earth-globe/) | [day-40-earth-globe](./day-40-earth-globe/) |
 | 41 | TYPEFORGE Kinetic Type Studio | Type-specimen lab where a variable-font headline morphs to your cursor with six behaviors, six curated scenes, live axis controls, and PNG poster export. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-41-kinetic-type/) | [day-41-kinetic-type](./day-41-kinetic-type/) |
+| 42 | FLORA LAB Botanical Genetics Studio | Scientific-editorial genetics studio for growing, mutating, crossbreeding, saving, sharing, and exporting deterministic SVG plants. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-42-flora-lab/) | [day-42-flora-lab](./day-42-flora-lab/) |
 
 ## Adding a New Day
 

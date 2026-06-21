@@ -48,6 +48,7 @@ on:
       - "day-39-whiteboard/**"
       - "day-40-earth-globe/**"
       - "day-41-kinetic-type/**"
+      - "day-42-flora-lab/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -99,6 +100,7 @@ jobs:
             day-39-whiteboard/package-lock.json
             day-40-earth-globe/package-lock.json
             day-41-kinetic-type/package-lock.json
+            day-42-flora-lab/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -276,6 +278,14 @@ jobs:
         working-directory: day-41-kinetic-type
         run: npm run build
 
+      - name: Install Day 42 app dependencies
+        working-directory: day-42-flora-lab
+        run: npm ci
+
+      - name: Build Day 42 app
+        working-directory: day-42-flora-lab
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -346,6 +356,8 @@ jobs:
           cp -R day-40-earth-globe/dist/. _site/day-40-earth-globe/
           mkdir -p _site/day-41-kinetic-type
           cp -R day-41-kinetic-type/dist/. _site/day-41-kinetic-type/
+          mkdir -p _site/day-42-flora-lab
+          cp -R day-42-flora-lab/dist/. _site/day-42-flora-lab/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
