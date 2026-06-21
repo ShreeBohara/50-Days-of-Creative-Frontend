@@ -3,6 +3,7 @@ import type { SavedSpecimen } from '../domain/collection'
 import { useFloraStore } from '../store/useFloraStore'
 import { GenomeReadout } from './GenomeReadout'
 import { PlantArtwork } from './PlantArtwork'
+import { BreedingLab } from './BreedingLab'
 
 function shortDate(date: string) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(date))
@@ -56,6 +57,7 @@ export function CollectionPanel() {
         </div>
       )}
 
+      <BreedingLab />
       <GenomeReadout />
     </div>
   )

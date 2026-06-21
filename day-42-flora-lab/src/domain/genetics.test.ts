@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_GENOME } from './genome'
-import { mutateGenome, randomGenome } from './genetics'
+import { createOffspringSet, crossGenomes, mutateGenome, randomGenome } from './genetics'
 
 function changedTraits(before: typeof DEFAULT_GENOME, after: typeof DEFAULT_GENOME) {
   const beforeValues = [
@@ -41,5 +41,23 @@ describe('genetic operations', () => {
     expect(mutated.every((genome) => genome.architecture.branchDepth >= 2 && genome.architecture.branchDepth <= 5)).toBe(true)
     expect(mutated.every((genome) => genome.foliage.density >= 0.18 && genome.foliage.density <= 1)).toBe(true)
     expect(mutated.every((genome) => genome.bloom.density >= 0 && genome.bloom.density <= 0.72)).toBe(true)
+  })
+
+  it('crossbreeds deterministic, order-independent offspring', () => {
+    const parentB = randomGenome('parent-b')
+    expect(crossGenomes(DEFAULT_GENOME, parentB, 0)).toEqual(crossGenomes(parentB, DEFAULT_GENOME, 0))
+    expect(createOffspringSet(DEFAULT_GENOME, parentB)).toHaveLength(3)
+    expect(new Set(createOffspringSet(DEFAULT_GENOME, parentB).map((child) => child.seed)).size).toBe(3)
+  })
+
+  it('keeps blended numeric genes between their parents', () => {
+    const parentB = randomGenome('parent-b')
+    const child = crossGenomes(DEFAULT_GENOME, parentB, 1)
+    const between = (value: number, a: number, b: number) =>
+      value >= Math.min(a, b) && value <= Math.max(a, b)
+
+    expect(between(child.architecture.spread, DEFAULT_GENOME.architecture.spread, parentB.architecture.spread)).toBe(true)
+    expect(between(child.foliage.size, DEFAULT_GENOME.foliage.size, parentB.foliage.size)).toBe(true)
+    expect([DEFAULT_GENOME.foliage.shape, parentB.foliage.shape]).toContain(child.foliage.shape)
   })
 })

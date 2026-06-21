@@ -577,6 +577,175 @@
   line-height: 1.5;
 }
 
+.breeding-lab {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.subsection-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.subsection-heading > svg {
+  width: 17px;
+  height: 17px;
+  margin-top: 0.2rem;
+  color: var(--specimen-red);
+  stroke-width: 1.5;
+}
+
+.subsection-heading h3,
+.subsection-heading p {
+  margin: 0;
+}
+
+.subsection-heading h3 {
+  font-family: var(--font-editorial);
+  font-size: 1.02rem;
+  font-weight: 500;
+}
+
+.subsection-heading p {
+  margin-top: 0.12rem;
+  color: var(--ink-soft);
+  font-size: 0.62rem;
+}
+
+.breeding-empty,
+.offspring-prompt {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px dashed var(--rule-strong);
+  font-family: var(--font-editorial);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.parent-selectors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-2);
+}
+
+.parent-selectors label {
+  min-width: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.parent-selectors label span {
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.parent-selectors select {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 0.5rem;
+  color: var(--ink);
+  background: var(--paper-light);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  font-size: 0.62rem;
+}
+
+.cross-symbol {
+  padding-bottom: 0.55rem;
+  color: var(--specimen-red);
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+}
+
+.offspring-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.offspring-card {
+  min-width: 0;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.4rem;
+  background: var(--paper-light);
+  border: 1px solid var(--rule);
+}
+
+.offspring-artwork {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+}
+
+.offspring-artwork svg {
+  width: 100%;
+  height: 100%;
+}
+
+.offspring-artwork .plant-branch,
+.offspring-artwork .plant-leaf,
+.offspring-artwork .plant-bloom {
+  opacity: 1;
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+.offspring-card > div:nth-child(2) {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.offspring-card strong {
+  font-family: var(--font-editorial);
+  font-size: 0.67rem;
+  font-weight: 500;
+}
+
+.offspring-card span {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.43rem;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.offspring-card button {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.35rem;
+  color: var(--paper-light);
+  background: var(--moss);
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.52rem;
+}
+
+.offspring-card button:hover {
+  background: var(--moss-deep);
+}
+
+.offspring-card button svg {
+  width: 12px;
+  height: 12px;
+}
+
 .genome-readout div {
   display: grid;
   grid-template-columns: 4.8rem minmax(0, 1fr);

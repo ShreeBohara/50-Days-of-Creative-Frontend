@@ -8,7 +8,8 @@ import {
   SYMMETRIES,
   type PlantGenomeV1,
 } from './genome'
-import { randomBetween, randomFor, randomItem } from './random'
+import { encodeGenome } from './genome'
+import { hashString, randomBetween, randomFor, randomItem } from './random'
 
 export type MutableGene =
   | 'architecture.branchDepth'
@@ -128,4 +129,49 @@ export function mutateGenome(source: PlantGenomeV1, mutationSeed = makeSeed()): 
 
   Array.from(selected).forEach((gene, index) => mutateGene(next, gene, mutationSeed, index))
   return normalizeGenome(next)
+}
+
+function blendNumber(parentA: number, parentB: number, seed: string, gene: string) {
+  const ratio = randomBetween(seed, `cross/${gene}`, 0.28, 0.72)
+  return parentA + (parentB - parentA) * ratio
+}
+
+function inherit<T>(parentA: T, parentB: T, seed: string, gene: string): T {
+  return randomFor(seed, `cross/${gene}`) < 0.5 ? parentA : parentB
+}
+
+export function crossGenomes(parentA: PlantGenomeV1, parentB: PlantGenomeV1, offspringIndex: number): PlantGenomeV1 {
+  const orderedParents = [parentA, parentB].sort((a, b) => encodeGenome(a).localeCompare(encodeGenome(b)))
+  const [first, second] = orderedParents
+  const ancestry = orderedParents.map(encodeGenome).join('::')
+  const seedHash = hashString(`${ancestry}::offspring-${offspringIndex}`).toString(36)
+  const seed = `hybrid-${seedHash}-${offspringIndex + 1}`
+
+  return normalizeGenome({
+    version: 1,
+    seed,
+    architecture: {
+      branchDepth: Math.round(blendNumber(first.architecture.branchDepth, second.architecture.branchDepth, seed, 'depth')),
+      spread: blendNumber(first.architecture.spread, second.architecture.spread, seed, 'spread'),
+      curvature: blendNumber(first.architecture.curvature, second.architecture.curvature, seed, 'curvature'),
+      taper: blendNumber(first.architecture.taper, second.architecture.taper, seed, 'taper'),
+      symmetry: inherit(first.architecture.symmetry, second.architecture.symmetry, seed, 'symmetry'),
+    },
+    foliage: {
+      shape: inherit(first.foliage.shape, second.foliage.shape, seed, 'leaf-shape'),
+      arrangement: inherit(first.foliage.arrangement, second.foliage.arrangement, seed, 'leaf-arrangement'),
+      size: blendNumber(first.foliage.size, second.foliage.size, seed, 'leaf-size'),
+      density: blendNumber(first.foliage.density, second.foliage.density, seed, 'leaf-density'),
+    },
+    bloom: {
+      form: inherit(first.bloom.form, second.bloom.form, seed, 'bloom-form'),
+      density: blendNumber(first.bloom.density, second.bloom.density, seed, 'bloom-density'),
+      scale: blendNumber(first.bloom.scale, second.bloom.scale, seed, 'bloom-scale'),
+    },
+    palette: inherit(first.palette, second.palette, seed, 'palette'),
+  })
+}
+
+export function createOffspringSet(parentA: PlantGenomeV1, parentB: PlantGenomeV1) {
+  return Array.from({ length: 3 }, (_, index) => crossGenomes(parentA, parentB, index))
 }

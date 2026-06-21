@@ -22,6 +22,8 @@ interface FloraState {
   future: PlantGenomeV1[]
   announcement: string
   collection: SavedSpecimen[]
+  parentAId: string | null
+  parentBId: string | null
   setGenome: (genome: PlantGenomeV1, announcement?: string) => void
   setArchitecture: <Key extends keyof PlantGenomeV1['architecture']>(
     key: Key,
@@ -41,6 +43,8 @@ interface FloraState {
   saveCurrent: () => void
   loadSpecimen: (id: string) => void
   removeSpecimen: (id: string) => void
+  setParent: (slot: 'a' | 'b', id: string | null) => void
+  cultivateOffspring: (genome: PlantGenomeV1) => void
   undo: () => void
   redo: () => void
   announce: (message: string) => void
@@ -75,6 +79,8 @@ export const useFloraStore = create<FloraState>((set) => {
     future: [],
     announcement: initial.error ?? '',
     collection: readCollection(),
+    parentAId: null,
+    parentBId: null,
     setGenome: commitGenome,
     setArchitecture: (key, value) => {
       set((state) => {
@@ -165,9 +171,22 @@ export const useFloraStore = create<FloraState>((set) => {
       set((state) => {
         const collection = state.collection.filter((item) => item.id !== id)
         writeCollection(collection)
-        return { collection, announcement: 'Specimen removed from the field archive.' }
+        return {
+          collection,
+          parentAId: state.parentAId === id ? null : state.parentAId,
+          parentBId: state.parentBId === id ? null : state.parentBId,
+          announcement: 'Specimen removed from the field archive.',
+        }
       })
     },
+    setParent: (slot, id) => {
+      set((state) => ({
+        parentAId: slot === 'a' ? id : state.parentAId,
+        parentBId: slot === 'b' ? id : state.parentBId,
+        announcement: id ? `Parent ${slot.toUpperCase()} selected.` : `Parent ${slot.toUpperCase()} cleared.`,
+      }))
+    },
+    cultivateOffspring: (genome) => commitGenome(genome, `${genome.seed} moved to the cultivation stage.`),
     undo: () => {
       set((state) => {
         const previous = state.past.at(-1)
