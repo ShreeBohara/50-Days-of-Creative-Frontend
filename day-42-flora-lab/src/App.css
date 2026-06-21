@@ -416,6 +416,167 @@
   margin: var(--space-4) 0 0;
 }
 
+.collection-panel {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+}
+
+.save-specimen-button {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  color: var(--paper-light);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
+  text-align: left;
+  transition: background 180ms ease;
+}
+
+.save-specimen-button:hover {
+  background: var(--moss-deep);
+}
+
+.save-specimen-button svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.5;
+}
+
+.save-specimen-button span {
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+}
+
+.archive-list {
+  max-height: 29rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+  scrollbar-color: var(--rule-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.archive-item {
+  min-height: 90px;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.archive-thumbnail {
+  width: 58px;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--paper-light);
+  border: 1px solid var(--rule);
+}
+
+.archive-thumbnail svg {
+  width: 100%;
+  height: 100%;
+}
+
+.archive-thumbnail .plant-branch,
+.archive-thumbnail .plant-leaf,
+.archive-thumbnail .plant-bloom {
+  opacity: 1;
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+.archive-item-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.archive-item-copy strong {
+  overflow: hidden;
+  font-family: var(--font-editorial);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archive-item-copy span {
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.archive-item-actions {
+  display: flex;
+}
+
+.archive-item-actions button {
+  width: 36px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 0;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.archive-item-actions button:hover {
+  color: var(--paper-light);
+  background: var(--moss);
+}
+
+.archive-item-actions button:last-child:hover {
+  background: var(--specimen-red);
+}
+
+.archive-item-actions svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.5;
+}
+
+.archive-empty {
+  min-height: 8rem;
+  display: grid;
+  place-content: center;
+  gap: 0.35rem;
+  padding: var(--space-5);
+  color: var(--ink-soft);
+  border: 1px dashed var(--rule-strong);
+  text-align: center;
+}
+
+.archive-empty p {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.archive-empty span {
+  max-width: 14rem;
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
 .genome-readout div {
   display: grid;
   grid-template-columns: 4.8rem minmax(0, 1fr);

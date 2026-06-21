@@ -7,6 +7,12 @@ import {
   type PlantGenomeV1,
 } from '../domain/genome'
 import { mutateGenome, randomGenome } from '../domain/genetics'
+import {
+  readCollection,
+  saveSpecimen,
+  writeCollection,
+  type SavedSpecimen,
+} from '../domain/collection'
 
 const HISTORY_LIMIT = 50
 
@@ -15,6 +21,7 @@ interface FloraState {
   past: PlantGenomeV1[]
   future: PlantGenomeV1[]
   announcement: string
+  collection: SavedSpecimen[]
   setGenome: (genome: PlantGenomeV1, announcement?: string) => void
   setArchitecture: <Key extends keyof PlantGenomeV1['architecture']>(
     key: Key,
@@ -31,6 +38,9 @@ interface FloraState {
   setPalette: (palette: PlantGenomeV1['palette']) => void
   randomize: () => void
   mutate: () => void
+  saveCurrent: () => void
+  loadSpecimen: (id: string) => void
+  removeSpecimen: (id: string) => void
   undo: () => void
   redo: () => void
   announce: (message: string) => void
@@ -64,6 +74,7 @@ export const useFloraStore = create<FloraState>((set) => {
     past: [],
     future: [],
     announcement: initial.error ?? '',
+    collection: readCollection(),
     setGenome: commitGenome,
     setArchitecture: (key, value) => {
       set((state) => {
@@ -126,6 +137,35 @@ export const useFloraStore = create<FloraState>((set) => {
           future: [],
           announcement: 'A bounded mutation changed this specimen.',
         }
+      })
+    },
+    saveCurrent: () => {
+      set((state) => {
+        const collection = saveSpecimen(state.collection, state.genome)
+        writeCollection(collection)
+        return {
+          collection,
+          announcement: `${state.genome.seed} was preserved in the field archive.`,
+        }
+      })
+    },
+    loadSpecimen: (id) => {
+      set((state) => {
+        const saved = state.collection.find((item) => item.id === id)
+        if (!saved) return state
+        return {
+          genome: cloneGenome(saved.genome),
+          past: [...state.past, cloneGenome(state.genome)].slice(-HISTORY_LIMIT),
+          future: [],
+          announcement: `${saved.genome.seed} opened from the archive.`,
+        }
+      })
+    },
+    removeSpecimen: (id) => {
+      set((state) => {
+        const collection = state.collection.filter((item) => item.id !== id)
+        writeCollection(collection)
+        return { collection, announcement: 'Specimen removed from the field archive.' }
       })
     },
     undo: () => {

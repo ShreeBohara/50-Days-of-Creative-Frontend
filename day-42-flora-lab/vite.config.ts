@@ -6,5 +6,10 @@ export default defineConfig({
   base: '/50-Days-of-Creative-Frontend/day-42-flora-lab/',
   test: {
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
   },
 })

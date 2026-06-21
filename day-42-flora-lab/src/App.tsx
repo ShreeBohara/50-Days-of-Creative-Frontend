@@ -1,6 +1,6 @@
 import { AppHeader } from './components/AppHeader'
+import { CollectionPanel } from './components/CollectionPanel'
 import { CultivationTools } from './components/CultivationTools'
-import { GenomeReadout } from './components/GenomeReadout'
 import { SpecimenStage } from './components/SpecimenStage'
 import { TraitPanel } from './components/TraitPanel'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
@@ -44,7 +44,7 @@ function App() {
               <p>Save, compare, cultivate.</p>
             </div>
           </div>
-          <GenomeReadout />
+          <CollectionPanel />
         </aside>
       </main>
       <div className="sr-live" aria-live="polite" aria-atomic="true">{announcement}</div>
