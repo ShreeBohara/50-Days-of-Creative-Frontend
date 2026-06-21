@@ -6,11 +6,16 @@ export function useKeyboardShortcuts() {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null
       if (target?.matches('input, select, textarea, [contenteditable="true"]')) return
-      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') return
-
-      event.preventDefault()
-      if (event.shiftKey) useFloraStore.getState().redo()
-      else useFloraStore.getState().undo()
+      const key = event.key.toLowerCase()
+      if ((event.metaKey || event.ctrlKey) && key === 'z') {
+        event.preventDefault()
+        if (event.shiftKey) useFloraStore.getState().redo()
+        else useFloraStore.getState().undo()
+        return
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey) return
+      if (key === 'r') useFloraStore.getState().randomize()
+      if (key === 'm') useFloraStore.getState().mutate()
     }
 
     window.addEventListener('keydown', onKeyDown)

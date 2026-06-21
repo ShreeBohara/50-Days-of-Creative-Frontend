@@ -1,4 +1,5 @@
 import { AppHeader } from './components/AppHeader'
+import { CultivationTools } from './components/CultivationTools'
 import { GenomeReadout } from './components/GenomeReadout'
 import { SpecimenStage } from './components/SpecimenStage'
 import { TraitPanel } from './components/TraitPanel'
@@ -29,6 +30,7 @@ function App() {
               <p>Shape the living system.</p>
             </div>
           </div>
+          <CultivationTools />
           <TraitPanel />
         </aside>
 

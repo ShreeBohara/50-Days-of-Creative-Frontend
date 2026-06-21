@@ -6,6 +6,7 @@ import {
   normalizeGenome,
   type PlantGenomeV1,
 } from '../domain/genome'
+import { mutateGenome, randomGenome } from '../domain/genetics'
 
 const HISTORY_LIMIT = 50
 
@@ -28,6 +29,8 @@ interface FloraState {
     value: PlantGenomeV1['bloom'][Key],
   ) => void
   setPalette: (palette: PlantGenomeV1['palette']) => void
+  randomize: () => void
+  mutate: () => void
   undo: () => void
   redo: () => void
   announce: (message: string) => void
@@ -110,6 +113,18 @@ export const useFloraStore = create<FloraState>((set) => {
           past: [...state.past, cloneGenome(state.genome)].slice(-HISTORY_LIMIT),
           future: [],
           announcement: 'Specimen pigments updated.',
+        }
+      })
+    },
+    randomize: () => commitGenome(randomGenome(), 'A new seed was generated.'),
+    mutate: () => {
+      set((state) => {
+        const next = mutateGenome(state.genome)
+        return {
+          genome: next,
+          past: [...state.past, cloneGenome(state.genome)].slice(-HISTORY_LIMIT),
+          future: [],
+          announcement: 'A bounded mutation changed this specimen.',
         }
       })
     },
