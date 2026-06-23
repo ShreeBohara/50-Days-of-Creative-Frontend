@@ -2,18 +2,19 @@ import AppHeader from './components/AppHeader'
 import ControlRail from './components/ControlRail'
 import StageView from './components/StageView'
 import { getPalette } from './domain/palettes'
+import { useHashFigure } from './hooks/useHashFigure'
 import { useReducedMotion } from './hooks/useReducedMotion'
 import { useStudioStore } from './store/useStudioStore'
 import './App.css'
 
 export default function App() {
+  useHashFigure()
   const reducedMotion = useReducedMotion()
   const params = useStudioStore((s) => s.params)
   const palette = getPalette(useStudioStore((s) => s.paletteId))
   const lineWidth = useStudioStore((s) => s.lineWidth)
   const glow = useStudioStore((s) => s.glow)
   const drawKey = useStudioStore((s) => s.drawKey)
-  const replay = useStudioStore((s) => s.replay)
 
   return (
     <div className="studio">
@@ -33,7 +34,6 @@ export default function App() {
               glow={glow}
               drawKey={drawKey}
               reducedMotion={reducedMotion}
-              onReplay={replay}
             />
           </div>
         </section>

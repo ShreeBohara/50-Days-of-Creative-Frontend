@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { RotateCcw } from 'lucide-react'
 import {
   figureExtent,
   pathToSvgD,
@@ -7,9 +6,9 @@ import {
   type HarmonographParams,
 } from '../domain/harmonograph'
 import type { Palette } from '../domain/palettes'
+import ExportToolbar from './ExportToolbar'
 import GridBackdrop from './GridBackdrop'
 import HarmonographCanvas from './HarmonographCanvas'
-import IconButton from './IconButton'
 
 interface Props {
   params: HarmonographParams
@@ -18,7 +17,6 @@ interface Props {
   glow: number
   drawKey: number
   reducedMotion: boolean
-  onReplay: () => void
 }
 
 function clamp(v: number, lo: number, hi: number) {
@@ -32,7 +30,6 @@ export default function StageView({
   glow,
   drawKey,
   reducedMotion,
-  onReplay,
 }: Props) {
   const { d, drawMs } = useMemo(() => {
     const points = samplePath(params)
@@ -54,11 +51,7 @@ export default function StageView({
         drawMs={drawMs}
         animate={!reducedMotion}
       />
-      <div className="stage__tools">
-        <IconButton label="Replay drawing" onClick={onReplay}>
-          <RotateCcw size={16} strokeWidth={1.8} />
-        </IconButton>
-      </div>
+      <ExportToolbar />
     </div>
   )
 }
