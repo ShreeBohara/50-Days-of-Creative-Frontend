@@ -1,12 +1,15 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import AppHeader from './components/AppHeader'
 import StageView from './components/StageView'
 import { createDefaultParams } from './domain/defaults'
 import { DEFAULT_PALETTE } from './domain/palettes'
+import { useReducedMotion } from './hooks/useReducedMotion'
 import './App.css'
 
 export default function App() {
   const params = useMemo(() => createDefaultParams(), [])
+  const reducedMotion = useReducedMotion()
+  const [drawKey, setDrawKey] = useState(0)
 
   return (
     <div className="studio">
@@ -19,7 +22,15 @@ export default function App() {
             <div className="stage-frame__corner stage-frame__corner--tr" />
             <div className="stage-frame__corner stage-frame__corner--bl" />
             <div className="stage-frame__corner stage-frame__corner--br" />
-            <StageView params={params} palette={DEFAULT_PALETTE} lineWidth={2.4} glow={1} />
+            <StageView
+              params={params}
+              palette={DEFAULT_PALETTE}
+              lineWidth={2.4}
+              glow={1}
+              drawKey={drawKey}
+              reducedMotion={reducedMotion}
+              onReplay={() => setDrawKey((k) => k + 1)}
+            />
           </div>
         </section>
 

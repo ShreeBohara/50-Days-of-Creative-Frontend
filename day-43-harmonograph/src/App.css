@@ -182,6 +182,47 @@
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.18));
 }
 
+.stage__tools {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+/* ——— icon button ——— */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-sm);
+  color: var(--text-dim);
+  background: rgba(17, 24, 41, 0.72);
+  border: 1px solid var(--edge);
+  backdrop-filter: blur(6px);
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.icon-btn:hover {
+  color: var(--brass);
+  border-color: rgba(230, 180, 80, 0.4);
+  background: rgba(27, 36, 64, 0.85);
+}
+.icon-btn.is-active {
+  color: var(--ink-900);
+  background: var(--brass);
+  border-color: var(--brass);
+}
+.icon-btn--danger:hover {
+  color: var(--oxblood);
+  border-color: rgba(196, 83, 58, 0.5);
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ——— panel column ——— */
 .panel-col {
   display: flex;

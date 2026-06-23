@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import type { Palette } from '../domain/palettes'
 
 interface Props {
@@ -6,12 +6,73 @@ interface Props {
   palette: Palette
   lineWidth: number
   glow: number
+  /** Bump to replay the pen-draw animation. */
+  drawKey: number
+  drawMs: number
+  animate: boolean
 }
 
-export default function HarmonographCanvas({ d, palette, lineWidth, glow }: Props) {
+export default function HarmonographCanvas({
+  d,
+  palette,
+  lineWidth,
+  glow,
+  drawKey,
+  drawMs,
+  animate,
+}: Props) {
   const id = useId().replace(/:/g, '')
   const gradId = `grad-${id}`
   const glowId = `glow-${id}`
+
+  const lineRef = useRef<SVGPathElement>(null)
+  const glowRef = useRef<SVGPathElement>(null)
+  const tipRef = useRef<SVGCircleElement>(null)
+
+  useEffect(() => {
+    const line = lineRef.current
+    const glowPath = glowRef.current
+    const tip = tipRef.current
+    if (!line) return
+
+    const reveal = (offset: number) => {
+      line.style.strokeDashoffset = String(offset)
+      if (glowPath) glowPath.style.strokeDashoffset = String(offset)
+    }
+
+    // getTotalLength is unavailable in jsdom; guard so tests never throw.
+    const total =
+      typeof line.getTotalLength === 'function' ? line.getTotalLength() : 0
+
+    if (!animate || total === 0) {
+      line.style.strokeDasharray = 'none'
+      glowPath?.style.setProperty('stroke-dasharray', 'none')
+      reveal(0)
+      if (tip) tip.style.opacity = '0'
+      return
+    }
+
+    line.style.strokeDasharray = String(total)
+    if (glowPath) glowPath.style.strokeDasharray = String(total)
+    reveal(total)
+    if (tip) tip.style.opacity = '1'
+
+    const start = performance.now()
+    let raf = 0
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / drawMs)
+      reveal(total * (1 - p))
+      if (tip && typeof line.getPointAtLength === 'function') {
+        const pt = line.getPointAtLength(total * p)
+        tip.setAttribute('cx', String(pt.x))
+        tip.setAttribute('cy', String(pt.y))
+        if (p >= 1) tip.style.opacity = '0'
+      }
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [d, drawKey, drawMs, animate])
 
   return (
     <svg
@@ -33,6 +94,7 @@ export default function HarmonographCanvas({ d, palette, lineWidth, glow }: Prop
       </defs>
 
       <path
+        ref={glowRef}
         className="figure__glow"
         d={d}
         fill="none"
@@ -44,6 +106,7 @@ export default function HarmonographCanvas({ d, palette, lineWidth, glow }: Prop
         opacity={0.32 * glow}
       />
       <path
+        ref={lineRef}
         className="figure__line"
         d={d}
         fill="none"
@@ -51,6 +114,14 @@ export default function HarmonographCanvas({ d, palette, lineWidth, glow }: Prop
         strokeWidth={lineWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+      <circle
+        ref={tipRef}
+        className="figure__pen"
+        r={lineWidth * 1.8}
+        fill={palette.glow}
+        filter={`url(#${glowId})`}
+        opacity="0"
       />
     </svg>
   )
