@@ -1,15 +1,19 @@
-import { useMemo, useState } from 'react'
 import AppHeader from './components/AppHeader'
+import ControlRail from './components/ControlRail'
 import StageView from './components/StageView'
-import { createDefaultParams } from './domain/defaults'
-import { DEFAULT_PALETTE } from './domain/palettes'
+import { getPalette } from './domain/palettes'
 import { useReducedMotion } from './hooks/useReducedMotion'
+import { useStudioStore } from './store/useStudioStore'
 import './App.css'
 
 export default function App() {
-  const params = useMemo(() => createDefaultParams(), [])
   const reducedMotion = useReducedMotion()
-  const [drawKey, setDrawKey] = useState(0)
+  const params = useStudioStore((s) => s.params)
+  const palette = getPalette(useStudioStore((s) => s.paletteId))
+  const lineWidth = useStudioStore((s) => s.lineWidth)
+  const glow = useStudioStore((s) => s.glow)
+  const drawKey = useStudioStore((s) => s.drawKey)
+  const replay = useStudioStore((s) => s.replay)
 
   return (
     <div className="studio">
@@ -24,21 +28,17 @@ export default function App() {
             <div className="stage-frame__corner stage-frame__corner--br" />
             <StageView
               params={params}
-              palette={DEFAULT_PALETTE}
-              lineWidth={2.4}
-              glow={1}
+              palette={palette}
+              lineWidth={lineWidth}
+              glow={glow}
               drawKey={drawKey}
               reducedMotion={reducedMotion}
-              onReplay={() => setDrawKey((k) => k + 1)}
+              onReplay={replay}
             />
           </div>
         </section>
 
-        <aside className="panel-col" aria-label="Controls">
-          <div className="panel">
-            <span className="eyebrow">controls</span>
-          </div>
-        </aside>
+        <ControlRail />
       </div>
 
       <footer className="studio__foot">

@@ -6,7 +6,7 @@ interface Props {
   palette: Palette
   lineWidth: number
   glow: number
-  /** Bump to replay the pen-draw animation. */
+  /** Bump to replay the pen-draw animation (live edits keep this stable). */
   drawKey: number
   drawMs: number
   animate: boolean
@@ -28,51 +28,74 @@ export default function HarmonographCanvas({
   const lineRef = useRef<SVGPathElement>(null)
   const glowRef = useRef<SVGPathElement>(null)
   const tipRef = useRef<SVGCircleElement>(null)
+  const animatingRef = useRef(false)
+  const drawMsRef = useRef(drawMs)
+  useEffect(() => {
+    drawMsRef.current = drawMs
+  }, [drawMs])
 
+  const showFull = () => {
+    for (const path of [lineRef.current, glowRef.current]) {
+      if (!path) continue
+      path.style.strokeDasharray = 'none'
+      path.style.strokeDashoffset = '0'
+    }
+    if (tipRef.current) tipRef.current.style.opacity = '0'
+  }
+
+  // Pen-draw animation — runs only when drawKey changes (or motion toggles).
   useEffect(() => {
     const line = lineRef.current
     const glowPath = glowRef.current
     const tip = tipRef.current
     if (!line) return
 
-    const reveal = (offset: number) => {
-      line.style.strokeDashoffset = String(offset)
-      if (glowPath) glowPath.style.strokeDashoffset = String(offset)
-    }
-
-    // getTotalLength is unavailable in jsdom; guard so tests never throw.
-    const total =
-      typeof line.getTotalLength === 'function' ? line.getTotalLength() : 0
-
+    const total = typeof line.getTotalLength === 'function' ? line.getTotalLength() : 0
     if (!animate || total === 0) {
-      line.style.strokeDasharray = 'none'
-      glowPath?.style.setProperty('stroke-dasharray', 'none')
-      reveal(0)
-      if (tip) tip.style.opacity = '0'
+      animatingRef.current = false
+      showFull()
       return
     }
 
+    const setOffset = (o: number) => {
+      line.style.strokeDashoffset = String(o)
+      if (glowPath) glowPath.style.strokeDashoffset = String(o)
+    }
+
+    animatingRef.current = true
     line.style.strokeDasharray = String(total)
     if (glowPath) glowPath.style.strokeDasharray = String(total)
-    reveal(total)
+    setOffset(total)
     if (tip) tip.style.opacity = '1'
 
     const start = performance.now()
     let raf = 0
     const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / drawMs)
-      reveal(total * (1 - p))
+      const p = Math.min(1, (now - start) / drawMsRef.current)
+      setOffset(total * (1 - p))
       if (tip && typeof line.getPointAtLength === 'function') {
         const pt = line.getPointAtLength(total * p)
         tip.setAttribute('cx', String(pt.x))
         tip.setAttribute('cy', String(pt.y))
-        if (p >= 1) tip.style.opacity = '0'
       }
-      if (p < 1) raf = requestAnimationFrame(tick)
+      if (p < 1) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        animatingRef.current = false
+        showFull()
+      }
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [d, drawKey, drawMs, animate])
+    return () => {
+      cancelAnimationFrame(raf)
+      animatingRef.current = false
+    }
+  }, [drawKey, animate])
+
+  // Live edits change `d` without replaying — make sure the full figure shows.
+  useEffect(() => {
+    if (!animatingRef.current) showFull()
+  }, [d])
 
   return (
     <svg
