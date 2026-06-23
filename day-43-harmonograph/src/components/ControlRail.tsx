@@ -1,9 +1,10 @@
-import { Redo2, RotateCcw, SlidersHorizontal, Undo2, Waves } from 'lucide-react'
+import { LayoutGrid, Redo2, RotateCcw, SlidersHorizontal, Undo2, Waves } from 'lucide-react'
 import { useStudioStore } from '../store/useStudioStore'
 import GlobalControls from './GlobalControls'
 import IconButton from './IconButton'
 import Panel from './Panel'
 import PendulumControls from './PendulumControls'
+import PresetGallery from './PresetGallery'
 import ReadoutPanel from './ReadoutPanel'
 
 export default function ControlRail() {
@@ -30,7 +31,11 @@ export default function ControlRail() {
 
       <ReadoutPanel />
 
-      <Panel title="Pendulums" icon={<Waves size={15} strokeWidth={1.8} />}>
+      <Panel title="Figures" icon={<LayoutGrid size={15} strokeWidth={1.8} />}>
+        <PresetGallery />
+      </Panel>
+
+      <Panel title="Pendulums" icon={<Waves size={15} strokeWidth={1.8} />} defaultOpen={false}>
         <PendulumControls />
       </Panel>
 

@@ -1,6 +1,9 @@
 import { create } from 'zustand'
+import type { Preset } from '../data/presets'
 import { createDefaultParams } from '../domain/defaults'
 import type { HarmonographParams, Pendulum } from '../domain/harmonograph'
+import { mutate, randomFigure } from '../domain/mutate'
+import { makeSeedToken } from '../domain/random'
 import { DEFAULT_PALETTE } from '../domain/palettes'
 
 export type Axis = 'x' | 'y'
@@ -14,6 +17,7 @@ export interface StudioState {
   lineWidth: number
   glow: number
   drawKey: number
+  activePresetId: string | null
 
   past: HarmonographParams[]
   future: HarmonographParams[]
@@ -25,6 +29,9 @@ export interface StudioState {
   setTiming: (patch: Partial<Pick<HarmonographParams, 'duration' | 'steps'>>, tag?: string) => void
   // whole-figure swaps — replay the draw
   loadParams: (next: HarmonographParams) => void
+  loadPreset: (preset: Preset) => void
+  randomize: () => void
+  mutateCurrent: (amount?: number) => void
   reset: () => void
 
   // render-only (not part of the figure / history)
@@ -59,6 +66,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   lineWidth: 2.4,
   glow: 1,
   drawKey: 0,
+  activePresetId: null,
   past: [],
   future: [],
   lastTag: null,
@@ -68,22 +76,49 @@ export const useStudioStore = create<StudioState>((set) => ({
     set((state) => {
       const arr = state.params[axis].map((p, i) => (i === index ? { ...p, ...patch } : p))
       const next = { ...state.params, [axis]: arr }
-      return commit(state, next, tag)
+      return { ...commit(state, next, tag), activePresetId: null }
     }),
 
   setTiming: (patch, tag) =>
-    set((state) => commit(state, { ...state.params, ...patch }, tag)),
+    set((state) => ({
+      ...commit(state, { ...state.params, ...patch }, tag),
+      activePresetId: null,
+    })),
 
   loadParams: (next) =>
     set((state) => ({
       ...commit(state, next),
       drawKey: state.drawKey + 1,
+      activePresetId: null,
+    })),
+
+  loadPreset: (preset) =>
+    set((state) => ({
+      ...commit(state, structuredClone(preset.params)),
+      paletteId: preset.paletteId,
+      drawKey: state.drawKey + 1,
+      activePresetId: preset.id,
+    })),
+
+  randomize: () =>
+    set((state) => ({
+      ...commit(state, randomFigure(makeSeedToken())),
+      drawKey: state.drawKey + 1,
+      activePresetId: null,
+    })),
+
+  mutateCurrent: (amount) =>
+    set((state) => ({
+      ...commit(state, mutate(state.params, makeSeedToken(), amount)),
+      drawKey: state.drawKey + 1,
+      activePresetId: null,
     })),
 
   reset: () =>
     set((state) => ({
       ...commit(state, createDefaultParams()),
       drawKey: state.drawKey + 1,
+      activePresetId: null,
     })),
 
   setPaletteId: (id) => set({ paletteId: id }),
@@ -104,6 +139,7 @@ export const useStudioStore = create<StudioState>((set) => ({
         lastTag: null,
         lastTs: 0,
         drawKey: state.drawKey + 1,
+        activePresetId: null,
       }
     }),
 
@@ -118,6 +154,7 @@ export const useStudioStore = create<StudioState>((set) => ({
         lastTag: null,
         lastTs: 0,
         drawKey: state.drawKey + 1,
+        activePresetId: null,
       }
     }),
 }))
