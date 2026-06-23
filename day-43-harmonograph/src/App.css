@@ -668,6 +668,55 @@
   border-color: var(--edge);
 }
 
+/* ——— blend lab ——— */
+.blend__hint {
+  margin: 0 0 0.85rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.blend__parents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: -0.6rem;
+}
+.blend__triad {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+}
+.blend__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.blend__cell .thumb {
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--edge-soft);
+}
+.blend__cell--child .thumb {
+  border-color: rgba(230, 180, 80, 0.45);
+  box-shadow: 0 0 18px -6px rgba(230, 180, 80, 0.5);
+}
+.blend__cell-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+.blend__cell--child .blend__cell-label {
+  color: var(--brass);
+}
+.blend__send {
+  width: 100%;
+  margin-top: 0.95rem;
+}
+
 /* ——— footer ——— */
 .studio__foot {
   display: flex;

@@ -1,5 +1,15 @@
-import { Bookmark, LayoutGrid, Redo2, RotateCcw, SlidersHorizontal, Undo2, Waves } from 'lucide-react'
+import {
+  Bookmark,
+  GitMerge,
+  LayoutGrid,
+  Redo2,
+  RotateCcw,
+  SlidersHorizontal,
+  Undo2,
+  Waves,
+} from 'lucide-react'
 import { useStudioStore } from '../store/useStudioStore'
+import BlendLab from './BlendLab'
 import CollectionPanel from './CollectionPanel'
 import GlobalControls from './GlobalControls'
 import IconButton from './IconButton'
@@ -51,6 +61,14 @@ export default function ControlRail() {
         action={<span className="panel-count">{collectionCount}</span>}
       >
         <CollectionPanel />
+      </Panel>
+
+      <Panel
+        title="Blend lab"
+        icon={<GitMerge size={15} strokeWidth={1.8} />}
+        defaultOpen={false}
+      >
+        <BlendLab />
       </Panel>
     </aside>
   )
