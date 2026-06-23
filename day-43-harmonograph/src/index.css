@@ -1,0 +1,42 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0a0e1a;
+  color: #e8ecf5;
+  font-family: 'Spline Sans Mono Variable', ui-monospace, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+.boot {
+  display: grid;
+  place-content: center;
+  gap: 0.25rem;
+  min-height: 100dvh;
+  text-align: center;
+}
+
+.boot__brand {
+  margin: 0;
+  font-family: 'Fraunces Variable', Georgia, serif;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  letter-spacing: 0.18em;
+}
+
+.boot__tag {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  font-size: 0.8rem;
+  color: #8a93a8;
+}
