@@ -1,14 +1,17 @@
 import AppHeader from './components/AppHeader'
 import ControlRail from './components/ControlRail'
+import LiveAnnouncer from './components/LiveAnnouncer'
 import StageView from './components/StageView'
 import { getPalette } from './domain/palettes'
 import { useHashFigure } from './hooks/useHashFigure'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useReducedMotion } from './hooks/useReducedMotion'
 import { useStudioStore } from './store/useStudioStore'
 import './App.css'
 
 export default function App() {
   useHashFigure()
+  useKeyboardShortcuts()
   const reducedMotion = useReducedMotion()
   const params = useStudioStore((s) => s.params)
   const palette = getPalette(useStudioStore((s) => s.paletteId))
@@ -45,7 +48,12 @@ export default function App() {
         <span>PENDULA</span>
         <span className="studio__foot-dot" aria-hidden="true">·</span>
         <span>50 Days of Creative Frontend</span>
+        <span className="studio__foot-keys" aria-hidden="true">
+          Space replay · R randomize · S save
+        </span>
       </footer>
+
+      <LiveAnnouncer />
     </div>
   )
 }
