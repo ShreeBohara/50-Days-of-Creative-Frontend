@@ -1,7 +1,13 @@
+import { useMemo } from 'react'
 import AppHeader from './components/AppHeader'
+import StageView from './components/StageView'
+import { createDefaultParams } from './domain/defaults'
+import { DEFAULT_PALETTE } from './domain/palettes'
 import './App.css'
 
 export default function App() {
+  const params = useMemo(() => createDefaultParams(), [])
+
   return (
     <div className="studio">
       <AppHeader />
@@ -13,9 +19,7 @@ export default function App() {
             <div className="stage-frame__corner stage-frame__corner--tr" />
             <div className="stage-frame__corner stage-frame__corner--bl" />
             <div className="stage-frame__corner stage-frame__corner--br" />
-            <div className="stage-placeholder">
-              <span className="eyebrow">plotting bed</span>
-            </div>
+            <StageView params={params} palette={DEFAULT_PALETTE} lineWidth={2.4} glow={1} />
           </div>
         </section>
 

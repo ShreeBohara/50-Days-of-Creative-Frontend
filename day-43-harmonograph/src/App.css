@@ -140,11 +140,46 @@
   border-top: 0;
 }
 
-.stage-placeholder {
+/* ——— plotting stage ——— */
+.stage {
   position: absolute;
   inset: 0;
   display: grid;
-  place-content: center;
+  place-items: center;
+  container-type: size;
+}
+
+.stage .backdrop,
+.stage .figure {
+  grid-area: 1 / 1;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+}
+
+.backdrop__grid line {
+  stroke: var(--grid-line);
+  stroke-width: 1;
+}
+.backdrop__axes line {
+  stroke: var(--grid-line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+.backdrop__rings circle {
+  fill: none;
+  stroke: var(--grid-line-strong);
+  stroke-width: 1;
+}
+.backdrop__ticks circle {
+  fill: var(--brass);
+  opacity: 0.7;
+}
+
+.figure {
+  overflow: visible;
+}
+.figure__line {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.18));
 }
 
 /* ——— panel column ——— */
