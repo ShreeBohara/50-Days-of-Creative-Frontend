@@ -1,5 +1,14 @@
 import { create } from 'zustand'
 import type { Preset } from '../data/presets'
+import {
+  addFigure,
+  createSavedFigure,
+  loadCollection,
+  removeFigure,
+  renameFigure,
+  saveCollection,
+  type SavedFigure,
+} from '../domain/collection'
 import { createDefaultParams } from '../domain/defaults'
 import type { HarmonographParams, Pendulum } from '../domain/harmonograph'
 import { mutate, randomFigure } from '../domain/mutate'
@@ -18,6 +27,7 @@ export interface StudioState {
   glow: number
   drawKey: number
   activePresetId: string | null
+  collection: SavedFigure[]
 
   past: HarmonographParams[]
   future: HarmonographParams[]
@@ -33,6 +43,12 @@ export interface StudioState {
   randomize: () => void
   mutateCurrent: (amount?: number) => void
   reset: () => void
+
+  // saved collection (persisted)
+  saveCurrent: (name?: string) => void
+  loadSaved: (id: string) => void
+  renameSaved: (id: string, name: string) => void
+  deleteSaved: (id: string) => void
 
   // render-only (not part of the figure / history)
   setPaletteId: (id: string) => void
@@ -67,6 +83,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   glow: 1,
   drawKey: 0,
   activePresetId: null,
+  collection: loadCollection(),
   past: [],
   future: [],
   lastTag: null,
@@ -120,6 +137,41 @@ export const useStudioStore = create<StudioState>((set) => ({
       drawKey: state.drawKey + 1,
       activePresetId: null,
     })),
+
+  saveCurrent: (name) =>
+    set((state) => {
+      const label = name?.trim() || `Figure ${state.collection.length + 1}`
+      const figure = createSavedFigure(label, state.params, state.paletteId)
+      const collection = addFigure(state.collection, figure)
+      saveCollection(collection)
+      return { collection }
+    }),
+
+  loadSaved: (id) =>
+    set((state) => {
+      const figure = state.collection.find((f) => f.id === id)
+      if (!figure) return state
+      return {
+        ...commit(state, structuredClone(figure.params)),
+        paletteId: figure.paletteId,
+        drawKey: state.drawKey + 1,
+        activePresetId: null,
+      }
+    }),
+
+  renameSaved: (id, name) =>
+    set((state) => {
+      const collection = renameFigure(state.collection, id, name)
+      saveCollection(collection)
+      return { collection }
+    }),
+
+  deleteSaved: (id) =>
+    set((state) => {
+      const collection = removeFigure(state.collection, id)
+      saveCollection(collection)
+      return { collection }
+    }),
 
   setPaletteId: (id) => set({ paletteId: id }),
   setLineWidth: (v) => set({ lineWidth: v }),

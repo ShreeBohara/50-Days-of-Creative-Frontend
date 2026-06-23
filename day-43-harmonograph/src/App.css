@@ -563,6 +563,111 @@
   color: var(--muted);
 }
 
+/* ——— collection ——— */
+.panel-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.4rem;
+  font-size: 0.68rem;
+  border-radius: 99px;
+  color: var(--brass);
+  background: rgba(230, 180, 80, 0.12);
+  border: 1px solid rgba(230, 180, 80, 0.3);
+}
+.collection__save {
+  width: 100%;
+  margin-bottom: 0.85rem;
+}
+.collection__empty {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.saved-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.saved {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem;
+  border-radius: var(--r-sm);
+  background: rgba(8, 12, 22, 0.55);
+  border: 1px solid var(--edge-soft);
+}
+.saved__open {
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.saved__open .thumb {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+}
+.saved__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.saved__name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.saved__name:hover {
+  color: var(--brass);
+}
+.saved__rename {
+  width: 100%;
+  padding: 0.2rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text);
+  background: var(--ink-850);
+  border: 1px solid var(--brass);
+  border-radius: 4px;
+}
+.saved__date {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+.saved__tools {
+  display: flex;
+  gap: 0.25rem;
+}
+.saved__tools .icon-btn {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border-color: transparent;
+}
+.saved__tools .icon-btn:hover {
+  background: rgba(27, 36, 64, 0.7);
+  border-color: var(--edge);
+}
+
 /* ——— footer ——— */
 .studio__foot {
   display: flex;

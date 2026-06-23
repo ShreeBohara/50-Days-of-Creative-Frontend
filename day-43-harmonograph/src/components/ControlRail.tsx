@@ -1,5 +1,6 @@
-import { LayoutGrid, Redo2, RotateCcw, SlidersHorizontal, Undo2, Waves } from 'lucide-react'
+import { Bookmark, LayoutGrid, Redo2, RotateCcw, SlidersHorizontal, Undo2, Waves } from 'lucide-react'
 import { useStudioStore } from '../store/useStudioStore'
+import CollectionPanel from './CollectionPanel'
 import GlobalControls from './GlobalControls'
 import IconButton from './IconButton'
 import Panel from './Panel'
@@ -13,6 +14,7 @@ export default function ControlRail() {
   const reset = useStudioStore((s) => s.reset)
   const canUndo = useStudioStore((s) => s.past.length > 0)
   const canRedo = useStudioStore((s) => s.future.length > 0)
+  const collectionCount = useStudioStore((s) => s.collection.length)
 
   return (
     <aside className="panel-col" aria-label="Controls">
@@ -41,6 +43,14 @@ export default function ControlRail() {
 
       <Panel title="Figure & ink" icon={<SlidersHorizontal size={15} strokeWidth={1.8} />}>
         <GlobalControls />
+      </Panel>
+
+      <Panel
+        title="Saved"
+        icon={<Bookmark size={15} strokeWidth={1.8} />}
+        action={<span className="panel-count">{collectionCount}</span>}
+      >
+        <CollectionPanel />
       </Panel>
     </aside>
   )
