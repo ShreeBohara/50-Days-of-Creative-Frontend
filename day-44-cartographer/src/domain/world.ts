@@ -97,6 +97,8 @@ export function generateHeightfield(params: WorldParams): HeightField {
   const opts = fbmOptions(params)
   const warpOpts: FbmOptions = { ...opts, octaves: 3 }
 
+  let min = Infinity
+  let max = -Infinity
   for (let gy = 0; gy < size; gy++) {
     for (let gx = 0; gx < size; gx++) {
       const u = gx / (size - 1)
@@ -120,7 +122,18 @@ export function generateHeightfield(params: WorldParams): HeightField {
 
       const idx = gy * size + gx
       data[idx] = e
+      if (e < min) min = e
+      if (e > max) max = e
       moisture[idx] = fbm(moistNoise, sx * 1.7 + 9.2, sy * 1.7 - 4.1, { ...opts, octaves: 3 })
+    }
+  }
+
+  // Normalise to the full [0, 1] range so `seaLevel` behaves consistently across
+  // seeds — every world reliably has both land and water at any sea level.
+  const range = max - min
+  if (range > 1e-6) {
+    for (let i = 0; i < data.length; i++) {
+      data[i] = Math.min(1, Math.max(0, (data[i] - min) / range))
     }
   }
 

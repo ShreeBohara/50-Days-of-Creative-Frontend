@@ -111,6 +111,11 @@
   border-color: var(--ink);
   color: var(--paper-0);
 }
+.icon-btn--danger:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper-0);
+}
 
 /* — body layout — */
 .studio__body {
@@ -440,6 +445,118 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+/* — preset gallery — */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.gallery-card {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--paper-edge);
+  background: var(--paper-0);
+  text-align: left;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.gallery-card:hover {
+  border-color: var(--sepia);
+}
+.gallery-card.is-active {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.world-thumb {
+  flex-shrink: 0;
+  border-radius: 3px;
+  border: 1px solid var(--rule);
+}
+.gallery-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.gallery-card__name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.gallery-card__blurb {
+  font-size: 0.66rem;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+/* — collection — */
+.collection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.collection__save {
+  margin-top: 0;
+}
+.collection__empty {
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.collection__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.saved {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--paper-edge);
+  background: var(--paper-0);
+}
+.saved__open {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  text-align: left;
+}
+.saved__open .world-thumb {
+  flex-shrink: 0;
+}
+.saved__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.saved__actions {
+  display: flex;
+  gap: 0.3rem;
+}
+.saved__rename {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 /* — footer — */

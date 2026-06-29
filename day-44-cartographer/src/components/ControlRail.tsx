@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Compass, Grid3x3, Mountain, RefreshCw, Sparkles, Tag, Waves } from 'lucide-react'
+import { Anchor, Compass, Grid3x3, Map, Mountain, RefreshCw, Sparkles, Tag, Waves } from 'lucide-react'
 import { LANGUAGES } from '../data/languages'
 import { PALETTES } from '../domain/palettes'
 import { PARAM_RANGES } from '../domain/world'
 import { useStudioStore } from '../store/useStudioStore'
+import CollectionPanel from './CollectionPanel'
 import IconButton from './IconButton'
 import Panel from './Panel'
+import PresetGallery from './PresetGallery'
 import RangeControl from './RangeControl'
 import SelectControl from './SelectControl'
 
@@ -116,6 +118,10 @@ export default function ControlRail() {
     <aside className="rail" aria-label="World controls">
       <SeedField />
 
+      <Panel title="Atlases" icon={<Map size={16} strokeWidth={1.7} />}>
+        <PresetGallery />
+      </Panel>
+
       <Panel title="Terrain" icon={<Mountain size={16} strokeWidth={1.7} />}>
         <RangeControl
           label="Sea level"
@@ -189,6 +195,10 @@ export default function ControlRail() {
           <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
           <span>Mutate this world</span>
         </button>
+      </Panel>
+
+      <Panel title="Collection" icon={<Anchor size={16} strokeWidth={1.7} />}>
+        <CollectionPanel />
       </Panel>
     </aside>
   )

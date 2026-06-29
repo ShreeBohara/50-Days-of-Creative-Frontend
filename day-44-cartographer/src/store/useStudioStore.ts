@@ -1,5 +1,15 @@
 import { create } from 'zustand'
 import type { ViewOptions } from '../components/MapCanvas'
+import type { Preset } from '../data/presets'
+import {
+  addWorld,
+  createSavedWorld,
+  loadCollection,
+  removeWorld,
+  renameWorld,
+  saveCollection,
+  type SavedWorld,
+} from '../domain/collection'
 import { createDefaultParams } from '../domain/defaults'
 import { mutate, randomWorld } from '../domain/mutate'
 import { makeSeedToken } from '../domain/random'
@@ -24,6 +34,7 @@ export interface StudioState {
   view: ViewOptions
   drawKey: number
   activePresetId: string | null
+  collection: SavedWorld[]
 
   past: WorldParams[]
   future: WorldParams[]
@@ -37,10 +48,17 @@ export interface StudioState {
   // whole-world swaps (replay the coastline draw)
   setSeed: (seed: string) => void
   loadParams: (next: WorldParams) => void
+  loadPreset: (preset: Preset) => void
   reseed: () => void
   randomize: () => void
   mutateCurrent: (amount?: number) => void
   reset: () => void
+
+  // saved collection (persisted)
+  saveCurrent: (name?: string) => void
+  loadSaved: (id: string) => void
+  renameSaved: (id: string, name: string) => void
+  deleteSaved: (id: string) => void
 
   // render-only
   setView: (patch: Partial<ViewOptions>) => void
@@ -78,6 +96,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   view: { ...DEFAULT_VIEW },
   drawKey: 0,
   activePresetId: null,
+  collection: loadCollection(),
   past: [],
   future: [],
   lastTag: null,
@@ -109,6 +128,13 @@ export const useStudioStore = create<StudioState>((set) => ({
       activePresetId: null,
     })),
 
+  loadPreset: (preset) =>
+    set((state) => ({
+      ...commit(state, structuredClone(preset.params)),
+      drawKey: state.drawKey + 1,
+      activePresetId: preset.id,
+    })),
+
   reseed: () =>
     set((state) => ({
       ...commit(state, { ...state.params, seed: makeSeedToken() }),
@@ -136,6 +162,40 @@ export const useStudioStore = create<StudioState>((set) => ({
       drawKey: state.drawKey + 1,
       activePresetId: null,
     })),
+
+  saveCurrent: (name) =>
+    set((state) => {
+      const label = name?.trim() || state.params.seed
+      const world = createSavedWorld(label, state.params)
+      const collection = addWorld(state.collection, world)
+      saveCollection(collection)
+      return { collection }
+    }),
+
+  loadSaved: (id) =>
+    set((state) => {
+      const world = state.collection.find((w) => w.id === id)
+      if (!world) return state
+      return {
+        ...commit(state, structuredClone(world.params)),
+        drawKey: state.drawKey + 1,
+        activePresetId: null,
+      }
+    }),
+
+  renameSaved: (id, name) =>
+    set((state) => {
+      const collection = renameWorld(state.collection, id, name)
+      saveCollection(collection)
+      return { collection }
+    }),
+
+  deleteSaved: (id) =>
+    set((state) => {
+      const collection = removeWorld(state.collection, id)
+      saveCollection(collection)
+      return { collection }
+    }),
 
   setView: (patch) => set((state) => ({ view: { ...state.view, ...patch } })),
 
