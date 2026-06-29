@@ -1,35 +1,39 @@
 import { useMemo } from 'react'
+import AppHeader from './components/AppHeader'
+import ControlRail from './components/ControlRail'
+import ReadoutPanel from './components/ReadoutPanel'
 import StageView from './components/StageView'
-import type { ViewOptions } from './components/MapCanvas'
-import { createDefaultParams } from './domain/defaults'
+import { composeWorld } from './domain/compose'
+import { useStudioStore } from './store/useStudioStore'
 import './App.css'
 
-// The control rail, collection, blend lab and export toolbar are wired in over
-// the following commits; for now the studio charts the default world.
 export default function App() {
-  const params = useMemo(() => createDefaultParams(), [])
-  const view: ViewOptions = { contours: true, rivers: true, labels: true, graticule: true }
+  const params = useStudioStore((s) => s.params)
+  const view = useStudioStore((s) => s.view)
+  const drawKey = useStudioStore((s) => s.drawKey)
+
+  const map = useMemo(() => composeWorld(params), [params])
 
   return (
     <div className="studio">
-      <header className="studio__head">
-        <div className="studio__brand">
-          <span className="eyebrow">50 Days of Creative Frontend · Day 44</span>
-          <h1 className="studio__title">MERIDIAN</h1>
-          <p className="studio__tag">Procedural Cartographer</p>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="studio__body">
         <section className="stage-col" aria-label="Chart stage">
-          <StageView params={params} view={view} reducedMotion={false} drawKey={0} />
+          <StageView map={map} view={view} reducedMotion={false} drawKey={drawKey} />
+          <ReadoutPanel map={map} />
         </section>
+
+        <ControlRail />
       </main>
 
       <footer className="studio__foot">
         <span>MERIDIAN</span>
         <span className="studio__foot-dot" aria-hidden="true">·</span>
         <span>50 Days of Creative Frontend</span>
+        <span className="studio__foot-keys" aria-hidden="true">
+          Space new seed · R randomize · M mutate
+        </span>
       </footer>
     </div>
   )

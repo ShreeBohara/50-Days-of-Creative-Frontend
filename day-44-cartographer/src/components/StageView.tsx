@@ -1,19 +1,16 @@
-import { useMemo } from 'react'
-import { composeWorld } from '../domain/compose'
+import type { WorldMap } from '../domain/compose'
 import { getPalette } from '../domain/palettes'
-import type { WorldParams } from '../domain/world'
 import MapCanvas, { type ViewOptions } from './MapCanvas'
 
 interface StageViewProps {
-  params: WorldParams
+  map: WorldMap
   view: ViewOptions
   reducedMotion: boolean
   drawKey: number
 }
 
-export default function StageView({ params, view, reducedMotion, drawKey }: StageViewProps) {
-  const map = useMemo(() => composeWorld(params), [params])
-  const palette = getPalette(params.biomePaletteId)
+export default function StageView({ map, view, reducedMotion, drawKey }: StageViewProps) {
+  const palette = getPalette(map.params.biomePaletteId)
 
   return (
     <div className="chart-frame">
