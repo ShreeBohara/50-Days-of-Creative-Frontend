@@ -1,0 +1,123 @@
+.studio {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* — header — */
+.studio__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.4rem clamp(1rem, 3vw, 2.4rem) 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.studio__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.studio__title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 0.95;
+  color: var(--ink-900);
+}
+
+.studio__tag {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-style: italic;
+  color: var(--sepia);
+  letter-spacing: 0.02em;
+}
+
+/* — body — */
+.studio__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 400px);
+  gap: clamp(1rem, 2vw, 1.8rem);
+  padding: clamp(1rem, 2.4vw, 1.8rem) clamp(1rem, 3vw, 2.4rem);
+  align-items: start;
+}
+
+.stage-col {
+  position: sticky;
+  top: clamp(1rem, 2.4vw, 1.8rem);
+  min-width: 0;
+}
+
+/* — engraved chart frame — */
+.chart-frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--r-md);
+  padding: 10px;
+  background:
+    linear-gradient(var(--paper-2), var(--paper-3));
+  border: 1px solid var(--paper-edge);
+  box-shadow: var(--shadow-panel);
+}
+
+.chart-frame::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+
+.chart-frame__plate {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: 2px;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(255, 250, 235, 0.5), transparent 60%),
+    var(--paper-0);
+  overflow: hidden;
+}
+
+.chart-frame__placeholder {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--muted);
+}
+
+/* — footer — */
+.studio__foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem clamp(1rem, 3vw, 2.4rem);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.studio__foot-dot {
+  opacity: 0.6;
+}
+
+@media (max-width: 900px) {
+  .studio__body {
+    grid-template-columns: 1fr;
+  }
+  .stage-col {
+    position: static;
+  }
+}

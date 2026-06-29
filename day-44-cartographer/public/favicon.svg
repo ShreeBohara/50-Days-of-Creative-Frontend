@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MERIDIAN compass rose">
+  <rect width="64" height="64" rx="12" fill="#ece3cf" />
+  <g fill="none" stroke="#3a2c1a" stroke-width="1.4">
+    <circle cx="32" cy="32" r="22" />
+    <circle cx="32" cy="32" r="15.5" stroke-width="0.9" />
+  </g>
+  <!-- 8-point compass star -->
+  <g>
+    <path d="M32 8 L36 30 L32 32 L28 30 Z" fill="#8a3b2e" />
+    <path d="M32 56 L36 34 L32 32 L28 34 Z" fill="#3a2c1a" />
+    <path d="M8 32 L30 28 L32 32 L30 36 Z" fill="#3a2c1a" />
+    <path d="M56 32 L34 28 L32 32 L34 36 Z" fill="#3a2c1a" />
+    <path d="M15 15 L31 29 L29 31 Z" fill="#6b5638" />
+    <path d="M49 15 L33 29 L35 31 Z" fill="#6b5638" />
+    <path d="M15 49 L29 33 L31 35 Z" fill="#6b5638" />
+    <path d="M49 49 L33 33 L35 35 Z" fill="#6b5638" />
+  </g>
+  <circle cx="32" cy="32" r="2.4" fill="#b08a3c" />
+</svg>

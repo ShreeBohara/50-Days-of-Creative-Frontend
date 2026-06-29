@@ -1,0 +1,157 @@
+:root {
+  /* — aged parchment ground — */
+  --paper-0: #f4eeda;
+  --paper: #ece3cf;
+  --paper-2: #e5dabf;
+  --paper-3: #ddcfac;
+  --paper-sink: #d6c69f;
+  --paper-edge: #cbb893;
+
+  /* — engraved sepia inks — */
+  --ink-900: #271d10;
+  --ink: #3a2c1a;
+  --ink-2: #4b3a24;
+  --sepia: #6b5638;
+  --muted: #7a6647;
+  --muted-2: #9a875f;
+
+  /* — chart accents — */
+  --ocean: #9bb7b1;
+  --ocean-deep: #6f938b;
+  --contour: #7c6a4d;
+  --rule: rgba(58, 44, 26, 0.16);
+  --rule-strong: rgba(58, 44, 26, 0.32);
+  --accent: #8a3b2e;
+  --accent-bright: #a84a37;
+  --gold: #b08a3c;
+  --gold-bright: #caa45a;
+  --focus: #8a3b2e;
+
+  /* — type — */
+  --font-display: 'Cormorant Garamond', 'Hoefler Text', Georgia, serif;
+  --font-body: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* — geometry — */
+  --r-sm: 4px;
+  --r-md: 7px;
+  --r-lg: 12px;
+  --r-xl: 18px;
+
+  --shadow-panel: 0 1px 0 rgba(255, 252, 240, 0.45) inset,
+    0 14px 36px -26px rgba(39, 29, 16, 0.7);
+  --shadow-pop: 0 22px 50px -22px rgba(39, 29, 16, 0.55);
+
+  --ring: 0 0 0 2px var(--paper), 0 0 0 4px var(--focus);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* aged-paper ground: warm vignette + faint foxing + a hairline rule wash */
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(135% 100% at 50% -8%, rgba(255, 250, 235, 0.55), transparent 60%),
+    radial-gradient(120% 120% at 12% 8%, rgba(176, 138, 60, 0.07), transparent 45%),
+    radial-gradient(130% 130% at 92% 96%, rgba(111, 147, 139, 0.08), transparent 52%),
+    radial-gradient(100% 100% at 88% 14%, rgba(138, 59, 46, 0.05), transparent 42%),
+    linear-gradient(180deg, var(--paper-0), var(--paper));
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(138, 59, 46, 0.22);
+  color: var(--ink-900);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--r-sm);
+}
+
+/* thin chart-rule scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--paper-edge) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--paper-edge);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* — small shared utilities — */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
