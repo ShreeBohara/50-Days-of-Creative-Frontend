@@ -663,4 +663,43 @@
   .stage-col {
     position: static;
   }
+  .rail {
+    max-width: 520px;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .studio__head {
+    align-items: flex-start;
+  }
+  .studio__tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .studio__foot {
+    flex-wrap: wrap;
+  }
+  .studio__foot-keys {
+    margin-left: 0;
+    width: 100%;
+  }
+  .readout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* comfortable touch targets on touch devices */
+@media (pointer: coarse) {
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .export-btn,
+  .gallery-card,
+  .swatch,
+  .saved__open {
+    min-height: 44px;
+  }
 }
