@@ -5,7 +5,7 @@ import { SCHEMA_VERSION, type WorldParams } from './world'
 export function createDefaultParams(): WorldParams {
   return {
     version: SCHEMA_VERSION,
-    seed: 'meridian',
+    seed: 'avalon',
     seaLevel: 0.44,
     relief: 0.28,
     octaves: 5,

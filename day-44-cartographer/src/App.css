@@ -40,16 +40,16 @@
 /* — body — */
 .studio__body {
   flex: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 400px);
+  display: flex;
+  justify-content: center;
   gap: clamp(1rem, 2vw, 1.8rem);
   padding: clamp(1rem, 2.4vw, 1.8rem) clamp(1rem, 3vw, 2.4rem);
-  align-items: start;
+  align-items: flex-start;
 }
 
 .stage-col {
-  position: sticky;
-  top: clamp(1rem, 2.4vw, 1.8rem);
+  width: min(82vh, 760px);
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -93,6 +93,25 @@
   font-style: italic;
   font-size: 1.3rem;
   color: var(--muted);
+}
+
+.map-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* the pen drawing the coastline on load / re-roll */
+.coast-draw {
+  stroke-dasharray: 9000;
+  stroke-dashoffset: 9000;
+  animation: coast-draw 1.5s ease-out forwards;
+}
+
+@keyframes coast-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* — footer — */

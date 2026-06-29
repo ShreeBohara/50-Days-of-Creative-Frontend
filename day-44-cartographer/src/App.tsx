@@ -1,8 +1,15 @@
+import { useMemo } from 'react'
+import StageView from './components/StageView'
+import type { ViewOptions } from './components/MapCanvas'
+import { createDefaultParams } from './domain/defaults'
 import './App.css'
 
-// Scaffold shell. The plotting stage, control rail, collection, blend lab and
-// export toolbar are wired in over the following commits.
+// The control rail, collection, blend lab and export toolbar are wired in over
+// the following commits; for now the studio charts the default world.
 export default function App() {
+  const params = useMemo(() => createDefaultParams(), [])
+  const view: ViewOptions = { contours: true, rivers: true, labels: true, graticule: true }
+
   return (
     <div className="studio">
       <header className="studio__head">
@@ -15,11 +22,7 @@ export default function App() {
 
       <main className="studio__body">
         <section className="stage-col" aria-label="Chart stage">
-          <div className="chart-frame">
-            <div className="chart-frame__plate">
-              <p className="chart-frame__placeholder">Charting imaginary worlds…</p>
-            </div>
-          </div>
+          <StageView params={params} view={view} reducedMotion={false} drawKey={0} />
         </section>
       </main>
 
