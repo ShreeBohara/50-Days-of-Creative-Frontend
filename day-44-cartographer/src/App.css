@@ -197,6 +197,33 @@
   }
 }
 
+/* — export bar — */
+.export-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+.export-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--paper-edge);
+  background: var(--paper-2);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+.export-btn:hover {
+  background: var(--paper-3);
+  border-color: var(--sepia);
+}
+
 /* — survey readout — */
 .readout {
   margin: 0;
