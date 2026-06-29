@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Anchor, Compass, Grid3x3, Map, Mountain, RefreshCw, Sparkles, Tag, Waves } from 'lucide-react'
+import { Anchor, Compass, GitMerge, Grid3x3, Map, Mountain, RefreshCw, Sparkles, Tag, Waves } from 'lucide-react'
 import { LANGUAGES } from '../data/languages'
 import { PALETTES } from '../domain/palettes'
 import { PARAM_RANGES } from '../domain/world'
 import { useStudioStore } from '../store/useStudioStore'
+import BlendLab from './BlendLab'
 import CollectionPanel from './CollectionPanel'
 import IconButton from './IconButton'
 import Panel from './Panel'
@@ -195,6 +196,10 @@ export default function ControlRail() {
           <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
           <span>Mutate this world</span>
         </button>
+      </Panel>
+
+      <Panel title="Blend lab" icon={<GitMerge size={16} strokeWidth={1.7} />} defaultOpen={false}>
+        <BlendLab />
       </Panel>
 
       <Panel title="Collection" icon={<Anchor size={16} strokeWidth={1.7} />}>
