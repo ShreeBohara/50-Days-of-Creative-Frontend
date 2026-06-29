@@ -51,6 +51,7 @@ Live gallery: [shreebohara.github.io/50-Days-of-Creative-Frontend](https://shree
 | 41 | TYPEFORGE Kinetic Type Studio | Type-specimen lab where a variable-font headline morphs to your cursor with six behaviors, six curated scenes, live axis controls, and PNG poster export. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-41-kinetic-type/) | [day-41-kinetic-type](./day-41-kinetic-type/) |
 | 42 | FLORA LAB Botanical Genetics Studio | Scientific-editorial genetics studio for growing, mutating, crossbreeding, saving, sharing, and exporting deterministic SVG plants. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-42-flora-lab/) | [day-42-flora-lab](./day-42-flora-lab/) |
 | 43 | PENDULA Harmonograph Studio | Ink-blueprint harmonograph lab for drawing, tuning, randomizing, crossbreeding, saving, sharing, and exporting deterministic damped-sine SVG figures. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-43-harmonograph/) | [day-43-harmonograph](./day-43-harmonograph/) |
+| 44 | MERIDIAN Procedural Cartographer | Antique-chart cartography studio for generating, tuning, crossbreeding, saving, sharing, and exporting deterministic island worlds — coastlines, contours, rivers, biomes, and procedural place-names. | [View demo](https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-44-cartographer/) | [day-44-cartographer](./day-44-cartographer/) |
 
 ## Adding a New Day
 
