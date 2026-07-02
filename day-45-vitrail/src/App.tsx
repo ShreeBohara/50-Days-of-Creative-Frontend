@@ -1,28 +1,31 @@
 import { useMemo } from 'react'
+import AppHeader from './components/AppHeader'
+import ControlRail from './components/ControlRail'
+import ReadoutPanel from './components/ReadoutPanel'
 import StageView from './components/StageView'
 import { composeWindow } from './domain/compose'
-import { defaultGenome } from './domain/genome'
 import { useReducedMotion } from './hooks/useReducedMotion'
+import { useStudioStore } from './store/useStudioStore'
 import './App.css'
 
 export default function App() {
   const reducedMotion = useReducedMotion()
-  const spec = useMemo(() => composeWindow(defaultGenome()), [])
+  const genome = useStudioStore((s) => s.genome)
+  const drawKey = useStudioStore((s) => s.drawKey)
+
+  const spec = useMemo(() => composeWindow(genome), [genome])
 
   return (
     <div className="studio">
-      <header className="studio__header">
-        <div className="studio__title">
-          <span className="studio__day">Day 45 · Atelier</span>
-          <h1 className="studio__wordmark">VITRAIL</h1>
-          <p className="studio__tagline">Procedural stained glass, grown from a seed</p>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="studio__body">
         <section className="stage-col" aria-label="Window stage">
-          <StageView spec={spec} reducedMotion={reducedMotion} drawKey={0} />
+          <StageView spec={spec} reducedMotion={reducedMotion} drawKey={drawKey} />
+          <ReadoutPanel spec={spec} />
         </section>
+
+        <ControlRail />
       </main>
 
       <footer className="studio__foot">
