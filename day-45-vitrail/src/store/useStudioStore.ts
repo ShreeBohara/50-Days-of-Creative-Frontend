@@ -1,5 +1,14 @@
 import { create } from 'zustand'
 import {
+  addWindow,
+  createSavedWindow,
+  loadCollection,
+  removeWindow,
+  renameWindow,
+  saveCollection,
+  type SavedWindow,
+} from '../domain/collection'
+import {
   clampGenome,
   defaultGenome,
   mutateGenome,
@@ -18,6 +27,7 @@ export interface StudioState {
   genome: WindowGenome
   drawKey: number
   activePresetId: string | null
+  collection: SavedWindow[]
 
   past: WindowGenome[]
   future: WindowGenome[]
@@ -36,6 +46,12 @@ export interface StudioState {
   mutateCurrent: (amount?: number) => void
   reset: () => void
   replay: () => void
+
+  // saved collection (persisted)
+  saveCurrent: (name?: string) => void
+  loadSaved: (id: string) => void
+  renameSaved: (id: string, name: string) => void
+  deleteSaved: (id: string) => void
 
   undo: () => void
   redo: () => void
@@ -61,6 +77,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   genome: defaultGenome(),
   drawKey: 0,
   activePresetId: null,
+  collection: loadCollection(),
   past: [],
   future: [],
   lastTag: null,
@@ -127,6 +144,39 @@ export const useStudioStore = create<StudioState>((set) => ({
     })),
 
   replay: () => set((state) => ({ drawKey: state.drawKey + 1 })),
+
+  saveCurrent: (name) =>
+    set((state) => {
+      const saved = createSavedWindow(name ?? '', state.genome)
+      const collection = addWindow(state.collection, saved)
+      saveCollection(collection)
+      return { collection }
+    }),
+
+  loadSaved: (id) =>
+    set((state) => {
+      const saved = state.collection.find((w) => w.id === id)
+      if (!saved) return state
+      return {
+        ...commit(state, clampGenome(saved.genome)),
+        drawKey: state.drawKey + 1,
+        activePresetId: null,
+      }
+    }),
+
+  renameSaved: (id, name) =>
+    set((state) => {
+      const collection = renameWindow(state.collection, id, name)
+      saveCollection(collection)
+      return { collection }
+    }),
+
+  deleteSaved: (id) =>
+    set((state) => {
+      const collection = removeWindow(state.collection, id)
+      saveCollection(collection)
+      return { collection }
+    }),
 
   undo: () =>
     set((state) => {

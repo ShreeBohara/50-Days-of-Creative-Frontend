@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Church, Dices, Gem, KeyRound } from 'lucide-react'
+import { BookMarked, Church, Dices, Gem, KeyRound, LibraryBig } from 'lucide-react'
 import { ARCHETYPES, MEDALLIONS, SYMMETRY_OPTIONS, TRACERY_STYLES } from '../domain/genome'
 import { PALETTE_LIST } from '../domain/palettes'
 import { useStudioStore } from '../store/useStudioStore'
+import CollectionPanel from './CollectionPanel'
 import IconButton from './IconButton'
 import Panel from './Panel'
+import PresetGallery from './PresetGallery'
 import RangeControl from './RangeControl'
 import SelectControl from './SelectControl'
 
@@ -124,6 +126,14 @@ export default function ControlRail() {
 
       <Panel title="Provenance" icon={<KeyRound size={15} strokeWidth={1.8} aria-hidden="true" />}>
         <SeedField />
+      </Panel>
+
+      <Panel title="The Canon" icon={<LibraryBig size={15} strokeWidth={1.8} aria-hidden="true" />}>
+        <PresetGallery />
+      </Panel>
+
+      <Panel title="Reliquary" icon={<BookMarked size={15} strokeWidth={1.8} aria-hidden="true" />} defaultOpen={false}>
+        <CollectionPanel />
       </Panel>
     </aside>
   )
