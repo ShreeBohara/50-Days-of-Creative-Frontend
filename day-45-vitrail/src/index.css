@@ -1,0 +1,116 @@
+/* ── VITRAIL · cathedral nave design tokens ─────────────────────────────── */
+
+:root {
+  /* stone + shadow */
+  --nave: #0b0a12;
+  --stone: #12101c;
+  --panel: #161320;
+  --panel-raised: #1d1929;
+  --lead: #262032;
+  --lead-soft: #2f2840;
+
+  /* gilding */
+  --gold: #c9a227;
+  --gold-bright: #e8c55a;
+  --gold-dim: #8a7433;
+  --gold-hairline: rgba(201, 162, 39, 0.34);
+
+  /* candle-lit text */
+  --ink: #efe9db;
+  --ink-muted: #b3aa97;
+  --ink-faint: #7d7566;
+
+  /* jewel glass */
+  --ruby: #b3223f;
+  --sapphire: #2f56b8;
+  --emerald: #1f8a5f;
+  --amber: #e09520;
+  --violet: #7b4fc9;
+
+  /* type */
+  --font-wordmark: 'Cinzel Decorative', serif;
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Jost', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* rhythm */
+  --radius: 10px;
+  --radius-arch: 999px 999px 10px 10px;
+  --speed: 220ms;
+  --focus-ring: 2px solid var(--gold-bright);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(1200px 640px at 50% -12%, rgba(123, 79, 201, 0.10), transparent 62%),
+    radial-gradient(900px 520px at 84% 108%, rgba(47, 86, 184, 0.08), transparent 60%),
+    var(--nave);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* faint stone grain over everything, kept extremely quiet */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.35);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
