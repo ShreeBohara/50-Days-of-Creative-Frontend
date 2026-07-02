@@ -644,6 +644,139 @@
   background: rgba(179, 34, 63, 0.12);
 }
 
+/* ── blend lab ──────────────────────────────────────────────────────────── */
+
+.blend {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.blend__hint,
+.blend__waiting {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-faint);
+}
+
+.blend__waiting {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-muted);
+}
+
+.blend__parents {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.blend__cross {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--gold);
+}
+
+.blend__slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  border: 1px dashed var(--lead-soft);
+  border-radius: 8px;
+}
+
+.blend__slot-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.blend__slot .thumb,
+.blend__slot-empty {
+  width: 56px;
+  height: 56px;
+}
+
+.blend__slot-empty {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--lead-soft);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--ink-faint);
+}
+
+.blend__capture {
+  padding: 5px 10px;
+  border: 1px solid var(--lead-soft);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color var(--speed), border-color var(--speed);
+}
+
+.blend__capture:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-hairline);
+}
+
+.blend__child {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--gold-hairline);
+  border-radius: 8px;
+  background: rgba(201, 162, 39, 0.05);
+}
+
+.blend__child-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.blend__child-preview .thumb {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+}
+
+.blend__child-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.blend__child-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--gold-bright);
+}
+
+.blend__child-sub {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+.blend__adopt {
+  height: 38px;
+  justify-content: center;
+  font-size: 12.5px;
+}
+
 /* ── footer ─────────────────────────────────────────────────────────────── */
 
 .studio__foot {

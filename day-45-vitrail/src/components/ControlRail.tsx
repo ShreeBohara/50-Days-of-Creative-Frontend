@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { BookMarked, Church, Dices, Gem, KeyRound, LibraryBig } from 'lucide-react'
+import { BookMarked, Church, Dices, FlaskConical, Gem, KeyRound, LibraryBig } from 'lucide-react'
 import { ARCHETYPES, MEDALLIONS, SYMMETRY_OPTIONS, TRACERY_STYLES } from '../domain/genome'
 import { PALETTE_LIST } from '../domain/palettes'
 import { useStudioStore } from '../store/useStudioStore'
+import BlendLab from './BlendLab'
 import CollectionPanel from './CollectionPanel'
 import IconButton from './IconButton'
 import Panel from './Panel'
@@ -130,6 +131,10 @@ export default function ControlRail() {
 
       <Panel title="The Canon" icon={<LibraryBig size={15} strokeWidth={1.8} aria-hidden="true" />}>
         <PresetGallery />
+      </Panel>
+
+      <Panel title="Blend Lab" icon={<FlaskConical size={15} strokeWidth={1.8} aria-hidden="true" />} defaultOpen={false}>
+        <BlendLab />
       </Panel>
 
       <Panel title="Reliquary" icon={<BookMarked size={15} strokeWidth={1.8} aria-hidden="true" />} defaultOpen={false}>
