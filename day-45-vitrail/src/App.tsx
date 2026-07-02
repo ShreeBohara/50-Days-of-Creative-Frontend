@@ -1,6 +1,14 @@
+import { useMemo } from 'react'
+import StageView from './components/StageView'
+import { composeWindow } from './domain/compose'
+import { defaultGenome } from './domain/genome'
+import { useReducedMotion } from './hooks/useReducedMotion'
 import './App.css'
 
 export default function App() {
+  const reducedMotion = useReducedMotion()
+  const spec = useMemo(() => composeWindow(defaultGenome()), [])
+
   return (
     <div className="studio">
       <header className="studio__header">
@@ -13,9 +21,7 @@ export default function App() {
 
       <main className="studio__body">
         <section className="stage-col" aria-label="Window stage">
-          <div className="stage-arch" role="img" aria-label="Empty window frame awaiting glass">
-            <span className="stage-arch__hint">The glass is being mixed…</span>
-          </div>
+          <StageView spec={spec} reducedMotion={reducedMotion} drawKey={0} />
         </section>
       </main>
 

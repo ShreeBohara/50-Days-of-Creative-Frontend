@@ -78,10 +78,13 @@ export function composeWindow(genome: WindowGenome): WindowSpec {
   const palette = getPalette(genome.paletteId)
   const rng = createRng(`${genome.seed}:glass`)
 
+  // Rings cycle through the palette from a seeded offset so neighbouring
+  // rings never repeat a glass; accents are free picks.
   const plans: RingPlan[] = []
+  const cycleOffset = randInt(rng, 0, palette.glasses.length - 1)
   for (let ring = 0; ring < tracery.ringCount; ring++) {
     plans.push({
-      base: randInt(rng, 0, palette.glasses.length - 1),
+      base: (cycleOffset + ring) % palette.glasses.length,
       accent: randInt(rng, 0, palette.glasses.length - 1),
       every: pick(rng, [2, 3, 4] as const),
     })
