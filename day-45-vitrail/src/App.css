@@ -816,12 +816,91 @@
   color: var(--ink-faint);
 }
 
+/* ── responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
+  .studio__body {
+    grid-template-columns: minmax(0, 1fr) 292px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .studio__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    order: 2;
+  }
+
+  .studio__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .studio__tools {
+    padding-bottom: 0;
+    flex-wrap: wrap;
+  }
+
+  .stage {
+    padding: 20px 14px 16px;
+  }
+}
+
 @media (max-width: 720px) {
   .studio {
     padding: 0 14px;
   }
 
+  .studio__foot {
+    flex-wrap: wrap;
+  }
+
   .studio__foot-keys {
     display: none;
+  }
+
+  .export {
+    flex-direction: column;
+  }
+
+  .readout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* comfortable touch targets on coarse pointers */
+@media (pointer: coarse) {
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .btn-primary,
+  .btn-ghost,
+  .export__btn,
+  .collection__save {
+    min-height: 44px;
+  }
+
+  .blend__capture {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+
+  .panel-block__toggle {
+    min-height: 48px;
+  }
+
+  .seed__row .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .range__input {
+    height: 32px;
   }
 }
