@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { BookMarked, Church, Dices, FlaskConical, Gem, KeyRound, LibraryBig } from 'lucide-react'
 import { ARCHETYPES, MEDALLIONS, SYMMETRY_OPTIONS, TRACERY_STYLES } from '../domain/genome'
 import { PALETTE_LIST } from '../domain/palettes'
@@ -18,8 +18,13 @@ function SeedField() {
   const setSeed = useStudioStore((s) => s.setSeed)
   const reseed = useStudioStore((s) => s.reseed)
   const [draft, setDraft] = useState(seed)
-
-  useEffect(() => setDraft(seed), [seed])
+  const [lastSeed, setLastSeed] = useState(seed)
+  // adjust-during-render: when the store seed changes (preset, randomize,
+  // share link), the field resyncs without an effect
+  if (seed !== lastSeed) {
+    setLastSeed(seed)
+    setDraft(seed)
+  }
 
   return (
     <div className="seed">
