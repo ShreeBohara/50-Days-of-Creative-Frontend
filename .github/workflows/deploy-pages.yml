@@ -51,6 +51,7 @@ on:
       - "day-42-flora-lab/**"
       - "day-43-harmonograph/**"
       - "day-44-cartographer/**"
+      - "day-45-vitrail/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -105,6 +106,7 @@ jobs:
             day-42-flora-lab/package-lock.json
             day-43-harmonograph/package-lock.json
             day-44-cartographer/package-lock.json
+            day-45-vitrail/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -306,6 +308,14 @@ jobs:
         working-directory: day-44-cartographer
         run: npm run build
 
+      - name: Install Day 45 app dependencies
+        working-directory: day-45-vitrail
+        run: npm ci
+
+      - name: Build Day 45 app
+        working-directory: day-45-vitrail
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -382,6 +392,8 @@ jobs:
           cp -R day-43-harmonograph/dist/. _site/day-43-harmonograph/
           mkdir -p _site/day-44-cartographer
           cp -R day-44-cartographer/dist/. _site/day-44-cartographer/
+          mkdir -p _site/day-45-vitrail
+          cp -R day-45-vitrail/dist/. _site/day-45-vitrail/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
