@@ -52,6 +52,7 @@ on:
       - "day-43-harmonograph/**"
       - "day-44-cartographer/**"
       - "day-45-vitrail/**"
+      - "day-46-kinetic-type-lab/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -394,6 +395,7 @@ jobs:
           cp -R day-44-cartographer/dist/. _site/day-44-cartographer/
           mkdir -p _site/day-45-vitrail
           cp -R day-45-vitrail/dist/. _site/day-45-vitrail/
+          cp -R day-46-kinetic-type-lab _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
