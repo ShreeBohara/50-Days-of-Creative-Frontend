@@ -17,6 +17,7 @@ import { initHero } from "./hero.js";
 import { initScatter } from "./scatter.js";
 import { initWave } from "./wave.js";
 import { initElastic } from "./elastic.js";
+import { initMarquee } from "./marquee.js";
 
 const wallGrid = document.querySelector(".wall-grid");
 const wallCells = buildWall(wallGrid);
@@ -41,6 +42,7 @@ mm.add(
     initWave(document.querySelector("#wave"), { coarse });
     initElastic(document.querySelector("#elastic"));
     initWallRipple(wallGrid, wallCells);
+    initMarquee(document.querySelector("#marquee"));
   }
 );
 
