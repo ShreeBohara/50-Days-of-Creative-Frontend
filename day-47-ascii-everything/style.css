@@ -452,6 +452,13 @@ body.is-dragging .drop-flash { display: grid; }
   color: var(--bg);
 }
 
+.export-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.btn-export { width: 100%; }
+
 /* ------------------------------------------------------------
    statusbar — vim energy
    ------------------------------------------------------------ */

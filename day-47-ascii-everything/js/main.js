@@ -61,6 +61,7 @@ setMode('demo');
 import('./webcam.js');
 import('./imageMode.js');
 import('./controls.js');
+import('./exportTools.js');
 
 // wait for the mono font so glyph metrics are right from the first frame
 document.fonts.ready.then(start);
