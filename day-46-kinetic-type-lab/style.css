@@ -192,6 +192,11 @@ body {
   line-height: 1.5;
   text-wrap: balance;
 }
+/* keep the 3D depth of scattered chars (SplitText wraps chars in divs) */
+.scatter-copy,
+.scatter-copy div {
+  transform-style: preserve-3d;
+}
 
 /* ---------- 03 · Wave ---------- */
 .wave-svg {

@@ -14,15 +14,28 @@ document.fonts.ready.then(() => ScrollTrigger.refresh());
 
 import { buildWall } from "./wall.js";
 import { initHero } from "./hero.js";
+import { initScatter } from "./scatter.js";
 
 buildWall(document.querySelector(".wall-grid"));
 
 /* All kinetic behaviour lives inside matchMedia contexts so
-   prefers-reduced-motion users get the clean static specimen. */
+   prefers-reduced-motion users get the clean static specimen.
+   Sections initialise in DOM order — the scatter pin changes the
+   page length, so trigger creation order matters. */
 const mm = gsap.matchMedia();
 
-mm.add("(prefers-reduced-motion: no-preference)", () => {
-  initHero(document.querySelector("#hero"));
-});
+mm.add(
+  {
+    motionOK: "(prefers-reduced-motion: no-preference)",
+    coarse: "(pointer: coarse)",
+  },
+  (ctx) => {
+    const { motionOK, coarse } = ctx.conditions;
+    if (!motionOK) return;
+
+    initHero(document.querySelector("#hero"));
+    initScatter(document.querySelector("#scatter"), { coarse });
+  }
+);
 
 console.info(`Kinetic Typography Lab — GSAP ${gsap.version}`);
