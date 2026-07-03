@@ -57,9 +57,10 @@ statusRamp.textContent = `RAMP:${settings.ramp}`;
 
 setMode('demo');
 
-// input modes register their modechange listeners on import
+// input modes and panel modules register their listeners on import
 import('./webcam.js');
 import('./imageMode.js');
+import('./controls.js');
 
 // wait for the mono font so glyph metrics are right from the first frame
 document.fonts.ready.then(start);

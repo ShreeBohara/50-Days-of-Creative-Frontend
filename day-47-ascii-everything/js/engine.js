@@ -66,6 +66,22 @@ function contrastFactor() {
   return (259 * (c + 255)) / (255 * (259 - c));
 }
 
+// The row-string fast path assumes every glyph advances exactly one cell.
+// Custom ramps (blocks, symbols) can fall back to another font with a
+// different advance width, which would shear the column grid — measure once
+// per ramp and drop to per-char placement when glyphs don't fit the cell.
+let rampCheck = { ramp: null, uniform: true };
+function rampIsUniform(ramp) {
+  if (rampCheck.ramp === ramp) return rampCheck.uniform;
+  ctx.font = `${FONT_SIZE}px "JetBrains Mono", monospace`;
+  const cellW = FONT_SIZE * CHAR_W_RATIO;
+  const uniform = [...ramp].every(
+    (char) => Math.abs(ctx.measureText(char).width - cellW) < 0.15
+  );
+  rampCheck = { ramp, uniform };
+  return uniform;
+}
+
 function frame(now) {
   rafId = requestAnimationFrame(frame);
   if (!source) return;
@@ -105,16 +121,28 @@ function frame(now) {
   ctx.font = `${FONT_SIZE}px "JetBrains Mono", monospace`;
   ctx.textBaseline = 'top';
 
-  const ramp = settings.ramp.length ? settings.ramp : '@ ';
-  const steps = ramp.length - 1;
+  const rampChars = [...(settings.ramp.length ? settings.ramp : '@ ')];
+  const steps = rampChars.length - 1;
   const factor = contrastFactor();
-  const perChar = settings.colorMode === 'original' || settings.colorMode === 'gameboy';
+  const perCharColor = settings.colorMode === 'original' || settings.colorMode === 'gameboy';
+  const rowStrings = !perCharColor && rampIsUniform(settings.ramp);
 
-  if (!perChar) ctx.fillStyle = MODE_COLORS[settings.colorMode] || MODE_COLORS.green;
+  if (!perCharColor) ctx.fillStyle = MODE_COLORS[settings.colorMode] || MODE_COLORS.green;
 
   for (let y = 0; y < rows; y++) {
     const rowBase = y * cols * 4;
-    if (perChar) {
+    if (rowStrings) {
+      // mono modes with grid-safe glyphs: one string, one draw — the fast path
+      let line = '';
+      for (let x = 0; x < cols; x++) {
+        const i = rowBase + x * 4;
+        let lum = 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
+        lum = Math.max(0, Math.min(255, factor * (lum - 128) + 128));
+        if (settings.invert) lum = 255 - lum;
+        line += rampChars[Math.round((1 - lum / 255) * steps)];
+      }
+      ctx.fillText(line, 0, y * cellH);
+    } else {
       for (let x = 0; x < cols; x++) {
         const i = rowBase + x * 4;
         const r = pixels[i];
@@ -123,26 +151,15 @@ function frame(now) {
         let lum = 0.299 * r + 0.587 * g + 0.114 * b;
         lum = Math.max(0, Math.min(255, factor * (lum - 128) + 128));
         if (settings.invert) lum = 255 - lum;
-        const char = ramp[Math.round((1 - lum / 255) * steps)];
+        const char = rampChars[Math.round((1 - lum / 255) * steps)];
         if (char === ' ') continue;
         if (settings.colorMode === 'gameboy') {
           ctx.fillStyle = GAMEBOY[Math.min(3, (lum / 64) | 0)];
-        } else {
+        } else if (settings.colorMode === 'original') {
           ctx.fillStyle = `rgb(${r},${g},${b})`;
         }
         ctx.fillText(char, x * cellW, y * cellH);
       }
-    } else {
-      // mono modes: build the row string once, draw once — the fast path
-      let line = '';
-      for (let x = 0; x < cols; x++) {
-        const i = rowBase + x * 4;
-        let lum = 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
-        lum = Math.max(0, Math.min(255, factor * (lum - 128) + 128));
-        if (settings.invert) lum = 255 - lum;
-        line += ramp[Math.round((1 - lum / 255) * steps)];
-      }
-      ctx.fillText(line, 0, y * cellH);
     }
   }
 
@@ -176,8 +193,8 @@ export function getTextFrame() {
   if (!grid) return '';
   const { cols, rows } = grid;
   const pixels = sctx.getImageData(0, 0, cols, rows).data;
-  const ramp = settings.ramp.length ? settings.ramp : '@ ';
-  const steps = ramp.length - 1;
+  const rampChars = [...(settings.ramp.length ? settings.ramp : '@ ')];
+  const steps = rampChars.length - 1;
   const factor = contrastFactor();
   const lines = [];
   for (let y = 0; y < rows; y++) {
@@ -187,7 +204,7 @@ export function getTextFrame() {
       let lum = 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
       lum = Math.max(0, Math.min(255, factor * (lum - 128) + 128));
       if (settings.invert) lum = 255 - lum;
-      line += ramp[Math.round((1 - lum / 255) * steps)];
+      line += rampChars[Math.round((1 - lum / 255) * steps)];
     }
     lines.push(line);
   }
