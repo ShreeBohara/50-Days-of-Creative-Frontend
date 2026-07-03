@@ -278,7 +278,7 @@ body {
 /* ---------- 05 · Wall ---------- */
 .wall-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--wall-cols, 5), minmax(0, 1fr));
   gap: 0.4rem 1.4rem;
   width: min(100%, 1100px);
 }
@@ -329,4 +329,45 @@ body {
 }
 .section--marquee .caption {
   margin-top: 3rem;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  .site-head {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .section::before {
+    top: 5rem;
+  }
+  .caption {
+    font-size: 0.7rem;
+    max-width: 34ch;
+  }
+  /* keep the wave's glyphs readable: let the ribbon overflow the
+     narrow viewport instead of shrinking to nothing */
+  .wave-svg {
+    width: 190%;
+    margin-left: -45%;
+  }
+  .mq-chunk {
+    font-size: clamp(2rem, 11vw, 3.5rem);
+  }
+}
+
+/* ---------- Reduced motion: the static specimen ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  /* no kinetics: present the hero at a confident middle state
+     (the JS modules never initialise under this preference) */
+  .hero-word {
+    font-weight: 500;
+    font-stretch: 100%;
+  }
+  .elastic-word {
+    cursor: default;
+    touch-action: auto;
+  }
 }

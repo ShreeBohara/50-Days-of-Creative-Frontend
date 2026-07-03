@@ -20,14 +20,30 @@ import { initElastic } from "./elastic.js";
 import { initMarquee } from "./marquee.js";
 import { initCursor } from "./cursor.js";
 
-const wallGrid = document.querySelector(".wall-grid");
-const wallCells = buildWall(wallGrid);
-
 /* All kinetic behaviour lives inside matchMedia contexts so
    prefers-reduced-motion users get the clean static specimen.
    Sections initialise in DOM order — the scatter pin changes the
    page length, so trigger creation order matters. */
 const mm = gsap.matchMedia();
+
+/* The wall exists for everyone; the cell count adapts to the viewport
+   and the ripple only runs for motion-OK users. matchMedia re-runs
+   this block whenever either condition flips. */
+mm.add(
+  {
+    motionOK: "(prefers-reduced-motion: no-preference)",
+    small: "(max-width: 640px)",
+  },
+  (ctx) => {
+    const { motionOK, small } = ctx.conditions;
+    const grid = document.querySelector(".wall-grid");
+    const cols = small ? 4 : 5;
+    const rows = small ? 5 : 8;
+    grid.style.setProperty("--wall-cols", cols);
+    const cells = buildWall(grid, cols, rows);
+    if (motionOK) initWallRipple(grid, cells, cols, rows);
+  }
+);
 
 mm.add(
   {
@@ -42,7 +58,6 @@ mm.add(
     initScatter(document.querySelector("#scatter"), { coarse });
     initWave(document.querySelector("#wave"), { coarse });
     initElastic(document.querySelector("#elastic"));
-    initWallRipple(wallGrid, wallCells);
     initMarquee(document.querySelector("#marquee"));
     initCursor();
 
