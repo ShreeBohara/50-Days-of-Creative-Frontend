@@ -99,3 +99,54 @@ COLOR_MODES.forEach((entry, i) => {
 });
 
 colorBody.append(colorRow);
+
+/* ── SIGNAL (resolution / contrast / invert) ──────────── */
+
+const signalBody = document.getElementById('signal-body');
+
+function slider({ label, min, max, value, format, onInput }) {
+  const input = el('input', 'range-input');
+  input.type = 'range';
+  input.min = min;
+  input.max = max;
+  input.value = value;
+  const wrap = field(label, input);
+  const readout = el('span', 'field-value', format(value));
+  wrap.querySelector('.field-label').appendChild(readout);
+  input.addEventListener('input', () => {
+    const v = Number(input.value);
+    readout.textContent = format(v);
+    onInput(v);
+  });
+  return wrap;
+}
+
+signalBody.append(
+  slider({
+    label: 'RESOLUTION',
+    min: 40,
+    max: 200,
+    value: settings.cols,
+    format: (v) => `${v} COLS`,
+    onInput: (v) => { settings.cols = v; },
+  }),
+  slider({
+    label: 'CONTRAST',
+    min: -100,
+    max: 100,
+    value: settings.contrast,
+    format: (v) => (v > 0 ? `+${v}` : `${v}`),
+    onInput: (v) => { settings.contrast = v; },
+  })
+);
+
+const invertBtn = el('button', 'toggle-btn', 'INVERT: OFF');
+invertBtn.type = 'button';
+invertBtn.setAttribute('aria-pressed', 'false');
+invertBtn.addEventListener('click', () => {
+  settings.invert = !settings.invert;
+  invertBtn.textContent = `INVERT: ${settings.invert ? 'ON' : 'OFF'}`;
+  invertBtn.classList.toggle('is-on', settings.invert);
+  invertBtn.setAttribute('aria-pressed', String(settings.invert));
+});
+signalBody.append(invertBtn);

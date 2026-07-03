@@ -399,6 +399,59 @@ body.is-dragging .drop-flash { display: grid; }
   box-shadow: var(--glow);
 }
 
+.range-input {
+  width: 100%;
+  height: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.range-input::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--line-bright);
+}
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 16px;
+  margin-top: -7px;
+  background: var(--accent);
+  border: none;
+  border-radius: 1px;
+  box-shadow: var(--glow);
+}
+.range-input::-moz-range-track {
+  height: 2px;
+  background: var(--line-bright);
+}
+.range-input::-moz-range-thumb {
+  width: 10px;
+  height: 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 1px;
+  box-shadow: var(--glow);
+}
+
+.toggle-btn {
+  margin-top: 12px;
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  border: 1px solid var(--line-bright);
+  border-radius: 2px;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+.toggle-btn:hover { color: var(--accent); border-color: var(--accent); }
+.toggle-btn.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
 /* ------------------------------------------------------------
    statusbar — vim energy
    ------------------------------------------------------------ */
