@@ -1,0 +1,165 @@
+/* ============================================================
+   SPECIMEN 46 · Kinetic Typography Lab
+   Day 46 of 50 Days of Creative Frontend
+   ============================================================ */
+
+/* ---------- Self-hosted fonts (no runtime CDN) ---------- */
+@font-face {
+  font-family: "Roboto Flex";
+  src: url("./fonts/RobotoFlex-variable.woff2") format("woff2-variations");
+  font-weight: 100 1000;
+  font-stretch: 25% 151%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Space Mono";
+  src: url("./fonts/SpaceMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Space Mono";
+  src: url("./fonts/SpaceMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ---------- Design tokens ---------- */
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --ink: #f2efe9;
+  --ink-dim: #938f88;
+  --line: #2a2a28;
+  --accent: #ff4d00;
+  --font-display: "Roboto Flex", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --label-size: 0.6875rem; /* 11px */
+  --pad: clamp(1.25rem, 4vw, 3rem);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- Reset & base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-decoration: none;
+  transform: translateY(-300%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* ---------- Header / footer chrome ---------- */
+.site-head {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 1rem var(--pad);
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+.site-mark {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--label-size);
+  letter-spacing: 0.18em;
+}
+.site-sub {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+}
+
+.site-foot {
+  padding: 2.5rem var(--pad);
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+}
+.foot-num {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ---------- Sections & corner labels ---------- */
+.section {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  padding: var(--pad);
+  overflow: hidden;
+}
+.section::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 4rem;
+  left: var(--pad);
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  letter-spacing: 0.18em;
+  color: var(--ink-dim);
+  pointer-events: none;
+}
+
+/* ---------- Hero (base typography; kinetics arrive later) ---------- */
+.hero-word {
+  font-size: clamp(3.5rem, 17vw, 15rem);
+  font-weight: 350;
+  font-stretch: 100%;
+  font-optical-sizing: none;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-align: center;
+}
+.hero-sub {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-dim);
+}
