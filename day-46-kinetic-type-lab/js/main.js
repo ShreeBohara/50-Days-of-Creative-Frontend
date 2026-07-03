@@ -12,4 +12,8 @@ ScrollTrigger.config({ ignoreMobileResize: true });
    are wrong; re-measure once the real fonts are in. */
 document.fonts.ready.then(() => ScrollTrigger.refresh());
 
+import { buildWall } from "./wall.js";
+
+buildWall(document.querySelector(".wall-grid"));
+
 console.info(`Kinetic Typography Lab — GSAP ${gsap.version}`);

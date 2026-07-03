@@ -145,7 +145,19 @@ body {
   pointer-events: none;
 }
 
-/* ---------- Hero (base typography; kinetics arrive later) ---------- */
+/* ---------- Shared caption line ---------- */
+.caption {
+  margin-top: 2.25rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  max-width: 48ch;
+  margin-inline: auto;
+}
+
+/* ---------- 01 · Hero ---------- */
 .hero-word {
   font-size: clamp(3.5rem, 17vw, 15rem);
   font-weight: 350;
@@ -162,4 +174,105 @@ body {
   font-size: 0.85rem;
   letter-spacing: 0.1em;
   color: var(--ink-dim);
+}
+
+/* ---------- 02 · Scatter ---------- */
+.scatter-stage {
+  max-width: 62ch;
+  perspective: 900px;
+}
+.scatter-copy {
+  font-size: clamp(1.35rem, 2.6vw, 2.1rem);
+  font-weight: 420;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+/* ---------- 03 · Wave ---------- */
+.wave-svg {
+  width: min(100%, 1400px);
+  height: auto;
+  overflow: visible;
+}
+.wave-text {
+  font-family: var(--font-display);
+  font-size: 72px; /* SVG user units (viewBox 2400 wide) */
+  font-weight: 620;
+  letter-spacing: 0.04em;
+  fill: var(--ink);
+}
+
+/* ---------- 04 · Elastic ---------- */
+.elastic-word {
+  font-size: clamp(3.5rem, 15vw, 13rem);
+  font-weight: 780;
+  font-stretch: 112%;
+  font-optical-sizing: none;
+  line-height: 1;
+  text-align: center;
+  user-select: none;
+  cursor: grab;
+}
+.elastic-word:active {
+  cursor: grabbing;
+}
+.elastic-word:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0.5rem;
+}
+
+/* ---------- 05 · Wall ---------- */
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.4rem 1.4rem;
+  width: min(100%, 1100px);
+}
+.wall-cell {
+  font-size: clamp(1rem, 2.4vw, 2rem);
+  font-weight: 300;
+  font-stretch: 100%;
+  font-optical-sizing: none;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--ink-dim);
+  contain: layout paint;
+  white-space: nowrap;
+}
+
+/* ---------- 06 · Marquee ---------- */
+.section--marquee {
+  place-content: center stretch;
+  padding-inline: 0;
+}
+.mq {
+  display: grid;
+  gap: 1rem;
+}
+.mq-row {
+  overflow: hidden;
+  white-space: nowrap;
+  border-block: 1px solid var(--line);
+  padding-block: 0.6rem;
+}
+.mq-track {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+.mq-chunk {
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  font-weight: 850;
+  font-stretch: 120%;
+  font-optical-sizing: none;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+.mq-row--accent .mq-chunk {
+  color: var(--accent);
+  font-weight: 350;
+  font-stretch: 80%;
+}
+.section--marquee .caption {
+  margin-top: 3rem;
 }

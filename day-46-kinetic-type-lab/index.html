@@ -18,10 +18,70 @@
   </header>
 
   <main id="main">
-    <!-- Sections land here in the layout stage -->
+    <!-- 01 · HERO — cursor-proximity variable weight/width -->
     <section class="section" id="hero" data-label="01 — HERO">
-      <h1 class="hero-word">KINETIC</h1>
+      <h1 class="hero-word" aria-label="KINETIC">KINETIC</h1>
       <p class="hero-sub">Six experiments in weight, width, and velocity.</p>
+      <p class="caption">Roboto Flex variable — each letter&rsquo;s weight and width follows your pointer.</p>
+    </section>
+
+    <!-- 02 · SCATTER — SplitText 3D scatter on scroll -->
+    <section class="section" id="scatter" data-label="02 — SCATTER">
+      <div class="scatter-stage">
+        <p class="scatter-copy">
+          Letters like to pretend they are solid. Scroll, and the sentence you
+          are reading lets go — every character drifts off on its own vector,
+          tumbling through depth until the words are weather. Scroll back up
+          and the paragraph remembers itself, one glyph at a time.
+        </p>
+        <p class="caption">GSAP SplitText — one paragraph, scattered and reassembled by scroll position.</p>
+      </div>
+    </section>
+
+    <!-- 03 · WAVE — sentence on a sine path -->
+    <section class="section" id="wave" data-label="03 — WAVE">
+      <svg class="wave-svg" viewBox="0 0 2400 600" preserveAspectRatio="xMidYMid meet"
+           role="img" aria-label="Type flows where the current pulls it — a sentence riding a sine wave.">
+        <path id="wavePath" fill="none" stroke="none"
+              d="M 0 300 Q 150 180 300 300 T 600 300 T 900 300 T 1200 300 T 1500 300 T 1800 300 T 2100 300 T 2400 300" />
+        <text class="wave-text">
+          <textPath id="waveTextPath" href="#wavePath" xlink:href="#wavePath" startOffset="0">
+            TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT —
+          </textPath>
+        </text>
+      </svg>
+      <p class="caption">SVG textPath — the wave&rsquo;s amplitude follows your pointer&rsquo;s height.</p>
+    </section>
+
+    <!-- 04 · ELASTIC — grab the word and fling it -->
+    <section class="section" id="elastic" data-label="04 — ELASTIC">
+      <h2 class="elastic-word" aria-label="STRETCH">STRETCH</h2>
+      <p class="caption">Draggable + elastic.out — grab the word, pull, and let go.</p>
+    </section>
+
+    <!-- 05 · WALL — distance-based ripple grid -->
+    <section class="section" id="wall" data-label="05 — WALL">
+      <div class="wall-grid" role="img" aria-label="The word KINETIC repeated as a type wall; weight ripples outward from your pointer."></div>
+      <p class="caption">Distance-based stagger — touch a cell and the weight ripples to its neighbours.</p>
+    </section>
+
+    <!-- 06 · MARQUEE — opposing loops with velocity skew -->
+    <section class="section section--marquee" id="marquee" data-label="06 — MARQUEE">
+      <div class="mq" aria-label="WEIGHT, WIDTH, VELOCITY — type in motion since day 46">
+        <div class="mq-row" data-dir="1">
+          <div class="mq-track">
+            <span class="mq-chunk">WEIGHT&nbsp;·&nbsp;WIDTH&nbsp;·&nbsp;VELOCITY&nbsp;·&nbsp;WEIGHT&nbsp;·&nbsp;WIDTH&nbsp;·&nbsp;VELOCITY&nbsp;·&nbsp;</span>
+            <span class="mq-chunk" aria-hidden="true">WEIGHT&nbsp;·&nbsp;WIDTH&nbsp;·&nbsp;VELOCITY&nbsp;·&nbsp;WEIGHT&nbsp;·&nbsp;WIDTH&nbsp;·&nbsp;VELOCITY&nbsp;·&nbsp;</span>
+          </div>
+        </div>
+        <div class="mq-row mq-row--accent" data-dir="-1">
+          <div class="mq-track">
+            <span class="mq-chunk">TYPE&nbsp;IN&nbsp;MOTION&nbsp;—&nbsp;SINCE&nbsp;DAY&nbsp;46&nbsp;—&nbsp;TYPE&nbsp;IN&nbsp;MOTION&nbsp;—&nbsp;SINCE&nbsp;DAY&nbsp;46&nbsp;—&nbsp;</span>
+            <span class="mq-chunk" aria-hidden="true">TYPE&nbsp;IN&nbsp;MOTION&nbsp;—&nbsp;SINCE&nbsp;DAY&nbsp;46&nbsp;—&nbsp;TYPE&nbsp;IN&nbsp;MOTION&nbsp;—&nbsp;SINCE&nbsp;DAY&nbsp;46&nbsp;—&nbsp;</span>
+          </div>
+        </div>
+      </div>
+      <p class="caption">Two opposing loops — hover to slow them; scroll velocity skews the line.</p>
     </section>
   </main>
 
