@@ -45,9 +45,9 @@
         <path id="wavePath" fill="none" stroke="none"
               d="M 0 300 Q 150 180 300 300 T 600 300 T 900 300 T 1200 300 T 1500 300 T 1800 300 T 2100 300 T 2400 300" />
         <text class="wave-text">
-          <textPath id="waveTextPath" href="#wavePath" xlink:href="#wavePath" startOffset="0">
-            TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT —
-          </textPath>
+          <!-- 4 repetitions: the loop shifts by one sentence, so the path
+               must stay covered at the most negative startOffset -->
+          <textPath id="waveTextPath" href="#wavePath" xlink:href="#wavePath" startOffset="0">TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT — TYPE FLOWS WHERE THE CURRENT PULLS IT — </textPath>
         </text>
       </svg>
       <p class="caption">SVG textPath — the wave&rsquo;s amplitude follows your pointer&rsquo;s height.</p>
