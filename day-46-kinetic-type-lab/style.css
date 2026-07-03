@@ -222,6 +222,10 @@ body {
   text-align: center;
   user-select: none;
   cursor: grab;
+  touch-action: none; /* the headline is a toy; the page scrolls fine around it */
+}
+.elastic-word .ltr {
+  display: inline-block;
 }
 .elastic-word:active {
   cursor: grabbing;

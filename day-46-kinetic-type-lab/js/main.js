@@ -16,6 +16,7 @@ import { buildWall } from "./wall.js";
 import { initHero } from "./hero.js";
 import { initScatter } from "./scatter.js";
 import { initWave } from "./wave.js";
+import { initElastic } from "./elastic.js";
 
 buildWall(document.querySelector(".wall-grid"));
 
@@ -37,6 +38,7 @@ mm.add(
     initHero(document.querySelector("#hero"));
     initScatter(document.querySelector("#scatter"), { coarse });
     initWave(document.querySelector("#wave"), { coarse });
+    initElastic(document.querySelector("#elastic"));
   }
 );
 
