@@ -2,6 +2,7 @@
 // boot: tabs, statusbar, engine start. Sources arrive per mode.
 
 import { settings, setSource, start, onStats } from './engine.js';
+import { demoSource } from './demo.js';
 
 const statusMode = document.getElementById('status-mode');
 const statusGrid = document.getElementById('status-grid');
@@ -40,26 +41,11 @@ export function toast(message) {
   toastTimer = setTimeout(() => el.classList.remove('is-visible'), 2200);
 }
 
-// --- temporary test card until the demo source lands ---
-// vertical gradient + a bright disc: proves the luminance→char mapping
-const card = document.createElement('canvas');
-card.width = 320;
-card.height = 180;
-const cctx = card.getContext('2d');
-const grad = cctx.createLinearGradient(0, 0, 320, 0);
-grad.addColorStop(0, '#000');
-grad.addColorStop(1, '#fff');
-cctx.fillStyle = grad;
-cctx.fillRect(0, 0, 320, 180);
-cctx.fillStyle = '#fff';
-cctx.beginPath();
-cctx.arc(160, 90, 55, 0, Math.PI * 2);
-cctx.fill();
+// demo is the default source, so the page is never empty
+setSource(demoSource);
 
-setSource({
-  drawable: card,
-  width: () => card.width,
-  height: () => card.height,
+document.addEventListener('modechange', ({ detail }) => {
+  if (detail.mode === 'demo') setSource(demoSource);
 });
 
 onStats(({ fps, cols, rows }) => {
