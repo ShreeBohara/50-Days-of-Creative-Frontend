@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASCII EVERYTHING — day 47</title>
+  <meta name="description" content="Real-time ASCII renderer — webcam, image, or demo scene rendered as live text. Day 47 of 50 Days of Creative Frontend." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preload" href="fonts/jetbrains-mono-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-colormode="green">
+
+  <div class="crt" id="crt-overlay" aria-hidden="true"></div>
+
+  <header class="masthead">
+    <pre class="ascii-title" id="ascii-title" aria-hidden="true"></pre>
+    <h1 class="masthead-h1">ASCII EVERYTHING</h1>
+    <p class="masthead-sub">
+      <span class="prompt-char" aria-hidden="true">$</span>
+      real-time signal-to-text converter
+      <span class="cursor-block" aria-hidden="true"></span>
+    </p>
+  </header>
+
+  <main class="console">
+
+    <section class="stage" aria-label="ASCII output">
+      <div class="stage-head">
+        <div class="tabs" role="tablist" aria-label="Input source">
+          <button class="tab" id="tab-webcam" role="tab" aria-selected="false" data-mode="webcam">[ WEBCAM ]</button>
+          <button class="tab" id="tab-image" role="tab" aria-selected="false" data-mode="image">[ IMAGE ]</button>
+          <button class="tab is-active" id="tab-demo" role="tab" aria-selected="true" data-mode="demo">[ DEMO ]</button>
+        </div>
+        <span class="stage-id">SIG-47//CRT</span>
+      </div>
+
+      <div class="screen" id="screen">
+        <canvas id="ascii-canvas" aria-label="Live ASCII rendering of the selected source"></canvas>
+
+        <div class="screen-notice" id="webcam-notice" hidden>
+          <p class="notice-title">// CAMERA ACCESS REQUIRED</p>
+          <p class="notice-body">This mode converts your webcam feed to text, locally. Nothing is uploaded, nothing leaves this page.</p>
+          <button class="btn btn-accent" id="webcam-enable">ENABLE CAMERA</button>
+          <p class="notice-error" id="webcam-error" hidden></p>
+        </div>
+
+        <div class="screen-notice" id="image-notice" hidden>
+          <p class="notice-title">// FEED ME AN IMAGE</p>
+          <p class="notice-body">Drop a file anywhere on the screen, or pick one.</p>
+          <button class="btn btn-accent" id="image-pick">SELECT FILE</button>
+          <input type="file" id="image-input" accept="image/*" hidden />
+        </div>
+
+        <div class="drop-flash" id="drop-flash" aria-hidden="true"><span>RELEASE TO CONVERT</span></div>
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="Controls">
+      <div class="panel-head">CONTROL // PANEL</div>
+
+      <section class="panel-group" id="group-ramp">
+        <h2 class="group-label">── RAMP ──</h2>
+        <div class="group-body" id="ramp-body"></div>
+      </section>
+
+      <section class="panel-group" id="group-signal">
+        <h2 class="group-label">── SIGNAL ──</h2>
+        <div class="group-body" id="signal-body"></div>
+      </section>
+
+      <section class="panel-group" id="group-color">
+        <h2 class="group-label">── PHOSPHOR ──</h2>
+        <div class="group-body" id="color-body"></div>
+      </section>
+
+      <section class="panel-group" id="group-fx">
+        <h2 class="group-label">── TUBE ──</h2>
+        <div class="group-body" id="fx-body"></div>
+      </section>
+
+      <section class="panel-group" id="group-export">
+        <h2 class="group-label">── EXPORT ──</h2>
+        <div class="group-body" id="export-body"></div>
+      </section>
+    </aside>
+
+  </main>
+
+  <footer class="statusbar" aria-label="Status">
+    <span class="status-cell" id="status-mode">MODE:DEMO</span>
+    <span class="status-cell" id="status-grid">--×--</span>
+    <span class="status-cell" id="status-fps">--FPS</span>
+    <span class="status-cell status-ramp" id="status-ramp"></span>
+    <a class="status-cell status-link" href="../">← day 47 / 50</a>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
