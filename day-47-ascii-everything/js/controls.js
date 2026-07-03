@@ -65,3 +65,37 @@ customInput.addEventListener('input', () => {
 });
 
 rampBody.append(chipRow, field('CUSTOM · dense→sparse', customInput));
+
+/* ── PHOSPHOR (color modes) ───────────────────────────── */
+// the page chrome retints with the phosphor: data-colormode swaps the
+// CSS custom properties, so the whole rig follows the screen
+
+const COLOR_MODES = [
+  { name: 'GREEN', mode: 'green' },
+  { name: 'AMBER', mode: 'amber' },
+  { name: 'WHITE', mode: 'white' },
+  { name: 'ORIGINAL', mode: 'original' },
+  { name: 'GAME BOY', mode: 'gameboy' },
+];
+
+const colorBody = document.getElementById('color-body');
+const colorRow = el('div', 'chip-row');
+
+COLOR_MODES.forEach((entry, i) => {
+  const chip = el('button', 'chip', entry.name);
+  chip.type = 'button';
+  chip.setAttribute('aria-pressed', String(i === 0));
+  if (i === 0) chip.classList.add('is-active');
+  chip.addEventListener('click', () => {
+    settings.colorMode = entry.mode;
+    // 'original' carries the source's own colors — chrome stays green
+    document.body.dataset.colormode = entry.mode === 'original' ? 'green' : entry.mode;
+    [...colorRow.children].forEach((other) => {
+      other.classList.toggle('is-active', other === chip);
+      other.setAttribute('aria-pressed', String(other === chip));
+    });
+  });
+  colorRow.appendChild(chip);
+});
+
+colorBody.append(colorRow);
