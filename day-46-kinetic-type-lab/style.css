@@ -159,13 +159,18 @@ body {
 
 /* ---------- 01 · Hero ---------- */
 .hero-word {
-  font-size: clamp(3.5rem, 17vw, 15rem);
-  font-weight: 350;
-  font-stretch: 100%;
+  font-size: clamp(3.5rem, 16vw, 15rem);
+  font-weight: 250;
+  font-stretch: 78%;
   font-optical-sizing: none;
   letter-spacing: 0.02em;
   line-height: 1;
   text-align: center;
+}
+.hero-word .ltr {
+  display: inline-block;
+  text-align: center;
+  contain: layout style;
 }
 .hero-sub {
   margin-top: 1.5rem;

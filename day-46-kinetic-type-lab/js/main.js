@@ -13,7 +13,16 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 document.fonts.ready.then(() => ScrollTrigger.refresh());
 
 import { buildWall } from "./wall.js";
+import { initHero } from "./hero.js";
 
 buildWall(document.querySelector(".wall-grid"));
+
+/* All kinetic behaviour lives inside matchMedia contexts so
+   prefers-reduced-motion users get the clean static specimen. */
+const mm = gsap.matchMedia();
+
+mm.add("(prefers-reduced-motion: no-preference)", () => {
+  initHero(document.querySelector("#hero"));
+});
 
 console.info(`Kinetic Typography Lab — GSAP ${gsap.version}`);

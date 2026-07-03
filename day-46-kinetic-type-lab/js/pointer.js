@@ -7,6 +7,7 @@ export const pointer = {
   y: window.innerHeight / 2,
   fine: window.matchMedia("(pointer: fine)").matches,
   moved: false, // stays false until the first real pointermove
+  lastMove: 0, // timestamp of the last move — lets sections fall back to idle motion
 };
 
 window.addEventListener(
@@ -15,6 +16,7 @@ window.addEventListener(
     pointer.x = e.clientX;
     pointer.y = e.clientY;
     pointer.moved = true;
+    pointer.lastMove = performance.now();
   },
   { passive: true }
 );
