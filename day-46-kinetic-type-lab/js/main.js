@@ -18,6 +18,7 @@ import { initScatter } from "./scatter.js";
 import { initWave } from "./wave.js";
 import { initElastic } from "./elastic.js";
 import { initMarquee } from "./marquee.js";
+import { initCursor } from "./cursor.js";
 
 const wallGrid = document.querySelector(".wall-grid");
 const wallCells = buildWall(wallGrid);
@@ -43,6 +44,29 @@ mm.add(
     initElastic(document.querySelector("#elastic"));
     initWallRipple(wallGrid, wallCells);
     initMarquee(document.querySelector("#marquee"));
+    initCursor();
+
+    /* Quiet entrances for the caption lines — one trigger each,
+       nothing continuous. */
+    document.querySelectorAll(".caption").forEach((el) => {
+      gsap.from(el, {
+        autoAlpha: 0,
+        y: 14,
+        duration: 0.7,
+        ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 88%" },
+      });
+    });
+
+    /* Hero chrome settles in on load */
+    gsap.from(".hero-sub, .site-head", {
+      autoAlpha: 0,
+      y: 10,
+      duration: 0.9,
+      ease: "power2.out",
+      stagger: 0.12,
+      delay: 0.15,
+    });
   }
 );
 
