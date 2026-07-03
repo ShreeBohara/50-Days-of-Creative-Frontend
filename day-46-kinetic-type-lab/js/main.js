@@ -12,13 +12,14 @@ ScrollTrigger.config({ ignoreMobileResize: true });
    are wrong; re-measure once the real fonts are in. */
 document.fonts.ready.then(() => ScrollTrigger.refresh());
 
-import { buildWall } from "./wall.js";
+import { buildWall, initWallRipple } from "./wall.js";
 import { initHero } from "./hero.js";
 import { initScatter } from "./scatter.js";
 import { initWave } from "./wave.js";
 import { initElastic } from "./elastic.js";
 
-buildWall(document.querySelector(".wall-grid"));
+const wallGrid = document.querySelector(".wall-grid");
+const wallCells = buildWall(wallGrid);
 
 /* All kinetic behaviour lives inside matchMedia contexts so
    prefers-reduced-motion users get the clean static specimen.
@@ -39,6 +40,7 @@ mm.add(
     initScatter(document.querySelector("#scatter"), { coarse });
     initWave(document.querySelector("#wave"), { coarse });
     initElastic(document.querySelector("#elastic"));
+    initWallRipple(wallGrid, wallCells);
   }
 );
 
