@@ -63,5 +63,10 @@ import('./imageMode.js');
 import('./controls.js');
 import('./exportTools.js');
 
-// wait for the mono font so glyph metrics are right from the first frame
-document.fonts.ready.then(start);
+// wait for the mono font so glyph metrics are right from the first frame,
+// then start the loop and grow the masthead out of its own hidden canvas
+document.fonts.ready.then(async () => {
+  start();
+  const { generateTitle } = await import('./title.js');
+  generateTitle();
+});

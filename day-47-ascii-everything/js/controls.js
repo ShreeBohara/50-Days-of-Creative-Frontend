@@ -150,3 +150,19 @@ invertBtn.addEventListener('click', () => {
   invertBtn.setAttribute('aria-pressed', String(settings.invert));
 });
 signalBody.append(invertBtn);
+
+/* ── TUBE (CRT overlay) ───────────────────────────────── */
+
+const fxBody = document.getElementById('fx-body');
+const crtOverlay = document.getElementById('crt-overlay');
+
+const crtBtn = el('button', 'toggle-btn', 'SCANLINES: OFF');
+crtBtn.type = 'button';
+crtBtn.setAttribute('aria-pressed', 'false');
+crtBtn.addEventListener('click', () => {
+  const on = crtOverlay.classList.toggle('is-on');
+  crtBtn.textContent = `SCANLINES: ${on ? 'ON' : 'OFF'}`;
+  crtBtn.classList.toggle('is-on', on);
+  crtBtn.setAttribute('aria-pressed', String(on));
+});
+fxBody.append(crtBtn);

@@ -112,7 +112,9 @@ button {
 }
 
 .ascii-title {
-  font-size: 9px;
+  /* 150 columns × 0.6em advance must fit the viewport minus padding
+     (÷93 instead of the exact ÷90 leaves rounding headroom) */
+  font-size: clamp(3px, calc((100vw - 48px) / 93), 9px);
   line-height: 1.05;
   letter-spacing: 0;
   color: var(--accent);
