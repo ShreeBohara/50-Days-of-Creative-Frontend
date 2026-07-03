@@ -41,6 +41,9 @@ export function toast(message) {
   toastTimer = setTimeout(() => el.classList.remove('is-visible'), 2200);
 }
 
+// smaller screens start at a friendlier density (still adjustable)
+if (window.innerWidth < 600) settings.cols = 90;
+
 // demo is the default source, so the page is never empty
 setSource(demoSource);
 

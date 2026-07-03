@@ -26,7 +26,11 @@ function blobPos(blob, t) {
   };
 }
 
+// reduced motion: hold a fixed, composed moment instead of animating
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 function tick(t) {
+  if (reducedMotion.matches) t = 42000;
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
