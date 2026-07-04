@@ -341,6 +341,133 @@ a { color: inherit; }
 
 .controls-body { padding: 14px; }
 
+.field { margin-bottom: 16px; }
+
+.field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+
+/* selects — flat chips with a hard shadow and a drawn caret */
+.select-wrap {
+  position: relative;
+  box-shadow: var(--shadow-chip);
+}
+
+.select-wrap select {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  font: 600 12px/1.2 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -3px;
+  border: 5px solid transparent;
+  border-top: 7px solid var(--ink);
+  pointer-events: none;
+}
+
+/* live palette swatches */
+.swatch-strip {
+  display: flex;
+  height: 16px;
+  margin-top: 8px;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+}
+
+.swatch { flex: 1; }
+
+.swatch + .swatch { border-left: 1px solid var(--ink); }
+
+/* custom palette picker */
+.custom-box { display: none; }
+
+.custom-box.is-open { display: block; margin-top: 8px; }
+
+.custom-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.custom-chip {
+  position: relative;
+  display: inline-flex;
+}
+
+.custom-color {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-chip);
+}
+
+.custom-color::-webkit-color-swatch-wrapper { padding: 2px; }
+.custom-color::-webkit-color-swatch { border: none; }
+
+.chip-del {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  font: 600 10px/1 var(--mono);
+  color: var(--accent-text);
+  background: var(--accent);
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* generic pressable chip button */
+.btn {
+  padding: 8px 12px;
+  font: 600 11px/1.2 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  box-shadow: var(--shadow-chip);
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
 /* ---- page footer --------------------------------------------------------------- */
 
 .page-foot {

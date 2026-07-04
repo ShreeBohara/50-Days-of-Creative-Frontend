@@ -4,14 +4,10 @@
 import { drawSampleScene } from "./sample.js";
 import { runPipeline } from "./pipeline.js";
 import { DITHERERS } from "./ditherers.js";
+import { PALETTES, resolvePalette } from "./palettes.js";
+import { buildControls } from "./controls.js";
 
 const MAX_SOURCE = 1600; // cap uploads so error diffusion stays instant
-
-// Temporary palette table until the full palette module lands.
-const PALETTES = {
-  "1-bit": [[23, 19, 11], [247, 243, 232]],
-  gameboy: [[15, 56, 15], [48, 98, 48], [139, 172, 15], [155, 188, 15]],
-};
 
 const state = {
   source: null,          // HTMLCanvasElement holding the (capped) source image
@@ -25,6 +21,7 @@ const state = {
   serpentine: true,
   crt: false,
   split: 0.5,            // comparison divider position, 0..1
+  customColors: ["#17130b", "#9d3a1c", "#f7f3e8"],
 };
 
 const stage = document.getElementById("stage");
@@ -98,7 +95,7 @@ function render() {
     grayscale: state.grayscale,
     brightness: state.brightness,
     contrast: state.contrast,
-    palette: PALETTES[state.palette] || PALETTES["1-bit"],
+    palette: resolvePalette(state),
     serpentine: state.serpentine,
     ditherFn: ditherer.draw ? null : ditherer.fn,
     drawFn: ditherer.draw ? ditherer.fn : null,
@@ -108,12 +105,14 @@ function render() {
   canvasProcessed.getContext("2d").drawImage(out, 0, 0);
 
   ticket.algo.textContent = ditherer.label;
-  ticket.palette.textContent = state.palette;
+  ticket.palette.textContent = (PALETTES[state.palette] || PALETTES["1-bit"]).label;
   ticket.px.textContent = `px ${state.pixelSize}`;
   ticket.size.textContent = `${src.width}×${src.height} — ${state.sourceName}`;
 }
 
 // ---- boot ---------------------------------------------------------------------
+
+buildControls(document.getElementById("controls-body"), state, requestRender);
 
 const sample = drawSampleScene();
 setSource(sample, sample.width, sample.height, "sample scene");
