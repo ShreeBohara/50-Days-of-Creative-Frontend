@@ -2,8 +2,15 @@
 // processing pipeline, algorithms and controls plug in around this.
 
 import { drawSampleScene } from "./sample.js";
+import { runPipeline } from "./pipeline.js";
 
 const MAX_SOURCE = 1600; // cap uploads so error diffusion stays instant
+
+// Temporary palette table until the full palette module lands.
+const PALETTES = {
+  "1-bit": [[23, 19, 11], [247, 243, 232]],
+  gameboy: [[15, 56, 15], [48, 98, 48], [139, 172, 15], [155, 188, 15]],
+};
 
 const state = {
   source: null,          // HTMLCanvasElement holding the (capped) source image
@@ -23,7 +30,12 @@ const stage = document.getElementById("stage");
 const stack = document.getElementById("stack");
 const canvasOriginal = document.getElementById("canvas-original");
 const canvasProcessed = document.getElementById("canvas-processed");
-const ticketSize = document.getElementById("ticket-size");
+const ticket = {
+  algo: document.getElementById("ticket-algo"),
+  palette: document.getElementById("ticket-palette"),
+  px: document.getElementById("ticket-px"),
+  size: document.getElementById("ticket-size"),
+};
 
 // ---- source handling --------------------------------------------------------
 
@@ -79,12 +91,23 @@ function render() {
   canvasOriginal.height = src.height;
   canvasOriginal.getContext("2d").drawImage(src, 0, 0);
 
-  // Processing pipeline lands next — until then the output mirrors the source.
-  canvasProcessed.width = src.width;
-  canvasProcessed.height = src.height;
-  canvasProcessed.getContext("2d").drawImage(src, 0, 0);
+  const out = runPipeline(src, {
+    pixelSize: state.pixelSize,
+    grayscale: state.grayscale,
+    brightness: state.brightness,
+    contrast: state.contrast,
+    palette: PALETTES[state.palette] || PALETTES["1-bit"],
+    serpentine: state.serpentine,
+    ditherFn: null, // dithering algorithms plug in here
+  });
+  canvasProcessed.width = out.width;
+  canvasProcessed.height = out.height;
+  canvasProcessed.getContext("2d").drawImage(out, 0, 0);
 
-  ticketSize.textContent = `${src.width}×${src.height} — ${state.sourceName}`;
+  ticket.algo.textContent = state.algorithm;
+  ticket.palette.textContent = state.palette;
+  ticket.px.textContent = `px ${state.pixelSize}`;
+  ticket.size.textContent = `${src.width}×${src.height} — ${state.sourceName}`;
 }
 
 // ---- boot ---------------------------------------------------------------------
