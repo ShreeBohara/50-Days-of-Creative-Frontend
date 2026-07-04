@@ -143,6 +143,84 @@ export function bayer8(img, palette) {
   orderedDither(img, palette, BAYER_8);
 }
 
+// ---- simple threshold ------------------------------------------------------------
+// The bluntest instrument: luminance against a hard 50% cut between the
+// palette's darkest and lightest colors. What fax machines saw.
+
+const luma = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+
+function paletteByLuma(palette) {
+  return [...palette].sort((a, b) => luma(...a) - luma(...b));
+}
+
+export function threshold(img, palette) {
+  const d = img.data;
+  const sorted = paletteByLuma(palette);
+  const dark = sorted[0];
+  const light = sorted[sorted.length - 1];
+  for (let i = 0; i < d.length; i += 4) {
+    const p = luma(d[i], d[i + 1], d[i + 2]) >= 128 ? light : dark;
+    d[i] = p[0]; d[i + 1] = p[1]; d[i + 2] = p[2];
+  }
+}
+
+// ---- halftone --------------------------------------------------------------------
+// Newspaper screening: the image becomes a brick-offset grid of ink dots on
+// the palette's lightest color, dot radius driven by cell darkness and dot
+// color picked from the palette. This one paints the output canvas itself.
+
+export function halftone(img, palette, out, px) {
+  const w = img.width;
+  const h = img.height;
+  const d = img.data;
+  const ctx = out.getContext("2d");
+
+  const sorted = paletteByLuma(palette);
+  const paper = sorted[sorted.length - 1];
+  const inks = sorted.length > 1 ? sorted.slice(0, -1) : sorted;
+
+  ctx.fillStyle = `rgb(${paper[0]}, ${paper[1]}, ${paper[2]})`;
+  ctx.fillRect(0, 0, out.width, out.height);
+
+  // cell size in small-image pixels; scales with pixel size so the slider
+  // reads as "dot size" here
+  const cell = 2;
+  const cellOut = cell * px;
+  const maxR = (cellOut / 2) * 1.25; // slight overlap lets shadows go solid
+
+  for (let cy = 0; cy < h; cy += cell) {
+    const brickShift = ((cy / cell) & 1) === 1 ? cell / 2 : 0;
+    for (let cx = -cell; cx < w + cell; cx += cell) {
+      // average the cell (brick rows sample half a cell to the left)
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let y = cy; y < Math.min(cy + cell, h); y++) {
+        for (let x = Math.max(0, cx + brickShift); x < Math.min(cx + brickShift + cell, w); x++) {
+          const i = (y * w + Math.floor(x)) * 4;
+          r += d[i]; g += d[i + 1]; b += d[i + 2]; n++;
+        }
+      }
+      if (n === 0) continue;
+      r /= n; g /= n; b /= n;
+
+      const darkness = 1 - luma(r, g, b) / 255;
+      const radius = maxR * Math.sqrt(darkness); // sqrt: area ∝ darkness
+      if (radius < 0.35) continue;
+
+      const ink = nearestColor(r, g, b, inks);
+      ctx.fillStyle = `rgb(${ink[0]}, ${ink[1]}, ${ink[2]})`;
+      ctx.beginPath();
+      ctx.arc(
+        (cx + brickShift + cell / 2) * px,
+        (cy + cell / 2) * px,
+        radius,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+  }
+}
+
 // ---- registry ------------------------------------------------------------------
 // label: ticket/UI text · diffusion: true → serpentine toggle applies
 
@@ -151,5 +229,7 @@ export const DITHERERS = {
   atkinson: { label: "atkinson", fn: atkinson, diffusion: true },
   "bayer-4": { label: "bayer 4×4", fn: bayer4, diffusion: false },
   "bayer-8": { label: "bayer 8×8", fn: bayer8, diffusion: false },
+  halftone: { label: "halftone", fn: halftone, diffusion: false, draw: true },
+  threshold: { label: "threshold 1-bit", fn: threshold, diffusion: false },
   none: { label: "no dither", fn: quantizeNearest, diffusion: false },
 };

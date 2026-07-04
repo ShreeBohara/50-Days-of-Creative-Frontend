@@ -75,6 +75,17 @@ export function runPipeline(source, opts) {
   // 2 + 3. pixel work on ImageData
   const img = sctx.getImageData(0, 0, w, h);
   adjust(img, opts);
+
+  // "draw" algorithms (halftone) paint the upscaled output themselves
+  // instead of quantizing pixels
+  if (opts.drawFn) {
+    const out = document.createElement("canvas");
+    out.width = w * px;
+    out.height = h * px;
+    opts.drawFn(img, opts.palette, out, px, opts);
+    return out;
+  }
+
   if (opts.ditherFn) {
     opts.ditherFn(img, opts.palette, opts);
   } else {

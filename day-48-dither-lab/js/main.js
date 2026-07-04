@@ -100,7 +100,8 @@ function render() {
     contrast: state.contrast,
     palette: PALETTES[state.palette] || PALETTES["1-bit"],
     serpentine: state.serpentine,
-    ditherFn: ditherer.fn,
+    ditherFn: ditherer.draw ? null : ditherer.fn,
+    drawFn: ditherer.draw ? ditherer.fn : null,
   });
   canvasProcessed.width = out.width;
   canvasProcessed.height = out.height;
