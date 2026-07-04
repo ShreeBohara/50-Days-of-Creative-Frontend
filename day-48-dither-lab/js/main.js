@@ -3,6 +3,7 @@
 
 import { drawSampleScene } from "./sample.js";
 import { runPipeline } from "./pipeline.js";
+import { DITHERERS } from "./ditherers.js";
 
 const MAX_SOURCE = 1600; // cap uploads so error diffusion stays instant
 
@@ -91,6 +92,7 @@ function render() {
   canvasOriginal.height = src.height;
   canvasOriginal.getContext("2d").drawImage(src, 0, 0);
 
+  const ditherer = DITHERERS[state.algorithm] || DITHERERS.none;
   const out = runPipeline(src, {
     pixelSize: state.pixelSize,
     grayscale: state.grayscale,
@@ -98,13 +100,13 @@ function render() {
     contrast: state.contrast,
     palette: PALETTES[state.palette] || PALETTES["1-bit"],
     serpentine: state.serpentine,
-    ditherFn: null, // dithering algorithms plug in here
+    ditherFn: ditherer.fn,
   });
   canvasProcessed.width = out.width;
   canvasProcessed.height = out.height;
   canvasProcessed.getContext("2d").drawImage(out, 0, 0);
 
-  ticket.algo.textContent = state.algorithm;
+  ticket.algo.textContent = ditherer.label;
   ticket.palette.textContent = state.palette;
   ticket.px.textContent = `px ${state.pixelSize}`;
   ticket.size.textContent = `${src.width}×${src.height} — ${state.sourceName}`;
