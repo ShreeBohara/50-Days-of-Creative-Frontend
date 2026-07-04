@@ -58,11 +58,24 @@ export function setSource(drawable, w, h, name) {
 function fitStack() {
   if (!state.source) return;
   const pad = 2; // stack border
-  const box = stage.getBoundingClientRect();
+  stage.style.height = ""; // measure with the stylesheet height first
   const cs = getComputedStyle(stage);
-  const availW = box.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - pad * 2;
-  const availH = box.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - pad * 2;
+  const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  const box = stage.getBoundingClientRect();
   const ar = state.source.width / state.source.height;
+  const availW = box.width - padX - pad * 2;
+
+  // small screens: the stage hugs the image instead of a fixed viewport slice
+  if (window.matchMedia("(max-width: 760px)").matches) {
+    const h = availW / ar;
+    stack.style.width = `${Math.floor(availW)}px`;
+    stack.style.height = `${Math.floor(h)}px`;
+    stage.style.height = `${Math.ceil(h + padY + pad * 2)}px`;
+    return;
+  }
+
+  const availH = box.height - padY - pad * 2;
   let w = availW;
   let h = w / ar;
   if (h > availH) { h = availH; w = h * ar; }
