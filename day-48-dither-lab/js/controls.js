@@ -5,6 +5,7 @@
 
 import { PALETTES, resolvePalette, applyAccent, rgbToHex } from "./palettes.js";
 import { DITHERERS } from "./ditherers.js";
+import { exportPNG } from "./exportTools.js";
 
 // tiny DOM helper: el("div", "class-name", { attr: value })
 function el(tag, className, attrs) {
@@ -294,6 +295,12 @@ export function buildControls(container, state, hooks) {
     update();
   });
   container.appendChild(randomBtn);
+
+  // -- export ---------------------------------------------------------------------------
+  const exportBtn = el("button", "btn btn-block btn-export", { type: "button" });
+  exportBtn.textContent = "⇩ download png";
+  exportBtn.addEventListener("click", () => exportPNG(state));
+  container.appendChild(exportBtn);
 
   // initial sync
   applyAccent(resolvePalette(state));
