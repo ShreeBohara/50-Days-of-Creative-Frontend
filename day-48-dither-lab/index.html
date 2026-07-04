@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DITHER LAB — day 48</title>
+  <meta name="description" content="Retro dithering image tool — Floyd–Steinberg, Atkinson, Bayer and halftone with Game Boy, CGA and amber palettes, plus a CRT pass. Day 48 of 50 Days of Creative Frontend." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preload" href="fonts/doto-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="masthead">
+    <p class="mast-kicker">50 days of creative frontend &middot; no. 48 &middot; est. 1984</p>
+    <h1 class="mast-title">DITHER LAB</h1>
+    <p class="mast-sub">
+      A one-hour photo lab for the 1-bit era. Drop in any picture and print it
+      through real error-diffusion and ordered-dither algorithms &mdash; Game Boy
+      greens, CGA neon, amber phosphor and honest black &amp; white.
+    </p>
+  </header>
+
+  <main class="bench">
+
+    <section class="panel viewer-panel" aria-label="Image darkroom">
+      <header class="panel-bar">
+        <span class="panel-dot" aria-hidden="true"></span>
+        <h2 class="panel-title">Darkroom</h2>
+        <span class="panel-hint">drag the seam to compare</span>
+      </header>
+
+      <div class="stage" id="stage">
+        <div class="stack" id="stack">
+          <canvas id="canvas-processed"></canvas>
+          <div class="original-clip" id="original-clip">
+            <canvas id="canvas-original"></canvas>
+          </div>
+          <div class="divider" id="divider" role="separator" aria-label="Comparison divider"
+               aria-orientation="vertical" tabindex="0">
+            <span class="divider-grip" aria-hidden="true"></span>
+          </div>
+          <span class="stage-tag tag-a" aria-hidden="true">ORIGINAL</span>
+          <span class="stage-tag tag-b" aria-hidden="true">DITHERED</span>
+        </div>
+      </div>
+
+      <footer class="ticket" id="ticket" aria-live="polite">
+        <span class="ticket-cell" id="ticket-algo">floyd&ndash;steinberg</span>
+        <span class="ticket-cell" id="ticket-palette">game boy</span>
+        <span class="ticket-cell" id="ticket-px">px 2</span>
+        <span class="ticket-cell" id="ticket-size">&mdash;</span>
+      </footer>
+    </section>
+
+    <aside class="panel controls-panel" aria-label="Controls">
+      <header class="panel-bar">
+        <span class="panel-dot" aria-hidden="true"></span>
+        <h2 class="panel-title">Job ticket</h2>
+      </header>
+      <div class="controls-body" id="controls-body"></div>
+    </aside>
+
+  </main>
+
+  <footer class="page-foot">
+    <span class="foot-cell">day 48 / 50 &mdash; dither lab</span>
+    <a class="foot-cell foot-link" href="../">&larr; all days</a>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
