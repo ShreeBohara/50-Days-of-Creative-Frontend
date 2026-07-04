@@ -68,10 +68,88 @@ export function floydSteinberg(img, palette, opts) {
   errorDiffuse(img, palette, FLOYD_STEINBERG, opts);
 }
 
+// Atkinson (Bill Atkinson, original Macintosh / MacPaint) — spreads only 6/8
+// of the error, letting highlights blow out and shadows crush. That lost
+// error is exactly what gives old Mac images their signature airy contrast.
+const ATKINSON = [
+  [1, 0, 1 / 8],
+  [2, 0, 1 / 8],
+  [-1, 1, 1 / 8],
+  [0, 1, 1 / 8],
+  [1, 1, 1 / 8],
+  [0, 2, 1 / 8],
+];
+
+export function atkinson(img, palette, opts) {
+  errorDiffuse(img, palette, ATKINSON, opts);
+}
+
+// ---- ordered (Bayer) dithering --------------------------------------------------
+// No error travels anywhere: each pixel is nudged up or down by a fixed
+// threshold from a tiled matrix, then quantized. Produces the crosshatch
+// texture burned into everyone's memory of early PC graphics.
+
+const BAYER_4 = [
+  [0, 8, 2, 10],
+  [12, 4, 14, 6],
+  [3, 11, 1, 9],
+  [15, 7, 13, 5],
+];
+
+// The 8×8 matrix is generated from the 4×4 by the standard recursive rule:
+// M2n = [[4M, 4M+2], [4M+3, 4M+1]]
+const BAYER_8 = (() => {
+  const m = [];
+  for (let y = 0; y < 8; y++) {
+    m.push([]);
+    for (let x = 0; x < 8; x++) {
+      const q = BAYER_4[y % 4][x % 4] * 4;
+      m[y].push(q + (y < 4 ? (x < 4 ? 0 : 2) : x < 4 ? 3 : 1));
+    }
+  }
+  return m;
+})();
+
+function orderedDither(img, palette, matrix) {
+  const w = img.width;
+  const h = img.height;
+  const d = img.data;
+  const n = matrix.length;
+  const levels = n * n;
+  // Strength scales with how far apart the palette shades sit, roughly the
+  // spacing of a gray ramp with palette.length stops.
+  const spread = 255 / Math.max(2, palette.length);
+  for (let y = 0; y < h; y++) {
+    const row = matrix[y % n];
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const t = ((row[x % n] + 0.5) / levels - 0.5) * spread;
+      const p = nearestColor(
+        clamp255(d[i] + t),
+        clamp255(d[i + 1] + t),
+        clamp255(d[i + 2] + t),
+        palette
+      );
+      d[i] = p[0]; d[i + 1] = p[1]; d[i + 2] = p[2];
+    }
+  }
+}
+
+export function bayer4(img, palette) {
+  orderedDither(img, palette, BAYER_4);
+}
+
+export function bayer8(img, palette) {
+  orderedDither(img, palette, BAYER_8);
+}
+
 // ---- registry ------------------------------------------------------------------
 // label: ticket/UI text · diffusion: true → serpentine toggle applies
 
 export const DITHERERS = {
   "floyd-steinberg": { label: "floyd–steinberg", fn: floydSteinberg, diffusion: true },
+  atkinson: { label: "atkinson", fn: atkinson, diffusion: true },
+  "bayer-4": { label: "bayer 4×4", fn: bayer4, diffusion: false },
+  "bayer-8": { label: "bayer 8×8", fn: bayer8, diffusion: false },
   none: { label: "no dither", fn: quantizeNearest, diffusion: false },
 };
