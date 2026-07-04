@@ -7,6 +7,7 @@ import { DITHERERS } from "./ditherers.js";
 import { PALETTES, resolvePalette } from "./palettes.js";
 import { buildControls } from "./controls.js";
 import { initCompare } from "./compare.js";
+import { applyCRT } from "./crt.js";
 
 const MAX_SOURCE = 1600; // cap uploads so error diffusion stays instant
 
@@ -104,6 +105,7 @@ function render() {
   canvasProcessed.width = out.width;
   canvasProcessed.height = out.height;
   canvasProcessed.getContext("2d").drawImage(out, 0, 0);
+  if (state.crt) applyCRT(canvasProcessed);
 
   ticket.algo.textContent = ditherer.label;
   ticket.palette.textContent = (PALETTES[state.palette] || PALETTES["1-bit"]).label;
