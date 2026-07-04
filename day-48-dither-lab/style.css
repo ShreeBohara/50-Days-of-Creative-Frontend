@@ -293,6 +293,14 @@ a { color: inherit; }
   box-shadow: var(--shadow-chip);
 }
 
+.stack.is-dragging { cursor: ew-resize; }
+
+.stack.is-dragging .divider-grip,
+.divider:hover .divider-grip {
+  background-image: none;
+  background-color: var(--accent);
+}
+
 .stage-tag {
   position: absolute;
   top: 10px;
