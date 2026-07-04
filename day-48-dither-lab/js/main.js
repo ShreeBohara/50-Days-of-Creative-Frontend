@@ -113,9 +113,39 @@ function render() {
   ticket.size.textContent = `${src.width}×${src.height} — ${state.sourceName}`;
 }
 
+// ---- uploads --------------------------------------------------------------------
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    setSource(img, img.naturalWidth, img.naturalHeight, file.name.toLowerCase());
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+// the whole page is a drop target
+window.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  document.body.classList.add("is-dropping");
+});
+window.addEventListener("dragleave", (e) => {
+  if (!e.relatedTarget) document.body.classList.remove("is-dropping");
+});
+window.addEventListener("drop", (e) => {
+  e.preventDefault();
+  document.body.classList.remove("is-dropping");
+  if (e.dataTransfer && e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+});
+
 // ---- boot ---------------------------------------------------------------------
 
-buildControls(document.getElementById("controls-body"), state, requestRender);
+buildControls(document.getElementById("controls-body"), state, {
+  onChange: requestRender,
+  loadFile,
+});
 initCompare(stack, document.getElementById("divider"), state);
 
 const sample = drawSampleScene();
