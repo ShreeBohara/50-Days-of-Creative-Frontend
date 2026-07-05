@@ -6,6 +6,18 @@
   <title>DITHER LAB — day 48</title>
   <meta name="description" content="Retro dithering image tool — Floyd–Steinberg, Atkinson, Bayer and halftone with Game Boy, CGA and amber palettes, plus a CRT pass. Day 48 of 50 Days of Creative Frontend." />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <script>
+    // set the print mode before first paint so there is no flash of the
+    // wrong theme; theme.js takes over once the app boots
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("dither-lab-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
   <link rel="preload" href="fonts/doto-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="style.css" />
@@ -13,6 +25,11 @@
 <body>
 
   <header class="masthead">
+    <button class="neg-toggle" id="neg-toggle" type="button" aria-pressed="false"
+            title="Flip between positive and negative print (dark mode)">
+      <span class="neg-swatch" aria-hidden="true"></span>
+      print: <span class="neg-label">positive</span>
+    </button>
     <p class="mast-kicker">50 days of creative frontend &middot; no. 48 &middot; est. 1984</p>
     <h1 class="mast-title">DITHER LAB</h1>
     <p class="mast-sub">

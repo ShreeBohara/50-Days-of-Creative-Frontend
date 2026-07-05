@@ -8,6 +8,7 @@ import { PALETTES, resolvePalette } from "./palettes.js";
 import { buildControls } from "./controls.js";
 import { initCompare } from "./compare.js";
 import { applyCRT } from "./crt.js";
+import { initTheme } from "./theme.js";
 
 const MAX_SOURCE = 1600; // cap uploads so error diffusion stays instant
 
@@ -160,6 +161,7 @@ buildControls(document.getElementById("controls-body"), state, {
   loadFile,
 });
 initCompare(stack, document.getElementById("divider"), state);
+initTheme(document.getElementById("neg-toggle"));
 
 const sample = drawSampleScene();
 setSource(sample, sample.width, sample.height, "sample scene");

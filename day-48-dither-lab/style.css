@@ -31,6 +31,8 @@
 /* ---- tokens -------------------------------------------------------------- */
 
 :root {
+  color-scheme: light;
+
   --paper: #efeadd;
   --paper-lift: #f7f3e8;
   --paper-deep: #e3dcc7;
@@ -38,6 +40,10 @@
   --ink-soft: #57503d;
   --accent: #9d3a1c;      /* overwritten from js to match the active palette */
   --accent-text: #f7f3e8; /* readable text on top of --accent */
+
+  /* darkroom stage mat (kept dark in both print modes) */
+  --stage-mat: #17130b;
+  --stage-dot: rgba(239, 234, 221, 0.14);
 
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --dot: "Doto", var(--mono);
@@ -48,6 +54,21 @@
 
   /* 50% checkerboard — the dither texture the whole page wears */
   --checker: repeating-conic-gradient(var(--ink) 0% 25%, transparent 0% 50%);
+}
+
+/* "negative print" — dark mode as a film negative: ink and paper swap,
+   the accent keeps following the active palette */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #16120b;
+  --paper-lift: #1f1a11;
+  --paper-deep: #2b2517;
+  --ink: #ece5d1;
+  --ink-soft: #a89d80;
+
+  --stage-mat: #0b0906;
+  --stage-dot: rgba(236, 229, 209, 0.09);
 }
 
 /* ---- base ---------------------------------------------------------------- */
@@ -153,6 +174,49 @@ a { color: inherit; }
   z-index: 1;
 }
 
+/* ---- negative-print (dark mode) toggle ------------------------------------ */
+
+.neg-toggle {
+  position: absolute;
+  top: clamp(20px, 3vw, 34px);
+  right: clamp(16px, 4vw, 48px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  font: 600 10px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  background: var(--paper-lift);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  box-shadow: var(--shadow-chip);
+  cursor: pointer;
+}
+
+.neg-toggle:hover {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.neg-toggle:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* half-flipped square: the film-negative pictogram */
+.neg-swatch {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border: 1.5px solid var(--ink);
+  background: linear-gradient(135deg, var(--ink) 0 50%, var(--paper) 50% 100%);
+}
+
+.neg-toggle:hover .neg-swatch { border-color: currentColor; }
+
 /* ---- bench layout --------------------------------------------------------- */
 
 .bench {
@@ -222,9 +286,9 @@ a { color: inherit; }
 .stage {
   height: min(64vh, 620px);
   padding: clamp(10px, 1.6vw, 20px);
-  background-color: var(--ink);
+  background-color: var(--stage-mat);
   /* faint paper dot grid on the dark stage mat */
-  background-image: radial-gradient(rgba(239, 234, 221, 0.14) 1px, transparent 1.5px);
+  background-image: radial-gradient(var(--stage-dot) 1px, transparent 1.5px);
   background-size: 18px 18px;
   display: grid;
   place-items: center;
@@ -687,6 +751,12 @@ input[type="range"].slider::-moz-range-thumb {
 
 @media (max-width: 760px) {
   body { font-size: 13px; }
+
+  /* the print-mode toggle joins the flow so it never sits on the kicker */
+  .neg-toggle {
+    position: static;
+    margin-bottom: 14px;
+  }
 
   /* height is set from JS to hug the image on small screens */
   .stage { height: auto; }
