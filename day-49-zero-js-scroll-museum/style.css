@@ -444,6 +444,82 @@ a:hover {
   }
 }
 
+/* --- Exhibit 04 · The Counterweights -------------------------------------------------------
+   Three catalogue columns. The section carries a named view() timeline;
+   the outer columns ride it in reverse, drifting downward while the page
+   climbs. The centre column stays in normal flow. */
+
+.counter__stage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 3vw, 2.5rem);
+  overflow: clip;
+  padding-block: clamp(2rem, 6vh, 4rem);
+}
+
+.counter__col {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  align-content: start;
+}
+
+.counter__card {
+  margin: 0;
+  padding: 1.2rem 1.25rem 1.3rem;
+  border: 1px solid var(--line);
+  background: var(--mat);
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 420;
+  font-size: clamp(1rem, 2.4vw, 1.5rem);
+  line-height: 1.2;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.counter__card--mid {
+  border-color: color-mix(in oklab, var(--ink) 38%, var(--line));
+  color: var(--ink);
+}
+
+.counter__cat {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 0.62rem;
+  font-weight: 540;
+  font-stretch: 115%;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.counter__card--mid .counter__cat {
+  color: var(--oxide);
+}
+
+@supports (animation-timeline: scroll()) {
+  .room--counter {
+    view-timeline: --counter block;
+  }
+
+  .counter__col--side {
+    animation: counter-descend linear both;
+    animation-timeline: --counter;
+    animation-range: cover 0% cover 100%;
+  }
+
+  @keyframes counter-descend {
+    from {
+      transform: translateY(clamp(-8rem, -14vh, -4rem));
+    }
+    to {
+      transform: translateY(clamp(4rem, 14vh, 8rem));
+    }
+  }
+}
+
 /* --- Colophon --------------------------------------------------------------------------- */
 
 .colophon {
