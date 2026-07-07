@@ -89,6 +89,40 @@ a:hover {
   color: var(--oxide);
 }
 
+/* --- Exhibit 01 · The Thin Red Line ------------------------------------------
+   A reading-progress bar driven by the document scroll position itself:
+   scroll(root) maps scrollTop 0→max onto the animation's 0%→100%. */
+
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 4px;
+  z-index: 5;
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--oxide);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+@supports (animation-timeline: scroll()) {
+  .progress__bar {
+    animation: thin-red-line linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes thin-red-line {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
 /* --- Wayfinding bar ---------------------------------------------------------- */
 
 .wayfinding {
