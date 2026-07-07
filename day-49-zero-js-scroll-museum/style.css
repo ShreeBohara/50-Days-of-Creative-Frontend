@@ -362,6 +362,88 @@ a:hover {
   height: auto;
 }
 
+/* --- Exhibit 03 · The Un-clipping ---------------------------------------------------------
+   Each framed piece is sealed behind a clip-path inset; its own view()
+   timeline (entry range) peels the clip open as the frame enters the
+   viewport. Labels rise in a beat later on the same timeline. */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(2.5rem, 6vw, 5.5rem);
+  align-items: start;
+  max-width: 58rem;
+}
+
+.gallery__piece {
+  margin: 0;
+}
+
+.gallery__piece:nth-child(even) {
+  margin-top: clamp(3.5rem, 12vh, 8rem);
+}
+
+.gallery__label {
+  margin-top: 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.gallery__label em {
+  font-family: var(--serif);
+  font-size: 1.05em;
+  color: var(--ink);
+}
+
+.gallery__num {
+  font-size: 0.85em;
+  font-weight: 560;
+  font-stretch: 115%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--oxide);
+  margin-right: 0.45em;
+}
+
+@supports (animation-timeline: scroll()) {
+  .gallery__piece {
+    view-timeline: --piece block;
+  }
+
+  .gallery__piece .frame {
+    animation: unclip ease-out both;
+    animation-timeline: --piece;
+    animation-range: entry 10% entry 95%;
+  }
+
+  .gallery__label {
+    animation: label-rise ease-out both;
+    animation-timeline: --piece;
+    animation-range: entry 55% entry 100%;
+  }
+
+  @keyframes unclip {
+    from {
+      clip-path: inset(44% 40% 44% 40%);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes label-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.7rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
 /* --- Colophon --------------------------------------------------------------------------- */
 
 .colophon {
