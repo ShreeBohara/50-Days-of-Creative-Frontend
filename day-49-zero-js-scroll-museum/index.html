@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Musée Zéro — The Zero-JavaScript Scroll Museum · Day 49</title>
+    <meta
+      name="description"
+      content="Eight scroll-driven exhibits built with pure CSS animation-timeline — zero JavaScript. Day 49 of 50 Days of Creative Frontend."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <nav class="wayfinding" aria-label="Museum wayfinding">
+      <a class="wayfinding__back" href="../">&larr; All days</a>
+      <span class="wayfinding__brand">Mus&eacute;e&nbsp;Z&eacute;ro</span>
+      <span class="wayfinding__hours">Open 24/7 &middot; Admission free</span>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="hero__inner">
+        <p class="hero__eyebrow">50 Days of Creative Frontend &middot; Day 49</p>
+        <h1 class="hero__title">Mus&eacute;e<br />Z&eacute;ro</h1>
+        <p class="hero__sub">Eight scroll-driven exhibits. Zero JavaScript.</p>
+      </div>
+      <p class="hero__hint" aria-hidden="true">Scroll to enter &darr;</p>
+    </header>
+
+    <main>
+      <section class="room room--foyer" id="foyer" aria-labelledby="foyer-name">
+        <header class="room__head">
+          <span class="room__no" aria-hidden="true">00</span>
+          <h2 class="room__name" id="foyer-name">The Foyer</h2>
+        </header>
+        <div class="room__prose">
+          <p>
+            You are inside the collection. Every piece in this building is
+            animated by the position of your scrollbar &mdash; measured, mapped
+            and rendered by the style system alone. No script tags were harmed,
+            hired, or shipped.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="colophon">
+      <p class="colophon__zero">
+        Built with <strong class="colophon__digit">0</strong> lines of JavaScript.
+      </p>
+      <p class="colophon__links">
+        <a
+          href="https://github.com/shreebohara/50-Days-of-Creative-Frontend/tree/main/day-49-zero-js-scroll-museum"
+          >View source</a
+        >
+        <span aria-hidden="true">&middot;</span>
+        <a href="../">50 Days of Creative Frontend</a> &mdash; Day 49
+      </p>
+    </footer>
+  </body>
+</html>
