@@ -729,6 +729,16 @@ a:hover {
   align-items: start;
 }
 
+.chapter__text {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.chapter__aside {
+  grid-column: 2;
+  grid-row: 1;
+}
+
 .chapter__kicker {
   margin: 0 0 2.2rem;
   font-size: 0.7rem;
@@ -1093,4 +1103,116 @@ a:hover {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-soft);
+}
+
+/* --- Small rooms (mobile) -------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .wayfinding__hours {
+    display: none;
+  }
+
+  .room {
+    padding-block: clamp(4.5rem, 12vh, 7rem);
+  }
+
+  /* Exhibit 03 — one canvas per wall on a narrow corridor */
+  .gallery {
+    grid-template-columns: 1fr;
+    max-width: 24rem;
+  }
+
+  .gallery__piece:nth-child(even) {
+    margin-top: 0;
+  }
+
+  /* Exhibit 04 — tighter catalogue cards */
+  .counter__stage {
+    gap: 0.6rem;
+  }
+
+  .counter__col {
+    gap: 0.6rem;
+  }
+
+  .counter__card {
+    padding: 0.75rem 0.7rem 0.85rem;
+    font-size: 0.84rem;
+  }
+
+  .counter__cat {
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Exhibit 06 — the dial rides a shelf above the essay */
+  .chapter {
+    display: block;
+  }
+
+  .chapter__aside {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.7rem 0 0.8rem;
+    margin-bottom: 2rem;
+    background: var(--wall);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  .dial {
+    width: 4.6rem;
+  }
+
+  .dial::after {
+    font-size: 1.15rem;
+  }
+
+  .chapter__dial-note {
+    margin: 0;
+    max-width: 12rem;
+  }
+
+  /* Exhibit 07 — shallower shelf */
+  .stack {
+    grid-template-rows: repeat(var(--stack-n), min(72vh, 30rem));
+  }
+
+  .stack__card {
+    top: calc(5vh + (var(--i) - 1) * 1.1rem);
+  }
+
+  .stack__inner {
+    min-height: min(46vh, 20rem);
+  }
+}
+
+/* --- Reduced motion ----------------------------------------------------------------------------
+   The museum still hangs; it simply does not perform. Every timeline is
+   detached and each piece rests in its finished state. */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  html,
+  .progress__bar,
+  .hero__inner,
+  .hero__hint,
+  .gallery__piece .frame,
+  .gallery__label,
+  .counter__col--side,
+  .coverflow__card,
+  .dial,
+  .stack__inner,
+  .corridor__you {
+    animation: none;
+  }
 }
