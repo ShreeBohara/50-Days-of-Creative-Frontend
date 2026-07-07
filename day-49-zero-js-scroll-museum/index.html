@@ -16,6 +16,14 @@
       <div class="progress__bar"></div>
     </div>
 
+    <aside class="no-support" role="note">
+      <strong>The lights are off in your browser.</strong> This museum is built
+      entirely from CSS scroll&#8209;driven animations
+      (<code>animation-timeline</code>), which your browser has not acquired
+      yet. The rooms will hang perfectly still &mdash; visit in Chrome, Edge or
+      Safari&nbsp;26+ to see them move.
+    </aside>
+
     <nav class="wayfinding" aria-label="Museum wayfinding">
       <a class="wayfinding__back" href="../">&larr; All days</a>
       <span class="wayfinding__brand">Mus&eacute;e&nbsp;Z&eacute;ro</span>
@@ -44,7 +52,55 @@
             and rendered by the style system alone. No script tags were harmed,
             hired, or shipped.
           </p>
+          <p>
+            Two works are already on display.
+          </p>
         </div>
+
+        <div class="plaque-row">
+          <div class="plaque">
+            <p class="plaque__no">Exhibit 01 &middot; overhead</p>
+            <h3 class="plaque__title">The Thin Red Line <span class="plaque__year">2026</span></h3>
+            <p class="plaque__medium">Cascade on doorframe &mdash; scroll(root) timeline, scaleX</p>
+            <p class="plaque__note">
+              Look up. The oxide thread along the lintel measures the whole
+              building against your progress through it:
+              <code>animation-timeline: scroll(root)</code> maps the
+              document&rsquo;s scroll offset onto a single
+              <code>scaleX</code> &mdash; the oldest scroll&#8209;driven trick,
+              hung here as the doorplate.
+            </p>
+          </div>
+          <div class="plaque">
+            <p class="plaque__no">Exhibit 02 &middot; behind you</p>
+            <h3 class="plaque__title">The Vanishing Foyer <span class="plaque__year">2026</span></h3>
+            <p class="plaque__medium">Cascade on threshold &mdash; view() timeline, exit range, blur</p>
+            <p class="plaque__note">
+              Look back. The title you walked through is dissolving on its own
+              <code>view()</code> timeline as it exits &mdash; scaled, blurred,
+              sunk behind this wall. Walk backwards and it reassembles; a
+              scroll timeline is a scrubber, not a trigger.
+            </p>
+          </div>
+        </div>
+
+        <nav class="directory" aria-label="Museum directory">
+          <h3 class="directory__title">Directory</h3>
+          <ol class="directory__list">
+            <li><a href="#foyer"><span class="directory__no">01</span> The Thin Red Line</a></li>
+            <li><a href="#foyer"><span class="directory__no">02</span> The Vanishing Foyer</a></li>
+            <li><a href="#unclipping"><span class="directory__no">03</span> The Un&#8209;clipping</a></li>
+            <li><a href="#counterweights"><span class="directory__no">04</span> The Counterweights</a></li>
+            <li><a href="#carousel"><span class="directory__no">05</span> The Carousel of Attention</a></li>
+            <li><a href="#patient-reader"><span class="directory__no">06</span> The Patient Reader</a></li>
+            <li><a href="#accumulation"><span class="directory__no">07</span> The Accumulation</a></li>
+            <li><a href="#chromatic"><span class="directory__no">08</span> The Chromatic Corridor</a></li>
+          </ol>
+          <p class="directory__hint">
+            Anchors travel by <code>scroll-behavior: smooth</code>; every room
+            you pass performs on the way.
+          </p>
+        </nav>
       </section>
       <section class="room" id="unclipping" aria-labelledby="unclipping-name">
         <header class="room__head">

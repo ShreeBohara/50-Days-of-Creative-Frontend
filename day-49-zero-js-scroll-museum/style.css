@@ -126,6 +126,38 @@ a:hover {
   }
 }
 
+/* --- Unsupported-browser notice ------------------------------------------------
+   Shown only where animation-timeline has not shipped; the museum still
+   hangs, it simply does not move. */
+
+.no-support {
+  display: none;
+}
+
+@supports not (animation-timeline: scroll()) {
+  .no-support {
+    display: block;
+    margin: 4.6rem var(--gutter) -3rem;
+    padding: 1.1rem 1.4rem;
+    max-width: 46rem;
+    margin-inline: auto;
+    background: var(--mat);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--oxide);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  .no-support strong {
+    color: var(--ink);
+  }
+
+  .no-support code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.85em;
+  }
+}
+
 /* --- Wayfinding bar ---------------------------------------------------------- */
 
 .wayfinding {
@@ -343,6 +375,88 @@ a:hover {
   background: color-mix(in oklab, var(--ink) 6%, transparent);
   padding: 0.08em 0.3em;
   border-radius: 2px;
+}
+
+.plaque-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+  gap: 1.5rem;
+  max-width: 70rem;
+}
+
+.plaque-row .plaque {
+  max-width: none;
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+/* --- Lobby directory ------------------------------------------------------------ */
+
+.directory {
+  max-width: 46rem;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding: clamp(1.8rem, 4vw, 3rem);
+  background: var(--ink);
+  color: oklch(93% 0.012 88);
+}
+
+.directory__title {
+  margin: 0 0 1.4rem;
+  font-size: 0.72rem;
+  font-weight: 560;
+  font-stretch: 118%;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.directory__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  column-gap: 2.5rem;
+}
+
+.directory__list li {
+  border-bottom: 1px solid color-mix(in oklab, currentColor 18%, transparent);
+}
+
+.directory__list a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: 0.7rem 0.2rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 420;
+  font-size: 1.08rem;
+  text-decoration: none;
+}
+
+.directory__list a:hover {
+  color: oklch(78% 0.11 45);
+}
+
+.directory__no {
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 560;
+  font-stretch: 116%;
+  letter-spacing: 0.12em;
+  color: var(--brass);
+}
+
+.directory__hint {
+  margin: 1.6rem 0 0;
+  font-size: 0.78rem;
+  color: color-mix(in oklab, currentColor 62%, transparent);
+}
+
+.directory__hint code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.9em;
 }
 
 /* --- Picture frames ------------------------------------------------------------------ */
