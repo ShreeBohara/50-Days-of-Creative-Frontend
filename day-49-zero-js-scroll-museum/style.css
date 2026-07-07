@@ -205,6 +205,38 @@ a:hover {
   color: var(--ink-soft);
 }
 
+/* --- Exhibit 02 · The Vanishing Foyer ------------------------------------------
+   The hero tracks its own exit through the top of the viewport (view()
+   timeline, exit range) and sinks away — scaling down, blurring, lagging
+   behind the wall like a room you are walking out of. */
+
+@supports (animation-timeline: scroll()) {
+  .hero {
+    view-timeline: --foyer block;
+  }
+
+  .hero__inner {
+    will-change: transform, filter, opacity;
+    animation: foyer-vanish linear both;
+    animation-timeline: --foyer;
+    animation-range: exit 0% exit 85%;
+  }
+
+  .hero__hint {
+    animation: foyer-vanish linear both;
+    animation-timeline: --foyer;
+    animation-range: exit 0% exit 30%;
+  }
+
+  @keyframes foyer-vanish {
+    to {
+      transform: translateY(34%) scale(0.84);
+      filter: blur(14px);
+      opacity: 0;
+    }
+  }
+}
+
 /* --- Rooms --------------------------------------------------------------------- */
 
 .room {
