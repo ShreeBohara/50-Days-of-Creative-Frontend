@@ -55,6 +55,7 @@ on:
       - "day-46-kinetic-type-lab/**"
       - "day-47-ascii-everything/**"
       - "day-48-dither-lab/**"
+      - "day-49-zero-js-scroll-museum/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -400,6 +401,7 @@ jobs:
           cp -R day-46-kinetic-type-lab _site/
           cp -R day-47-ascii-everything _site/
           cp -R day-48-dither-lab _site/
+          cp -R day-49-zero-js-scroll-museum _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
