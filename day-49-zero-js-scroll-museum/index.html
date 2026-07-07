@@ -525,6 +525,49 @@
           </p>
         </div>
       </section>
+
+      <section class="room" id="chromatic" aria-labelledby="chromatic-name">
+        <header class="room__head">
+          <span class="room__no" aria-hidden="true">08</span>
+          <h2 class="room__name" id="chromatic-name">The Chromatic Corridor</h2>
+        </header>
+
+        <div class="room__prose">
+          <p>
+            This exhibit has been running since you walked in. The plaster of
+            every wall in the building is mixed from a single registered
+            number &mdash; <code>--hue</code> &mdash; and your total scroll
+            turns it once around the colour wheel, at a chroma so low you only
+            notice when you look back at where you entered.
+          </p>
+        </div>
+
+        <div class="corridor" role="img" aria-label="Corridor map of the page: a full-spectrum band with a marker showing your position">
+          <div class="corridor__band"></div>
+          <div class="corridor__you">
+            <span class="corridor__flag">You are here</span>
+          </div>
+          <p class="corridor__legend">
+            <span>Entrance &middot; hue 88&deg;</span>
+            <span><span class="corridor__swatch" aria-hidden="true"></span>current pigment</span>
+            <span>Exit &middot; hue 448&deg;</span>
+          </p>
+        </div>
+
+        <div class="plaque">
+          <p class="plaque__no">Exhibit 08</p>
+          <h3 class="plaque__title">The Chromatic Corridor <span class="plaque__year">2026</span></h3>
+          <p class="plaque__medium">Cascade on architecture &mdash; scroll(root), registered --hue, oklch plaster</p>
+          <p class="plaque__note">
+            A registered <code>@property</code> number is animated from 88 to
+            448 by the document&rsquo;s own <code>scroll()</code> timeline, and
+            the wall, mat and hairline tokens are all
+            <code>oklch(&hellip; var(--hue))</code> mixes of it. The building
+            repaints on the compositor as you walk; the marker above walks the
+            same timeline.
+          </p>
+        </div>
+      </section>
     </main>
 
     <footer class="colophon">

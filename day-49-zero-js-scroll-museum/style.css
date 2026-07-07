@@ -26,11 +26,14 @@
 /* --- Palette & tokens ------------------------------------------------------ */
 
 :root {
-  --wall: oklch(95.4% 0.013 88);
-  --mat: oklch(97.8% 0.008 92);
+  /* The building's pigment. Exhibit 08 rotates --hue once around the
+     wheel over the total scroll of the page; every wall listens. */
+  --hue: 88;
+  --wall: oklch(95.4% 0.014 var(--hue));
+  --mat: oklch(97.8% 0.009 var(--hue));
   --ink: oklch(24% 0.014 75);
   --ink-soft: oklch(48% 0.02 78);
-  --line: oklch(86% 0.018 85);
+  --line: oklch(86% 0.02 var(--hue));
   --oxide: oklch(46% 0.14 38);
   --brass: oklch(62% 0.075 85);
   --wood: oklch(28% 0.03 60);
@@ -827,6 +830,118 @@ a:hover {
     to {
       transform: scale(var(--press-scale));
       filter: brightness(0.93);
+    }
+  }
+}
+
+/* --- Exhibit 08 · The Chromatic Corridor -----------------------------------------------------
+   One registered <number>, --hue, animated once around the colour wheel
+   by scroll(root). The wall, mat and hairline tokens are all mixed from
+   it, so the entire building repaints as you walk. */
+
+@property --hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 88;
+}
+
+.corridor {
+  position: relative;
+  max-width: 52rem;
+  margin-top: 1rem;
+  padding-top: 2.6rem;
+}
+
+.corridor__band {
+  height: 16px;
+  border: 1px solid color-mix(in oklab, var(--ink) 25%, transparent);
+  background: linear-gradient(
+    90deg in oklch longer hue,
+    oklch(82% 0.1 88),
+    oklch(82% 0.1 87.9)
+  );
+}
+
+.corridor__you {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+}
+
+.corridor__flag {
+  position: absolute;
+  bottom: -2.05rem;
+  left: 0;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  font-size: 0.6rem;
+  font-weight: 580;
+  font-stretch: 116%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.corridor__flag::after {
+  content: "";
+  width: 2px;
+  height: 0.9rem;
+  background: var(--ink);
+}
+
+.corridor__legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.9rem;
+  font-size: 0.66rem;
+  font-weight: 520;
+  font-stretch: 114%;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.corridor__swatch {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.5em;
+  vertical-align: -0.1em;
+  border: 1px solid color-mix(in oklab, var(--ink) 30%, transparent);
+  background: oklch(78% 0.11 var(--hue));
+}
+
+@supports (animation-timeline: scroll()) {
+  html {
+    animation: chromatic-corridor linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  .corridor__you {
+    animation: corridor-walk linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes chromatic-corridor {
+    from {
+      --hue: 88;
+    }
+    to {
+      --hue: 448;
+    }
+  }
+
+  @keyframes corridor-walk {
+    from {
+      left: 0%;
+    }
+    to {
+      left: 100%;
     }
   }
 }
