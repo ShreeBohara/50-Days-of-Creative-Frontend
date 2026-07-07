@@ -520,6 +520,80 @@ a:hover {
   }
 }
 
+/* --- Exhibit 05 · The Carousel of Attention -------------------------------------------------
+   A horizontal scroll-snap rack. Each postcard reads its own position in
+   the rack via view(x) and turns to face the centre — cover-flow with no
+   pointer math. */
+
+.coverflow__hint {
+  margin: 0 0 1.6rem;
+  font-size: 0.72rem;
+  font-weight: 520;
+  font-stretch: 114%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.coverflow {
+  display: flex;
+  gap: clamp(1.4rem, 3.5vw, 2.6rem);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 2.5rem max(28vw, 8rem) 3rem;
+  margin-inline: calc(-1 * var(--gutter));
+  perspective: 1000px;
+  scrollbar-width: none;
+}
+
+.coverflow:focus-visible {
+  outline: 2px solid var(--oxide);
+  outline-offset: -2px;
+}
+
+.coverflow__card {
+  margin: 0;
+  flex: 0 0 clamp(10.5rem, 26vw, 14rem);
+  scroll-snap-align: center;
+  text-align: center;
+}
+
+.frame--postcard {
+  border-width: 5px;
+  outline-offset: -4px;
+  padding: 0.55rem;
+}
+
+.coverflow__label {
+  margin-top: 0.8rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+@supports (animation-timeline: scroll()) {
+  .coverflow__card {
+    animation: postcard-turn linear both;
+    animation-timeline: view(x);
+    animation-range: cover 0% cover 100%;
+  }
+
+  @keyframes postcard-turn {
+    from {
+      transform: rotateY(46deg) scale(0.82);
+      opacity: 0.55;
+    }
+    50% {
+      transform: rotateY(0deg) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: rotateY(-46deg) scale(0.82);
+      opacity: 0.55;
+    }
+  }
+}
+
 /* --- Colophon --------------------------------------------------------------------------- */
 
 .colophon {
