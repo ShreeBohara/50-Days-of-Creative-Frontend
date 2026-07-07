@@ -594,6 +594,135 @@ a:hover {
   }
 }
 
+/* --- Exhibit 06 · The Patient Reader ---------------------------------------------------------
+   The chapter publishes a named view-timeline; a sticky dial subscribes,
+   animating a registered <integer> custom property that paints a
+   conic-gradient ring AND typesets the numeral via counter(). */
+
+@property --dial {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.chapter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(2.5rem, 7vw, 6rem);
+  align-items: start;
+}
+
+.chapter__kicker {
+  margin: 0 0 2.2rem;
+  font-size: 0.7rem;
+  font-weight: 540;
+  font-stretch: 116%;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--oxide);
+}
+
+.chapter__text {
+  max-width: 36rem;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.06rem;
+  line-height: 1.78;
+}
+
+.chapter__text p {
+  margin: 0 0 1.5rem;
+}
+
+.chapter__text code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.82em;
+  background: color-mix(in oklab, var(--ink) 6%, transparent);
+  padding: 0.08em 0.3em;
+  border-radius: 2px;
+}
+
+.chapter__kicker + p::first-letter {
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.8;
+  padding: 0.08em 0.12em 0 0;
+  font-weight: 560;
+  color: var(--oxide);
+}
+
+.chapter__pull {
+  margin: 2.4rem 0 2.4rem 0;
+  padding-left: 1.4rem;
+  border-left: 2px solid var(--brass);
+  font-style: italic;
+  font-weight: 440;
+  font-size: 1.35rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.chapter__aside {
+  position: sticky;
+  top: 30vh;
+  text-align: center;
+}
+
+.dial {
+  --dial-track: color-mix(in oklab, var(--ink) 10%, transparent);
+  --dial: 100;
+  width: clamp(8.5rem, 16vw, 11rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(closest-side, var(--wall) 66%, transparent 0),
+    conic-gradient(var(--oxide) calc(var(--dial) * 1%), var(--dial-track) 0);
+  counter-reset: dial-pct var(--dial);
+}
+
+.dial::after {
+  content: counter(dial-pct) "%";
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.chapter__dial-note {
+  margin: 1.1rem auto 0;
+  max-width: 11rem;
+  font-size: 0.66rem;
+  font-weight: 520;
+  font-stretch: 114%;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+@supports (animation-timeline: scroll()) {
+  .chapter {
+    view-timeline: --chapter block;
+  }
+
+  .dial {
+    animation: dial-fill linear both;
+    animation-timeline: --chapter;
+    animation-range: contain 0% contain 100%;
+  }
+
+  @keyframes dial-fill {
+    from {
+      --dial: 0;
+    }
+    to {
+      --dial: 100;
+    }
+  }
+}
+
 /* --- Colophon --------------------------------------------------------------------------- */
 
 .colophon {

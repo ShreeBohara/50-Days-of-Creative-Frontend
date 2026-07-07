@@ -363,6 +363,85 @@
           </p>
         </div>
       </section>
+
+      <section class="room" id="patient-reader" aria-labelledby="patient-reader-name">
+        <header class="room__head">
+          <span class="room__no" aria-hidden="true">06</span>
+          <h2 class="room__name" id="patient-reader-name">The Patient Reader</h2>
+        </header>
+
+        <div class="chapter">
+          <div class="chapter__text">
+            <p class="chapter__kicker">Catalogue essay &mdash; A short history of motion, without scripts</p>
+            <p>
+              Movement arrived on the web wearing a costume. In 1996 the
+              <code>&lt;marquee&gt;</code> element dragged text across the screen
+              with the solemn dignity of a hotel lobby ticker, and for a decade
+              that was roughly the state of the art. Anything more ambitious
+              meant scripting &mdash; timers firing thirty times a second,
+              elements nudged pixel by pixel, fans audibly objecting.
+            </p>
+            <p>
+              The stylesheet fought back slowly. Transitions appeared in WebKit
+              in 2007, <code>@keyframes</code> shortly after, and suddenly a
+              hover could bloom without a single callback. But the animations
+              were deaf: they played on their own clock, indifferent to the one
+              gesture the reader makes constantly and unconsciously &mdash;
+              scrolling.
+            </p>
+            <blockquote class="chapter__pull">
+              &ldquo;Movement was never the property of the script tag; it was
+              only ever on loan.&rdquo;
+            </blockquote>
+            <p>
+              So a generation of libraries grew up to translate. They listened
+              to scroll events, throttled them, debounced them, measured
+              bounding boxes and requested animation frames, all to answer a
+              simple question: <em>how far along is the reader?</em> The answer
+              powered every parallax hero and scroll-triggered reveal of the
+              2010s, and it ran, every frame of it, on the main thread.
+            </p>
+            <p>
+              Then in 2023 the question became a unit of style.
+              <code>animation-timeline: scroll()</code> shipped in Chrome 115,
+              and the scrollbar itself became a clock that any animation may
+              keep. The browser drives it off the main thread, at the refresh
+              rate of the display, and the page weighs nothing more than the
+              stylesheet you are currently inside of.
+            </p>
+            <p>
+              The dial beside this essay is the proof. It knows how much of the
+              chapter you have traversed because the chapter publishes its own
+              position as a timeline &mdash; <code>view-timeline: --chapter</code>
+              &mdash; and the dial subscribes with one declaration. The number
+              in its centre is not typeset by a script; it is a CSS counter
+              reading an animated <code>@property</code> integer. You may
+              verify this claim at any speed you like.
+            </p>
+          </div>
+
+          <div class="chapter__aside">
+            <div class="dial" role="img" aria-label="Dial showing how much of the chapter has been read"></div>
+            <p class="chapter__dial-note">
+              conic&#8209;gradient dial &middot; the percentage is a CSS counter
+            </p>
+          </div>
+        </div>
+
+        <div class="plaque">
+          <p class="plaque__no">Exhibit 06</p>
+          <h3 class="plaque__title">The Patient Reader <span class="plaque__year">2026</span></h3>
+          <p class="plaque__medium">Cascade on essay &mdash; named view&#8209;timeline, @property, conic&#8209;gradient</p>
+          <p class="plaque__note">
+            The chapter declares <code>view-timeline: --chapter</code>; the
+            sticky dial rides it through the <code>contain</code> range,
+            animating a registered <code>&lt;integer&gt;</code> custom property
+            from 0 to 100. The ring is a <code>conic-gradient</code> of that
+            integer; the numeral is <code>counter()</code> reading the same
+            value. Two properties, one timeline, zero script.
+          </p>
+        </div>
+      </section>
     </main>
 
     <footer class="colophon">
