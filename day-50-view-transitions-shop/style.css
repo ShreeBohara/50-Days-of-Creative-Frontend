@@ -70,6 +70,31 @@
   }
 }
 
+/* Shared-element morphs: the same cover carries the same name on the catalog
+   page and on its detail page, so navigating makes it physically travel.
+   Names must be unique per page — one rule per record in the bin. */
+
+.album-cover[data-album="1"] { view-transition-name: cover-1; }
+.album-cover[data-album="2"] { view-transition-name: cover-2; }
+.album-cover[data-album="3"] { view-transition-name: cover-3; }
+.album-cover[data-album="4"] { view-transition-name: cover-4; }
+.album-cover[data-album="5"] { view-transition-name: cover-5; }
+.album-cover[data-album="6"] { view-transition-name: cover-6; }
+.album-cover[data-album="7"] { view-transition-name: cover-7; }
+.album-cover[data-album="8"] { view-transition-name: cover-8; }
+
+.album-cover {
+  view-transition-class: cover;
+}
+
+/* Let the sleeve glide with a vinyl-flip easing, above the page cross-fade. */
+
+::view-transition-group(.cover) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 5;
+}
+
 /* ---- Tokens -------------------------------------------------------------- */
 
 :root {
