@@ -809,6 +809,89 @@ svg {
   color: var(--accent);
 }
 
+/* ---- Responsive: the shop on a phone ------------------------------------------------ */
+
+.wordmark .disc {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+  .album-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .album-hero {
+    max-width: 24rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    flex-wrap: wrap;
+    row-gap: 0.55rem;
+    padding-block: 0.75rem;
+    position: static;
+  }
+
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .vt-badge {
+    margin-left: auto;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 2rem;
+  }
+
+  .hero-disc {
+    width: clamp(9rem, 40vw, 13rem);
+    margin-top: 0.5rem;
+  }
+
+  .tracklist-wrap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .album-title {
+    font-size: clamp(2.2rem, 10.5vw, 3.6rem);
+  }
+
+  .album-grid {
+    gap: 1.7rem 1.2rem;
+  }
+
+  .album-pager {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .site-nav {
+    gap: 0.2rem;
+  }
+
+  .site-nav a {
+    padding: 0.36rem 0.68rem;
+    font-size: 0.66rem;
+  }
+
+  .wordmark {
+    font-size: 1.12rem;
+  }
+
+  .vt-badge {
+    font-size: 0.55rem;
+    padding: 0.28rem 0.6rem;
+  }
+}
+
 /* ---- Reduced motion: hold every record still --------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
