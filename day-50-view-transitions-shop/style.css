@@ -354,6 +354,29 @@ svg {
   color: var(--paper);
 }
 
+/* "Morphing enabled" sticker — rendered by CSS support detection alone.
+   view-transition-class ships with the same engines as cross-document
+   transitions, so it is the honest @supports probe. Hidden by default;
+   unsupported browsers simply never see it. */
+
+.vt-badge {
+  display: none;
+  align-items: center;
+  color: var(--teal);
+  border: 1.5px solid var(--teal);
+  border-radius: 999px;
+  padding: 0.32rem 0.72rem;
+  font-size: 0.6rem;
+  rotate: 2deg;
+  background: var(--card);
+}
+
+@supports (view-transition-class: sticker) {
+  .vt-badge {
+    display: inline-flex;
+  }
+}
+
 /* ---- Footer ----------------------------------------------------------------- */
 
 .site-footer {
@@ -758,4 +781,24 @@ svg {
 
 .prose strong {
   color: var(--accent);
+}
+
+/* ---- Reduced motion: hold every record still --------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  .wordmark .disc,
+  .hero-disc,
+  .marquee-track {
+    animation: none;
+  }
+
+  .album-cover,
+  .card-price,
+  .btn {
+    transition: none;
+  }
 }
