@@ -337,6 +337,98 @@ svg {
   filter: drop-shadow(0.5rem 0.75rem 0 rgba(38, 25, 14, 0.18));
 }
 
+/* ---- Catalog: the record bin ----------------------------------------------------- */
+
+.album-grid {
+  list-style: none;
+  margin: 2.4rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  gap: 2rem 1.6rem;
+}
+
+.album-card .card-link {
+  display: grid;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+
+.album-cover {
+  margin: 0;
+  border: var(--hairline);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: var(--hard-shadow);
+  transition: translate 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.4), box-shadow 0.22s ease, rotate 0.22s ease;
+}
+
+.album-cover svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.album-card .card-link:hover .album-cover,
+.album-card .card-link:focus-visible .album-cover {
+  translate: -0.3rem -0.55rem;
+  rotate: -1.2deg;
+  box-shadow: 0.65rem 0.9rem 0 var(--ink);
+}
+
+.album-card .card-link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.card-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.card-titles {
+  display: grid;
+  line-height: 1.25;
+}
+
+.card-titles b {
+  font-weight: 800;
+  font-size: 1.06rem;
+  letter-spacing: -0.01em;
+}
+
+.card-titles i {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.card-price {
+  font-size: 0.82rem;
+  color: var(--card);
+  background: var(--accent);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+  rotate: 3deg;
+  transition: rotate 0.22s ease, scale 0.22s ease;
+}
+
+.album-card .card-link:hover .card-price {
+  rotate: -4deg;
+  scale: 1.08;
+}
+
+.card-tag {
+  color: var(--ink-soft);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
 /* ---- Generic page shell (about, etc.) ------------------------------------------- */
 
 .page {
