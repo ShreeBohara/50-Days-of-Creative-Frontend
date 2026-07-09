@@ -95,6 +95,79 @@
   z-index: 5;
 }
 
+/* Entrance choreography: the detail page's heading and track rows only exist
+   on the new page, so their ::view-transition-new snapshots play entrances —
+   each row staggered a beat later, like a needle finding the groove. */
+
+.album-title {
+  view-transition-name: album-title;
+}
+
+::view-transition-new(album-title) {
+  animation: 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both vt-heading-in;
+}
+
+::view-transition-old(album-title) {
+  animation: 0.18s ease both vt-fade-out;
+}
+
+@keyframes vt-heading-in {
+  from {
+    opacity: 0;
+    translate: 0 1.4rem;
+  }
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.tracklist li {
+  view-transition-class: track;
+}
+
+[data-vt="t1"] { view-transition-name: t1; }
+[data-vt="t2"] { view-transition-name: t2; }
+[data-vt="t3"] { view-transition-name: t3; }
+[data-vt="t4"] { view-transition-name: t4; }
+[data-vt="t5"] { view-transition-name: t5; }
+[data-vt="t6"] { view-transition-name: t6; }
+[data-vt="t7"] { view-transition-name: t7; }
+[data-vt="t8"] { view-transition-name: t8; }
+[data-vt="t9"] { view-transition-name: t9; }
+[data-vt="t10"] { view-transition-name: t10; }
+
+::view-transition-new(.track) {
+  animation-name: vt-track-in;
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+::view-transition-old(.track) {
+  animation: 0.15s ease both vt-fade-out;
+}
+
+@keyframes vt-track-in {
+  from {
+    opacity: 0;
+    translate: 2.2rem 0;
+  }
+}
+
+::view-transition-new(t1)  { animation-delay: 0.12s; }
+::view-transition-new(t2)  { animation-delay: 0.16s; }
+::view-transition-new(t3)  { animation-delay: 0.2s; }
+::view-transition-new(t4)  { animation-delay: 0.24s; }
+::view-transition-new(t5)  { animation-delay: 0.28s; }
+::view-transition-new(t6)  { animation-delay: 0.32s; }
+::view-transition-new(t7)  { animation-delay: 0.36s; }
+::view-transition-new(t8)  { animation-delay: 0.4s; }
+::view-transition-new(t9)  { animation-delay: 0.44s; }
+::view-transition-new(t10) { animation-delay: 0.48s; }
+
 /* ---- Tokens -------------------------------------------------------------- */
 
 :root {
