@@ -38,6 +38,38 @@
   src: url("./fonts/space-mono-latin-400italic.woff2") format("woff2");
 }
 
+/* ---- Cross-document view transitions -------------------------------------
+   The whole trick of the day: both the outgoing and incoming page opt in,
+   and the browser morphs between two real HTML documents. No JS anywhere. */
+
+@view-transition {
+  navigation: auto;
+}
+
+/* Customized root cross-fade: old page sinks and fades, new page rises in. */
+
+::view-transition-old(root) {
+  animation: 0.3s cubic-bezier(0.4, 0, 0.7, 0.2) both vt-sink-away;
+}
+
+::view-transition-new(root) {
+  animation: 0.42s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both vt-rise-in;
+}
+
+@keyframes vt-sink-away {
+  to {
+    opacity: 0;
+    translate: 0 1.8rem;
+  }
+}
+
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 2.2rem;
+  }
+}
+
 /* ---- Tokens -------------------------------------------------------------- */
 
 :root {
