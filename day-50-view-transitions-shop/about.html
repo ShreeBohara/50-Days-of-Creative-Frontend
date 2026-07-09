@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About — Wavelength Records</title>
+    <meta name="description" content="The story of Wavelength Records, a fictional record shop built to demonstrate cross-document View Transitions." />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="wordmark" href="./index.html">
+        <svg class="disc" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="#26190e" />
+          <circle cx="32" cy="32" r="22" fill="none" stroke="#f4ead8" stroke-opacity="0.25" stroke-width="2" />
+          <circle cx="32" cy="32" r="15" fill="none" stroke="#f4ead8" stroke-opacity="0.25" stroke-width="2" />
+          <circle cx="32" cy="32" r="10" fill="#e4572e" />
+          <circle cx="32" cy="32" r="2.5" fill="#f4ead8" />
+        </svg>
+        Wavelength <small>Records</small>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="./index.html">Home</a>
+        <a href="./catalog.html">Catalog</a>
+        <a href="./about.html" aria-current="page">About</a>
+      </nav>
+    </header>
+
+    <main class="page about-panel">
+      <p class="mono page-kicker">The shop</p>
+      <h1>Fifty years of<br />good noise</h1>
+      <div class="prose">
+        <p>
+          Wavelength opened in 1974 with a single crate of soul 45s and a
+          landlord who accepted payment in Coltrane bootlegs. The crate
+          multiplied. The landlord retired to Marrakesh. We stayed.
+        </p>
+        <p>
+          The rules of the house have not changed: <strong>listen before you
+          buy</strong>, the booth in the back is first come first served, and
+          if you ask for the good stuff we will ask what you had for
+          breakfast, because the answer matters.
+        </p>
+        <p>
+          This little site is also a demo. Every page you visit here is a
+          <strong>real HTML page</strong> &mdash; no framework, no client-side
+          router, not a single line of JavaScript. The morphing you see as you
+          move between pages is the browser&rsquo;s native
+          <strong>cross-document View Transitions API</strong>, switched on
+          with a few lines of CSS. Where the API is not supported, the shop
+          quietly falls back to what it always was: a fast, plain,
+          multi-page website.
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p class="mono"><b>Wavelength Records</b> &mdash; 33&#8531; Groove St.</p>
+      <p class="mono">Open Tue&ndash;Sun, noon till late</p>
+      <p class="mono">Day 50 / 50 &mdash; cross-document view transitions, zero JS</p>
+    </footer>
+  </body>
+</html>

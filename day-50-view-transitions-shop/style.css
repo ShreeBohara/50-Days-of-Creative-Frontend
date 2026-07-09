@@ -1,0 +1,366 @@
+/* ==========================================================================
+   Day 50 — Wavelength Records
+   A cross-document View Transitions micro-site. Plain HTML + CSS, no JS.
+   ========================================================================== */
+
+/* ---- Fonts (self-hosted, SIL OFL — see fonts/OFL.txt) ------------------- */
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url("./fonts/bricolage-grotesque-latin-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/space-mono-latin-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fonts/space-mono-latin-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/space-mono-latin-400italic.woff2") format("woff2");
+}
+
+/* ---- Tokens -------------------------------------------------------------- */
+
+:root {
+  --paper: #f4ead8;
+  --paper-deep: #eaddc4;
+  --card: #fdf6e7;
+  --ink: #26190e;
+  --ink-soft: #5c4a38;
+  --line: #26190e;
+  --accent: #e4572e;   /* burnt tomato */
+  --mustard: #eea311;
+  --teal: #12716f;
+  --plum: #703d57;
+  --midnight: #1d2440;
+
+  --display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", sans-serif;
+  --mono: "Space Mono", "Courier New", monospace;
+
+  --hard-shadow: 0.375rem 0.375rem 0 var(--ink);
+  --hairline: 1.5px solid var(--line);
+  --radius: 10px;
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --measure: 62ch;
+}
+
+/* ---- Reset / base --------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(rgba(38, 25, 14, 0.055) 1px, transparent 1.5px),
+    linear-gradient(180deg, rgba(238, 163, 17, 0.06), transparent 30rem);
+  background-size: 26px 26px, 100% 100%;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--card);
+}
+
+/* ---- Utility type --------------------------------------------------------- */
+
+.mono {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---- Header ---------------------------------------------------------------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.9rem var(--gutter);
+  background: var(--paper);
+  border-bottom: var(--hairline);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.28rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wordmark .disc {
+  width: 1.05em;
+  height: 1.05em;
+  align-self: center;
+  animation: spin 9s linear infinite;
+}
+
+.wordmark small {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+.site-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.site-nav a {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.42rem 0.85rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+}
+
+.site-nav a:hover {
+  border-color: var(--line);
+}
+
+.site-nav a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---- Footer ----------------------------------------------------------------- */
+
+.site-footer {
+  margin-top: auto;
+  border-top: var(--hairline);
+  padding: 1.4rem var(--gutter) 1.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2.5rem;
+  align-items: baseline;
+  background: var(--paper-deep);
+}
+
+.site-footer .mono {
+  color: var(--ink-soft);
+}
+
+.site-footer .mono b {
+  color: var(--ink);
+}
+
+/* ---- Marquee strip ------------------------------------------------------------ */
+
+.marquee {
+  overflow: hidden;
+  border-block: var(--hairline);
+  background: var(--accent);
+  color: var(--paper);
+  padding-block: 0.5rem;
+  white-space: nowrap;
+}
+
+.marquee-track {
+  display: inline-block;
+  animation: marquee 26s linear infinite;
+}
+
+.marquee span {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding-inline: 1.4rem;
+}
+
+@keyframes marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+
+/* ---- Home hero ------------------------------------------------------------------ */
+
+.hero {
+  padding: clamp(2.5rem, 7vh, 5rem) var(--gutter) clamp(2rem, 6vh, 4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+}
+
+.hero-kicker {
+  color: var(--accent);
+  margin-bottom: 1.1rem;
+}
+
+.hero h1 {
+  font-size: clamp(3.2rem, 11.5vw, 8.75rem);
+  font-stretch: 78%;
+  text-transform: uppercase;
+  line-height: 0.92;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-lede {
+  margin-top: 1.4rem;
+  font-size: clamp(1.02rem, 1.6vw, 1.22rem);
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+
+.hero-cta {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--card);
+  border: var(--hairline);
+  border-radius: 999px;
+  padding: 0.78rem 1.35rem;
+  box-shadow: var(--hard-shadow);
+  transition: translate 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  translate: 0.14rem 0.14rem;
+  box-shadow: 0.235rem 0.235rem 0 var(--ink);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0.375rem 0.375rem 0 var(--accent);
+}
+
+.btn-primary:hover {
+  box-shadow: 0.235rem 0.235rem 0 var(--accent);
+}
+
+.hero-disc {
+  width: clamp(11rem, 24vw, 19rem);
+  animation: spin 14s linear infinite;
+  filter: drop-shadow(0.5rem 0.75rem 0 rgba(38, 25, 14, 0.18));
+}
+
+/* ---- Generic page shell (about, etc.) ------------------------------------------- */
+
+.page {
+  padding: clamp(2.2rem, 6vh, 4rem) var(--gutter) clamp(3rem, 8vh, 5rem);
+}
+
+.page-kicker {
+  color: var(--accent);
+  margin-bottom: 0.9rem;
+}
+
+.page h1 {
+  font-size: clamp(2.4rem, 6.5vw, 4.6rem);
+  text-transform: uppercase;
+  font-stretch: 82%;
+}
+
+.prose {
+  margin-top: 1.8rem;
+  display: grid;
+  gap: 1.1rem;
+  font-size: 1.05rem;
+}
+
+.prose strong {
+  color: var(--accent);
+}
