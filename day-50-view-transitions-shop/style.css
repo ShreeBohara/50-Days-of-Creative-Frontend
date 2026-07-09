@@ -168,6 +168,27 @@
 ::view-transition-new(t9)  { animation-delay: 0.44s; }
 ::view-transition-new(t10) { animation-delay: 0.48s; }
 
+/* The shop sign stays up: the header exists on every page with the same name,
+   so it snapshots onto itself and appears bolted in place while the room
+   changes around it. The footer shares the trick and glides to its new spot. */
+
+.site-header {
+  view-transition-name: site-header;
+}
+
+.site-footer {
+  view-transition-name: site-footer;
+}
+
+::view-transition-group(site-header) {
+  z-index: 20;
+}
+
+::view-transition-group(site-footer) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* ---- Tokens -------------------------------------------------------------- */
 
 :root {
