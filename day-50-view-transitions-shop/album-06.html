@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Static Bloom — Wavelength Records</title>
-    <meta name="description" content="Static Bloom by VHS Garden at Wavelength Records." />
+    <meta name="description" content="Static Bloom by VHS Garden (1991, Shoegaze) at Wavelength Records." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -27,11 +27,70 @@
       </nav>
     </header>
 
-    <main class="page">
-      <p class="mono page-kicker">WVL-06</p>
-      <h1>Static Bloom</h1>
-      <p class="prose">VHS Garden</p>
-      <p><a class="btn" href="./catalog.html">&larr; Back to the bin</a></p>
+    <main class="page album-page" style="--album-accent: #b04ba8">
+      <p class="back-row"><a class="mono back-link" href="./catalog.html">&larr; Back to the bin</a></p>
+
+      <section class="album-top">
+        <figure class="album-cover album-hero" data-album="6">
+          <svg viewBox="0 0 400 400" role="img" aria-label="Static Bloom album cover">
+          <defs>
+          <filter id="c6-haze" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="14"/>
+          </filter>
+          <pattern id="c6-static" width="6" height="6" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="1.6" height="1.6" fill="#f6ecd4" opacity="0.16"/>
+          <rect x="3" y="3" width="1.4" height="1.4" fill="#f6ecd4" opacity="0.1"/>
+          </pattern>
+          </defs>
+          <rect width="400" height="400" fill="#1e1430"/>
+          <g filter="url(#c6-haze)">
+          <circle cx="150" cy="170" r="105" fill="#7a3bb5" fill-opacity="0.85"/>
+          <circle cx="252" cy="200" r="95" fill="#b04ba8" fill-opacity="0.8"/>
+          <circle cx="196" cy="286" r="82" fill="#e78bc5" fill-opacity="0.75"/>
+          </g>
+          <circle cx="196" cy="212" r="60" fill="none" stroke="#f6ecd4" stroke-opacity="0.5" stroke-width="1.5"/>
+          <rect width="400" height="400" fill="url(#c6-static)"/>
+          <text x="200" y="66" text-anchor="middle" font-family="'Space Mono',monospace" font-size="13" font-weight="700" letter-spacing="6" fill="#e78bc5">VHS GARDEN</text>
+          <text x="200" y="366" text-anchor="middle" font-family="'Bricolage Grotesque',sans-serif" font-size="40" font-weight="800" letter-spacing="6" fill="#f6ecd4">STATIC BLOOM</text>
+          </svg>
+        </figure>
+        <div class="album-info">
+          <p class="mono album-kicker">WVL-006 &middot; Shoegaze &middot; 1991</p>
+          <h1 class="album-title">Static Bloom</h1>
+          <p class="album-artist">VHS Garden</p>
+          <p class="album-blurb">Four guitarists, zero audible words, one hundred and eleven pedals. Turn it up until the flowers on the sleeve start to move. Includes the fold-out poster, miraculously unfaded.</p>
+          <div class="album-buy">
+            <span class="mono album-price">$29</span>
+            <span class="mono album-cond">Condition NM / sleeve VG+</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="tracklist-wrap" aria-label="Tracklist">
+        <div class="tracklist-side">
+          <h2 class="mono side-label">Side A</h2>
+          <ol class="tracklist">
+            <li data-vt="t1"><span class="tk-no">A1</span><span class="tk-title">Petal Distortion</span><span class="tk-time">5:26</span></li>
+            <li data-vt="t2"><span class="tk-no">A2</span><span class="tk-title">Static Bloom</span><span class="tk-time">4:49</span></li>
+            <li data-vt="t3"><span class="tk-no">A3</span><span class="tk-title">Chlorophyll</span><span class="tk-time">6:03</span></li>
+            <li data-vt="t4"><span class="tk-no">A4</span><span class="tk-title">Tape Hiss Lullaby</span><span class="tk-time">3:58</span></li>
+          </ol>
+        </div>
+        <div class="tracklist-side">
+          <h2 class="mono side-label">Side B</h2>
+          <ol class="tracklist">
+            <li data-vt="t5"><span class="tk-no">B1</span><span class="tk-title">Greenhouse Feedback</span><span class="tk-time">5:11</span></li>
+            <li data-vt="t6"><span class="tk-no">B2</span><span class="tk-title">Overexposed</span><span class="tk-time">4:36</span></li>
+            <li data-vt="t7"><span class="tk-no">B3</span><span class="tk-title">Pollen Drone</span><span class="tk-time">7:24</span></li>
+            <li data-vt="t8"><span class="tk-no">B4</span><span class="tk-title">Rewind the Garden</span><span class="tk-time">4:02</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <nav class="album-pager" aria-label="More records">
+        <a class="mono" href="./album-05.html">&larr; Copper Canyon</a>
+        <a class="mono" href="./album-07.html">Twelve Bar Motel &rarr;</a>
+      </nav>
     </main>
 
     <footer class="site-footer">

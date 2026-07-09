@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Meridian Funk — Wavelength Records</title>
-    <meta name="description" content="Meridian Funk by Otis Delacroix at Wavelength Records." />
+    <meta name="description" content="Meridian Funk by Otis Delacroix (1974, Funk / Soul) at Wavelength Records." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -27,11 +27,74 @@
       </nav>
     </header>
 
-    <main class="page">
-      <p class="mono page-kicker">WVL-02</p>
-      <h1>Meridian Funk</h1>
-      <p class="prose">Otis Delacroix</p>
-      <p><a class="btn" href="./catalog.html">&larr; Back to the bin</a></p>
+    <main class="page album-page" style="--album-accent: #e4572e">
+      <p class="back-row"><a class="mono back-link" href="./catalog.html">&larr; Back to the bin</a></p>
+
+      <section class="album-top">
+        <figure class="album-cover album-hero" data-album="2">
+          <svg viewBox="0 0 400 400" role="img" aria-label="Meridian Funk album cover">
+          <defs>
+          <radialGradient id="c2-sun" cx="0.5" cy="0.62">
+          <stop offset="0" stop-color="#f6c545"/><stop offset="1" stop-color="#eea311"/>
+          </radialGradient>
+          </defs>
+          <rect width="400" height="400" fill="url(#c2-sun)"/>
+          <g>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#e4572e"/>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#c73a10" transform="rotate(30 200 250)"/>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#e4572e" transform="rotate(60 200 250)"/>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#c73a10" transform="rotate(90 200 250)"/>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#e4572e" transform="rotate(-30 200 250)"/>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#c73a10" transform="rotate(-60 200 250)"/>
+          <path d="M200,250 L156,-60 L244,-60 Z" fill="#e4572e" transform="rotate(-90 200 250)"/>
+          </g>
+          <circle cx="200" cy="250" r="86" fill="#26190e"/>
+          <circle cx="200" cy="250" r="86" fill="none" stroke="#f6ecd4" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="3 6"/>
+          <circle cx="200" cy="250" r="30" fill="#eea311"/>
+          <circle cx="200" cy="250" r="4" fill="#26190e"/>
+          <text x="200" y="360" text-anchor="middle" font-family="'Bricolage Grotesque',sans-serif" font-size="42" font-weight="800" letter-spacing="-1" fill="#26190e">MERIDIAN FUNK</text>
+          <text x="200" y="386" text-anchor="middle" font-family="'Space Mono',monospace" font-size="12" font-weight="700" letter-spacing="4" fill="#7c2d12">OTIS DELACROIX</text>
+          </svg>
+        </figure>
+        <div class="album-info">
+          <p class="mono album-kicker">WVL-002 &middot; Funk / Soul &middot; 1974</p>
+          <h1 class="album-title">Meridian Funk</h1>
+          <p class="album-artist">Otis Delacroix</p>
+          <p class="album-blurb">The horn section was reportedly paid in gumbo. Every track locks into the pocket by bar two and stays there like it signed a lease. Original pressing, still smells faintly of hairspray.</p>
+          <div class="album-buy">
+            <span class="mono album-price">$31</span>
+            <span class="mono album-cond">Condition NM / sleeve VG+</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="tracklist-wrap" aria-label="Tracklist">
+        <div class="tracklist-side">
+          <h2 class="mono side-label">Side A</h2>
+          <ol class="tracklist">
+            <li data-vt="t1"><span class="tk-no">A1</span><span class="tk-title">Meridian Strut</span><span class="tk-time">4:22</span></li>
+            <li data-vt="t2"><span class="tk-no">A2</span><span class="tk-title">Gravy Train Local</span><span class="tk-time">3:48</span></li>
+            <li data-vt="t3"><span class="tk-no">A3</span><span class="tk-title">Delacroix Slide</span><span class="tk-time">5:15</span></li>
+            <li data-vt="t4"><span class="tk-no">A4</span><span class="tk-title">Hot Butter Telephone</span><span class="tk-time">3:33</span></li>
+            <li data-vt="t5"><span class="tk-no">A5</span><span class="tk-title">Ninth Ward Lean</span><span class="tk-time">4:41</span></li>
+          </ol>
+        </div>
+        <div class="tracklist-side">
+          <h2 class="mono side-label">Side B</h2>
+          <ol class="tracklist">
+            <li data-vt="t6"><span class="tk-no">B1</span><span class="tk-title">Sister Saturday</span><span class="tk-time">4:08</span></li>
+            <li data-vt="t7"><span class="tk-no">B2</span><span class="tk-title">Copper Kettle Break</span><span class="tk-time">3:26</span></li>
+            <li data-vt="t8"><span class="tk-no">B3</span><span class="tk-title">Funk for a Rainy Parade</span><span class="tk-time">5:52</span></li>
+            <li data-vt="t9"><span class="tk-no">B4</span><span class="tk-title">Take It to the Levee</span><span class="tk-time">4:17</span></li>
+            <li data-vt="t10"><span class="tk-no">B5</span><span class="tk-title">Meridian Outro (Slow Simmer)</span><span class="tk-time">2:58</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <nav class="album-pager" aria-label="More records">
+        <a class="mono" href="./album-01.html">&larr; Parallel Coasts</a>
+        <a class="mono" href="./album-03.html">Glasshouse &rarr;</a>
+      </nav>
     </main>
 
     <footer class="site-footer">
