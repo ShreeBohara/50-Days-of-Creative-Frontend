@@ -189,6 +189,32 @@
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* About page flavor: the story panel wipes in sideways, like a record
+   sliding out of its sleeve, instead of riding the root cross-fade. */
+
+.about-panel {
+  view-transition-name: about-panel;
+}
+
+::view-transition-new(about-panel) {
+  animation: 0.55s cubic-bezier(0.22, 1, 0.36, 1) both vt-sleeve-wipe;
+}
+
+::view-transition-old(about-panel) {
+  animation: 0.18s ease both vt-fade-out;
+}
+
+@keyframes vt-sleeve-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+    translate: -1rem 0;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    translate: 0 0;
+  }
+}
+
 /* ---- Tokens -------------------------------------------------------------- */
 
 :root {
