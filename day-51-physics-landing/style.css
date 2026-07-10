@@ -55,6 +55,20 @@ body {
   -webkit-user-select: none;
 }
 
+/* physics-driven elements: positioned purely via transform each tick */
+.phys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  border: var(--border);
+  box-shadow: var(--shadow-rest);
+  background: var(--paper-raised);
+}
+
 /* ---------- fixed chrome ---------- */
 
 .chrome {
