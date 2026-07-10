@@ -1,0 +1,181 @@
+/* Day 51 — HEAVY: physics playground landing page */
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/space-grotesk-latin-variable.woff2") format("woff2");
+}
+
+:root {
+  --paper: #f3ead9;
+  --paper-raised: #fbf5e8;
+  --ink: #17130e;
+  --red: #e04e26;
+  --cobalt: #2848d2;
+  --mustard: #eda712;
+  --border: 2px solid var(--ink);
+  --shadow-rest: 4px 4px 0 var(--ink);
+  --shadow-lift: 7px 9px 0 var(--ink);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  background: var(--paper);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(23, 19, 14, 0.07) 1px,
+    transparent 0
+  );
+  background-size: 26px 26px;
+  color: var(--ink);
+}
+
+/* ---------- physics stage ---------- */
+
+#stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- fixed chrome ---------- */
+
+.chrome {
+  position: fixed;
+  z-index: 40;
+}
+
+.masthead {
+  top: 20px;
+  left: 24px;
+  pointer-events: none;
+}
+
+.logo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.logo sup {
+  font-size: 0.55em;
+  font-weight: 500;
+}
+
+.tagline {
+  font-weight: 350;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.hint {
+  right: 24px;
+  bottom: 20px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* ---------- controls ---------- */
+
+.controls {
+  left: 24px;
+  bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.ctl {
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-rest);
+  padding: 8px 14px 9px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.ctl:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.ctl:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.ctl-primary {
+  background: var(--mustard);
+}
+
+.ctl-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.ctl-value {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ---------- toast ---------- */
+
+#toast {
+  position: fixed;
+  z-index: 50;
+  top: 22px;
+  left: 50%;
+  translate: -50% 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  padding: 9px 18px;
+  opacity: 0;
+  scale: 0.85;
+  pointer-events: none;
+  transition:
+    opacity 180ms ease,
+    scale 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#toast.show {
+  opacity: 1;
+  scale: 1;
+}

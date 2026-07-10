@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HEAVY — a design studio with weight</title>
+    <meta
+      name="description"
+      content="Day 51 of 50 Days of Creative Frontend — a landing page where every element is a Matter.js physics body: grab it, fling it, flip gravity, reassemble it."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- physics stage: every element inside is driven by a Matter.js body -->
+    <div id="stage" aria-label="physics playground"></div>
+
+    <!-- fixed chrome (not physical) -->
+    <header class="chrome masthead">
+      <p class="logo">HEAVY<sup>&reg;</sup></p>
+      <p class="tagline">a design studio with weight</p>
+    </header>
+
+    <aside class="chrome controls" aria-label="world controls">
+      <button id="gravity-btn" class="ctl" type="button">
+        <span class="ctl-label">gravity</span>
+        <span class="ctl-value" id="gravity-value">&darr; down</span>
+      </button>
+      <button id="shake-btn" class="ctl" type="button">
+        <span class="ctl-label">chaos</span>
+        <span class="ctl-value">shake</span>
+      </button>
+      <button id="reassemble-btn" class="ctl ctl-primary" type="button">
+        <span class="ctl-label">order</span>
+        <span class="ctl-value">reassemble</span>
+      </button>
+    </aside>
+
+    <p class="chrome hint">grab anything &mdash; it all has mass</p>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
