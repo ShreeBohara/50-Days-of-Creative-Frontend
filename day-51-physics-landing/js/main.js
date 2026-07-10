@@ -3,7 +3,7 @@
 import { createWorld } from "./engine.js";
 import { createSync } from "./sync.js";
 import { createCast, layoutCast } from "./bodies.js";
-import { setupMouse, setupGravity } from "./interactions.js";
+import { setupMouse, setupGravity, setupShake } from "./interactions.js";
 
 const { Composite, Body } = window.Matter;
 
@@ -39,6 +39,7 @@ function boot() {
   rainIn(world, sync, cast);
   setupMouse(world, cast, stage);
   setupGravity(world, cast);
+  setupShake(world, cast);
 
   world.onResize((vp) => {
     layoutCast(cast, vp);

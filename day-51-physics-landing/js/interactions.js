@@ -96,3 +96,27 @@ export function setupGravity(world, cast) {
 
   apply();
 }
+
+// shake: a random impulse blast on every body plus a 200ms screen shake
+export function setupShake(world, cast) {
+  const btn = document.getElementById("shake-btn");
+
+  btn.addEventListener("click", () => {
+    world.enableCeiling();
+    const upward = world.engine.gravity.y >= 0 ? -1 : 1;
+    for (const item of cast) {
+      Body.setVelocity(item.body, {
+        x: item.body.velocity.x + (Math.random() - 0.5) * 24,
+        y: item.body.velocity.y + upward * (4 + Math.random() * 13),
+      });
+      Body.setAngularVelocity(
+        item.body,
+        item.body.angularVelocity + (Math.random() - 0.5) * 0.4
+      );
+    }
+    document.body.classList.remove("is-shaking");
+    void document.body.offsetWidth; // restart the animation on rapid re-clicks
+    document.body.classList.add("is-shaking");
+    setTimeout(() => document.body.classList.remove("is-shaking"), 230);
+  });
+}
