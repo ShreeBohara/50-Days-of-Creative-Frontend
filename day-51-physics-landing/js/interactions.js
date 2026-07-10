@@ -97,6 +97,73 @@ export function setupGravity(world, cast) {
   apply();
 }
 
+// reassemble: freeze every body, tween it home into the proper hero layout,
+// hold the illusion of a normal landing page for 2s, then let it all collapse.
+const easeInOutCubic = (t) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+// shortest signed rotation back to upright
+const unwind = (angle) => {
+  const tau = Math.PI * 2;
+  return ((angle % tau) + tau + Math.PI) % tau - Math.PI;
+};
+
+export function setupReassemble(world, cast, sync) {
+  const btn = document.getElementById("reassemble-btn");
+  const DUR = 950;
+  const STAGGER = 45;
+  const HOLD = 2000;
+
+  btn.addEventListener("click", () => {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    world.enableCeiling();
+
+    const starts = cast.map((item, i) => ({
+      item,
+      x: item.body.position.x,
+      y: item.body.position.y,
+      a: unwind(item.body.angle),
+      delay: i * STAGGER,
+    }));
+    for (const s of starts) {
+      Body.setStatic(s.item.body, true);
+      Body.setAngle(s.item.body, s.a);
+    }
+
+    const t0 = performance.now();
+    function frame(now) {
+      let done = true;
+      for (const s of starts) {
+        const t = Math.min(1, Math.max(0, (now - t0 - s.delay) / DUR));
+        if (t < 1) done = false;
+        const e = easeInOutCubic(t);
+        const { home } = s.item;
+        Body.setPosition(s.item.body, {
+          x: s.x + (home.x - s.x) * e,
+          y: s.y + (home.y - s.y) * e,
+        });
+        Body.setAngle(s.item.body, s.a * (1 - e));
+      }
+      sync.render();
+      if (!done) {
+        requestAnimationFrame(frame);
+      } else {
+        // the held moment of order — then physics gets it back
+        setTimeout(() => {
+          for (const s of starts) {
+            Body.setStatic(s.item.body, false);
+            Body.setVelocity(s.item.body, { x: 0, y: 0 });
+            Body.setAngularVelocity(s.item.body, 0);
+          }
+          btn.disabled = false;
+        }, HOLD);
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
 // shake: a random impulse blast on every body plus a 200ms screen shake
 export function setupShake(world, cast) {
   const btn = document.getElementById("shake-btn");
