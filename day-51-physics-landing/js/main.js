@@ -13,13 +13,13 @@ import {
   REDUCED_MOTION,
 } from "./interactions.js";
 
-const { Composite, Body } = window.Matter;
+const { Composite, Body, Events } = window.Matter;
 
 // entrance: each body starts above the viewport near its layout x and drops in
 // on its own beat — letters first, then pills, cards, circles
 function rainIn(world, sync, cast) {
   const jitter = (n) => (Math.random() - 0.5) * n;
-  let last = 0;
+  let added = 0;
   cast.forEach((item, i) => {
     Body.setPosition(item.body, {
       x: item.home.x + jitter(60),
@@ -27,15 +27,22 @@ function rainIn(world, sync, cast) {
     });
     Body.setAngle(item.body, jitter(0.6));
     Body.setAngularVelocity(item.body, jitter(0.1));
-    last = 160 + i * 80 + Math.random() * 50;
     setTimeout(() => {
       sync.register(item);
       Composite.add(world.world, item.body);
-    }, last);
+      added += 1;
+    }, 160 + i * 80 + Math.random() * 50);
   });
-  // close the roof once everything has had time to fall in,
-  // so "gravity up" has something to pile against
-  setTimeout(() => world.enableCeiling(), last + 2600);
+  // close the roof only once every body has genuinely fallen into view —
+  // simulation time, not wall clock, so a paused/throttled tab can't trap
+  // stragglers on the wrong side of the ceiling
+  const guard = () => {
+    if (added < cast.length) return;
+    if (!cast.every((c) => c.body.position.y > c.h / 2)) return;
+    Events.off(world.engine, "afterUpdate", guard);
+    world.enableCeiling();
+  };
+  Events.on(world.engine, "afterUpdate", guard);
 }
 
 // reduced motion: no rain — the page opens already composed, weightless
@@ -68,6 +75,21 @@ function boot() {
   setupNavToasts(cast);
   setupIdle(world, cast);
 
+  // pull anything stranded outside the walls (resize, tunneling) back into view
+  function clampIntoView(vp) {
+    for (const item of cast) {
+      if (item.body.isStatic) continue;
+      const { x, y } = item.body.position;
+      const cx = Math.min(Math.max(x, item.w / 2 + 4), vp.w - item.w / 2 - 4);
+      let cy = Math.min(y, vp.h - item.h / 2 - 4);
+      if (world.hasCeiling()) cy = Math.max(cy, item.h / 2 + 4);
+      if (cx !== x || cy !== y) {
+        Body.setPosition(item.body, { x: cx, y: cy });
+        Body.setVelocity(item.body, { x: 0, y: 0 });
+      }
+    }
+  }
+
   world.onResize((vp) => {
     layoutCast(cast, vp);
 
@@ -88,18 +110,11 @@ function boot() {
       }
     }
 
-    // pull anything the resize stranded outside the new walls back into view
-    for (const item of cast) {
-      const { x, y } = item.body.position;
-      const cx = Math.min(Math.max(x, item.w / 2 + 4), vp.w - item.w / 2 - 4);
-      let cy = Math.min(y, vp.h - item.h / 2 - 4);
-      if (world.hasCeiling()) cy = Math.max(cy, item.h / 2 + 4);
-      if (cx !== x || cy !== y) {
-        Body.setPosition(item.body, { x: cx, y: cy });
-        Body.setVelocity(item.body, { x: 0, y: 0 });
-      }
-    }
+    clampIntoView(vp);
   });
+
+  // slow warden sweep for anything that still finds a way out
+  setInterval(() => clampIntoView(world.viewport()), 2500);
 
   console.info(`HEAVY: ${cast.length} bodies live`);
 
