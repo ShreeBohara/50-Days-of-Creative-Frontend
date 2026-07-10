@@ -67,6 +67,22 @@ body {
   border: var(--border);
   box-shadow: var(--shadow-rest);
   background: var(--paper-raised);
+  transition: box-shadow 150ms ease;
+}
+
+.phys.is-hover {
+  cursor: grab;
+  box-shadow: var(--shadow-lift);
+}
+
+.phys.is-grabbed {
+  cursor: grabbing;
+  box-shadow: 10px 13px 0 rgba(23, 19, 14, 0.85);
+  z-index: 10;
+}
+
+#stage.is-dragging {
+  cursor: grabbing;
 }
 
 /* headline letter blocks */
