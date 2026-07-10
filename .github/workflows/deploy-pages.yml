@@ -57,6 +57,7 @@ on:
       - "day-48-dither-lab/**"
       - "day-49-zero-js-scroll-museum/**"
       - "day-50-view-transitions-shop/**"
+      - "day-51-physics-landing/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -404,6 +405,7 @@ jobs:
           cp -R day-48-dither-lab _site/
           cp -R day-49-zero-js-scroll-museum _site/
           cp -R day-50-view-transitions-shop _site/
+          cp -R day-51-physics-landing _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
