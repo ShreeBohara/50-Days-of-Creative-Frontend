@@ -4,10 +4,16 @@
 export function createSync(world, stage) {
   const items = []; // { body, el, w, h, home }
 
+  function place(item) {
+    const { body, el, w, h } = item;
+    el.style.transform = `translate3d(${body.position.x - w / 2}px, ${body.position.y - h / 2}px, 0) rotate(${body.angle}rad)`;
+  }
+
   function register(item) {
     item.el.classList.add("phys");
     item.el.style.width = `${item.w}px`;
     item.el.style.height = `${item.h}px`;
+    place(item); // position before it hits the DOM so nothing flashes at 0,0
     stage.append(item.el);
     items.push(item);
     return item;

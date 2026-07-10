@@ -6,20 +6,36 @@ import { createCast, layoutCast } from "./bodies.js";
 
 const { Composite, Body } = window.Matter;
 
+// entrance: each body starts above the viewport near its layout x and drops in
+// on its own beat — letters first, then pills, cards, circles
+function rainIn(world, sync, cast) {
+  const jitter = (n) => (Math.random() - 0.5) * n;
+  let last = 0;
+  cast.forEach((item, i) => {
+    Body.setPosition(item.body, {
+      x: item.home.x + jitter(60),
+      y: -item.h / 2 - 60 - Math.random() * 300,
+    });
+    Body.setAngle(item.body, jitter(0.6));
+    Body.setAngularVelocity(item.body, jitter(0.1));
+    last = 160 + i * 80 + Math.random() * 50;
+    setTimeout(() => {
+      sync.register(item);
+      Composite.add(world.world, item.body);
+    }, last);
+  });
+  // close the roof once everything has had time to fall in,
+  // so "gravity up" has something to pile against
+  setTimeout(() => world.enableCeiling(), last + 2600);
+}
+
 function boot() {
   const stage = document.getElementById("stage");
   const world = createWorld();
   const sync = createSync(world, stage);
 
   const cast = createCast(world.viewport());
-  for (const item of cast) {
-    sync.register(item);
-    Composite.add(world.world, item.body);
-  }
-
-  // bodies currently spawn in the hero layout and immediately succumb to gravity;
-  // the staggered entrance rain replaces this in the next commit
-  world.enableCeiling();
+  rainIn(world, sync, cast);
 
   world.onResize((vp) => {
     layoutCast(cast, vp);
