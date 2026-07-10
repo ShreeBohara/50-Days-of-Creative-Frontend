@@ -66,6 +66,7 @@ export function createWorld() {
     world: engine.world,
     viewport,
     enableCeiling,
+    hasCeiling: () => ceilingEnabled,
     onResize: (fn) => resizeListeners.push(fn),
     onTick: (fn) => Events.on(engine, "afterUpdate", fn),
   };

@@ -69,6 +69,82 @@ body {
   background: var(--paper-raised);
 }
 
+/* headline letter blocks */
+.p-letter {
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 18px;
+  padding-bottom: 0.06em;
+}
+
+/* nav pills */
+.p-pill {
+  font-family: inherit;
+  color: inherit;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  cursor: grab;
+}
+
+/* feature cards */
+.p-card {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.2em;
+  padding: 0.7em 0.85em;
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.card-num {
+  position: absolute;
+  top: 0.55em;
+  right: 0.7em;
+  font-size: 0.7em;
+  font-weight: 500;
+  opacity: 0.55;
+}
+
+.card-title {
+  font-size: 1.18em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.card-copy {
+  font-size: 0.74em;
+  font-weight: 400;
+  line-height: 1.25;
+  opacity: 0.75;
+}
+
+/* decorative circles */
+.p-circle {
+  border-radius: 50%;
+}
+
+/* tones (after the component rules so they win the color cascade) */
+.phys.tone-red {
+  background: var(--red);
+}
+.phys.tone-mustard {
+  background: var(--mustard);
+}
+.phys.tone-cobalt {
+  background: var(--cobalt);
+  color: var(--paper);
+}
+.phys.tone-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+.phys.tone-paper {
+  background: var(--paper-raised);
+}
+
 /* ---------- fixed chrome ---------- */
 
 .chrome {
