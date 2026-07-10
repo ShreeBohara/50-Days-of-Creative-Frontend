@@ -1,5 +1,10 @@
-// HEAVY — boot. Modules land in later commits:
-// engine.js (world/walls), sync.js (DOM renderer), bodies.js (cast), interactions.js (controls).
+// HEAVY — boot. Remaining modules land in later commits:
+// sync.js (DOM renderer), bodies.js (cast), interactions.js (controls).
 
-const { version } = window.Matter;
-console.info(`HEAVY: Matter.js ${version} loaded, stage ready`);
+import { createWorld } from "./engine.js";
+
+const world = createWorld();
+
+console.info(
+  `HEAVY: Matter.js ${window.Matter.version} running, world ${world.viewport().w}x${world.viewport().h}`
+);
