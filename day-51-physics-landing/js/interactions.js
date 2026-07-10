@@ -47,6 +47,59 @@ export function setupMouse(world, cast, stage) {
   return mc;
 }
 
+// toast — one at a time, self-dismissing
+let toastTimer = 0;
+export function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 1900);
+}
+
+// nav pills are real buttons: a genuine click (not a fling) while the pill is
+// at rest owns up to the joke
+export function setupNavToasts(cast) {
+  let down = null;
+  for (const item of cast.filter((c) => c.kind === "pill")) {
+    item.el.addEventListener("pointerdown", (e) => {
+      down = { x: e.clientX, y: e.clientY };
+    });
+    item.el.addEventListener("click", (e) => {
+      const keyboard = e.detail === 0;
+      const moved = down
+        ? Math.hypot(e.clientX - down.x, e.clientY - down.y)
+        : 0;
+      if ((keyboard || moved < 6) && item.body.speed < 1.2) {
+        showToast("this nav has weight");
+      }
+    });
+  }
+}
+
+// idle wobble: every ~8s some body gets a tiny off-center nudge
+export function setupIdle(world, cast) {
+  function tick() {
+    setTimeout(tick, 6500 + Math.random() * 3000);
+    if (document.hidden) return;
+    if (cast.some((c) => c.body.isStatic)) return; // mid-reassemble
+    const item = cast[Math.floor(Math.random() * cast.length)];
+    const away = world.engine.gravity.y >= 0 ? -1 : 1;
+    Body.applyForce(
+      item.body,
+      {
+        x: item.body.position.x + (Math.random() - 0.5) * item.w * 0.7,
+        y: item.body.position.y,
+      },
+      {
+        x: (Math.random() - 0.5) * 0.004 * item.body.mass,
+        y: away * (0.002 + Math.random() * 0.004) * item.body.mass,
+      }
+    );
+  }
+  setTimeout(tick, 8000);
+}
+
 // gravity switch: down → float → up. Float keeps bodies adrift with tiny
 // random impulses; up piles everything against the ceiling.
 const GRAVITY_MODES = [

@@ -8,6 +8,8 @@ import {
   setupGravity,
   setupShake,
   setupReassemble,
+  setupNavToasts,
+  setupIdle,
 } from "./interactions.js";
 
 const { Composite, Body } = window.Matter;
@@ -46,6 +48,8 @@ function boot() {
   setupGravity(world, cast);
   setupShake(world, cast);
   setupReassemble(world, cast, sync);
+  setupNavToasts(cast);
+  setupIdle(world, cast);
 
   world.onResize((vp) => {
     layoutCast(cast, vp);
