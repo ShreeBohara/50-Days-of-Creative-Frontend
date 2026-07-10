@@ -33,6 +33,7 @@ body {
 }
 
 body {
+  -webkit-tap-highlight-color: transparent;
   font-family: "Space Grotesk", system-ui, sans-serif;
   background: var(--paper);
   background-image: radial-gradient(
@@ -309,4 +310,58 @@ body.is-shaking {
 #toast.show {
   opacity: 1;
   scale: 1;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 640px) {
+  .masthead {
+    top: 14px;
+    left: 16px;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+
+  .tagline {
+    font-size: 0.7rem;
+  }
+
+  .controls {
+    left: 16px;
+    bottom: 14px;
+    gap: 7px;
+  }
+
+  .ctl {
+    padding: 6px 10px 7px;
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .ctl-label {
+    font-size: 0.5rem;
+  }
+
+  .ctl-value {
+    font-size: 0.76rem;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  #toast {
+    font-size: 0.75rem;
+    max-width: 82vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phys,
+  .ctl,
+  #toast {
+    transition: none;
+  }
 }

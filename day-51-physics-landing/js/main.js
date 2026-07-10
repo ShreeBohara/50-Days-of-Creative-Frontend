@@ -1,8 +1,8 @@
-// HEAVY — boot: world, renderer, cast. Interactions land in later commits.
+// HEAVY — boot: world, renderer, cast, interactions.
 
 import { createWorld } from "./engine.js";
 import { createSync } from "./sync.js";
-import { createCast, layoutCast } from "./bodies.js";
+import { createCast, layoutCast, scaleFor } from "./bodies.js";
 import {
   setupMouse,
   setupGravity,
@@ -10,6 +10,7 @@ import {
   setupReassemble,
   setupNavToasts,
   setupIdle,
+  REDUCED_MOTION,
 } from "./interactions.js";
 
 const { Composite, Body } = window.Matter;
@@ -37,15 +38,31 @@ function rainIn(world, sync, cast) {
   setTimeout(() => world.enableCeiling(), last + 2600);
 }
 
+// reduced motion: no rain — the page opens already composed, weightless
+function placeSettled(world, sync, cast) {
+  for (const item of cast) {
+    sync.register(item);
+    Composite.add(world.world, item.body);
+  }
+  world.enableCeiling();
+}
+
 function boot() {
   const stage = document.getElementById("stage");
   const world = createWorld();
   const sync = createSync(world, stage);
 
   const cast = createCast(world.viewport());
-  rainIn(world, sync, cast);
+  let scale = scaleFor(world.viewport().w);
+
+  if (REDUCED_MOTION) {
+    placeSettled(world, sync, cast);
+  } else {
+    rainIn(world, sync, cast);
+  }
+
   setupMouse(world, cast, stage);
-  setupGravity(world, cast);
+  setupGravity(world, cast, REDUCED_MOTION ? 1 : 0); // reduced motion starts in float
   setupShake(world, cast);
   setupReassemble(world, cast, sync);
   setupNavToasts(cast);
@@ -53,6 +70,24 @@ function boot() {
 
   world.onResize((vp) => {
     layoutCast(cast, vp);
+
+    // resize across a size class: rescale bodies and their elements in place
+    const next = scaleFor(vp.w);
+    const f = next / scale;
+    if (Math.abs(f - 1) > 0.08) {
+      scale = next;
+      for (const item of cast) {
+        Body.scale(item.body, f, f);
+        item.w *= f;
+        item.h *= f;
+        if (item.r) item.r *= f;
+        item.el.style.width = `${item.w}px`;
+        item.el.style.height = `${item.h}px`;
+        const fs = parseFloat(item.el.style.fontSize);
+        if (fs) item.el.style.fontSize = `${fs * f}px`;
+      }
+    }
+
     // pull anything the resize stranded outside the new walls back into view
     for (const item of cast) {
       const { x, y } = item.body.position;

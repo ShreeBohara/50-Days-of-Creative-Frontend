@@ -2,6 +2,10 @@
 
 const { Mouse, MouseConstraint, Composite, Events, Query, Body } = window.Matter;
 
+export const REDUCED_MOTION = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
+
 export function setupMouse(world, cast, stage) {
   const mouse = Mouse.create(stage);
   const mc = MouseConstraint.create(world.engine, {
@@ -79,6 +83,7 @@ export function setupNavToasts(cast) {
 
 // idle wobble: every ~8s some body gets a tiny off-center nudge
 export function setupIdle(world, cast) {
+  if (REDUCED_MOTION) return;
   function tick() {
     setTimeout(tick, 6500 + Math.random() * 3000);
     if (document.hidden) return;
@@ -108,10 +113,10 @@ const GRAVITY_MODES = [
   { name: "up", y: -1, label: "↑ up" },
 ];
 
-export function setupGravity(world, cast) {
+export function setupGravity(world, cast, startMode = 0) {
   const btn = document.getElementById("gravity-btn");
   const value = document.getElementById("gravity-value");
-  let mode = 0;
+  let mode = startMode;
   let driftTimer = 0;
 
   function apply() {
@@ -124,7 +129,7 @@ export function setupGravity(world, cast) {
       item.body.frictionAir =
         m.name === "float" ? 0.02 : item.bodyOpts.frictionAir;
     }
-    if (m.name === "float") {
+    if (m.name === "float" && !REDUCED_MOTION) {
       driftTimer = setInterval(() => {
         for (const item of cast) {
           if (Math.random() < 0.4) continue;
@@ -163,8 +168,8 @@ const unwind = (angle) => {
 
 export function setupReassemble(world, cast, sync) {
   const btn = document.getElementById("reassemble-btn");
-  const DUR = 950;
-  const STAGGER = 45;
+  const DUR = REDUCED_MOTION ? 0.001 : 950; // reduced motion: snap, don't glide
+  const STAGGER = REDUCED_MOTION ? 0 : 45;
   const HOLD = 2000;
 
   btn.addEventListener("click", () => {
@@ -234,9 +239,11 @@ export function setupShake(world, cast) {
         item.body.angularVelocity + (Math.random() - 0.5) * 0.4
       );
     }
-    document.body.classList.remove("is-shaking");
-    void document.body.offsetWidth; // restart the animation on rapid re-clicks
-    document.body.classList.add("is-shaking");
-    setTimeout(() => document.body.classList.remove("is-shaking"), 230);
+    if (!REDUCED_MOTION) {
+      document.body.classList.remove("is-shaking");
+      void document.body.offsetWidth; // restart the animation on rapid re-clicks
+      document.body.classList.add("is-shaking");
+      setTimeout(() => document.body.classList.remove("is-shaking"), 230);
+    }
   });
 }
