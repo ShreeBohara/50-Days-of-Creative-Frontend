@@ -62,10 +62,16 @@ export function createEngine({ field }) {
     render();
   }
 
+  // Wrap v into [0, size) — true modulo, safe for negatives.
+  const wrap = (v, size) => ((v % size) + size) % size;
+
   function render() {
     for (const tile of state.tiles) {
-      const x = tile.c * state.cellW + state.x;
-      const y = tile.r * state.cellH + state.y;
+      // Wrapping by the pool size (a whole number of 5x4 repeats) means a
+      // tile that jumps from one edge to the other lands exactly where its
+      // own postcard belongs — the field is seamless in every direction.
+      const x = wrap(tile.c * state.cellW + state.x, state.poolW) - state.cellW;
+      const y = wrap(tile.r * state.cellH + state.y, state.poolH) - state.cellH;
       tile.node.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
     }
   }
@@ -88,6 +94,9 @@ export function createEngine({ field }) {
   });
 
   build();
+  // Start slightly into the field so the origin card isn't pinned to the corner.
+  state.x = -state.cellW * 0.4;
+  state.y = -state.cellH * 0.3;
   requestAnimationFrame(frame);
 
   return {
