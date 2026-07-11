@@ -77,7 +77,16 @@ body {
   will-change: transform;
 }
 
-/* ---------- Postcards ---------- */
+/* ---------- Tiles / postcards ---------- */
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--tile-w);
+  height: var(--tile-h);
+  will-change: transform;
+}
+
 .postcard {
   width: var(--tile-w);
   height: var(--tile-h);
