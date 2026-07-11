@@ -6,6 +6,7 @@ import { createEngine } from "./engine.js";
 import { createDrag } from "./drag.js";
 import { createParallax } from "./parallax.js";
 import { createOverlay } from "./overlay.js";
+import { createHud } from "./hud.js";
 
 function boot() {
   const field = document.getElementById("field");
@@ -22,6 +23,13 @@ function boot() {
     onCardClick(tile) {
       overlay.show(tile);
     },
+  });
+
+  createHud({
+    engine,
+    minimap: document.getElementById("minimap"),
+    minimapDot: document.getElementById("minimapDot"),
+    coordsValue: document.getElementById("coordsValue"),
   });
 
   // Debug handle: lets tooling drive the simulation when rAF is throttled.
