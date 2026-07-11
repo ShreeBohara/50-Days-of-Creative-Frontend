@@ -265,16 +265,26 @@ const MOTIFS = [
 /* ---------- the twenty sectors ---------- */
 
 export const CARDS = [
-  { name: "PALE HARBOR" },      { name: "THE ANNULUS" },
-  { name: "LONG GOODBYE" },     { name: "FALSE MAP" },
-  { name: "DUNES OF STATIC" },  { name: "LIGHTHOUSE 9" },
-  { name: "CLOCKWORK GARDEN" }, { name: "FOUR QUIET MOONS" },
-  { name: "LAST TRANSMITTER" }, { name: "MILK OF THE VOID" },
-  { name: "RED SHALLOWS" },     { name: "BROKEN HALO" },
-  { name: "COURIER 12" },       { name: "NORTH OF NOWHERE" },
-  { name: "GLASS STEPPE" },     { name: "METRONOME" },
-  { name: "TIDAL LEDGER" },     { name: "ECLIPSE DRILL" },
-  { name: "QUIET ANTENNA" },    { name: "TERMINUS BLOOM" },
+  { name: "PALE HARBOR",      note: "The tide here rises once a century. We waited." },
+  { name: "THE ANNULUS",      note: "The rings hum in B-flat. Nobody knows for whom." },
+  { name: "LONG GOODBYE",     note: "It has been leaving for nine thousand years." },
+  { name: "FALSE MAP",        note: "Every chart of this sector disagrees. All are correct." },
+  { name: "DUNES OF STATIC",  note: "The sand is old signal. Walk softly, it replays." },
+  { name: "LIGHTHOUSE 9",     note: "Still blinking. Still nothing to warn away." },
+  { name: "CLOCKWORK GARDEN", note: "The orbits were planted in rows. They keep time." },
+  { name: "FOUR QUIET MOONS", note: "They take turns being full. Tonight, none." },
+  { name: "LAST TRANSMITTER", note: "It repeats one word. We stopped translating it." },
+  { name: "MILK OF THE VOID", note: "The nebula is warm. This is not reassuring." },
+  { name: "RED SHALLOWS",     note: "Depth here is a rumor. Do not anchor." },
+  { name: "BROKEN HALO",      note: "The ring cracked on a Tuesday. We heard it." },
+  { name: "COURIER 12",       note: "Carrying mail between stars that no longer exist." },
+  { name: "NORTH OF NOWHERE", note: "The constellations here spell something. Don't read it." },
+  { name: "GLASS STEPPE",     note: "The horizon shatters nightly. Sweeping at dawn." },
+  { name: "METRONOME",        note: "The pulsar keeps perfect time. For nobody." },
+  { name: "TIDAL LEDGER",     note: "Every orbit is an entry. The debt never clears." },
+  { name: "ECLIPSE DRILL",    note: "Rehearsal at noon. The moons know their places." },
+  { name: "QUIET ANTENNA",    note: "It stopped asking. Now it only listens." },
+  { name: "TERMINUS BLOOM",   note: "The last stop flowers once. You just missed it." },
 ];
 
 /* Fake survey coordinates, deterministic per card */

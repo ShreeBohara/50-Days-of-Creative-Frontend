@@ -5,6 +5,7 @@
 import { createEngine } from "./engine.js";
 import { createDrag } from "./drag.js";
 import { createParallax } from "./parallax.js";
+import { createOverlay } from "./overlay.js";
 
 function boot() {
   const field = document.getElementById("field");
@@ -13,11 +14,13 @@ function boot() {
 
   createParallax({ engine, layer: document.getElementById("parallax") });
 
+  const overlay = createOverlay({ engine });
+
   createDrag({
     engine,
     universe,
     onCardClick(tile) {
-      console.info("[void-post] card click —", tile.dataset.card);
+      overlay.show(tile);
     },
   });
 
