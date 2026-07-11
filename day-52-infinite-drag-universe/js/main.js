@@ -3,10 +3,20 @@
    hidden/zero-size embed never boots with a 0x0 viewport. */
 
 import { createEngine } from "./engine.js";
+import { createDrag } from "./drag.js";
 
 function boot() {
   const field = document.getElementById("field");
+  const universe = document.getElementById("universe");
   const engine = createEngine({ field });
+
+  createDrag({
+    engine,
+    universe,
+    onCardClick(tile) {
+      console.info("[void-post] card click —", tile.dataset.card);
+    },
+  });
 
   // Debug handle: lets tooling drive the simulation when rAF is throttled.
   window.__universe = engine;
