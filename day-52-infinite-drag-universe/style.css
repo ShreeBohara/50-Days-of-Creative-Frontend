@@ -78,6 +78,16 @@ body {
 .field {
   position: absolute;
   inset: 0;
+}
+
+/* oversized so its wrap seam always sits off-screen */
+.parallax-sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% + 1520px);   /* + 2 pattern tiles */
+  height: calc(100% + 1520px);
+  background-repeat: repeat;
   will-change: transform;
 }
 

@@ -4,11 +4,14 @@
 
 import { createEngine } from "./engine.js";
 import { createDrag } from "./drag.js";
+import { createParallax } from "./parallax.js";
 
 function boot() {
   const field = document.getElementById("field");
   const universe = document.getElementById("universe");
   const engine = createEngine({ field });
+
+  createParallax({ engine, layer: document.getElementById("parallax") });
 
   createDrag({
     engine,
