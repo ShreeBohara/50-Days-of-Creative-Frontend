@@ -58,6 +58,7 @@ on:
       - "day-49-zero-js-scroll-museum/**"
       - "day-50-view-transitions-shop/**"
       - "day-51-physics-landing/**"
+      - "day-52-infinite-drag-universe/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -406,6 +407,7 @@ jobs:
           cp -R day-49-zero-js-scroll-museum _site/
           cp -R day-50-view-transitions-shop _site/
           cp -R day-51-physics-landing _site/
+          cp -R day-52-infinite-drag-universe _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
