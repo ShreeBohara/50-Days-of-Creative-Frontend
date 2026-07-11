@@ -76,8 +76,31 @@ export function createEngine({ field }) {
     }
   }
 
+  // Velocity FX: the field leans away from motion. We smooth the per-frame
+  // offset delta (covers drag AND glide) and publish it as CSS variables —
+  // one style write per frame instead of one per tile.
+  let prevX = 0, prevY = 0, smoothX = 0, smoothY = 0;
+
+  function velocityFx() {
+    const dx = state.x - prevX;
+    const dy = state.y - prevY;
+    prevX = state.x;
+    prevY = state.y;
+    smoothX += (dx - smoothX) * 0.14;
+    smoothY += (dy - smoothY) * 0.14;
+
+    const lean = (v, max) => Math.max(-1, Math.min(1, v / 70)) * max;
+    const speed = Math.hypot(smoothX, smoothY);
+    const scale = 1 - Math.min(speed / 1600, 0.045);
+    const rs = document.documentElement.style;
+    rs.setProperty("--vel-skew-x", `${(-lean(smoothX, 6)).toFixed(3)}deg`);
+    rs.setProperty("--vel-skew-y", `${(-lean(smoothY, 3.5)).toFixed(3)}deg`);
+    rs.setProperty("--vel-scale", scale.toFixed(4));
+  }
+
   function step() {
     hooks.forEach((h) => h(state));
+    velocityFx();
     render();
   }
 

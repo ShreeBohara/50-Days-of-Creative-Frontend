@@ -38,6 +38,10 @@
   --tile-w: 340px;
   --tile-h: 440px;
   --tile-gap: 56px;
+  /* live velocity FX, written by the engine every frame */
+  --vel-skew-x: 0deg;
+  --vel-skew-y: 0deg;
+  --vel-scale: 1;
 }
 
 /* ---------- Reset / base ---------- */
@@ -90,6 +94,8 @@ body {
 .postcard {
   width: var(--tile-w);
   height: var(--tile-h);
+  /* lean away from the direction of travel; engine keeps these smoothed */
+  transform: skew(var(--vel-skew-x), var(--vel-skew-y)) scale(var(--vel-scale));
   border-radius: 12px;
   border: 1px solid var(--lumen-soft);
   box-shadow:
