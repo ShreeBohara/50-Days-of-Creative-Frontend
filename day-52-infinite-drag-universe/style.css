@@ -317,6 +317,38 @@ body {
   100% { transform: translate(0, 0); }
 }
 
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  :root {
+    --tile-w: 225px;
+    --tile-h: 290px;
+    --tile-gap: 30px;
+  }
+
+  .hud-brand { top: 18px; left: 18px; }
+  .tagline { font-size: 0.54rem; }
+
+  .hud-hint {
+    top: auto;
+    bottom: 76px;
+    right: 18px;
+    font-size: 0.56rem;
+    padding: 8px 11px;
+  }
+  .hint-kbd { display: none; } /* no arrow keys on touch */
+
+  .hud-coords { bottom: 18px; left: 18px; font-size: 0.56rem; padding: 8px 11px; }
+  .hud-minimap { bottom: 18px; right: 18px; width: 70px; height: 56px; }
+
+  .overlay-name { font-size: 0.95rem; }
+  .overlay-note { font-size: 0.74rem; padding: 0 20px; }
+}
+
+/* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .grain { animation: none; }
+  .postcard { transform: none; } /* no velocity lean */
+  .overlay-backdrop,
+  .overlay-meta,
+  .overlay-close { transition: none; }
 }

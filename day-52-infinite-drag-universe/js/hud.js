@@ -12,6 +12,8 @@ const KEY_SPEED = 16;      // px/frame while an arrow is held
 const IDLE_AFTER = 5000;   // ms of no interaction before auto-drift
 const DRIFT_SPEED = 0.45;  // px/frame of idle wander
 
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
 export function createHud({ engine, overlay, universe, dragCtl, minimap, minimapDot, coordsValue }) {
   let lastText = "";
 
@@ -66,8 +68,9 @@ export function createHud({ engine, overlay, universe, dragCtl, minimap, minimap
       }
 
       // idle wander: a slow curving stroll until anything happens
-      const resting = !dragCtl.dragging && !held.size && !glideTarget &&
-                      state.vx === 0 && state.vy === 0;
+      // (skipped entirely for prefers-reduced-motion visitors)
+      const resting = !reducedMotion.matches && !dragCtl.dragging && !held.size &&
+                      !glideTarget && state.vx === 0 && state.vy === 0;
       if (resting && performance.now() - lastActive > IDLE_AFTER) {
         driftAngle += 0.002;
         state.x += Math.cos(driftAngle) * DRIFT_SPEED;

@@ -6,8 +6,9 @@
 
 import { buildPostcardSVG, CARDS, cardCoords, CARD_W, CARD_H } from "./postcards.js";
 
-const OPEN_MS = 460;
-const CLOSE_MS = 340;
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const OPEN_MS = () => (reducedMotion.matches ? 0 : 460);
+const CLOSE_MS = () => (reducedMotion.matches ? 0 : 340);
 
 export function createOverlay({ engine }) {
   let open = false;
@@ -98,10 +99,10 @@ export function createOverlay({ engine }) {
     card.style.transition = "none";
     card.style.transform = flipFrom(tile.getBoundingClientRect(), to);
     void card.offsetWidth; // commit the inverted state before releasing it
-    card.style.transition = `transform ${OPEN_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+    card.style.transition = `transform ${OPEN_MS()}ms cubic-bezier(0.22, 1, 0.36, 1)`;
     card.style.transform = "none";
 
-    setTimeout(() => root.classList.add("is-settled"), OPEN_MS * 0.55);
+    setTimeout(() => root.classList.add("is-settled"), OPEN_MS() * 0.55);
     closeBtn.focus();
   }
 
@@ -115,7 +116,7 @@ export function createOverlay({ engine }) {
     const onScreen = from && from.right > 0 && from.left < innerWidth &&
                      from.bottom > 0 && from.top < innerHeight;
 
-    card.style.transition = `transform ${CLOSE_MS}ms cubic-bezier(0.55, 0, 0.55, 0.2)`;
+    card.style.transition = `transform ${CLOSE_MS()}ms cubic-bezier(0.55, 0, 0.55, 0.2)`;
     card.style.transform = onScreen
       ? flipFrom(from, to)
       : "translate(0px, 40px) scale(0.9)"; // origin drifted away: settle down and fade
@@ -124,7 +125,7 @@ export function createOverlay({ engine }) {
       root.classList.remove("is-open");
       card.style.transition = "none";
       card.style.transform = "none";
-    }, CLOSE_MS);
+    }, CLOSE_MS());
 
     if (lastFocus && lastFocus.focus) lastFocus.focus();
     originTile = null;
