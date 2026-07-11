@@ -1,0 +1,193 @@
+/* ============================================================
+   DAY 52 — VOID POST · Infinite Drag Universe
+   Deep-navy space field, luminous postcard borders, film grain.
+   ============================================================ */
+
+/* ---------- Fonts (self-hosted, variable, latin) ---------- */
+@font-face {
+  font-family: "Syne";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("./fonts/Syne-Variable-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Martian Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("./fonts/MartianMono-Variable-latin.woff2") format("woff2");
+}
+
+/* ---------- Tokens ---------- */
+:root {
+  --void: #05081a;          /* page deep navy */
+  --void-2: #0a1030;        /* card face navy */
+  --ink: #e9edff;           /* starlight text */
+  --ink-dim: #8a93c4;       /* muted labels */
+  --lumen: #86e7ff;         /* luminous border cyan */
+  --lumen-soft: rgba(134, 231, 255, 0.28);
+  --aurora-a: #7df0c8;      /* mint */
+  --aurora-b: #ff8ad8;      /* magenta */
+  --aurora-c: #ffd479;      /* amber */
+  --aurora-d: #a08bff;      /* violet */
+  --hud-bg: rgba(6, 9, 28, 0.55);
+  --border-hud: 1px solid rgba(134, 231, 255, 0.22);
+  --font-display: "Syne", sans-serif;
+  --font-mono: "Martian Mono", monospace;
+  --tile-w: 340px;
+  --tile-h: 440px;
+  --tile-gap: 56px;
+}
+
+/* ---------- Reset / base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;           /* the universe pans, the page never scrolls */
+  overscroll-behavior: none;
+}
+
+body {
+  background:
+    radial-gradient(120vmax 120vmax at 70% -20%, #0c1440 0%, transparent 55%),
+    radial-gradient(90vmax 90vmax at 10% 110%, #170f38 0%, transparent 50%),
+    var(--void);
+  color: var(--ink);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- Universe / field ---------- */
+.universe {
+  position: fixed;
+  inset: 0;
+  cursor: grab;
+  touch-action: none;         /* we handle all panning ourselves */
+}
+.universe.is-dragging { cursor: grabbing; }
+
+.parallax-layer,
+.field {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* ---------- HUD chrome ---------- */
+.hud {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  font-family: var(--font-mono);
+}
+
+.hud-brand { top: 28px; left: 32px; }
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: var(--ink);
+  text-shadow: 0 0 24px rgba(134, 231, 255, 0.35);
+}
+.tagline {
+  margin-top: 8px;
+  font-size: 0.62rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+}
+
+.hud-hint {
+  top: 32px;
+  right: 32px;
+  font-size: 0.62rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  padding: 10px 14px;
+  background: var(--hud-bg);
+  border: var(--border-hud);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+.hint-key { color: var(--lumen); font-weight: 500; }
+
+.hud-coords {
+  bottom: 28px;
+  left: 32px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 0.66rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  padding: 10px 14px;
+  background: var(--hud-bg);
+  border: var(--border-hud);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+}
+.coords-label { color: var(--lumen); font-weight: 600; font-size: 0.58rem; }
+.coords-value { font-variant-numeric: tabular-nums; }
+
+.hud-minimap {
+  bottom: 28px;
+  right: 32px;
+  width: 92px;
+  height: 74px;
+  background: var(--hud-bg);
+  border: var(--border-hud);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+/* faint 5x4 cell grid inside the minimap */
+.hud-minimap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(to right, transparent 0, transparent calc(20% - 1px), rgba(134, 231, 255, 0.10) calc(20% - 1px), rgba(134, 231, 255, 0.10) 20%),
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(25% - 1px), rgba(134, 231, 255, 0.10) calc(25% - 1px), rgba(134, 231, 255, 0.10) 25%);
+}
+.minimap-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lumen);
+  box-shadow: 0 0 10px var(--lumen), 0 0 3px #fff;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+}
+
+/* ---------- Film grain over everything ---------- */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 40;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  animation: grain-shift 0.9s steps(4) infinite;
+}
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-2%, 1.4%); }
+  50%  { transform: translate(1.6%, -1%); }
+  75%  { transform: translate(-1%, -1.8%); }
+  100% { transform: translate(0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VOID POST — Infinite Drag Universe · Day 52</title>
+  <meta name="description" content="An infinitely draggable universe of postcards from nowhere. Grab the void and fling it — it wraps forever. Day 52 of 50 Days of Creative Frontend." />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- The draggable universe: parallax starfield behind, postcard field in front -->
+  <main class="universe" id="universe" aria-label="Infinite draggable field of postcards">
+    <div class="parallax-layer" id="parallax" aria-hidden="true"></div>
+    <div class="field" id="field"></div>
+  </main>
+
+  <!-- HUD chrome — fixed above the universe -->
+  <header class="hud hud-brand">
+    <h1 class="wordmark">VOID&nbsp;POST</h1>
+    <p class="tagline">twenty postcards from nowhere · repeating forever</p>
+  </header>
+
+  <div class="hud hud-hint" id="hint">
+    <span class="hint-key">drag</span> anywhere ·
+    <span class="hint-key">click</span> a card ·
+    <span class="hint-key">&larr;&uarr;&darr;&rarr;</span> pan
+  </div>
+
+  <div class="hud hud-coords" id="coords" aria-live="off">
+    <span class="coords-label">POS</span>
+    <span class="coords-value" id="coordsValue">+00.0000&deg; / +00.0000&deg;</span>
+  </div>
+
+  <div class="hud hud-minimap" id="minimap" aria-hidden="true">
+    <div class="minimap-dot" id="minimapDot"></div>
+  </div>
+
+  <!-- Film grain over everything -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
