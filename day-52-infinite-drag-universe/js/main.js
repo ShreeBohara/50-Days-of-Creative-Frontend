@@ -17,7 +17,7 @@ function boot() {
 
   const overlay = createOverlay({ engine });
 
-  createDrag({
+  const dragCtl = createDrag({
     engine,
     universe,
     onCardClick(tile) {
@@ -27,6 +27,9 @@ function boot() {
 
   createHud({
     engine,
+    overlay,
+    universe,
+    dragCtl,
     minimap: document.getElementById("minimap"),
     minimapDot: document.getElementById("minimapDot"),
     coordsValue: document.getElementById("coordsValue"),
