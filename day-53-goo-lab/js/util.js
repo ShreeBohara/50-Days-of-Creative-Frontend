@@ -26,7 +26,13 @@ function applyAttrs(node, attrs, isSvg = false) {
     if (key === 'class') node.setAttribute('class', value);
     else if (key === 'text') node.textContent = value;
     else if (key === 'html') throw new Error('util: use text/children, not html');
-    else if (key === 'style' && typeof value === 'object') Object.assign(node.style, value);
+    else if (key === 'style' && typeof value === 'object') {
+      // Object.assign skips CSS custom properties (--x), so set them explicitly.
+      for (const [k, v] of Object.entries(value)) {
+        if (k.startsWith('--')) node.style.setProperty(k, v);
+        else node.style[k] = v;
+      }
+    }
     else if (key.startsWith('on') && typeof value === 'function') {
       node.addEventListener(key.slice(2).toLowerCase(), value);
     } else if (isSvg) node.setAttribute(key, value);
