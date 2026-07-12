@@ -4,7 +4,7 @@
 // The whole thing is driven by a single normalised progress p∈[0,1], so it can
 // be played on rAF *or* seek()'d frame-by-frame (handy since preview rAF pauses).
 
-import { el, svgEl, clamp, lerp, easeInOut, TAU } from './util.js';
+import { el, svgEl, clamp, lerp, easeInOut, TAU, prefersReducedMotion, onVisible } from './util.js';
 
 const C = 100;             // centre of the 200×200 viewBox
 const ORBIT = 48;          // orbit radius
@@ -96,8 +96,15 @@ export function mountLoader(stage) {
   function play() { p = 0; startT = 0; playing = true; render(0); requestAnimationFrame(frame); }
 
   replay.addEventListener('click', play);
-  render(0);
-  play(); // autoplay once on mount
+  // play the sequence the first time it scrolls into view; if the user prefers
+  // reduced motion, just rest on the finished checkmark.
+  if (prefersReducedMotion()) {
+    render(1);
+  } else {
+    render(0);
+    let played = false;
+    onVisible(wrap, (on) => { if (on && !played) { played = true; play(); } });
+  }
 
   return {
     play,

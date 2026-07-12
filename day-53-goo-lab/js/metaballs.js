@@ -103,7 +103,7 @@ export function mountMetaballs(stage) {
     fctx.fillRect(0, 0, FW, FH);
     fctx.globalCompositeOperation = 'lighter';
     for (const b of blobs) {
-      const rr = b.r * (1 + Math.sin(t * 0.03 + b.phase) * b.pulse);
+      const rr = reduced ? b.r : b.r * (1 + Math.sin(t * 0.03 + b.phase) * b.pulse);
       stamp(b.x, b.y, rr);
     }
     stamp(cursor.x, cursor.y, cursor.r * (cursor.active ? 1.15 : 1));
@@ -178,6 +178,8 @@ export function mountMetaballs(stage) {
   const ro = new ResizeObserver(resize);
   ro.observe(stage);
   window.addEventListener('resize', resize);
+  window.matchMedia('(prefers-reduced-motion: reduce)')
+    .addEventListener('change', (e) => { reduced = e.matches; });
   resize();
   start();                                   // eager — run immediately
   // IntersectionObserver only PAUSES the loop when the section is off-screen
