@@ -1,3 +1,5 @@
+import { createGrainTexture, drawSurfaceEffects } from "./effects.js";
+
 function hexToRgba(hex, alpha) {
   const value = hex.replace("#", "");
   const normalized = value.length === 3
@@ -55,6 +57,7 @@ export function createMeshRenderer(canvas) {
   const displayContext = canvas.getContext("2d", { alpha: false });
   const workCanvas = document.createElement("canvas");
   const workContext = workCanvas.getContext("2d", { alpha: false });
+  const grainTexture = createGrainTexture();
   let dimensions = getSurfaceDimensions(1, 1);
 
   function resize(
@@ -88,6 +91,7 @@ export function createMeshRenderer(canvas) {
       canvas.width,
       canvas.height,
     );
+    drawSurfaceEffects(displayContext, canvas.width, canvas.height, scene.settings, grainTexture);
   }
 
   return {
@@ -99,6 +103,9 @@ export function createMeshRenderer(canvas) {
     },
     get workCanvas() {
       return workCanvas;
+    },
+    get grainTexture() {
+      return grainTexture;
     },
     resize,
     render,
