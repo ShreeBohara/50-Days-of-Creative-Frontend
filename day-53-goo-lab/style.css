@@ -370,7 +370,7 @@ body {
   height: 100%;
   border-radius: 10px;
   cursor: crosshair;
-  touch-action: none;      /* let us drive the cursor blob on touch */
+  touch-action: pan-y;     /* blob follows touch, but vertical scroll still works */
   background:
     radial-gradient(90% 120% at 50% 0%, #0c140f, #070a08);
 }
@@ -586,6 +586,30 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .lava { animation: none; }
   .lava-blob { animation: none; }
+}
+
+/* =========================================================================
+   Responsive
+   ========================================================================= */
+@media (max-width: 760px) {
+  .goo-explainer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .specimen { padding: 1.35rem 1.15rem; }
+  .specimen::before { left: 1.15rem; }
+  /* shrink the radial fan so it never overflows a phone panel */
+  .radial { transform: translateY(46px) scale(0.82); }
+  .spec-stage { min-height: clamp(260px, 46vh, 360px); }
+  .spec-stage--canvas { min-height: clamp(300px, 62vh, 440px); }
+  /* compact the metaball theme pill */
+  .mb-ui { gap: 3px; padding: 4px; bottom: 10px; }
+  .mb-theme { padding: 6px 10px 6px 8px; font-size: 0.62rem; gap: 5px; }
+  .mb-dot { width: 9px; height: 9px; }
+  .gtext { font-size: clamp(3rem, 19vw, 5rem); }
 }
 
 /* ---- footer ------------------------------------------------------------ */
