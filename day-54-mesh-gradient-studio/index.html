@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#061a24" />
+    <meta
+      name="description"
+      content="MESH / 54 is an animated grainy gradient studio built with Canvas and vanilla JavaScript."
+    />
+    <title>MESH / 54 — Gradient Studio</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="studio" id="studio">
+      <canvas id="mesh-canvas" aria-hidden="true"></canvas>
+
+      <header class="studio-mark">
+        <p>50 Days of Creative Frontend · Day 54</p>
+        <h1>MESH <span>/54</span></h1>
+      </header>
+
+      <aside class="control-panel" id="control-panel" aria-label="Mesh gradient controls">
+        <p class="boot-status" id="boot-status">Preparing color field…</p>
+      </aside>
+
+      <p class="sr-only" id="live-region" role="status" aria-live="polite"></p>
+    </main>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
