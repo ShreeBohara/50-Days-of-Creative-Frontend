@@ -4,14 +4,19 @@
 // (More specimen modules are wired in over the following commits.)
 
 import { mountRadialMenu } from './radialMenu.js';
+import { mountMetaballs } from './metaballs.js';
 
 function mount(id, fn) {
   const stage = document.getElementById(id);
-  if (stage) fn(stage);
+  return stage ? fn(stage) : null;
 }
 
 function boot() {
-  mount('stage-radial', mountRadialMenu);
+  // controllers are exposed on window.goolab so the effects can be poked/tested
+  window.goolab = {
+    radial: mount('stage-radial', mountRadialMenu),
+    metaballs: mount('stage-metaballs', mountMetaballs),
+  };
 }
 
 if (document.readyState === 'loading') {
