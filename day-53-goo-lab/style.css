@@ -4,6 +4,24 @@
    goo, mono specimen labels, faint film grain.
    ========================================================================= */
 
+/* Self-hosted variable fonts (latin subset), see fonts/ + OFL licenses.
+   Baloo 2 (rounded) melts nicely under the goo filter; Spline Sans Mono is
+   the lab-instrument UI face. */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('./fonts/Baloo2-Variable-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('./fonts/SplineSansMono-Variable-latin.woff2') format('woff2');
+}
+
 :root {
   /* palette */
   --bg:        #0a0d0b;
