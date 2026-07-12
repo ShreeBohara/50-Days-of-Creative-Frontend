@@ -6,6 +6,7 @@
 import { mountRadialMenu } from './radialMenu.js';
 import { mountMetaballs } from './metaballs.js';
 import { mountLoader } from './loader.js';
+import { mountGooeyText } from './gooeyText.js';
 
 function mount(id, fn) {
   const stage = document.getElementById(id);
@@ -18,6 +19,7 @@ function boot() {
     radial: mount('stage-radial', mountRadialMenu),
     metaballs: mount('stage-metaballs', mountMetaballs),
     loader: mount('stage-loader', mountLoader),
+    text: mount('stage-text', mountGooeyText),
   };
 }
 

@@ -388,6 +388,83 @@ body {
 .loader-replay:active { transform: translateY(1px); }
 .loader-replay-ic { width: 16px; height: 16px; }
 
+/* =========================================================================
+   SPECIMEN 04 — Gooey Text
+   ========================================================================= */
+.gtext-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.75rem;
+}
+.gtext {
+  filter: url(#goo-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3.6rem, 15vw, 8.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;    /* tight so the goo bridges neighbouring letters */
+  color: var(--slime);
+  cursor: pointer;
+  user-select: none;
+  padding: 0.15em 0.1em;
+}
+.gtext-cell {
+  display: inline-block;
+  animation: gdrift 3.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.22s);
+}
+.gtext-glyph {
+  display: inline-block;
+  transition: transform 0.55s var(--ease-goo);
+}
+/* hover pulls letters apart from the centre; the goo stretches then snaps */
+.gtext:hover .gtext-glyph { transform: translateX(calc(var(--i) * 18px)); }
+@keyframes gdrift {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+.visc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.visc-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: min(56vw, 240px);
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--slime-deep), var(--slime));
+  outline: none;
+  cursor: pointer;
+}
+.visc-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #eafff0;
+  box-shadow: 0 0 10px var(--glow);
+  cursor: grab;
+}
+.visc-range::-moz-range-thumb {
+  width: 20px; height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: #eafff0;
+  box-shadow: 0 0 10px var(--glow);
+  cursor: grab;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtext-cell { animation: none; }
+}
+
 /* ---- footer ------------------------------------------------------------ */
 .lab-foot {
   border-top: 1px solid var(--line);
