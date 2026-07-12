@@ -40,8 +40,55 @@
     <p class="scroll-cue" aria-hidden="true">scroll to inspect ↓</p>
   </header>
 
-  <!-- Specimens get injected/enhanced here (built in later commits) -->
-  <main class="specimens" id="specimens"></main>
+  <!-- Five specimens. Each .spec-stage is a mount point a JS module fills in. -->
+  <main class="specimens" id="specimens">
+
+    <section class="specimen" id="spec-01" data-spec="radial-menu">
+      <div class="spec-head">
+        <span class="spec-num">Specimen 01</span>
+        <h2 class="spec-name">Gooey Radial Menu</h2>
+        <p class="spec-desc">A tap makes five actions ooze out of one button, held together by liquid necks until they pull free.</p>
+      </div>
+      <div class="spec-stage" id="stage-radial"></div>
+    </section>
+
+    <section class="specimen" id="spec-02" data-spec="metaballs">
+      <div class="spec-head">
+        <span class="spec-num">Specimen 02</span>
+        <h2 class="spec-name">Cursor Metaballs</h2>
+        <p class="spec-desc">Eight blobs wander a field; a ninth follows your cursor. Get close and they fuse into one organism.</p>
+      </div>
+      <div class="spec-stage spec-stage--canvas" id="stage-metaballs"></div>
+    </section>
+
+    <section class="specimen" id="spec-03" data-spec="loader">
+      <div class="spec-head">
+        <span class="spec-num">Specimen 03</span>
+        <h2 class="spec-name">Liquid Loader</h2>
+        <p class="spec-desc">A drop falls, splits into three, orbits, re-merges, then resolves into a checkmark. Replayable.</p>
+      </div>
+      <div class="spec-stage" id="stage-loader"></div>
+    </section>
+
+    <section class="specimen" id="spec-04" data-spec="text">
+      <div class="spec-head">
+        <span class="spec-num">Specimen 04</span>
+        <h2 class="spec-name">Gooey Text</h2>
+        <p class="spec-desc">Letters that melt into their neighbours. Drag the viscosity slider to thin or thicken the goo.</p>
+      </div>
+      <div class="spec-stage" id="stage-text"></div>
+    </section>
+
+    <section class="specimen specimen--bleed" id="spec-05" data-spec="lava">
+      <div class="spec-head">
+        <span class="spec-num">Specimen 05</span>
+        <h2 class="spec-name">Lava Lamp</h2>
+        <p class="spec-desc">An ambient culture: blobs rise, fall, and swap heat as the hue drifts. Just let it breathe.</p>
+      </div>
+      <div class="spec-stage" id="stage-lava"></div>
+    </section>
+
+  </main>
 
   <footer class="lab-foot">
     <span>GOO LAB — cultured in vanilla HTML/CSS/JS · no libraries</span>

@@ -120,15 +120,78 @@ body {
   50%      { transform: translateY(6px); opacity: 1; }
 }
 
-/* ---- specimen shell (populated in later commits) ----------------------- */
+/* ---- specimen shell ---------------------------------------------------- */
 .specimens {
   display: flex;
   flex-direction: column;
-  gap: clamp(3rem, 9vw, 7rem);
+  gap: clamp(3.5rem, 9vw, 8rem);
   padding: 0 var(--pad) 6rem;
   max-width: 1180px;
   margin: 0 auto;
 }
+
+.specimen {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 40%),
+    var(--bg-panel);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  overflow: hidden;
+}
+
+/* a corner tab of bioluminescence to make each panel feel like a slide */
+.specimen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: clamp(1.5rem, 4vw, 2.75rem);
+  width: 46px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--slime), var(--cyan));
+  box-shadow: 0 0 14px var(--glow);
+}
+
+.spec-head { max-width: 52ch; margin-bottom: 2rem; }
+
+.spec-num {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 0.6rem;
+}
+
+.spec-name {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  line-height: 1.02;
+  color: var(--ink);
+}
+
+.spec-desc {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: clamp(0.85rem, 2.2vw, 0.98rem);
+  max-width: 46ch;
+}
+
+/* the interactive area every specimen mounts into */
+.spec-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(280px, 42vh, 440px);
+}
+
+.spec-stage--canvas { min-height: clamp(320px, 52vh, 560px); }
+
+/* full-bleed ambient specimen (lava lamp) */
+.specimen--bleed .spec-stage { min-height: clamp(420px, 78vh, 760px); }
 
 /* ---- footer ------------------------------------------------------------ */
 .lab-foot {
