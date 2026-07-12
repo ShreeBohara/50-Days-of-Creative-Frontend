@@ -19,10 +19,57 @@
       <header class="studio-mark">
         <p>50 Days of Creative Frontend · Day 54</p>
         <h1>MESH <span>/54</span></h1>
+        <div class="field-status" aria-hidden="true">
+          <span class="status-orbit"><i></i></span>
+          <span>Generative color field</span>
+        </div>
       </header>
 
       <aside class="control-panel" id="control-panel" aria-label="Mesh gradient controls">
-        <p class="boot-status" id="boot-status">Preparing color field…</p>
+        <header class="panel-header">
+          <div>
+            <p class="panel-kicker">Gradient instrument</p>
+            <h2>Field controls</h2>
+          </div>
+          <span class="live-chip"><i></i> Live</span>
+        </header>
+
+        <form class="control-form" id="control-form">
+          <section class="control-section" aria-labelledby="palette-heading">
+            <header class="section-header">
+              <span>01</span>
+              <h3 id="palette-heading">Palette</h3>
+            </header>
+            <div class="module-placeholder" id="palette-controls">
+              <span>Curated color fields</span>
+            </div>
+          </section>
+
+          <section class="control-section" aria-labelledby="motion-heading">
+            <header class="section-header">
+              <span>02</span>
+              <h3 id="motion-heading">Motion</h3>
+            </header>
+            <div class="module-placeholder" id="motion-controls">
+              <span>Drift and composition</span>
+            </div>
+          </section>
+
+          <section class="control-section" aria-labelledby="surface-heading">
+            <header class="section-header">
+              <span>03</span>
+              <h3 id="surface-heading">Surface</h3>
+            </header>
+            <div class="module-placeholder" id="surface-controls">
+              <span>Grain and light falloff</span>
+            </div>
+          </section>
+        </form>
+
+        <footer class="panel-footer">
+          <span id="boot-status">Color field online</span>
+          <span>Canvas / sRGB</span>
+        </footer>
       </aside>
 
       <p class="sr-only" id="live-region" role="status" aria-live="polite"></p>
