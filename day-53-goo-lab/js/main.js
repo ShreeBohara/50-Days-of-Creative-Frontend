@@ -5,6 +5,7 @@
 
 import { mountRadialMenu } from './radialMenu.js';
 import { mountMetaballs } from './metaballs.js';
+import { mountLoader } from './loader.js';
 
 function mount(id, fn) {
   const stage = document.getElementById(id);
@@ -16,6 +17,7 @@ function boot() {
   window.goolab = {
     radial: mount('stage-radial', mountRadialMenu),
     metaballs: mount('stage-metaballs', mountMetaballs),
+    loader: mount('stage-loader', mountLoader),
   };
 }
 

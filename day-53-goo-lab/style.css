@@ -342,6 +342,52 @@ body {
   border-color: color-mix(in srgb, var(--sw) 60%, transparent);
 }
 
+/* =========================================================================
+   SPECIMEN 03 — Liquid Loader
+   ========================================================================= */
+.loader-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.loader-svg {
+  width: clamp(180px, 34vw, 260px);
+  height: auto;
+  overflow: visible;
+}
+.loader-check {
+  fill: none;
+  stroke: #eafff0;
+  stroke-width: 15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  filter: drop-shadow(0 0 7px var(--glow));
+}
+.loader-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+.loader-replay:hover {
+  color: var(--slime);
+  border-color: color-mix(in srgb, var(--slime) 45%, transparent);
+}
+.loader-replay:active { transform: translateY(1px); }
+.loader-replay-ic { width: 16px; height: 16px; }
+
 /* ---- footer ------------------------------------------------------------ */
 .lab-foot {
   border-top: 1px solid var(--line);
