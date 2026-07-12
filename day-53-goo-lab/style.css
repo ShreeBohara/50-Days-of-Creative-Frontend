@@ -191,7 +191,12 @@ body {
 .spec-stage--canvas { min-height: clamp(320px, 52vh, 560px); }
 
 /* full-bleed ambient specimen (lava lamp) */
-.specimen--bleed .spec-stage { min-height: clamp(420px, 78vh, 760px); }
+.specimen--bleed .spec-stage {
+  min-height: clamp(420px, 78vh, 760px);
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(130% 100% at 50% 118%, #11241b, #080b09 72%);
+}
 
 /* =========================================================================
    SPECIMEN 01 — Gooey Radial Menu
@@ -463,6 +468,53 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .gtext-cell { animation: none; }
+}
+
+/* =========================================================================
+   SPECIMEN 05 — Lava Lamp
+   ========================================================================= */
+@property --lava-hue {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.lava {
+  position: absolute;
+  inset: 0;
+  filter: url(#goo) hue-rotate(var(--lava-hue));
+  animation: lavaHue 28s linear infinite;
+}
+.lava-blob {
+  position: absolute;
+  bottom: -9%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 34%, #c4ffd4, var(--slime) 52%, var(--cyan));
+  animation-name: lavaRise;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.lava-pool {
+  position: absolute;
+  left: -6%;
+  width: 112%;
+  background: radial-gradient(60% 120% at 50% 50%, var(--slime), var(--cyan));
+}
+.lava-pool--bottom { bottom: -14%; height: 24%; border-radius: 46% 54% 0 0 / 60% 55% 0 0; }
+.lava-pool--top    { top: -14%; height: 22%; border-radius: 0 0 54% 46% / 0 0 55% 60%; }
+
+@keyframes lavaRise {
+  0%   { transform: translateY(12vh) scale(1);     border-radius: 46% 54% 60% 40% / 55% 48% 52% 45%; }
+  25%  { transform: translateY(-16vh) scale(1.05); border-radius: 60% 40% 45% 55% / 45% 60% 40% 55%; }
+  50%  { transform: translateY(-52vh) scale(1.14); border-radius: 40% 60% 55% 45% / 60% 45% 55% 40%; }
+  75%  { transform: translateY(-18vh) scale(1.04); border-radius: 55% 45% 40% 60% / 48% 55% 45% 52%; }
+  100% { transform: translateY(12vh) scale(1);     border-radius: 46% 54% 60% 40% / 55% 48% 52% 45%; }
+}
+@keyframes lavaHue { to { --lava-hue: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lava { animation: none; }
+  .lava-blob { animation: none; }
 }
 
 /* ---- footer ------------------------------------------------------------ */
