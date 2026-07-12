@@ -1,0 +1,141 @@
+/* =========================================================================
+   GOO LAB — Day 53
+   Aesthetic: "bio-lab slime" — near-black cabinet, bioluminescent green/cyan
+   goo, mono specimen labels, faint film grain.
+   ========================================================================= */
+
+:root {
+  /* palette */
+  --bg:        #0a0d0b;
+  --bg-panel:  #0e120f;
+  --ink:       #e7f4ec;
+  --ink-dim:   #8fa79a;
+  --ink-faint: #5b6f65;
+  --line:      #1c2620;
+
+  --slime:  #7cff9b;  /* primary bioluminescent green */
+  --cyan:   #35e0d8;  /* secondary cyan */
+  --slime-deep: #29c66a;
+  --glow:   rgba(124, 255, 155, 0.55);
+
+  /* type */
+  --font-mono: 'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Baloo 2', var(--font-mono);
+  --font-ui: var(--font-mono);
+
+  /* rhythm */
+  --pad: clamp(1.25rem, 4vw, 3.5rem);
+  --radius: 14px;
+  --ease-goo: cubic-bezier(0.5, 1.4, 0.5, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #101712 0%, var(--bg) 55%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* off-screen filter host */
+.goo-defs { position: absolute; width: 0; height: 0; pointer-events: none; }
+
+/* ---- masthead ---------------------------------------------------------- */
+.masthead {
+  min-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--pad);
+  gap: 0.75rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.lab-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3.5rem, 18vw, 12rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  color: var(--slime);
+  text-shadow: 0 0 32px var(--glow), 0 0 4px rgba(124, 255, 155, 0.6);
+}
+
+.lab-sub {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--ink-dim);
+  font-size: clamp(0.85rem, 2.4vw, 1.05rem);
+}
+
+.scroll-cue {
+  margin-top: 2.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  animation: bob 2.4s var(--ease-goo) infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50%      { transform: translateY(6px); opacity: 1; }
+}
+
+/* ---- specimen shell (populated in later commits) ----------------------- */
+.specimens {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 9vw, 7rem);
+  padding: 0 var(--pad) 6rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* ---- footer ------------------------------------------------------------ */
+.lab-foot {
+  border-top: 1px solid var(--line);
+  padding: 2rem var(--pad) 3rem;
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ---- film grain -------------------------------------------------------- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* respect users who ask for calm */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scroll-cue { animation: none; }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOO LAB — Liquid Effects Collection · Day 53</title>
+  <meta name="description" content="A specimen cabinet of five liquid effects — a gooey radial menu, cursor metaballs, a morphing liquid loader, melting text, and a lava-lamp — all built from one SVG goo filter. Day 53 of 50 Days of Creative Frontend." />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!--
+    Shared goo filters live here, once, off-screen. Any element with
+    filter:url(#goo) has its blurred children fused into liquid blobs.
+    #goo-text is a second copy whose stdDeviation the viscosity slider drives live.
+  -->
+  <svg class="goo-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+      <filter id="goo-text">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Page masthead -->
+  <header class="masthead">
+    <p class="eyebrow">50 Days of Creative Frontend · Day 53</p>
+    <h1 class="lab-title">GOO&nbsp;LAB</h1>
+    <p class="lab-sub">Five liquid specimens grown from a single SVG goo filter.</p>
+    <p class="scroll-cue" aria-hidden="true">scroll to inspect ↓</p>
+  </header>
+
+  <!-- Specimens get injected/enhanced here (built in later commits) -->
+  <main class="specimens" id="specimens"></main>
+
+  <footer class="lab-foot">
+    <span>GOO LAB — cultured in vanilla HTML/CSS/JS · no libraries</span>
+  </footer>
+
+  <!-- Film grain over everything -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
