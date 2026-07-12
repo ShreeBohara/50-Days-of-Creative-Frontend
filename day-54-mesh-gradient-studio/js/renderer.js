@@ -10,6 +10,19 @@ function hexToRgba(hex, alpha) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
+export function getSurfaceDimensions(cssWidth, cssHeight, devicePixelRatio = 1) {
+  const dpr = Math.min(Math.max(devicePixelRatio || 1, 1), 2);
+  return {
+    cssWidth: Math.max(1, Math.round(cssWidth)),
+    cssHeight: Math.max(1, Math.round(cssHeight)),
+    displayWidth: Math.max(1, Math.round(cssWidth * dpr)),
+    displayHeight: Math.max(1, Math.round(cssHeight * dpr)),
+    workWidth: Math.max(1, Math.ceil(cssWidth / 8)),
+    workHeight: Math.max(1, Math.ceil(cssHeight / 8)),
+    dpr,
+  };
+}
+
 export function renderMesh(context, width, height, scene) {
   context.globalAlpha = 1;
   context.globalCompositeOperation = "source-over";
@@ -36,4 +49,58 @@ export function renderMesh(context, width, height, scene) {
 
   context.globalAlpha = 1;
   context.globalCompositeOperation = "source-over";
+}
+
+export function createMeshRenderer(canvas) {
+  const displayContext = canvas.getContext("2d", { alpha: false });
+  const workCanvas = document.createElement("canvas");
+  const workContext = workCanvas.getContext("2d", { alpha: false });
+  let dimensions = getSurfaceDimensions(1, 1);
+
+  function resize(
+    cssWidth = window.innerWidth,
+    cssHeight = window.innerHeight,
+    devicePixelRatio = window.devicePixelRatio,
+  ) {
+    dimensions = getSurfaceDimensions(cssWidth, cssHeight, devicePixelRatio);
+    canvas.width = dimensions.displayWidth;
+    canvas.height = dimensions.displayHeight;
+    workCanvas.width = dimensions.workWidth;
+    workCanvas.height = dimensions.workHeight;
+    return dimensions;
+  }
+
+  function render(scene) {
+    renderMesh(workContext, workCanvas.width, workCanvas.height, scene);
+
+    displayContext.globalAlpha = 1;
+    displayContext.globalCompositeOperation = "source-over";
+    displayContext.imageSmoothingEnabled = true;
+    displayContext.imageSmoothingQuality = "high";
+    displayContext.drawImage(
+      workCanvas,
+      0,
+      0,
+      workCanvas.width,
+      workCanvas.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+  }
+
+  return {
+    get dimensions() {
+      return dimensions;
+    },
+    get displayContext() {
+      return displayContext;
+    },
+    get workCanvas() {
+      return workCanvas;
+    },
+    resize,
+    render,
+  };
 }

@@ -8,6 +8,7 @@ import {
   createDefaultScene,
   setPointCount,
 } from "../js/scene.js";
+import { getSurfaceDimensions } from "../js/renderer.js";
 
 test("the default scene contains six reusable points and exposes five", () => {
   const scene = createDefaultScene();
@@ -32,4 +33,17 @@ test("reduced motion starts paused and setPointCount mutates safely", () => {
   assert.equal(scene.settings.playing, false);
   assert.equal(setPointCount(scene, 99), MAX_POINTS);
   assert.equal(scene.pointCount, MAX_POINTS);
+});
+
+test("render surfaces cap DPR and keep an eighth-size work canvas", () => {
+  const surface = getSurfaceDimensions(1920, 1080, 3);
+  assert.deepEqual(surface, {
+    cssWidth: 1920,
+    cssHeight: 1080,
+    displayWidth: 3840,
+    displayHeight: 2160,
+    workWidth: 240,
+    workHeight: 135,
+    dpr: 2,
+  });
 });
