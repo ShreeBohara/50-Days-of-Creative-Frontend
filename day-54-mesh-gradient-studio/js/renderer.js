@@ -23,7 +23,7 @@ export function getSurfaceDimensions(cssWidth, cssHeight, devicePixelRatio = 1) 
   };
 }
 
-export function renderMesh(context, width, height, scene) {
+export function renderMesh(context, width, height, scene, framePoints = scene.points) {
   context.globalAlpha = 1;
   context.globalCompositeOperation = "source-over";
   context.fillStyle = scene.baseColor;
@@ -32,7 +32,7 @@ export function renderMesh(context, width, height, scene) {
   const radiusScale = Math.max(width, height) * scene.settings.size;
   context.globalCompositeOperation = "screen";
 
-  scene.points.slice(0, scene.pointCount).forEach((point) => {
+  framePoints.slice(0, scene.pointCount).forEach((point) => {
     const x = point.x * width;
     const y = point.y * height;
     const radius = point.radius * radiusScale;
@@ -70,8 +70,8 @@ export function createMeshRenderer(canvas) {
     return dimensions;
   }
 
-  function render(scene) {
-    renderMesh(workContext, workCanvas.width, workCanvas.height, scene);
+  function render(scene, framePoints = scene.points) {
+    renderMesh(workContext, workCanvas.width, workCanvas.height, scene, framePoints);
 
     displayContext.globalAlpha = 1;
     displayContext.globalCompositeOperation = "source-over";
