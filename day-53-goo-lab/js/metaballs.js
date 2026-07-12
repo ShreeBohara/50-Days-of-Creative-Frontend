@@ -155,7 +155,26 @@ export function mountMetaballs(stage) {
   display.addEventListener('pointerdown', (e) => { cursor.active = true; pointerTo(e.clientX, e.clientY); });
   display.addEventListener('pointerleave', () => { cursor.active = false; });
 
+  // theme selector — a little segmented control floating over the field
+  const swatches = { slime: '#7cff9b', lava: '#ff7a3c', mercury: '#cfe0ee' };
+  const buttons = {};
+  function applyTheme(name) {
+    if (!THEMES[name]) return;
+    theme = THEMES[name];
+    for (const [k, b] of Object.entries(buttons)) b.setAttribute('aria-pressed', String(k === name));
+  }
+  const ui = el('div', { class: 'mb-ui', role: 'group', 'aria-label': 'Metaball colour theme' },
+    Object.keys(THEMES).map((name) => {
+      const b = el('button', {
+        class: 'mb-theme', type: 'button', 'aria-pressed': String(THEMES[name] === theme),
+        style: { '--sw': swatches[name] }, onClick: () => applyTheme(name),
+      }, [el('span', { class: 'mb-dot' }), name]);
+      buttons[name] = b;
+      return b;
+    }));
+
   stage.appendChild(display);
+  stage.appendChild(ui);
   const ro = new ResizeObserver(resize);
   ro.observe(stage);
   window.addEventListener('resize', resize);
@@ -164,9 +183,9 @@ export function mountMetaballs(stage) {
   // IntersectionObserver only PAUSES the loop when the section is off-screen
   onVisible(stage, (on) => { visible = on; if (on) { resize(); start(); } else stop(); });
 
-  // public API (theme selector in commit 6; step() lets tests force frames)
+  // public API (step() lets tests force frames since preview rAF is paused)
   return {
-    setTheme(name) { if (THEMES[name]) theme = THEMES[name]; },
+    setTheme: applyTheme,
     get themeName() { return Object.keys(THEMES).find((k) => THEMES[k] === theme); },
     step(n = 1) { for (let k = 0; k < n; k++) tick(); },
   };

@@ -299,6 +299,49 @@ body {
     radial-gradient(90% 120% at 50% 0%, #0c140f, #070a08);
 }
 
+.mb-ui {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(8, 12, 10, 0.72);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+.mb-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.mb-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: 0 0 8px var(--sw);
+}
+.mb-theme:hover { color: var(--ink); }
+.mb-theme[aria-pressed="true"] {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: color-mix(in srgb, var(--sw) 60%, transparent);
+}
+
 /* ---- footer ------------------------------------------------------------ */
 .lab-foot {
   border-top: 1px solid var(--line);
