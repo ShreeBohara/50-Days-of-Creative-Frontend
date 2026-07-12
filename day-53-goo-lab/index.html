@@ -40,6 +40,33 @@
     <p class="scroll-cue" aria-hidden="true">scroll to inspect ↓</p>
   </header>
 
+  <!-- The shared trick, explained once with the actual filter code. -->
+  <section class="goo-explainer">
+    <div class="goo-explainer-copy">
+      <span class="spec-note-tag">the shared trick</span>
+      <h2>One filter makes everything&nbsp;liquid</h2>
+      <p>
+        Every specimen below is powered by the same tiny SVG filter. Blur the
+        shapes so their edges bleed together, then crank the contrast of the
+        <em>alpha</em> channel (<code>0 0 0 19 -9</code>) so soft edges snap back
+        to hard ones — but wherever two shapes overlapped, the blur has already
+        fused them. Put <code>filter: url(#goo)</code> on any container and its
+        children start behaving like drops of the same liquid.
+      </p>
+    </div>
+    <pre class="goo-code" aria-label="The goo filter definition"><code>&lt;filter id="goo"&gt;
+  &lt;feGaussianBlur stdDeviation="10"
+                  result="blur"/&gt;
+  &lt;feColorMatrix in="blur" values=
+    "1 0 0 0 0
+     0 1 0 0 0
+     0 0 1 0 0
+     0 0 0 19 -9"/&gt;
+  &lt;feComposite in="SourceGraphic"
+               operator="atop"/&gt;
+&lt;/filter&gt;</code></pre>
+  </section>
+
   <!-- Five specimens. Each .spec-stage is a mount point a JS module fills in. -->
   <main class="specimens" id="specimens">
 
@@ -50,6 +77,13 @@
         <p class="spec-desc">A tap makes five actions ooze out of one button, held together by liquid necks until they pull free.</p>
       </div>
       <div class="spec-stage" id="stage-radial"></div>
+      <p class="spec-note">
+        <span class="spec-note-tag">how it works</span>
+        The button and its five items sit on one goo-filtered layer. While an
+        item is still close to the button their blurred edges read as a single
+        shape — a liquid neck — that stretches and snaps as it travels out. The
+        crisp icons ride a second, un-filtered layer on top.
+      </p>
     </section>
 
     <section class="specimen" id="spec-02" data-spec="metaballs">
@@ -59,6 +93,13 @@
         <p class="spec-desc">Eight blobs wander a field; a ninth follows your cursor. Get close and they fuse into one organism.</p>
       </div>
       <div class="spec-stage spec-stage--canvas" id="stage-metaballs"></div>
+      <p class="spec-note">
+        <span class="spec-note-tag">how it works</span>
+        No SVG filter here — this one is canvas. Soft white circles are summed
+        onto a tiny offscreen buffer with <code>lighter</code> blending; every
+        pixel brighter than a threshold is repainted in the theme colour with a
+        soft rim. Overlapping blobs share a bright region, so they weld together.
+      </p>
     </section>
 
     <section class="specimen" id="spec-03" data-spec="loader">
@@ -68,6 +109,13 @@
         <p class="spec-desc">A drop falls, splits into three, orbits, re-merges, then resolves into a checkmark. Replayable.</p>
       </div>
       <div class="spec-stage" id="stage-loader"></div>
+      <p class="spec-note">
+        <span class="spec-note-tag">how it works</span>
+        Three goo-filtered circles follow one normalised timeline — drip, split,
+        orbit, merge — so the whole thing is a single number from 0 to 1. When
+        they land, a separate crisp <code>&lt;path&gt;</code> strokes itself in
+        for the checkmark while the blob fades away.
+      </p>
     </section>
 
     <section class="specimen" id="spec-04" data-spec="text">
@@ -77,6 +125,13 @@
         <p class="spec-desc">Letters that melt into their neighbours. Drag the viscosity slider to thin or thicken the goo.</p>
       </div>
       <div class="spec-stage" id="stage-text"></div>
+      <p class="spec-note">
+        <span class="spec-note-tag">how it works</span>
+        Each letter is its own element under a second goo filter. Tight spacing
+        keeps their blurred edges touching; the slider raises that filter's
+        <code>stdDeviation</code>, thickening the goo until the letters lose
+        their outlines and pour into one blob. Hovering pulls them apart again.
+      </p>
     </section>
 
     <section class="specimen specimen--bleed" id="spec-05" data-spec="lava">
@@ -86,6 +141,13 @@
         <p class="spec-desc">An ambient culture: blobs rise, fall, and swap heat as the hue drifts. Just let it breathe.</p>
       </div>
       <div class="spec-stage" id="stage-lava"></div>
+      <p class="spec-note">
+        <span class="spec-note-tag">how it works</span>
+        Pure CSS motion. Blobs drift up and down on staggered
+        <code>ease-in-out</code> timelines inside a goo container, pinching off
+        the top and bottom pools and re-merging on the way. An animated
+        <code>hue-rotate</code> on the whole layer lets the colour drift forever.
+      </p>
     </section>
 
   </main>
