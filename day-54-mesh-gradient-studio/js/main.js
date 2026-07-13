@@ -9,10 +9,16 @@ import { randomizeScene, shuffleSceneMotion } from "./randomize.js";
 import { mountCssExport, mountPngExport } from "./exportControls.js";
 
 const canvas = document.querySelector("#mesh-canvas");
+const studio = document.querySelector("#studio");
+const controlPanel = document.querySelector("#control-panel");
+const studioMark = document.querySelector(".studio-mark");
 const status = document.querySelector("#boot-status");
 const liveRegion = document.querySelector("#live-region");
 const toast = document.querySelector("#toast");
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const motionChip = document.querySelector("#motion-chip");
+const ambientButton = document.querySelector("#ambient-button");
+const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+let reducedMotion = motionPreference.matches;
 const scene = createDefaultScene({ reducedMotion });
 const renderer = createMeshRenderer(canvas);
 const noise = createSimplexNoise(54);
@@ -25,6 +31,7 @@ let transitionActive = false;
 let transitionStart = 0;
 let transitionProgress = 1;
 let toastTimer = 0;
+let hiddenAt = 0;
 
 function render() {
   renderer.render(scene, framePoints, { transitionProgress });
@@ -72,12 +79,36 @@ function notify(message) {
   window.clearTimeout(toastTimer);
   toast.textContent = message;
   toast.classList.add("is-visible");
+  announce(message);
   toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3600);
 }
 
 function sceneChanged() {
   framePoints = sampleMotion(scene, elapsedSeconds, noise);
   requestRender();
+}
+
+function syncMotionStatus() {
+  const label = scene.settings.playing ? "Live" : "Paused";
+  motionChip.querySelector("span").textContent = label;
+  motionChip.classList.toggle("is-paused", !scene.settings.playing);
+  status.textContent = scene.settings.playing ? "Color field online" : "Motion paused";
+}
+
+function setAmbient(active) {
+  studio.classList.toggle("is-ambient", active);
+  controlPanel.inert = active;
+  controlPanel.setAttribute("aria-hidden", String(active));
+  studioMark.setAttribute("aria-hidden", String(active));
+  if (active) {
+    toast.classList.remove("is-visible");
+    announce("Ambient mode. Click the canvas or press Escape to restore controls.");
+  } else {
+    controlPanel.removeAttribute("aria-hidden");
+    studioMark.removeAttribute("aria-hidden");
+    ambientButton.focus({ preventScroll: true });
+    announce("Controls restored");
+  }
 }
 
 function resizeCanvas() {
@@ -95,7 +126,17 @@ requestRender();
 window.addEventListener("resize", resizeCanvas, { passive: true });
 document.addEventListener("visibilitychange", () => {
   lastTimestamp = 0;
-  if (!document.hidden) requestRender();
+  if (document.hidden) {
+    hiddenAt = performance.now();
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+  } else {
+    if (transitionActive && hiddenAt) {
+      transitionStart += performance.now() - hiddenAt;
+    }
+    hiddenAt = 0;
+    requestRender();
+  }
 });
 const paletteControls = mountPaletteControls({
   container: document.querySelector("#palette-controls"),
@@ -103,12 +144,13 @@ const paletteControls = mountPaletteControls({
   onChange: sceneChanged,
   announce,
 });
-mountStudioControls({
+const studioControls = mountStudioControls({
   motionContainer: document.querySelector("#motion-controls"),
   surfaceContainer: document.querySelector("#surface-controls"),
   scene,
   onChange: sceneChanged,
   onPointCountChange: () => paletteControls.refresh(),
+  onPlayStateChange: syncMotionStatus,
   announce,
 });
 mountRandomizeControls({
@@ -139,6 +181,7 @@ mountPngExport({
   container: document.querySelector("#export-controls"),
   scene,
   getFramePoints: () => framePoints,
+  getMeshSource: () => renderer.exportCompositeCanvas,
   grainTexture: renderer.grainTexture,
   announce,
 });
@@ -155,4 +198,23 @@ document.querySelector("#select-css").addEventListener("click", () => {
   code.focus();
   code.select();
 });
-status.textContent = "Color field online";
+ambientButton.addEventListener("click", () => setAmbient(true));
+canvas.addEventListener("pointerup", () => {
+  if (studio.classList.contains("is-ambient")) setAmbient(false);
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && studio.classList.contains("is-ambient")) {
+    setAmbient(false);
+  }
+});
+motionPreference.addEventListener("change", (event) => {
+  reducedMotion = event.matches;
+  if (reducedMotion && scene.settings.playing) {
+    scene.settings.playing = false;
+    studioControls.syncPlayButton();
+    syncMotionStatus();
+    sceneChanged();
+    announce("Motion paused to match your reduced-motion preference");
+  }
+});
+syncMotionStatus();

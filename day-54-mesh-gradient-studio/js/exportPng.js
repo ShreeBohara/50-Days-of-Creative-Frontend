@@ -9,12 +9,16 @@ export function createExportFileName(presetId, date = new Date()) {
   return `mesh-54-${presetId}-${stamp}.png`;
 }
 
-export function renderExportCanvas(scene, framePoints, grainTexture) {
-  const workCanvas = document.createElement("canvas");
-  workCanvas.width = EXPORT_WIDTH / 8;
-  workCanvas.height = EXPORT_HEIGHT / 8;
-  const workContext = workCanvas.getContext("2d", { alpha: false });
-  renderMesh(workContext, workCanvas.width, workCanvas.height, scene, framePoints);
+export function renderExportCanvas(scene, framePoints, grainTexture, meshSource = null) {
+  let source = meshSource;
+  if (!source) {
+    const workCanvas = document.createElement("canvas");
+    workCanvas.width = EXPORT_WIDTH / 8;
+    workCanvas.height = EXPORT_HEIGHT / 8;
+    const workContext = workCanvas.getContext("2d", { alpha: false });
+    renderMesh(workContext, workCanvas.width, workCanvas.height, scene, framePoints);
+    source = workCanvas;
+  }
 
   const exportCanvas = document.createElement("canvas");
   exportCanvas.width = EXPORT_WIDTH;
@@ -22,7 +26,7 @@ export function renderExportCanvas(scene, framePoints, grainTexture) {
   const exportContext = exportCanvas.getContext("2d", { alpha: false });
   exportContext.imageSmoothingEnabled = true;
   exportContext.imageSmoothingQuality = "high";
-  exportContext.drawImage(workCanvas, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+  exportContext.drawImage(source, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
   drawSurfaceEffects(
     exportContext,
     EXPORT_WIDTH,
@@ -42,8 +46,8 @@ function canvasToBlob(canvas) {
   });
 }
 
-export async function downloadPng({ scene, framePoints, grainTexture }) {
-  const canvas = renderExportCanvas(scene, framePoints, grainTexture);
+export async function downloadPng({ scene, framePoints, grainTexture, meshSource }) {
+  const canvas = renderExportCanvas(scene, framePoints, grainTexture, meshSource);
   const blob = await canvasToBlob(canvas);
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");

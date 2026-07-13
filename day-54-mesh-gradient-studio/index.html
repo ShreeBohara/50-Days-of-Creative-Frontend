@@ -31,7 +31,7 @@
             <p class="panel-kicker">Gradient instrument</p>
             <h2>Field controls</h2>
           </div>
-          <span class="live-chip"><i></i> Live</span>
+          <span class="live-chip" id="motion-chip"><i></i><span>Live</span></span>
         </header>
 
         <form class="control-form" id="control-form">
@@ -75,6 +75,15 @@
             <div class="export-actions" id="export-controls"></div>
           </section>
         </form>
+
+        <button class="ambient-button" id="ambient-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 12s3.4-6 9-6 9 6 9 6-3.4 6-9 6-9-6-9-6Z" />
+            <circle cx="12" cy="12" r="2.5" />
+          </svg>
+          <span>Use as page background</span>
+          <kbd>Esc</kbd>
+        </button>
 
         <footer class="panel-footer">
           <span id="boot-status">Color field online</span>

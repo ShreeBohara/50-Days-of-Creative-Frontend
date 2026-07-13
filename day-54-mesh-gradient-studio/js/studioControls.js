@@ -51,6 +51,7 @@ export function mountStudioControls({
   scene,
   onChange,
   onPointCountChange,
+  onPlayStateChange = () => {},
   announce,
 }) {
   const count = rangeField({
@@ -135,6 +136,7 @@ export function mountStudioControls({
   playButton.addEventListener("click", () => {
     scene.settings.playing = !scene.settings.playing;
     syncPlayButton();
+    onPlayStateChange(scene.settings.playing);
     onChange();
     announce(`Motion ${scene.settings.playing ? "playing" : "paused"}`);
   });

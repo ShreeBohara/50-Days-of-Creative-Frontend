@@ -61,8 +61,32 @@ export function createMeshRenderer(canvas) {
   const compositeContext = compositeCanvas.getContext("2d", { alpha: false });
   const transitionCanvas = document.createElement("canvas");
   const transitionContext = transitionCanvas.getContext("2d", { alpha: false });
+  const exportWorkCanvas = document.createElement("canvas");
+  const exportWorkContext = exportWorkCanvas.getContext("2d", { alpha: false });
+  const exportCompositeCanvas = document.createElement("canvas");
+  const exportCompositeContext = exportCompositeCanvas.getContext("2d", { alpha: false });
+  const exportTransitionCanvas = document.createElement("canvas");
+  const exportTransitionContext = exportTransitionCanvas.getContext("2d", { alpha: false });
   const grainTexture = createGrainTexture();
   let dimensions = getSurfaceDimensions(1, 1);
+
+  exportWorkCanvas.width = 240;
+  exportWorkCanvas.height = 135;
+  exportCompositeCanvas.width = 240;
+  exportCompositeCanvas.height = 135;
+  exportTransitionCanvas.width = 240;
+  exportTransitionCanvas.height = 135;
+
+  function compositeFrame(context, previousCanvas, nextCanvas, transitionProgress) {
+    context.globalAlpha = 1;
+    context.globalCompositeOperation = "source-over";
+    if (transitionProgress < 1) {
+      context.drawImage(previousCanvas, 0, 0);
+      context.globalAlpha = Math.max(0, transitionProgress);
+    }
+    context.drawImage(nextCanvas, 0, 0);
+    context.globalAlpha = 1;
+  }
 
   function resize(
     cssWidth = window.innerWidth,
@@ -83,15 +107,23 @@ export function createMeshRenderer(canvas) {
 
   function render(scene, framePoints = scene.points, { transitionProgress = 1 } = {}) {
     renderMesh(workContext, workCanvas.width, workCanvas.height, scene, framePoints);
+    compositeFrame(compositeContext, transitionCanvas, workCanvas, transitionProgress);
 
-    compositeContext.globalAlpha = 1;
-    compositeContext.globalCompositeOperation = "source-over";
-    if (transitionProgress < 1) {
-      compositeContext.drawImage(transitionCanvas, 0, 0);
-      compositeContext.globalAlpha = Math.max(0, transitionProgress);
-    }
-    compositeContext.drawImage(workCanvas, 0, 0);
-    compositeContext.globalAlpha = 1;
+    // Keep a normalized 16:9 mesh in sync with the visible frame. PNG export
+    // can then capture an in-progress crossfade without inheriting viewport shape.
+    renderMesh(
+      exportWorkContext,
+      exportWorkCanvas.width,
+      exportWorkCanvas.height,
+      scene,
+      framePoints,
+    );
+    compositeFrame(
+      exportCompositeContext,
+      exportTransitionCanvas,
+      exportWorkCanvas,
+      transitionProgress,
+    );
 
     displayContext.globalAlpha = 1;
     displayContext.globalCompositeOperation = "source-over";
@@ -116,6 +148,10 @@ export function createMeshRenderer(canvas) {
     transitionContext.globalCompositeOperation = "copy";
     transitionContext.drawImage(compositeCanvas, 0, 0);
     transitionContext.globalCompositeOperation = "source-over";
+    exportTransitionContext.globalAlpha = 1;
+    exportTransitionContext.globalCompositeOperation = "copy";
+    exportTransitionContext.drawImage(exportCompositeCanvas, 0, 0);
+    exportTransitionContext.globalCompositeOperation = "source-over";
   }
 
   return {
@@ -130,6 +166,9 @@ export function createMeshRenderer(canvas) {
     },
     get grainTexture() {
       return grainTexture;
+    },
+    get exportCompositeCanvas() {
+      return exportCompositeCanvas;
     },
     captureTransition,
     resize,
