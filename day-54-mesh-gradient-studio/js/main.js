@@ -6,11 +6,12 @@ import { mountPaletteControls } from "./paletteControls.js";
 import { mountStudioControls } from "./studioControls.js";
 import { mountRandomizeControls } from "./randomizeControls.js";
 import { randomizeScene, shuffleSceneMotion } from "./randomize.js";
-import { mountPngExport } from "./exportControls.js";
+import { mountCssExport, mountPngExport } from "./exportControls.js";
 
 const canvas = document.querySelector("#mesh-canvas");
 const status = document.querySelector("#boot-status");
 const liveRegion = document.querySelector("#live-region");
+const toast = document.querySelector("#toast");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const scene = createDefaultScene({ reducedMotion });
 const renderer = createMeshRenderer(canvas);
@@ -23,6 +24,7 @@ let framePoints = sampleMotion(scene, 0, noise);
 let transitionActive = false;
 let transitionStart = 0;
 let transitionProgress = 1;
+let toastTimer = 0;
 
 function render() {
   renderer.render(scene, framePoints, { transitionProgress });
@@ -64,6 +66,13 @@ function announce(message) {
   requestAnimationFrame(() => {
     liveRegion.textContent = message;
   });
+}
+
+function notify(message) {
+  window.clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3600);
 }
 
 function sceneChanged() {
@@ -132,5 +141,18 @@ mountPngExport({
   getFramePoints: () => framePoints,
   grainTexture: renderer.grainTexture,
   announce,
+});
+mountCssExport({
+  container: document.querySelector("#export-controls"),
+  scene,
+  getFramePoints: () => framePoints,
+  fallbackDialog: document.querySelector("#css-fallback"),
+  fallbackCode: document.querySelector("#css-fallback-code"),
+  notify,
+});
+document.querySelector("#select-css").addEventListener("click", () => {
+  const code = document.querySelector("#css-fallback-code");
+  code.focus();
+  code.select();
 });
 status.textContent = "Color field online";

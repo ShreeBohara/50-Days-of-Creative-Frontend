@@ -83,6 +83,24 @@
       </aside>
 
       <p class="sr-only" id="live-region" role="status" aria-live="polite"></p>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <dialog class="css-fallback" id="css-fallback" aria-labelledby="css-fallback-title">
+        <form method="dialog">
+          <div class="dialog-heading">
+            <p>Clipboard fallback</p>
+            <h2 id="css-fallback-title">Copy the static mesh CSS</h2>
+          </div>
+          <p class="dialog-copy">
+            Your browser blocked direct clipboard access. The complete static approximation is selected below.
+          </p>
+          <textarea id="css-fallback-code" rows="11" readonly spellcheck="false"></textarea>
+          <div class="dialog-actions">
+            <button type="button" id="select-css">Select all</button>
+            <button type="submit" class="dialog-done">Done</button>
+          </div>
+        </form>
+      </dialog>
     </main>
 
     <script type="module" src="./js/main.js"></script>

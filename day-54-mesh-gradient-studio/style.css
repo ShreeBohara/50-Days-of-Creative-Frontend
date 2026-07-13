@@ -479,7 +479,7 @@ input[type="range"]::-moz-range-thumb {
 
 .export-actions {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
@@ -520,6 +520,118 @@ input[type="range"]::-moz-range-thumb {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.7;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 30;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 16px;
+  transform: translate(-50%, 14px);
+  border: 1px solid rgb(255 255 255 / 23%);
+  border-radius: 999px;
+  background: rgb(4 8 12 / 90%);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 28%);
+  color: #f5fffc;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+  backdrop-filter: blur(18px);
+}
+
+.toast.is-visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+.css-fallback {
+  width: min(620px, calc(100vw - 32px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 24px;
+  background: #0a1015;
+  box-shadow: 0 30px 120px rgb(0 0 0 / 55%);
+  color: var(--ink);
+}
+
+.css-fallback::backdrop {
+  background: rgb(0 0 0 / 58%);
+  backdrop-filter: blur(8px);
+}
+
+.css-fallback form {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+}
+
+.dialog-heading p,
+.dialog-heading h2,
+.dialog-copy {
+  margin: 0;
+}
+
+.dialog-heading p {
+  margin-bottom: 5px;
+  color: #80ffdb;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dialog-heading h2 {
+  font-size: 1.45rem;
+  font-weight: 550;
+  letter-spacing: -0.035em;
+}
+
+.dialog-copy {
+  max-width: 56ch;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+#css-fallback-code {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #04080b;
+  color: #c7fff5;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  line-height: 1.55;
+  padding: 14px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialog-actions button {
+  min-height: 44px;
+  padding: 0 17px;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  background: rgb(255 255 255 / 6%);
+  color: var(--ink);
+}
+
+.dialog-actions .dialog-done {
+  border-color: #effffb;
+  background: #effffb;
+  color: #071015;
 }
 
 .palette-module {
