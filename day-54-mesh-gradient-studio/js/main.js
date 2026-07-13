@@ -4,6 +4,8 @@ import { createSimplexNoise } from "./noise.js";
 import { sampleMotion } from "./motion.js";
 import { mountPaletteControls } from "./paletteControls.js";
 import { mountStudioControls } from "./studioControls.js";
+import { mountRandomizeControls } from "./randomizeControls.js";
+import { randomizeScene, shuffleSceneMotion } from "./randomize.js";
 
 const canvas = document.querySelector("#mesh-canvas");
 const status = document.querySelector("#boot-status");
@@ -17,9 +19,12 @@ let animationFrame = 0;
 let elapsedSeconds = 0;
 let lastTimestamp = 0;
 let framePoints = sampleMotion(scene, 0, noise);
+let transitionActive = false;
+let transitionStart = 0;
+let transitionProgress = 1;
 
 function render() {
-  renderer.render(scene, framePoints);
+  renderer.render(scene, framePoints, { transitionProgress });
 }
 
 function animate(timestamp) {
@@ -31,9 +36,18 @@ function animate(timestamp) {
   }
   lastTimestamp = timestamp;
   framePoints = sampleMotion(scene, elapsedSeconds, noise);
+
+  if (transitionActive) {
+    const linearProgress = Math.min(1, Math.max(0, (timestamp - transitionStart) / 1000));
+    transitionProgress = 1 - (1 - linearProgress) ** 3;
+    if (linearProgress >= 1) {
+      transitionActive = false;
+      transitionProgress = 1;
+    }
+  }
   render();
 
-  if (scene.settings.playing) {
+  if (scene.settings.playing || transitionActive) {
     animationFrame = requestAnimationFrame(animate);
   }
 }
@@ -59,6 +73,8 @@ function sceneChanged() {
 function resizeCanvas() {
   cancelAnimationFrame(resizeFrame);
   resizeFrame = requestAnimationFrame(() => {
+    transitionActive = false;
+    transitionProgress = 1;
     renderer.resize();
     requestRender();
   });
@@ -84,5 +100,29 @@ mountStudioControls({
   onChange: sceneChanged,
   onPointCountChange: () => paletteControls.refresh(),
   announce,
+});
+mountRandomizeControls({
+  container: document.querySelector("#compose-controls"),
+  onRandomize: () => {
+    if (!reducedMotion) renderer.captureTransition();
+    const palette = randomizeScene(scene);
+    elapsedSeconds = 0;
+    lastTimestamp = 0;
+    framePoints = sampleMotion(scene, 0, noise);
+    paletteControls.refresh();
+    transitionActive = !reducedMotion;
+    transitionStart = performance.now();
+    transitionProgress = reducedMotion ? 1 : 0;
+    requestRender();
+    announce(`${palette.name} field randomized`);
+  },
+  onShuffle: () => {
+    shuffleSceneMotion(scene, framePoints);
+    elapsedSeconds = 0;
+    lastTimestamp = 0;
+    framePoints = sampleMotion(scene, 0, noise);
+    requestRender();
+    announce("Motion paths shuffled");
+  },
 });
 status.textContent = "Color field online";

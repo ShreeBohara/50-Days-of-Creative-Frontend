@@ -5,10 +5,14 @@ export function sampleMotion(scene, seconds, noise) {
 
   return scene.points.map((point, index) => {
     const offset = index * 17.37;
-    const driftX = noise.noise2D(point.seedX + driftTime, point.seedY + offset);
-    const driftY = noise.noise2D(point.seedY - driftTime * 0.83, point.seedX + offset + 31.8);
-    const pulseNoise = noise.noise2D(point.seedX + driftTime * 0.42, point.seedY - 61.4);
-    const pulse = Math.sin(seconds * 0.48 + point.phase) * 0.045 + pulseNoise * 0.025;
+    const startX = noise.noise2D(point.seedX, point.seedY + offset);
+    const startY = noise.noise2D(point.seedY, point.seedX + offset + 31.8);
+    const driftX = noise.noise2D(point.seedX + driftTime, point.seedY + offset) - startX;
+    const driftY = noise.noise2D(point.seedY - driftTime * 0.83, point.seedX + offset + 31.8) - startY;
+    const startPulse = noise.noise2D(point.seedX, point.seedY - 61.4);
+    const pulseNoise = noise.noise2D(point.seedX + driftTime * 0.42, point.seedY - 61.4) - startPulse;
+    const sinePulse = Math.sin(seconds * 0.48 + point.phase) - Math.sin(point.phase);
+    const pulse = sinePulse * 0.045 + pulseNoise * 0.025;
 
     return {
       ...point,

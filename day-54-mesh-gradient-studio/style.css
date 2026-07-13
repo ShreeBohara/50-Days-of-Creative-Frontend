@@ -426,6 +426,57 @@ input[type="range"]::-moz-range-thumb {
   stroke-width: 1.8;
 }
 
+.compose-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.action-button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: rgb(255 255 255 / 5%);
+  color: var(--muted);
+  font-size: 0.7rem;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.action-button:hover {
+  border-color: rgb(255 255 255 / 36%);
+  background: rgb(255 255 255 / 10%);
+  color: var(--ink);
+}
+
+.action-button--primary {
+  border-color: #effffb;
+  background: #effffb;
+  color: #071015;
+  font-weight: 550;
+}
+
+.action-button--primary:hover {
+  border-color: #fff;
+  background: #fff;
+  color: #020607;
+}
+
+.action-button svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
 .palette-module {
   display: grid;
   gap: 15px;

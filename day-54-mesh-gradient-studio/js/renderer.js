@@ -57,6 +57,10 @@ export function createMeshRenderer(canvas) {
   const displayContext = canvas.getContext("2d", { alpha: false });
   const workCanvas = document.createElement("canvas");
   const workContext = workCanvas.getContext("2d", { alpha: false });
+  const compositeCanvas = document.createElement("canvas");
+  const compositeContext = compositeCanvas.getContext("2d", { alpha: false });
+  const transitionCanvas = document.createElement("canvas");
+  const transitionContext = transitionCanvas.getContext("2d", { alpha: false });
   const grainTexture = createGrainTexture();
   let dimensions = getSurfaceDimensions(1, 1);
 
@@ -70,28 +74,48 @@ export function createMeshRenderer(canvas) {
     canvas.height = dimensions.displayHeight;
     workCanvas.width = dimensions.workWidth;
     workCanvas.height = dimensions.workHeight;
+    compositeCanvas.width = dimensions.workWidth;
+    compositeCanvas.height = dimensions.workHeight;
+    transitionCanvas.width = dimensions.workWidth;
+    transitionCanvas.height = dimensions.workHeight;
     return dimensions;
   }
 
-  function render(scene, framePoints = scene.points) {
+  function render(scene, framePoints = scene.points, { transitionProgress = 1 } = {}) {
     renderMesh(workContext, workCanvas.width, workCanvas.height, scene, framePoints);
+
+    compositeContext.globalAlpha = 1;
+    compositeContext.globalCompositeOperation = "source-over";
+    if (transitionProgress < 1) {
+      compositeContext.drawImage(transitionCanvas, 0, 0);
+      compositeContext.globalAlpha = Math.max(0, transitionProgress);
+    }
+    compositeContext.drawImage(workCanvas, 0, 0);
+    compositeContext.globalAlpha = 1;
 
     displayContext.globalAlpha = 1;
     displayContext.globalCompositeOperation = "source-over";
     displayContext.imageSmoothingEnabled = true;
     displayContext.imageSmoothingQuality = "high";
     displayContext.drawImage(
-      workCanvas,
+      compositeCanvas,
       0,
       0,
-      workCanvas.width,
-      workCanvas.height,
+      compositeCanvas.width,
+      compositeCanvas.height,
       0,
       0,
       canvas.width,
       canvas.height,
     );
     drawSurfaceEffects(displayContext, canvas.width, canvas.height, scene.settings, grainTexture);
+  }
+
+  function captureTransition() {
+    transitionContext.globalAlpha = 1;
+    transitionContext.globalCompositeOperation = "copy";
+    transitionContext.drawImage(compositeCanvas, 0, 0);
+    transitionContext.globalCompositeOperation = "source-over";
   }
 
   return {
@@ -107,6 +131,7 @@ export function createMeshRenderer(canvas) {
     get grainTexture() {
       return grainTexture;
     },
+    captureTransition,
     resize,
     render,
   };
