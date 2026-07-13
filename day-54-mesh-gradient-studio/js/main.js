@@ -6,6 +6,7 @@ import { mountPaletteControls } from "./paletteControls.js";
 import { mountStudioControls } from "./studioControls.js";
 import { mountRandomizeControls } from "./randomizeControls.js";
 import { randomizeScene, shuffleSceneMotion } from "./randomize.js";
+import { mountPngExport } from "./exportControls.js";
 
 const canvas = document.querySelector("#mesh-canvas");
 const status = document.querySelector("#boot-status");
@@ -124,5 +125,12 @@ mountRandomizeControls({
     requestRender();
     announce("Motion paths shuffled");
   },
+});
+mountPngExport({
+  container: document.querySelector("#export-controls"),
+  scene,
+  getFramePoints: () => framePoints,
+  grainTexture: renderer.grainTexture,
+  announce,
 });
 status.textContent = "Color field online";
