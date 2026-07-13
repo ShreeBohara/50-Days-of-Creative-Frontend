@@ -2,9 +2,11 @@ import { createDefaultScene } from "./scene.js";
 import { createMeshRenderer } from "./renderer.js";
 import { createSimplexNoise } from "./noise.js";
 import { sampleMotion } from "./motion.js";
+import { mountPaletteControls } from "./paletteControls.js";
 
 const canvas = document.querySelector("#mesh-canvas");
 const status = document.querySelector("#boot-status");
+const liveRegion = document.querySelector("#live-region");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const scene = createDefaultScene({ reducedMotion });
 const renderer = createMeshRenderer(canvas);
@@ -41,6 +43,18 @@ function requestRender() {
   }
 }
 
+function announce(message) {
+  liveRegion.textContent = "";
+  requestAnimationFrame(() => {
+    liveRegion.textContent = message;
+  });
+}
+
+function sceneChanged() {
+  framePoints = sampleMotion(scene, elapsedSeconds, noise);
+  requestRender();
+}
+
 function resizeCanvas() {
   cancelAnimationFrame(resizeFrame);
   resizeFrame = requestAnimationFrame(() => {
@@ -55,5 +69,11 @@ window.addEventListener("resize", resizeCanvas, { passive: true });
 document.addEventListener("visibilitychange", () => {
   lastTimestamp = 0;
   if (!document.hidden) requestRender();
+});
+mountPaletteControls({
+  container: document.querySelector("#palette-controls"),
+  scene,
+  onChange: sceneChanged,
+  announce,
 });
 status.textContent = "Color field online";
