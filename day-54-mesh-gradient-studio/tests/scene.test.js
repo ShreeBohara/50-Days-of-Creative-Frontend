@@ -9,6 +9,7 @@ import {
   setPointCount,
 } from "../js/scene.js";
 import { getSurfaceDimensions } from "../js/renderer.js";
+import { setNumericSetting } from "../js/settings.js";
 
 test("the default scene contains six reusable points and exposes five", () => {
   const scene = createDefaultScene();
@@ -46,4 +47,12 @@ test("render surfaces cap DPR and keep an eighth-size work canvas", () => {
     workHeight: 135,
     dpr: 2,
   });
+});
+
+test("numeric settings clamp to the documented control ranges", () => {
+  const scene = createDefaultScene();
+  assert.equal(setNumericSetting(scene, "speed", 4), 2);
+  assert.equal(setNumericSetting(scene, "size", 0.1), 0.7);
+  assert.equal(setNumericSetting(scene, "grain", 0.12), 0.12);
+  assert.throws(() => setNumericSetting(scene, "unknown", 1));
 });

@@ -3,6 +3,7 @@ import { createMeshRenderer } from "./renderer.js";
 import { createSimplexNoise } from "./noise.js";
 import { sampleMotion } from "./motion.js";
 import { mountPaletteControls } from "./paletteControls.js";
+import { mountStudioControls } from "./studioControls.js";
 
 const canvas = document.querySelector("#mesh-canvas");
 const status = document.querySelector("#boot-status");
@@ -70,10 +71,18 @@ document.addEventListener("visibilitychange", () => {
   lastTimestamp = 0;
   if (!document.hidden) requestRender();
 });
-mountPaletteControls({
+const paletteControls = mountPaletteControls({
   container: document.querySelector("#palette-controls"),
   scene,
   onChange: sceneChanged,
+  announce,
+});
+mountStudioControls({
+  motionContainer: document.querySelector("#motion-controls"),
+  surfaceContainer: document.querySelector("#surface-controls"),
+  scene,
+  onChange: sceneChanged,
+  onPointCountChange: () => paletteControls.refresh(),
   announce,
 });
 status.textContent = "Color field online";
