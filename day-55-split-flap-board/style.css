@@ -788,6 +788,20 @@ input[type="range"] {
   background: #181c19;
 }
 
+.sound-button[aria-pressed="true"] {
+  border-color: rgba(223, 159, 56, 0.72);
+  background: #1b1a14;
+}
+
+.sound-button[aria-pressed="true"] svg path:last-child {
+  display: none;
+}
+
+.sound-button:disabled {
+  cursor: progress;
+  opacity: 0.64;
+}
+
 .utility-button svg,
 .sound-button svg {
   width: 22px;
