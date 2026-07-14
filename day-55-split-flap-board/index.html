@@ -15,34 +15,157 @@
   <body>
     <main class="terminal" id="terminal">
       <header class="terminal-header">
-        <p class="eyebrow">50 Days of Creative Frontend · Day 55</p>
-        <h1>TERMINAL <span>/ 55</span></h1>
-        <p class="terminal-intro">A mechanical information board for imaginary arrivals and imminent departures.</p>
+        <div class="terminal-title">
+          <p class="eyebrow">50 Days of Creative Frontend · Day 55</p>
+          <h1>TERMINAL <span>/ 55</span></h1>
+          <p class="terminal-intro">Every arrival begins somewhere else.</p>
+        </div>
+        <div class="service-badge" aria-label="Board status: local service active">
+          <span class="service-light" aria-hidden="true"></span>
+          <span>Local service</span>
+          <strong>Active</strong>
+        </div>
       </header>
 
       <section class="board-station" aria-labelledby="board-title">
         <div class="station-sign">
-          <p>North concourse</p>
-          <h2 id="board-title">Departures</h2>
-          <span>Local service · Platform 55</span>
+          <div>
+            <p>North concourse</p>
+            <h2 id="board-title">Departures</h2>
+          </div>
+          <div class="station-meta" aria-hidden="true">
+            <span>TRM 55</span>
+            <span>Platform information</span>
+          </div>
         </div>
-        <div
-          class="board-housing"
-          id="board-label"
-          role="img"
-          aria-label="Split-flap departure board loading"
-        >
-          <div class="board-grid" id="board-grid" aria-hidden="true"></div>
+
+        <div class="board-housing-wrap">
+          <span class="mount mount-nw" aria-hidden="true"></span>
+          <span class="mount mount-ne" aria-hidden="true"></span>
+          <span class="mount mount-sw" aria-hidden="true"></span>
+          <span class="mount mount-se" aria-hidden="true"></span>
+          <div class="board-legend" aria-hidden="true">
+            <span>Time</span>
+            <span>Destination</span>
+            <span>Status</span>
+          </div>
+          <div
+            class="board-housing"
+            id="board-label"
+            role="img"
+            aria-label="Split-flap departure board loading"
+          >
+            <div class="board-grid" id="board-grid" aria-hidden="true"></div>
+          </div>
+          <div class="board-serial" aria-hidden="true">
+            <span>Solari system / mechanical sequence</span>
+            <span>Unit 055 · 220V</span>
+          </div>
         </div>
       </section>
 
       <section class="terminal-controls" aria-label="Departure board controls">
-        <p>Mechanical systems standing by.</p>
+        <div class="mode-console">
+          <div class="console-label">
+            <span>Display source</span>
+            <small>Select programme</small>
+          </div>
+          <div class="mode-tabs" role="tablist" aria-label="Board modes">
+            <button id="tab-message" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-message" data-mode="message">
+              <span>01</span> Message
+            </button>
+            <button id="tab-departures" class="mode-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-departures" data-mode="departures">
+              <span>02</span> Departures
+            </button>
+            <button id="tab-clock" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-clock" data-mode="clock">
+              <span>03</span> Clock
+            </button>
+            <button id="tab-quotes" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-quotes" data-mode="quotes">
+              <span>04</span> Quotes
+            </button>
+          </div>
+        </div>
+
+        <div class="control-deck">
+          <div class="mode-panels">
+            <section id="panel-message" class="mode-panel" role="tabpanel" aria-labelledby="tab-message" hidden>
+              <div class="field-heading">
+                <label for="message-input">Compose message</label>
+                <output id="message-count" for="message-input">0 / 132</output>
+              </div>
+              <textarea id="message-input" rows="3" maxlength="300" placeholder="TYPE A MESSAGE FOR THE BOARD" spellcheck="false"></textarea>
+              <p>Unsupported punctuation becomes a space. Text wraps automatically.</p>
+            </section>
+            <section id="panel-departures" class="mode-panel is-active" role="tabpanel" aria-labelledby="tab-departures">
+              <span class="panel-code">AUTO / 08 SEC</span>
+              <h3>Live departures programme</h3>
+              <p>One service changes status every eight seconds.</p>
+            </section>
+            <section id="panel-clock" class="mode-panel" role="tabpanel" aria-labelledby="tab-clock" hidden>
+              <span class="panel-code">LOCAL / 24 HR</span>
+              <h3>Station master clock</h3>
+              <p>Aligned to the local second without timer drift.</p>
+            </section>
+            <section id="panel-quotes" class="mode-panel" role="tabpanel" aria-labelledby="tab-quotes" hidden>
+              <span class="panel-code">PLATFORM / 55</span>
+              <h3>Words for the journey</h3>
+              <p>A new dispatch from Platform 55 every twelve seconds.</p>
+            </section>
+          </div>
+
+          <fieldset class="control-bank motion-bank">
+            <legend>Mechanism</legend>
+            <div class="range-control">
+              <div>
+                <label for="speed-control">Flip speed</label>
+                <output id="speed-output" for="speed-control">1.0×</output>
+              </div>
+              <input id="speed-control" type="range" min="0.5" max="2" value="1" step="0.1" />
+              <div class="range-scale" aria-hidden="true"><span>Slow</span><span>Fast</span></div>
+            </div>
+            <label class="switch-control" for="stagger-control">
+              <span>
+                <strong>Left-to-right wave</strong>
+                <small>Column stagger</small>
+              </span>
+              <input id="stagger-control" type="checkbox" checked />
+              <i aria-hidden="true"></i>
+            </label>
+            <button class="utility-button" id="keyboard-mode" type="button" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M7 9h.01M11 9h.01M15 9h.01M18 9h.01M7 13h.01M11 13h.01M15 13h.01M8 16h8" />
+              </svg>
+              <span><strong>Focus typing</strong><small>Write directly to row one</small></span>
+              <kbd>K</kbd>
+            </button>
+          </fieldset>
+
+          <fieldset class="control-bank audio-bank">
+            <legend>Sound</legend>
+            <button class="sound-button" id="sound-toggle" type="button" aria-pressed="false">
+              <svg class="sound-off-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 5 6.5 9H3v6h3.5l4.5 4V5Z" />
+                <path d="m16 9 5 5m0-5-5 5" />
+              </svg>
+              <span><strong>Enable clacks</strong><small>Sound is off</small></span>
+              <i aria-hidden="true"></i>
+            </button>
+            <div class="range-control volume-control">
+              <div>
+                <label for="volume-control">Master volume</label>
+                <output id="volume-output" for="volume-control">45%</output>
+              </div>
+              <input id="volume-control" type="range" min="0" max="1" value="0.45" step="0.05" disabled />
+            </div>
+            <p class="audio-note">Synthesized live · no samples</p>
+          </fieldset>
+        </div>
       </section>
 
       <footer class="terminal-footer">
-        <span>TER / 55</span>
-        <span id="system-status">Board offline</span>
+        <span>TER / 55 · Mechanical information systems</span>
+        <span id="system-status">Board standing by</span>
       </footer>
 
       <p class="sr-only" id="live-region" role="status" aria-live="polite"></p>
