@@ -98,6 +98,15 @@ export function createFlapSequencer(cell, options = {}) {
     if (!paused && !running) void pump();
   }
 
+  function reschedule(delay = 0) {
+    if (destroyed || running || paused || !startTimer) return false;
+    clearStartTimer();
+    const safeDelay = Math.max(0, Number(delay) || 0);
+    if (safeDelay) startTimer = window.setTimeout(() => void pump(), safeDelay);
+    else void pump();
+    return true;
+  }
+
   function destroy() {
     destroyed = true;
     clearStartTimer();
@@ -109,6 +118,7 @@ export function createFlapSequencer(cell, options = {}) {
     setSpeed,
     setReducedMotion,
     setPaused,
+    reschedule,
     destroy,
     get targetCharacter() {
       return targetCharacter;

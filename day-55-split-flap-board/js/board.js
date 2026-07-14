@@ -124,7 +124,14 @@ export function createSplitFlapBoard(root, options = {}) {
   }
 
   function setStagger(nextStaggered) {
-    staggered = Boolean(nextStaggered);
+    const nextValue = Boolean(nextStaggered);
+    if (nextValue === staggered) return staggered;
+    staggered = nextValue;
+    sequencers.forEach((sequencer, index) => {
+      const row = Math.floor(index / columns);
+      const column = index % columns;
+      sequencer.reschedule(getStaggerDelay(row, column, staggered));
+    });
     return staggered;
   }
 

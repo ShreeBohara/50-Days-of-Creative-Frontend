@@ -4,6 +4,7 @@ import { createMessageMode } from "./messageMode.js";
 import { createDeparturesMode } from "./departuresMode.js";
 import { createClockMode } from "./clockMode.js";
 import { createQuotesMode } from "./quotesMode.js";
+import { createFocusTyping, createTabController } from "./controls.js";
 
 const status = document.querySelector("#system-status");
 const grid = document.querySelector("#board-grid");
@@ -17,7 +18,13 @@ const modePanels = [...document.querySelectorAll(".mode-panel")];
 const boardTitle = document.querySelector("#board-title");
 const messageInput = document.querySelector("#message-input");
 const messageCount = document.querySelector("#message-count");
+const terminal = document.querySelector("#terminal");
+const speedControl = document.querySelector("#speed-control");
+const speedOutput = document.querySelector("#speed-output");
+const staggerControl = document.querySelector("#stagger-control");
+const keyboardModeButton = document.querySelector("#keyboard-mode");
 let activeMode = "departures";
+let focusTyping = null;
 
 function describeBoard(lines) {
   const content = lines.map((line) => line.trim()).filter(Boolean).join("; ");
@@ -128,28 +135,53 @@ function renderActiveMode() {
 
 function setActiveMode(mode) {
   if (!mode || mode === activeMode) return;
+  if (mode !== "message" && focusTyping?.active) {
+    focusTyping.exit({ restoreFocus: false, announce: false });
+  }
   messageMode.deactivate();
   departuresMode.deactivate();
   clockMode.deactivate();
   quotesMode.deactivate();
   activeMode = mode;
-  modeTabs.forEach((tab) => {
-    const selected = tab.dataset.mode === mode;
-    tab.classList.toggle("is-active", selected);
-    tab.setAttribute("aria-selected", String(selected));
-  });
-  modePanels.forEach((panel) => {
-    const selected = panel.id === `panel-${mode}`;
-    panel.classList.toggle("is-active", selected);
-    panel.hidden = !selected;
-  });
+  terminal.dataset.mode = mode;
   boardTitle.textContent = mode;
   renderActiveMode();
   announce(`${mode} mode selected`);
 }
 
-modeTabs.forEach((tab) => {
-  tab.addEventListener("click", () => setActiveMode(tab.dataset.mode));
+const tabController = createTabController({
+  tabs: modeTabs,
+  panels: modePanels,
+  initialMode: activeMode,
+  onSelect: setActiveMode,
+});
+
+speedControl.addEventListener("input", () => {
+  const speed = board.setSpeed(speedControl.value);
+  speedOutput.value = `${speed.toFixed(1)}×`;
+  speedControl.setAttribute("aria-valuetext", `${speed.toFixed(1)} times`);
+});
+
+speedControl.addEventListener("change", () => {
+  announce(`Flip speed ${Number(speedControl.value).toFixed(1)} times`);
+});
+
+staggerControl.addEventListener("change", () => {
+  const staggered = board.setStagger(staggerControl.checked);
+  announce(staggered ? "Left to right solve wave enabled" : "Simultaneous solve enabled");
+});
+
+focusTyping = createFocusTyping({
+  button: keyboardModeButton,
+  boardTarget: boardLabel,
+  getColumns: () => board.columns,
+  setText: (text) => messageMode.setSource(text, { announce: false }),
+  onEnter: () => tabController.select("message"),
+  onStateChange: (active) => {
+    terminal.classList.toggle("is-keyboard-mode", active);
+    status.textContent = active ? "Focus typing active · Escape to exit" : "Focus typing ready";
+  },
+  announce,
 });
 
 let resizeFrame = 0;
@@ -161,12 +193,15 @@ window.addEventListener("resize", () => {
       else if (activeMode === "departures") departuresMode.resize();
       else if (activeMode === "clock") clockMode.resize();
       else quotesMode.resize();
+      focusTyping.resize();
     }
   });
 }, { passive: true });
 
 document.documentElement.classList.add("is-ready");
+terminal.dataset.mode = activeMode;
 syncAudioControls(audio.state);
+speedControl.setAttribute("aria-valuetext", "1.0 times");
 volumeControl.setAttribute("aria-valuetext", "45 percent");
 departuresMode.activate();
 

@@ -53,6 +53,7 @@
             class="board-housing"
             id="board-label"
             role="img"
+            tabindex="-1"
             aria-label="Split-flap departure board loading"
           >
             <div class="board-grid" id="board-grid" aria-hidden="true"></div>
@@ -71,16 +72,16 @@
             <small>Select programme</small>
           </div>
           <div class="mode-tabs" role="tablist" aria-label="Board modes">
-            <button id="tab-message" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-message" data-mode="message">
+            <button id="tab-message" class="mode-tab" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-message" data-mode="message">
               <span>01</span> Message
             </button>
-            <button id="tab-departures" class="mode-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-departures" data-mode="departures">
+            <button id="tab-departures" class="mode-tab is-active" type="button" role="tab" tabindex="0" aria-selected="true" aria-controls="panel-departures" data-mode="departures">
               <span>02</span> Departures
             </button>
-            <button id="tab-clock" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-clock" data-mode="clock">
+            <button id="tab-clock" class="mode-tab" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-clock" data-mode="clock">
               <span>03</span> Clock
             </button>
-            <button id="tab-quotes" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-quotes" data-mode="quotes">
+            <button id="tab-quotes" class="mode-tab" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-quotes" data-mode="quotes">
               <span>04</span> Quotes
             </button>
           </div>
@@ -93,8 +94,8 @@
                 <label for="message-input">Compose message</label>
                 <output id="message-count" for="message-input">0 / 132</output>
               </div>
-              <textarea id="message-input" rows="3" maxlength="300" placeholder="TYPE A MESSAGE FOR THE BOARD" spellcheck="false"></textarea>
-              <p>Unsupported punctuation becomes a space. Text wraps automatically.</p>
+              <textarea id="message-input" rows="3" maxlength="300" aria-describedby="message-help" placeholder="TYPE A MESSAGE FOR THE BOARD" spellcheck="false"></textarea>
+              <p id="message-help">Unsupported punctuation becomes a space. Text wraps automatically.</p>
             </section>
             <section id="panel-departures" class="mode-panel is-active" role="tabpanel" aria-labelledby="tab-departures">
               <span class="panel-code">AUTO / 08 SEC</span>
@@ -131,13 +132,13 @@
               <input id="stagger-control" type="checkbox" checked />
               <i aria-hidden="true"></i>
             </label>
-            <button class="utility-button" id="keyboard-mode" type="button" aria-pressed="false">
+            <button class="utility-button" id="keyboard-mode" type="button" aria-pressed="false" aria-controls="message-input" aria-keyshortcuts="Alt+K">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="M7 9h.01M11 9h.01M15 9h.01M18 9h.01M7 13h.01M11 13h.01M15 13h.01M8 16h8" />
               </svg>
               <span><strong>Focus typing</strong><small>Write directly to row one</small></span>
-              <kbd>K</kbd>
+              <kbd>ALT K</kbd>
             </button>
           </fieldset>
 
