@@ -1,3 +1,5 @@
+import { createFlapCell } from "./flapCell.js";
+
 const status = document.querySelector("#system-status");
 const grid = document.querySelector("#board-grid");
 
@@ -12,10 +14,8 @@ const previewLines = [
 
 for (const line of previewLines) {
   for (const character of line.padEnd(22).slice(0, 22)) {
-    const cell = document.createElement("span");
-    cell.className = "flap-placeholder";
-    cell.textContent = character;
-    grid.append(cell);
+    const cell = createFlapCell(character);
+    grid.append(cell.element);
   }
 }
 
