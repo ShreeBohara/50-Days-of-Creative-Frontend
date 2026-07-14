@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0c0b" />
+    <meta
+      name="description"
+      content="TERMINAL / 55 is a tactile split-flap departure board built with CSS 3D transforms and Web Audio."
+    />
+    <title>TERMINAL / 55 — Split-Flap Departure Board</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="terminal" id="terminal">
+      <header class="terminal-header">
+        <p class="eyebrow">50 Days of Creative Frontend · Day 55</p>
+        <h1>TERMINAL <span>/ 55</span></h1>
+        <p class="terminal-intro">A mechanical information board for imaginary arrivals and imminent departures.</p>
+      </header>
+
+      <section class="board-station" aria-labelledby="board-title">
+        <div class="station-sign">
+          <p>North concourse</p>
+          <h2 id="board-title">Departures</h2>
+          <span>Local service · Platform 55</span>
+        </div>
+        <div
+          class="board-housing"
+          id="board-label"
+          role="img"
+          aria-label="Split-flap departure board loading"
+        >
+          <div class="board-grid" id="board-grid" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="terminal-controls" aria-label="Departure board controls">
+        <p>Mechanical systems standing by.</p>
+      </section>
+
+      <footer class="terminal-footer">
+        <span>TER / 55</span>
+        <span id="system-status">Board offline</span>
+      </footer>
+
+      <p class="sr-only" id="live-region" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

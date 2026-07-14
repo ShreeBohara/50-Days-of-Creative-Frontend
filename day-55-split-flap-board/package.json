@@ -1,0 +1,8 @@
+{
+  "name": "day-55-split-flap-board",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
