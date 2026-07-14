@@ -2,6 +2,7 @@ import { createSplitFlapBoard, getColumnsForWidth } from "./board.js";
 import { createClackAudio } from "./audio.js";
 import { createMessageMode } from "./messageMode.js";
 import { createDeparturesMode } from "./departuresMode.js";
+import { createClockMode } from "./clockMode.js";
 
 const status = document.querySelector("#system-status");
 const grid = document.querySelector("#board-grid");
@@ -81,6 +82,11 @@ const departuresMode = createDeparturesMode({
   announce,
 });
 
+const clockMode = createClockMode({
+  getColumns: () => board.columns,
+  setBoard: board.setBoard,
+});
+
 soundToggle.addEventListener("click", async () => {
   soundToggle.disabled = true;
   const wasEnabled = audio.state.enabled;
@@ -112,6 +118,8 @@ function renderActiveMode() {
     messageMode.activate();
   } else if (activeMode === "departures") {
     departuresMode.activate();
+  } else if (activeMode === "clock") {
+    clockMode.activate();
   } else {
     renderPlaceholder(activeMode);
   }
@@ -121,6 +129,7 @@ function setActiveMode(mode) {
   if (!mode || mode === activeMode) return;
   messageMode.deactivate();
   departuresMode.deactivate();
+  clockMode.deactivate();
   activeMode = mode;
   modeTabs.forEach((tab) => {
     const selected = tab.dataset.mode === mode;
@@ -148,6 +157,7 @@ window.addEventListener("resize", () => {
     if (board.setColumns(getColumnsForWidth(window.innerWidth))) {
       if (activeMode === "message") messageMode.resize();
       else if (activeMode === "departures") departuresMode.resize();
+      else if (activeMode === "clock") clockMode.resize();
       else renderActiveMode();
     }
   });
