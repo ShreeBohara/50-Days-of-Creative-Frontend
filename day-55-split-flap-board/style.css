@@ -454,6 +454,12 @@ kbd {
   animation: flap-back var(--flip-duration, 100ms) linear both;
 }
 
+.flap-cell.is-flipping {
+  box-shadow:
+    0 0 0 1px rgba(223, 159, 56, 0.07),
+    0 2px 5px #000;
+}
+
 @keyframes flap-front {
   0% {
     filter: brightness(1);
