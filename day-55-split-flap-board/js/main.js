@@ -3,6 +3,7 @@ import { createClackAudio } from "./audio.js";
 import { createMessageMode } from "./messageMode.js";
 import { createDeparturesMode } from "./departuresMode.js";
 import { createClockMode } from "./clockMode.js";
+import { createQuotesMode } from "./quotesMode.js";
 
 const status = document.querySelector("#system-status");
 const grid = document.querySelector("#board-grid");
@@ -87,6 +88,12 @@ const clockMode = createClockMode({
   setBoard: board.setBoard,
 });
 
+const quotesMode = createQuotesMode({
+  getColumns: () => board.columns,
+  setBoard: board.setBoard,
+  announce,
+});
+
 soundToggle.addEventListener("click", async () => {
   soundToggle.disabled = true;
   const wasEnabled = audio.state.enabled;
@@ -107,12 +114,6 @@ volumeControl.addEventListener("input", () => {
   volumeControl.setAttribute("aria-valuetext", `${percentage} percent`);
 });
 
-function renderPlaceholder(label) {
-  const line = String(label).toUpperCase().slice(0, board.columns);
-  const leftPadding = Math.max(0, Math.floor((board.columns - line.length) / 2));
-  board.setBoard(["", "", `${" ".repeat(leftPadding)}${line}`]);
-}
-
 function renderActiveMode() {
   if (activeMode === "message") {
     messageMode.activate();
@@ -121,7 +122,7 @@ function renderActiveMode() {
   } else if (activeMode === "clock") {
     clockMode.activate();
   } else {
-    renderPlaceholder(activeMode);
+    quotesMode.activate();
   }
 }
 
@@ -130,6 +131,7 @@ function setActiveMode(mode) {
   messageMode.deactivate();
   departuresMode.deactivate();
   clockMode.deactivate();
+  quotesMode.deactivate();
   activeMode = mode;
   modeTabs.forEach((tab) => {
     const selected = tab.dataset.mode === mode;
@@ -158,7 +160,7 @@ window.addEventListener("resize", () => {
       if (activeMode === "message") messageMode.resize();
       else if (activeMode === "departures") departuresMode.resize();
       else if (activeMode === "clock") clockMode.resize();
-      else renderActiveMode();
+      else quotesMode.resize();
     }
   });
 }, { passive: true });
