@@ -61,6 +61,7 @@ on:
       - "day-52-infinite-drag-universe/**"
       - "day-53-goo-lab/**"
       - "day-54-mesh-gradient-studio/**"
+      - "day-55-split-flap-board/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -412,6 +413,7 @@ jobs:
           cp -R day-52-infinite-drag-universe _site/
           cp -R day-53-goo-lab _site/
           cp -R day-54-mesh-gradient-studio _site/
+          cp -R day-55-split-flap-board _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
