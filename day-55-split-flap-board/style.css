@@ -631,6 +631,10 @@ kbd {
   font-size: 0.62rem;
 }
 
+.field-heading output.is-overflow {
+  color: var(--danger);
+}
+
 textarea {
   width: 100%;
   min-height: 96px;

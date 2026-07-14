@@ -1,5 +1,6 @@
 import { createSplitFlapBoard, getColumnsForWidth } from "./board.js";
 import { createClackAudio } from "./audio.js";
+import { createMessageMode } from "./messageMode.js";
 
 const status = document.querySelector("#system-status");
 const grid = document.querySelector("#board-grid");
@@ -8,6 +9,12 @@ const liveRegion = document.querySelector("#live-region");
 const soundToggle = document.querySelector("#sound-toggle");
 const volumeControl = document.querySelector("#volume-control");
 const volumeOutput = document.querySelector("#volume-output");
+const modeTabs = [...document.querySelectorAll(".mode-tab")];
+const modePanels = [...document.querySelectorAll(".mode-panel")];
+const boardTitle = document.querySelector("#board-title");
+const messageInput = document.querySelector("#message-input");
+const messageCount = document.querySelector("#message-count");
+let activeMode = "departures";
 
 const previewServices = [
   { time: "06:40", destination: "BERLIN", code: "BER", status: "ON TIME" },
@@ -86,6 +93,14 @@ const board = createSplitFlapBoard(grid, {
   },
 });
 
+const messageMode = createMessageMode({
+  input: messageInput,
+  counter: messageCount,
+  getColumns: () => board.columns,
+  setBoard: board.setBoard,
+  announce,
+});
+
 soundToggle.addEventListener("click", async () => {
   soundToggle.disabled = true;
   const wasEnabled = audio.state.enabled;
@@ -110,11 +125,53 @@ function renderPreview() {
   board.setBoard(formatPreview(board.columns));
 }
 
+function renderPlaceholder(label) {
+  const line = String(label).toUpperCase().slice(0, board.columns);
+  const leftPadding = Math.max(0, Math.floor((board.columns - line.length) / 2));
+  board.setBoard(["", "", `${" ".repeat(leftPadding)}${line}`]);
+}
+
+function renderActiveMode() {
+  if (activeMode === "message") {
+    messageMode.activate();
+  } else if (activeMode === "departures") {
+    renderPreview();
+  } else {
+    renderPlaceholder(activeMode);
+  }
+}
+
+function setActiveMode(mode) {
+  if (!mode || mode === activeMode) return;
+  messageMode.deactivate();
+  activeMode = mode;
+  modeTabs.forEach((tab) => {
+    const selected = tab.dataset.mode === mode;
+    tab.classList.toggle("is-active", selected);
+    tab.setAttribute("aria-selected", String(selected));
+  });
+  modePanels.forEach((panel) => {
+    const selected = panel.id === `panel-${mode}`;
+    panel.classList.toggle("is-active", selected);
+    panel.hidden = !selected;
+  });
+  boardTitle.textContent = mode;
+  renderActiveMode();
+  announce(`${mode} mode selected`);
+}
+
+modeTabs.forEach((tab) => {
+  tab.addEventListener("click", () => setActiveMode(tab.dataset.mode));
+});
+
 let resizeFrame = 0;
 window.addEventListener("resize", () => {
   window.cancelAnimationFrame(resizeFrame);
   resizeFrame = window.requestAnimationFrame(() => {
-    if (board.setColumns(getColumnsForWidth(window.innerWidth))) renderPreview();
+    if (board.setColumns(getColumnsForWidth(window.innerWidth))) {
+      if (activeMode === "message") messageMode.resize();
+      else renderActiveMode();
+    }
   });
 }, { passive: true });
 
