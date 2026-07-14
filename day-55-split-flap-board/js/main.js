@@ -18,6 +18,7 @@ const modePanels = [...document.querySelectorAll(".mode-panel")];
 const boardTitle = document.querySelector("#board-title");
 const messageInput = document.querySelector("#message-input");
 const messageCount = document.querySelector("#message-count");
+const messageHelp = document.querySelector("#message-help");
 const terminal = document.querySelector("#terminal");
 const speedControl = document.querySelector("#speed-control");
 const speedOutput = document.querySelector("#speed-output");
@@ -25,6 +26,7 @@ const staggerControl = document.querySelector("#stagger-control");
 const keyboardModeButton = document.querySelector("#keyboard-mode");
 let activeMode = "departures";
 let focusTyping = null;
+const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function describeBoard(lines) {
   const content = lines.map((line) => line.trim()).filter(Boolean).join("; ");
@@ -62,11 +64,13 @@ function syncAudioControls(audioState) {
 
 const audio = createClackAudio({
   volume: volumeControl.value,
+  reducedMotion: motionPreference.matches,
   onStateChange: syncAudioControls,
 });
 
 const board = createSplitFlapBoard(grid, {
   columns: getColumnsForWidth(window.innerWidth),
+  reducedMotion: motionPreference.matches,
   onFlip: audio.clack,
   onFrameRequested: (lines, changedIndices) => {
     boardLabel.setAttribute("aria-label", describeBoard(lines));
@@ -79,6 +83,7 @@ const board = createSplitFlapBoard(grid, {
 const messageMode = createMessageMode({
   input: messageInput,
   counter: messageCount,
+  help: messageHelp,
   getColumns: () => board.columns,
   setBoard: board.setBoard,
   announce,
@@ -198,11 +203,46 @@ window.addEventListener("resize", () => {
   });
 }, { passive: true });
 
+function handleVisibilityChange() {
+  const hidden = document.hidden;
+  audio.setHidden(hidden);
+  if (hidden) board.setPaused(true);
+  messageMode.setHidden(hidden);
+  departuresMode.setHidden(hidden);
+  clockMode.setHidden(hidden);
+  quotesMode.setHidden(hidden);
+  if (!hidden) board.setPaused(false);
+}
+
+function handleMotionPreference(event) {
+  board.setReducedMotion(event.matches);
+  audio.setReducedMotion(event.matches);
+  announce(event.matches
+    ? "Reduced motion enabled. Board changes now settle immediately."
+    : "Mechanical board motion enabled for future changes.");
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange);
+motionPreference.addEventListener("change", handleMotionPreference);
+
+window.addEventListener("pagehide", (event) => {
+  if (event.persisted) return;
+  messageMode.destroy();
+  departuresMode.destroy();
+  clockMode.destroy();
+  quotesMode.destroy();
+  focusTyping.destroy();
+  tabController.destroy();
+  board.destroy();
+  void audio.destroy();
+}, { once: true });
+
 document.documentElement.classList.add("is-ready");
 terminal.dataset.mode = activeMode;
 syncAudioControls(audio.state);
 speedControl.setAttribute("aria-valuetext", "1.0 times");
 volumeControl.setAttribute("aria-valuetext", "45 percent");
 departuresMode.activate();
+if (document.hidden) handleVisibilityChange();
 
 window.splitFlapBoard = board;

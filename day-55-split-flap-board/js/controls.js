@@ -1,7 +1,7 @@
 import { normalizeMessageText } from "./messageMode.js";
 
 export function isInteractiveTarget(target) {
-  return target instanceof Element && Boolean(target.closest(
+  return typeof Element !== "undefined" && target instanceof Element && Boolean(target.closest(
     "a, button, input, textarea, select, summary, [contenteditable]:not([contenteditable='false'])",
   ));
 }

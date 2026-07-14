@@ -26,7 +26,8 @@ export function createFlapCell(initialCharacter = " ") {
   let destroyed = false;
   let midpointTimer = 0;
   let completionTimer = 0;
-  let finishActiveFlip = null;
+  let cancelActiveFlip = null;
+  let animationCycle = 0;
 
   function writeStatic(character) {
     staticTop.glyph.textContent = character;
@@ -70,9 +71,10 @@ export function createFlapCell(initialCharacter = " ") {
     staticBottom.glyph.textContent = previousCharacter;
     foldingFront.glyph.textContent = previousCharacter;
     foldingBack.glyph.textContent = nextCharacter;
-    element.classList.remove("is-flipping");
-    void element.offsetWidth;
-    element.classList.add("is-flipping");
+    animationCycle = animationCycle ? 0 : 1;
+    const animationClass = animationCycle ? "is-flipping-a" : "is-flipping-b";
+    element.classList.remove("is-flipping-a", "is-flipping-b");
+    element.classList.add(animationClass);
 
     return new Promise((resolve) => {
       let midpointReached = false;
@@ -90,26 +92,43 @@ export function createFlapCell(initialCharacter = " ") {
         clearActiveTimers();
         reachMidpoint();
         flipping = false;
-        element.classList.remove("is-flipping");
+        element.classList.remove("is-flipping-a", "is-flipping-b");
         setCharacter(nextCharacter);
         foldingBack.half.removeEventListener("animationend", finish);
-        finishActiveFlip = null;
+        cancelActiveFlip = null;
         resolve(currentCharacter);
       }
 
-      finishActiveFlip = finish;
+      function cancel(character) {
+        if (!flipping) return;
+        clearActiveTimers();
+        flipping = false;
+        foldingBack.half.removeEventListener("animationend", finish);
+        element.classList.remove("is-flipping-a", "is-flipping-b");
+        setCharacter(character);
+        cancelActiveFlip = null;
+        resolve(currentCharacter);
+      }
+
+      cancelActiveFlip = cancel;
       midpointTimer = window.setTimeout(reachMidpoint, safeDuration / 2);
       completionTimer = window.setTimeout(finish, safeDuration + 34);
       foldingBack.half.addEventListener("animationend", finish, { once: true });
     });
   }
 
+  function settle(character) {
+    if (destroyed) return;
+    if (cancelActiveFlip) cancelActiveFlip(character);
+    else setCharacter(character);
+  }
+
   function destroy() {
     if (destroyed) return;
-    destroyed = true;
     clearActiveTimers();
-    finishActiveFlip?.();
-    finishActiveFlip = null;
+    cancelActiveFlip?.(currentCharacter);
+    destroyed = true;
+    cancelActiveFlip = null;
     element.remove();
   }
 
@@ -119,6 +138,7 @@ export function createFlapCell(initialCharacter = " ") {
     element,
     flipOnce,
     setCharacter,
+    settle,
     destroy,
     get currentCharacter() {
       return currentCharacter;

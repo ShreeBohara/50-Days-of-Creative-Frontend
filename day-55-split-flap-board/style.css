@@ -31,7 +31,7 @@
   text-rendering: optimizeLegibility;
   --ink: #f3ead2;
   --muted: #9da198;
-  --dim: #676c65;
+  --dim: #898e86;
   --amber: #df9f38;
   --amber-bright: #ffc35a;
   --signal: #9ac47b;
@@ -57,7 +57,6 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  overflow-x: hidden;
   background:
     radial-gradient(circle at 50% 22%, rgba(223, 159, 56, 0.075), transparent 32rem),
     radial-gradient(circle at 12% 90%, rgba(84, 104, 88, 0.1), transparent 34rem),
@@ -369,6 +368,7 @@ kbd {
   width: 100%;
   height: 50%;
   overflow: hidden;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   background-color: #131613;
   transform-style: preserve-3d;
@@ -428,7 +428,6 @@ kbd {
 .flap-fold-back {
   visibility: hidden;
   z-index: 4;
-  will-change: transform;
 }
 
 .flap-fold-front {
@@ -441,20 +440,29 @@ kbd {
   transform-origin: center top;
 }
 
-.flap-cell.is-flipping .flap-fold-front,
-.flap-cell.is-flipping .flap-fold-back {
+.flap-cell:is(.is-flipping-a, .is-flipping-b) .flap-fold-front,
+.flap-cell:is(.is-flipping-a, .is-flipping-b) .flap-fold-back {
   visibility: visible;
+  will-change: transform;
 }
 
-.flap-cell.is-flipping .flap-fold-front {
+.flap-cell.is-flipping-a .flap-fold-front {
   animation: flap-front var(--flip-duration, 100ms) linear both;
 }
 
-.flap-cell.is-flipping .flap-fold-back {
+.flap-cell.is-flipping-a .flap-fold-back {
   animation: flap-back var(--flip-duration, 100ms) linear both;
 }
 
-.flap-cell.is-flipping {
+.flap-cell.is-flipping-b .flap-fold-front {
+  animation: flap-front-alt var(--flip-duration, 100ms) linear both;
+}
+
+.flap-cell.is-flipping-b .flap-fold-back {
+  animation: flap-back-alt var(--flip-duration, 100ms) linear both;
+}
+
+.flap-cell:is(.is-flipping-a, .is-flipping-b) {
   box-shadow:
     0 0 0 1px rgba(223, 159, 56, 0.07),
     0 2px 5px #000;
@@ -484,6 +492,40 @@ kbd {
     filter: brightness(1);
     transform: rotateX(0deg);
   }
+}
+
+@keyframes flap-front-alt {
+  0% {
+    filter: brightness(1);
+    transform: rotateX(0deg);
+  }
+
+  50%,
+  100% {
+    filter: brightness(0.52);
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flap-back-alt {
+  0%,
+  49.9% {
+    filter: brightness(0.5);
+    transform: rotateX(90deg);
+  }
+
+  100% {
+    filter: brightness(1);
+    transform: rotateX(0deg);
+  }
+}
+
+.board-grid[data-columns="16"] .flap-cell {
+  font-size: clamp(0.76rem, 3.4vw, 2rem);
+}
+
+.board-grid[data-columns="12"] .flap-cell {
+  font-size: clamp(0.78rem, 5.3vw, 1.9rem);
 }
 
 .board-serial {
@@ -605,6 +647,10 @@ kbd {
   line-height: 1.55;
 }
 
+.mode-panel p.is-warning {
+  color: #e2a984;
+}
+
 .panel-code {
   color: var(--amber);
   font-size: 0.55rem;
@@ -652,7 +698,7 @@ textarea {
 }
 
 textarea::placeholder {
-  color: #575c56;
+  color: #8b9088;
 }
 
 .control-bank {
@@ -688,7 +734,7 @@ input[type="range"] {
   display: flex;
   justify-content: space-between;
   margin-top: -3px;
-  color: #626760;
+  color: #898e86;
   font-size: 0.43rem;
 }
 
@@ -853,7 +899,7 @@ kbd {
 
 .audio-note {
   margin: auto 0 0;
-  color: #5f645e;
+  color: #898e86;
   font-size: 0.48rem;
 }
 
@@ -869,7 +915,7 @@ kbd {
   margin-top: 54px;
   padding-top: 17px;
   border-top: 1px solid #2c302d;
-  color: #60655f;
+  color: #898e86;
   font-size: 0.53rem;
 }
 
@@ -965,7 +1011,7 @@ kbd {
   }
 
   .board-legend {
-    padding-inline: 3px;
+    display: none;
   }
 
   .board-serial span:first-child {
@@ -990,5 +1036,41 @@ kbd {
   .terminal-footer {
     align-items: start;
     flex-direction: column;
+  }
+
+  .mode-panel p,
+  .switch-control small,
+  .utility-button small,
+  .sound-button small {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .terminal-header h1 {
+    font-size: 2.65rem;
+  }
+
+  .mode-tabs {
+    gap: 4px;
+  }
+
+  .mode-tab {
+    padding-inline: 10px;
+  }
+
+  .board-housing-wrap {
+    padding-inline: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }

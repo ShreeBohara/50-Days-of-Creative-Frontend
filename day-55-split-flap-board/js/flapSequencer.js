@@ -84,9 +84,9 @@ export function createFlapSequencer(cell, options = {}) {
   function setReducedMotion(nextReducedMotion) {
     reducedMotion = Boolean(nextReducedMotion);
     clearStartTimer();
-    if (!running && reducedMotion) {
-      cell.setCharacter(targetCharacter);
-      options.onSettled?.(cell.currentCharacter);
+    if (reducedMotion) {
+      cell.settle(targetCharacter);
+      if (!running) options.onSettled?.(cell.currentCharacter);
     } else if (!running && !paused) {
       void pump();
     }

@@ -69,9 +69,12 @@ export function wrapMessage(value, { columns, rows = 6 } = {}) {
 
 export function createMessageMode(options) {
   const { input, counter } = options;
+  const defaultHelp = options.help?.textContent ?? "";
   let source = input.value;
   let active = false;
+  let hidden = false;
   let debounceTimer = 0;
+  let announceTimer = 0;
 
   function getComposition() {
     return wrapMessage(source, {
@@ -84,6 +87,12 @@ export function createMessageMode(options) {
     counter.value = `${composition.characterCount} / ${composition.capacity}`;
     counter.classList.toggle("is-overflow", composition.truncated);
     counter.dataset.truncated = String(composition.truncated);
+    if (options.help) {
+      options.help.textContent = composition.truncated
+        ? `Board limit reached. Only the first ${composition.capacity} positions are displayed.`
+        : defaultHelp;
+      options.help.classList.toggle("is-warning", composition.truncated);
+    }
   }
 
   function render({ announce = false } = {}) {
@@ -100,10 +109,17 @@ export function createMessageMode(options) {
 
   function scheduleRender() {
     window.clearTimeout(debounceTimer);
+    window.clearTimeout(announceTimer);
     const composition = getComposition();
     syncCounter(composition);
-    if (!active) return;
-    debounceTimer = window.setTimeout(() => render({ announce: true }), 120);
+    if (!active || hidden) return;
+    debounceTimer = window.setTimeout(() => render(), 120);
+    announceTimer = window.setTimeout(() => {
+      const latest = getComposition();
+      options.announce?.(latest.truncated
+        ? `Message truncated to ${latest.capacity} board positions`
+        : "Message updated on the split-flap board");
+    }, 700);
   }
 
   function onInput() {
@@ -122,6 +138,7 @@ export function createMessageMode(options) {
     deactivate() {
       active = false;
       window.clearTimeout(debounceTimer);
+      window.clearTimeout(announceTimer);
     },
     resize() {
       if (active) return render();
@@ -134,12 +151,19 @@ export function createMessageMode(options) {
       if (syncInput) input.value = source;
       return active ? render({ announce }) : getComposition();
     },
+    setHidden(nextHidden) {
+      hidden = Boolean(nextHidden);
+      window.clearTimeout(debounceTimer);
+      window.clearTimeout(announceTimer);
+      if (active && !hidden) render();
+    },
     get source() {
       return source;
     },
     destroy() {
       active = false;
       window.clearTimeout(debounceTimer);
+      window.clearTimeout(announceTimer);
       input.removeEventListener("input", onInput);
     },
   };
