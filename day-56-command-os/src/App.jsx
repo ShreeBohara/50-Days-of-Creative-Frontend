@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Dashboard from './dashboard/Dashboard.jsx'
+import CommandPalette from './palette/CommandPalette.jsx'
+import { useCommandK } from './palette/useCommandK.jsx'
 import Icon from './icons.jsx'
 import { documents as seedDocs, people, statusTone } from './dashboard/dashboardData.js'
 
@@ -48,10 +50,8 @@ export default function App() {
 
   const openDocument = openDocId ? documents.find((d) => d.id === openDocId) : null
 
-  // Placeholder palette trigger — the real palette lands in the next commit.
-  const openPalette = useCallback(() => {
-    setSidebarCollapsed(false)
-  }, [])
+  // Palette open state + ⌘K/Ctrl+K global hotkey.
+  const palette = useCommandK()
 
   return (
     <>
@@ -63,10 +63,12 @@ export default function App() {
         peopleById={peopleById}
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={toggleSidebar}
-        onOpenPalette={openPalette}
+        onOpenPalette={palette.open}
         newDocId={newDocId}
         onOpenDoc={openDoc}
       />
+
+      <CommandPalette open={palette.isOpen} onClose={palette.close} />
 
       {openDocument && (
         <DocModal doc={openDocument} owner={peopleById[openDocument.ownerId]} onClose={closeDoc} />
