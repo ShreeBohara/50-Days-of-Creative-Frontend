@@ -2,6 +2,25 @@ import { useEffect, useRef } from 'react'
 import Icon from '../icons.jsx'
 import Highlight from './Highlight.jsx'
 
+// Skeleton rows for an "async" panel (the People/Assign page) while it "loads".
+export function LoadingRows({ groups }) {
+  return (
+    <div className="cmd-results" aria-busy="true" aria-label="Loading">
+      {groups.map((group) => (
+        <div className="cmd-group" key={group.id}>
+          <div className="cmd-group-head"><span>{group.label}</span></div>
+          {group.items.map((_, i) => (
+            <div className="cmd-row cmd-row--skeleton" key={i} aria-hidden="true">
+              <span className="sk sk-avatar" />
+              <span className="sk sk-line" style={{ maxWidth: `${44 - i * 4}%` }} />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // A row's leading glyph: an accent swatch, a person avatar, or an icon.
 function RowIcon({ item }) {
   if (item.swatch) {

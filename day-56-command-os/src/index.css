@@ -595,6 +595,26 @@ button { font-family: inherit; }
 .cmd-row[data-active='true'] .cmd-row-icon { background: var(--accent); color: #fff; }
 .cmd-row[data-active='true'] .cmd-row-enter { opacity: 1; }
 
+/* async "loading" skeleton rows */
+.cmd-row--skeleton { pointer-events: none; cursor: default; }
+.sk {
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-hover) 25%,
+    color-mix(in srgb, var(--text) 10%, transparent) 37%,
+    var(--surface-hover) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+.sk-avatar { width: 26px; height: 26px; border-radius: 50%; flex: none; }
+.sk-line { height: 11px; flex: 1; }
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
 .cmd-foot {
   display: flex;
   align-items: center;

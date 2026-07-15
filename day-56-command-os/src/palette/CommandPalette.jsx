@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Icon from '../icons.jsx'
-import ResultList from './ResultList.jsx'
+import ResultList, { LoadingRows } from './ResultList.jsx'
 import { rankCommands } from './fuzzy.js'
 import { indexCommands } from './useCommandRegistry.js'
 import { loadRecents, pushRecent } from './recents.js'
@@ -19,6 +19,7 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(null)
   const [path, setPath] = useState([]) // stack of nested panels
+  const [loading, setLoading] = useState(false) // async panel "fetch"
   const inputRef = useRef(null)
 
   // Root groups, or the current nested panel's groups.
@@ -54,9 +55,11 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
     [recentResults, filtered],
   )
 
+  const isLoading = !!activePanel?.async && loading
+
   const flat = useMemo(
-    () => displayGroups.flatMap((g) => g.results.map((r) => ({ item: r.item }))),
-    [displayGroups],
+    () => (isLoading ? NO_RESULTS : displayGroups.flatMap((g) => g.results.map((r) => ({ item: r.item })))),
+    [displayGroups, isLoading],
   )
 
   // Active row is derived: honour the selection while it's a valid result,
@@ -97,6 +100,11 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
       if (item.panel) {
         setQuery('')
         setPath((p) => [...p, item.panel])
+        // "Fetch" async panels: show a shimmer for a beat before results land.
+        if (item.panel.async) {
+          setLoading(true)
+          window.setTimeout(() => setLoading(false), 420)
+        }
         return
       }
       if (path.length === 0) {
@@ -195,7 +203,9 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
         </div>
 
         <div className="cmd-body">
-          {hasResults ? (
+          {isLoading ? (
+            <LoadingRows groups={activePanel.groups} />
+          ) : hasResults ? (
             <ResultList
               groups={displayGroups}
               activeId={activeId}
