@@ -60,7 +60,7 @@ export default function ResultList({ groups, activeId, onHoverItem, onRunItem })
   }, [activeId])
 
   return (
-    <div className="cmd-results" role="listbox" aria-label="Commands">
+    <div className="cmd-results" role="listbox" id="cmd-listbox" aria-label="Commands">
       {groups.map((group, gi) => (
         <div className="cmd-group" key={group.id}>
           <div className="cmd-group-head">
@@ -72,6 +72,7 @@ export default function ResultList({ groups, activeId, onHoverItem, onRunItem })
             return (
               <button
                 key={item.id}
+                id={`cmdrow-${item.id}`}
                 ref={active ? activeRef : null}
                 type="button"
                 className="cmd-row"

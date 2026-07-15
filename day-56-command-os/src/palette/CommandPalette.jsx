@@ -21,6 +21,7 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
   const [path, setPath] = useState([]) // stack of nested panels
   const [loading, setLoading] = useState(false) // async panel "fetch"
   const inputRef = useRef(null)
+  const restoreFocusRef = useRef(null)
 
   // Root groups, or the current nested panel's groups.
   const activePanel = path[path.length - 1] ?? null
@@ -70,8 +71,15 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
   const activeIndex = flat.findIndex((f) => f.item.id === activeId)
   const activeItem = flat.find((f) => f.item.id === activeId)?.item
 
+  // Focus the input on open; restore focus to the opener (search button/⌘K) on
+  // close so keyboard users aren't dropped at the top of the page.
   useEffect(() => {
-    if (open) inputRef.current?.focus()
+    if (open) {
+      restoreFocusRef.current = document.activeElement
+      inputRef.current?.focus()
+    } else {
+      restoreFocusRef.current?.focus?.()
+    }
   }, [open])
 
   // Live-preview the active row's theme/accent while open; clear otherwise.
@@ -122,6 +130,12 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
       if (e.key === 'Escape') {
         e.preventDefault()
         close()
+        return
+      }
+      // Trap Tab: keep focus on the input (arrows drive selection).
+      if (e.key === 'Tab') {
+        e.preventDefault()
+        inputRef.current?.focus()
         return
       }
       // Backspace on an empty query steps back out of a nested page.
@@ -198,6 +212,10 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
             spellCheck="false"
             autoComplete="off"
             aria-label="Search commands"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="cmd-listbox"
+            aria-activedescendant={!isLoading && activeId ? `cmdrow-${activeId}` : undefined}
             tabIndex={open ? 0 : -1}
           />
           <span className="kbd">ESC</span>
