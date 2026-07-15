@@ -11,7 +11,7 @@ import { rankCommands } from './fuzzy.js'
  * mounted and animates from `data-state`, so open/close never depend on
  * requestAnimationFrame (which throttles in background tabs).
  */
-export default function CommandPalette({ open, onClose, groups }) {
+export default function CommandPalette({ open, onClose, groups, onPreview }) {
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(null)
   const [path, setPath] = useState([]) // stack of nested panels
@@ -41,10 +41,18 @@ export default function CommandPalette({ open, onClose, groups }) {
     ? selectedId
     : flat[0]?.item.id ?? null
   const activeIndex = flat.findIndex((f) => f.item.id === activeId)
+  const activeItem = flat.find((f) => f.item.id === activeId)?.item
 
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
+
+  // Live-preview the active row's theme/accent while open; clear otherwise.
+  // (onPreview is a parent callback, so this "sync external system" effect is
+  // the right place for it.)
+  useEffect(() => {
+    onPreview(open ? activeItem?.preview ?? null : null)
+  }, [open, activeItem, onPreview])
 
   // Close resets the page stack + query so the next open starts clean at root.
   const close = useCallback(() => {

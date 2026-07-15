@@ -15,6 +15,12 @@ export default function App() {
   // --- theme + accent -------------------------------------------------
   const [theme, setTheme] = useState('dark') // 'dark' | 'light' | 'system'
   const [accent, setAccent] = useState('violet') // violet | magenta | blue | emerald
+  // Transient preview from the palette (hovering a theme/accent option). It
+  // wins over the committed value until it's cleared or the choice is run.
+  const [preview, setPreview] = useState(null)
+
+  const effectiveTheme = preview?.theme ?? theme
+  const effectiveAccent = preview?.accent ?? accent
 
   // Resolve 'system' against the OS preference and reflect the choice on <html>
   // so every CSS token switches at once.
@@ -22,19 +28,19 @@ export default function App() {
     const root = document.documentElement
     const mq = window.matchMedia('(prefers-color-scheme: light)')
     const apply = () => {
-      const resolved = theme === 'system' ? (mq.matches ? 'light' : 'dark') : theme
+      const resolved = effectiveTheme === 'system' ? (mq.matches ? 'light' : 'dark') : effectiveTheme
       root.dataset.theme = resolved
     }
     apply()
-    if (theme === 'system') {
+    if (effectiveTheme === 'system') {
       mq.addEventListener('change', apply)
       return () => mq.removeEventListener('change', apply)
     }
-  }, [theme])
+  }, [effectiveTheme])
 
   useEffect(() => {
-    document.documentElement.dataset.accent = accent
-  }, [accent])
+    document.documentElement.dataset.accent = effectiveAccent
+  }, [effectiveAccent])
 
   // --- dashboard state ------------------------------------------------
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -125,7 +131,12 @@ export default function App() {
         onOpenDoc={openDoc}
       />
 
-      <CommandPalette open={palette.isOpen} onClose={palette.close} groups={commandGroups} />
+      <CommandPalette
+        open={palette.isOpen}
+        onClose={palette.close}
+        groups={commandGroups}
+        onPreview={setPreview}
+      />
 
       {openDocument && (
         <DocModal doc={openDocument} owner={peopleById[openDocument.ownerId]} onClose={closeDoc} />

@@ -18,9 +18,9 @@ function themePanel(actions) {
         id: 'appearance',
         label: 'Appearance',
         items: [
-          { id: 'theme-light', label: 'Light', icon: 'sun', keywords: 'bright day', run: () => actions.setTheme('light') },
-          { id: 'theme-dark', label: 'Dark', icon: 'moon', keywords: 'night', run: () => actions.setTheme('dark') },
-          { id: 'theme-system', label: 'System', icon: 'monitor', keywords: 'auto os', run: () => actions.setTheme('system') },
+          { id: 'theme-light', label: 'Light', icon: 'sun', keywords: 'bright day', preview: { theme: 'light' }, run: () => actions.setTheme('light') },
+          { id: 'theme-dark', label: 'Dark', icon: 'moon', keywords: 'night', preview: { theme: 'dark' }, run: () => actions.setTheme('dark') },
+          { id: 'theme-system', label: 'System', icon: 'monitor', keywords: 'auto os', preview: { theme: 'system' }, run: () => actions.setTheme('system') },
         ],
       },
       {
