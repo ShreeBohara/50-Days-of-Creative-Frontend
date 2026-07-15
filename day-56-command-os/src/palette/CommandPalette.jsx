@@ -158,6 +158,7 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
 
   const state = open ? 'open' : 'closed'
   const hasResults = flat.length > 0
+  const fallbackCommand = commandIndex.get('create-document')
 
   return createPortal(
     <div
@@ -213,7 +214,15 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
               onRunItem={activate}
             />
           ) : (
-            <p className="cmd-hint">No results for “{query}”.</p>
+            <div className="cmd-empty">
+              <span className="cmd-empty-icon"><Icon name="search" /></span>
+              <p>No results for <b>“{query}”</b></p>
+              {fallbackCommand && (
+                <button type="button" className="cmd-empty-action" onClick={() => activate(fallbackCommand)}>
+                  <Icon name="plus" /> Create a document instead
+                </button>
+              )}
+            </div>
           )}
         </div>
 

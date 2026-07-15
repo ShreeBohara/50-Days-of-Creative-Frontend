@@ -3,6 +3,8 @@ import Dashboard from './dashboard/Dashboard.jsx'
 import CommandPalette from './palette/CommandPalette.jsx'
 import { useCommandK } from './palette/useCommandK.jsx'
 import { buildCommandGroups } from './palette/useCommandRegistry.js'
+import Toaster from './Toaster.jsx'
+import { useToasts } from './useToasts.js'
 import Icon from './icons.jsx'
 import { documents as seedDocs, people, statusTone } from './dashboard/dashboardData.js'
 
@@ -49,6 +51,8 @@ export default function App() {
   const [openDocId, setOpenDocId] = useState(null)
   const [newDocId, setNewDocId] = useState(null)
 
+  const { toasts, pushToast, dismiss } = useToasts()
+
   const peopleById = useMemo(
     () => Object.fromEntries(people.map((p) => [p.id, p])),
     [],
@@ -75,20 +79,28 @@ export default function App() {
     setNavActive('docs')
     setNewDocId(id)
     window.setTimeout(() => setNewDocId((cur) => (cur === id ? null : cur)), 1200)
-  }, [])
+    pushToast('Document created', 'plus')
+  }, [pushToast])
 
   const copyLink = useCallback(() => {
-    return navigator.clipboard?.writeText(window.location.href)
-  }, [])
+    Promise.resolve(navigator.clipboard?.writeText(window.location.href))
+      .then(() => pushToast('Page link copied', 'link'))
+      .catch(() => pushToast('Couldn’t copy link', 'link'))
+  }, [pushToast])
 
   // Reassign the top document's owner (visible in the table) — used by the
   // palette's "Assign to…" nested page.
-  const assignTopDoc = useCallback((personId) => {
-    setNavActive('docs')
-    setDocuments((docs) =>
-      docs.map((d, i) => (i === 0 ? { ...d, ownerId: personId, updated: 'Just now' } : d)),
-    )
-  }, [])
+  const assignTopDoc = useCallback(
+    (personId) => {
+      setNavActive('docs')
+      setDocuments((docs) =>
+        docs.map((d, i) => (i === 0 ? { ...d, ownerId: personId, updated: 'Just now' } : d)),
+      )
+      const person = people.find((p) => p.id === personId)
+      pushToast(`Assigned to ${person?.name ?? 'someone'}`, 'users')
+    },
+    [pushToast],
+  )
 
   const openDocument = openDocId ? documents.find((d) => d.id === openDocId) : null
 
@@ -141,6 +153,8 @@ export default function App() {
       {openDocument && (
         <DocModal doc={openDocument} owner={peopleById[openDocument.ownerId]} onClose={closeDoc} />
       )}
+
+      <Toaster toasts={toasts} onDismiss={dismiss} />
     </>
   )
 }
