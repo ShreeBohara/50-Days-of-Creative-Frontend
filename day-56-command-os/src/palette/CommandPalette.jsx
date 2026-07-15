@@ -3,6 +3,10 @@ import { createPortal } from 'react-dom'
 import Icon from '../icons.jsx'
 import ResultList from './ResultList.jsx'
 import { rankCommands } from './fuzzy.js'
+import { indexCommands } from './useCommandRegistry.js'
+import { loadRecents, pushRecent } from './recents.js'
+
+const NO_RESULTS = [] // stable empty reference so memos don't churn
 
 /**
  * The palette: a portalled backdrop + panel, fuzzy-filtered grouped results,
@@ -30,9 +34,29 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
     [currentGroups, query],
   )
 
+  // Recents: on the root page with an empty query, prepend the last-run
+  // commands. Read fresh from storage (cheap) so a command run just before is
+  // reflected on the next open; resolved to live handlers, stale ids dropped.
+  const commandIndex = useMemo(() => indexCommands(groups), [groups])
+  const recentResults =
+    !activePanel && !query.trim()
+      ? loadRecents()
+          .map((r) => commandIndex.get(r.id))
+          .filter(Boolean)
+          .map((item) => ({ item: { ...item, id: `recent:${item.id}` }, indices: [] }))
+      : NO_RESULTS
+
+  const displayGroups = useMemo(
+    () =>
+      recentResults.length
+        ? [{ id: 'recent', label: 'Recent', results: recentResults }, ...filtered]
+        : filtered,
+    [recentResults, filtered],
+  )
+
   const flat = useMemo(
-    () => filtered.flatMap((g) => g.results.map((r) => ({ item: r.item }))),
-    [filtered],
+    () => displayGroups.flatMap((g) => g.results.map((r) => ({ item: r.item }))),
+    [displayGroups],
   )
 
   // Active row is derived: honour the selection while it's a valid result,
@@ -66,7 +90,8 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
     setPath((p) => p.slice(0, depth))
   }, [])
 
-  // Enter/click a row: push its nested page, or run it and close.
+  // Enter/click a row: push its nested page, or run it and close. Root-level
+  // commands are recorded as recents (base id, not the recent: clone id).
   const activate = useCallback(
     (item) => {
       if (item.panel) {
@@ -74,10 +99,14 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
         setPath((p) => [...p, item.panel])
         return
       }
+      if (path.length === 0) {
+        const baseId = item.id.startsWith('recent:') ? item.id.slice('recent:'.length) : item.id
+        pushRecent({ id: baseId, label: item.label, icon: item.icon })
+      }
       item.run()
       close()
     },
-    [close],
+    [close, path.length],
   )
 
   const onKeyDown = useCallback(
@@ -109,14 +138,14 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
         return
       }
       if ((e.metaKey || e.ctrlKey) && /^[1-9]$/.test(e.key)) {
-        const g = filtered[Number(e.key) - 1]
+        const g = displayGroups[Number(e.key) - 1]
         if (g) {
           e.preventDefault()
           setSelectedId(g.results[0].item.id)
         }
       }
     },
-    [flat, activeIndex, filtered, query, path.length, close, popPage, activate],
+    [flat, activeIndex, displayGroups, query, path.length, close, popPage, activate],
   )
 
   const state = open ? 'open' : 'closed'
@@ -168,7 +197,7 @@ export default function CommandPalette({ open, onClose, groups, onPreview }) {
         <div className="cmd-body">
           {hasResults ? (
             <ResultList
-              groups={filtered}
+              groups={displayGroups}
               activeId={activeId}
               onHoverItem={setSelectedId}
               onRunItem={activate}

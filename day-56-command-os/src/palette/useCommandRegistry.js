@@ -108,3 +108,15 @@ export function buildCommandGroups({ actions, documents }) {
 
   return groups
 }
+
+// Flattens every runnable leaf command (root + nested panels) into an id→item
+// map, so recents can resolve a stored id back to its live handler.
+export function indexCommands(groups, map = new Map()) {
+  for (const group of groups) {
+    for (const item of group.items) {
+      if (item.run) map.set(item.id, item)
+      if (item.panel) indexCommands(item.panel.groups, map)
+    }
+  }
+  return map
+}
