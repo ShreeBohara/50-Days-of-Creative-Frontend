@@ -8,6 +8,9 @@ import { documents as seedDocs, people, statusTone } from './dashboard/dashboard
 
 const me = people[0]
 
+// Monotonic label for freshly-created demo documents.
+let untitledCount = 0
+
 export default function App() {
   // --- theme + accent -------------------------------------------------
   const [theme, setTheme] = useState('dark') // 'dark' | 'light' | 'system'
@@ -36,8 +39,9 @@ export default function App() {
   // --- dashboard state ------------------------------------------------
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [navActive, setNavActive] = useState('home')
-  const documents = seedDocs
+  const [documents, setDocuments] = useState(seedDocs)
   const [openDocId, setOpenDocId] = useState(null)
+  const [newDocId, setNewDocId] = useState(null)
 
   const peopleById = useMemo(
     () => Object.fromEntries(people.map((p) => [p.id, p])),
@@ -47,6 +51,29 @@ export default function App() {
   const toggleSidebar = useCallback(() => setSidebarCollapsed((v) => !v), [])
   const openDoc = useCallback((id) => setOpenDocId(id), [])
   const closeDoc = useCallback(() => setOpenDocId(null), [])
+
+  // Prepend a fresh doc, flag it for the row entrance animation, then clear the
+  // flag so the highlight only plays once.
+  const createDocument = useCallback(() => {
+    const n = (untitledCount += 1)
+    const id = `new-${Date.now()}-${n}`
+    const doc = {
+      id,
+      title: `Untitled document ${n}`,
+      type: 'Doc',
+      ownerId: me.id,
+      updated: 'Just now',
+      status: 'Draft',
+    }
+    setDocuments((docs) => [doc, ...docs])
+    setNavActive('docs')
+    setNewDocId(id)
+    window.setTimeout(() => setNewDocId((cur) => (cur === id ? null : cur)), 1200)
+  }, [])
+
+  const copyLink = useCallback(() => {
+    return navigator.clipboard?.writeText(window.location.href)
+  }, [])
 
   const openDocument = openDocId ? documents.find((d) => d.id === openDocId) : null
 
@@ -59,10 +86,12 @@ export default function App() {
       navigate: (id) => setNavActive(id),
       toggleSidebar,
       openDoc,
+      createDocument,
+      copyLink,
       setTheme,
       setAccent,
     }),
-    [toggleSidebar, openDoc],
+    [toggleSidebar, openDoc, createDocument, copyLink],
   )
 
   const commandGroups = useMemo(
@@ -81,7 +110,8 @@ export default function App() {
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={toggleSidebar}
         onOpenPalette={palette.open}
-        newDocId={null}
+        onCreateDocument={createDocument}
+        newDocId={newDocId}
         onOpenDoc={openDoc}
       />
 

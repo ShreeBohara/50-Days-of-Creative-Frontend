@@ -27,6 +27,7 @@ export default function Dashboard({
   sidebarCollapsed,
   onToggleSidebar,
   onOpenPalette,
+  onCreateDocument,
   newDocId,
   onOpenDoc,
 }) {
@@ -111,7 +112,7 @@ export default function Dashboard({
               <h2>Documents</h2>
               <span className="count">{documents.length}</span>
               <span className="grow" />
-              <button className="btn" onClick={onOpenPalette}>
+              <button className="btn" onClick={onCreateDocument}>
                 <Icon name="plus" /> New
               </button>
             </div>

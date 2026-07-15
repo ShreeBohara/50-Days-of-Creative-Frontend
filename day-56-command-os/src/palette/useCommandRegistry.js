@@ -14,6 +14,21 @@ export function buildCommandGroups({ actions, documents }) {
     label: 'Actions',
     items: [
       {
+        id: 'create-document',
+        label: 'Create document',
+        icon: 'plus',
+        hint: '⌘N',
+        keywords: 'new add file draft',
+        run: () => actions.createDocument(),
+      },
+      {
+        id: 'copy-link',
+        label: 'Copy page link',
+        icon: 'link',
+        keywords: 'share url clipboard address',
+        run: () => actions.copyLink(),
+      },
+      {
         id: 'toggle-sidebar',
         label: 'Toggle sidebar',
         icon: 'sidebar',
