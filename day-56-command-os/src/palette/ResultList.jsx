@@ -2,6 +2,32 @@ import { useEffect, useRef } from 'react'
 import Icon from '../icons.jsx'
 import Highlight from './Highlight.jsx'
 
+// A row's leading glyph: an accent swatch, a person avatar, or an icon.
+function RowIcon({ item }) {
+  if (item.swatch) {
+    return (
+      <span className="cmd-row-icon cmd-row-icon--bare">
+        <span className="cmd-swatch" style={{ background: item.swatch }} />
+      </span>
+    )
+  }
+  if (item.avatar) {
+    return (
+      <span
+        className="cmd-row-icon cmd-row-icon--bare avatar"
+        style={{ background: `linear-gradient(135deg, hsl(${item.avatar.hue} 70% 58%), hsl(${item.avatar.hue + 40} 68% 48%))` }}
+      >
+        {item.avatar.initials}
+      </span>
+    )
+  }
+  return (
+    <span className="cmd-row-icon">
+      <Icon name={item.icon} />
+    </span>
+  )
+}
+
 /**
  * Renders the filtered, grouped results. The active row is tracked by id and
  * scrolled into view as the keyboard selection moves. Mouse *movement* (not
@@ -36,12 +62,14 @@ export default function ResultList({ groups, activeId, onHoverItem, onRunItem })
                 onMouseMove={() => onHoverItem(item.id)}
                 onClick={() => onRunItem(item)}
               >
-                <span className="cmd-row-icon"><Icon name={item.icon} /></span>
+                <RowIcon item={item} />
                 <span className="cmd-row-label">
                   <Highlight text={item.label} indices={indices} />
                 </span>
                 {item.hint && <span className="cmd-row-hint">{item.hint}</span>}
-                <span className="cmd-row-enter" aria-hidden="true"><Icon name="cornerDownLeft" /></span>
+                <span className="cmd-row-enter" aria-hidden="true">
+                  <Icon name={item.panel ? 'chevronRight' : 'cornerDownLeft'} />
+                </span>
               </button>
             )
           })}

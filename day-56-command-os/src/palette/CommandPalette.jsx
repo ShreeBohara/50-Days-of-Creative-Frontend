@@ -5,53 +5,67 @@ import ResultList from './ResultList.jsx'
 import { rankCommands } from './fuzzy.js'
 
 /**
- * The palette: a portalled backdrop + panel, fuzzy-filtered grouped results, and
- * full keyboard control (↑↓ move, Enter run, ⌘+number jump to group, ESC/backdrop
- * close). It stays mounted and animates purely from the `data-state` attribute,
- * so open/close never depend on requestAnimationFrame (which throttles in
- * background tabs).
+ * The palette: a portalled backdrop + panel, fuzzy-filtered grouped results,
+ * nested pages, and full keyboard control (↑↓ move, Enter run/open, ⌘+number
+ * jump to group, Backspace-on-empty pop a page, ESC/backdrop close). It stays
+ * mounted and animates from `data-state`, so open/close never depend on
+ * requestAnimationFrame (which throttles in background tabs).
  */
 export default function CommandPalette({ open, onClose, groups }) {
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(null)
+  const [path, setPath] = useState([]) // stack of nested panels
   const inputRef = useRef(null)
+
+  // Root groups, or the current nested panel's groups.
+  const activePanel = path[path.length - 1] ?? null
+  const currentGroups = activePanel ? activePanel.groups : groups
 
   // Fuzzy-filter each group; drop empty groups.
   const filtered = useMemo(
     () =>
-      groups
+      currentGroups
         .map((g) => ({ ...g, results: rankCommands(g.items, query) }))
         .filter((g) => g.results.length > 0),
-    [groups, query],
+    [currentGroups, query],
   )
 
-  // Flattened view for keyboard traversal across group boundaries.
   const flat = useMemo(
     () => filtered.flatMap((g) => g.results.map((r) => ({ item: r.item }))),
     [filtered],
   )
 
-  // Active row is derived: honour the user's selection while it's still a valid
-  // result, otherwise fall back to the top row. No effect needed to "reset" it.
+  // Active row is derived: honour the selection while it's a valid result,
+  // otherwise fall back to the top row.
   const activeId = flat.some((f) => f.item.id === selectedId)
     ? selectedId
     : flat[0]?.item.id ?? null
   const activeIndex = flat.findIndex((f) => f.item.id === activeId)
 
-  // Focus the input whenever the palette opens (focus() is not a state update).
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
 
-  // Every close path clears the query so the next open starts fresh. Done in an
-  // event handler (not an effect) to avoid cascading renders.
+  // Close resets the page stack + query so the next open starts clean at root.
   const close = useCallback(() => {
     setQuery('')
+    setPath([])
     onClose()
   }, [onClose])
 
-  const runItem = useCallback(
+  const popPage = useCallback((depth) => {
+    setQuery('')
+    setPath((p) => p.slice(0, depth))
+  }, [])
+
+  // Enter/click a row: push its nested page, or run it and close.
+  const activate = useCallback(
     (item) => {
+      if (item.panel) {
+        setQuery('')
+        setPath((p) => [...p, item.panel])
+        return
+      }
       item.run()
       close()
     },
@@ -63,6 +77,12 @@ export default function CommandPalette({ open, onClose, groups }) {
       if (e.key === 'Escape') {
         e.preventDefault()
         close()
+        return
+      }
+      // Backspace on an empty query steps back out of a nested page.
+      if (e.key === 'Backspace' && query === '' && path.length) {
+        e.preventDefault()
+        popPage(path.length - 1)
         return
       }
       if (e.key === 'ArrowDown' || (e.key === 'n' && e.ctrlKey)) {
@@ -77,10 +97,9 @@ export default function CommandPalette({ open, onClose, groups }) {
       }
       if (e.key === 'Enter') {
         e.preventDefault()
-        if (flat[activeIndex]) runItem(flat[activeIndex].item)
+        if (flat[activeIndex]) activate(flat[activeIndex].item)
         return
       }
-      // ⌘/Ctrl + number → jump to the first item of that group.
       if ((e.metaKey || e.ctrlKey) && /^[1-9]$/.test(e.key)) {
         const g = filtered[Number(e.key) - 1]
         if (g) {
@@ -89,7 +108,7 @@ export default function CommandPalette({ open, onClose, groups }) {
         }
       }
     },
-    [flat, activeIndex, filtered, close, runItem],
+    [flat, activeIndex, filtered, query, path.length, close, popPage, activate],
   )
 
   const state = open ? 'open' : 'closed'
@@ -112,10 +131,22 @@ export default function CommandPalette({ open, onClose, groups }) {
       >
         <div className="cmd-input-row">
           <Icon name="search" className="cmd-search-icon" />
+          {path.map((page, i) => (
+            <button
+              key={page.id}
+              type="button"
+              className="cmd-crumb"
+              onClick={() => popPage(i)}
+              title="Back"
+            >
+              {page.title}
+              <Icon name="chevronRight" />
+            </button>
+          ))}
           <input
             ref={inputRef}
             className="cmd-input"
-            placeholder="Search or run a command…"
+            placeholder={activePanel ? `${activePanel.title}…` : 'Search or run a command…'}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             spellCheck="false"
@@ -132,7 +163,7 @@ export default function CommandPalette({ open, onClose, groups }) {
               groups={filtered}
               activeId={activeId}
               onHoverItem={setSelectedId}
-              onRunItem={runItem}
+              onRunItem={activate}
             />
           ) : (
             <p className="cmd-hint">No results for “{query}”.</p>
@@ -142,7 +173,11 @@ export default function CommandPalette({ open, onClose, groups }) {
         <div className="cmd-foot">
           <span className="cmd-foot-item"><span className="kbd">↑↓</span> navigate</span>
           <span className="cmd-foot-item"><span className="kbd">↵</span> select</span>
-          <span className="cmd-foot-item"><span className="kbd">⌘1–9</span> jump</span>
+          {path.length ? (
+            <span className="cmd-foot-item"><span className="kbd">⌫</span> back</span>
+          ) : (
+            <span className="cmd-foot-item"><span className="kbd">⌘1–9</span> jump</span>
+          )}
           <span className="cmd-foot-item cmd-foot-end"><span className="kbd">esc</span> close</span>
         </div>
       </div>

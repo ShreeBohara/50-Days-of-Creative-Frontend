@@ -75,6 +75,15 @@ export default function App() {
     return navigator.clipboard?.writeText(window.location.href)
   }, [])
 
+  // Reassign the top document's owner (visible in the table) — used by the
+  // palette's "Assign to…" nested page.
+  const assignTopDoc = useCallback((personId) => {
+    setNavActive('docs')
+    setDocuments((docs) =>
+      docs.map((d, i) => (i === 0 ? { ...d, ownerId: personId, updated: 'Just now' } : d)),
+    )
+  }, [])
+
   const openDocument = openDocId ? documents.find((d) => d.id === openDocId) : null
 
   // Palette open state + ⌘K/Ctrl+K global hotkey.
@@ -88,10 +97,11 @@ export default function App() {
       openDoc,
       createDocument,
       copyLink,
+      assignTopDoc,
       setTheme,
       setAccent,
     }),
-    [toggleSidebar, openDoc, createDocument, copyLink],
+    [toggleSidebar, openDoc, createDocument, copyLink, assignTopDoc],
   )
 
   const commandGroups = useMemo(
