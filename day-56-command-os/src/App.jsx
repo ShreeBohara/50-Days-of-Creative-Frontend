@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Dashboard from './dashboard/Dashboard.jsx'
 import CommandPalette from './palette/CommandPalette.jsx'
 import { useCommandK } from './palette/useCommandK.jsx'
+import { buildCommandGroups } from './palette/useCommandRegistry.js'
 import Icon from './icons.jsx'
 import { documents as seedDocs, people, statusTone } from './dashboard/dashboardData.js'
 
@@ -35,9 +36,8 @@ export default function App() {
   // --- dashboard state ------------------------------------------------
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [navActive, setNavActive] = useState('home')
-  const [documents, setDocuments] = useState(seedDocs)
+  const documents = seedDocs
   const [openDocId, setOpenDocId] = useState(null)
-  const [newDocId, setNewDocId] = useState(null)
 
   const peopleById = useMemo(
     () => Object.fromEntries(people.map((p) => [p.id, p])),
@@ -53,6 +53,23 @@ export default function App() {
   // Palette open state + ⌘K/Ctrl+K global hotkey.
   const palette = useCommandK()
 
+  // Actions the palette can run — shared with the dashboard so both stay in sync.
+  const actions = useMemo(
+    () => ({
+      navigate: (id) => setNavActive(id),
+      toggleSidebar,
+      openDoc,
+      setTheme,
+      setAccent,
+    }),
+    [toggleSidebar, openDoc],
+  )
+
+  const commandGroups = useMemo(
+    () => buildCommandGroups({ actions, documents }),
+    [actions, documents],
+  )
+
   return (
     <>
       <Dashboard
@@ -64,11 +81,11 @@ export default function App() {
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={toggleSidebar}
         onOpenPalette={palette.open}
-        newDocId={newDocId}
+        newDocId={null}
         onOpenDoc={openDoc}
       />
 
-      <CommandPalette open={palette.isOpen} onClose={palette.close} />
+      <CommandPalette open={palette.isOpen} onClose={palette.close} groups={commandGroups} />
 
       {openDocument && (
         <DocModal doc={openDocument} owner={peopleById[openDocument.ownerId]} onClose={closeDoc} />

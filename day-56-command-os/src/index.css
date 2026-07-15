@@ -436,9 +436,17 @@ button { font-family: inherit; }
   background: rgba(4, 5, 8, 0.5);
   backdrop-filter: blur(4px);
   opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* fade out, then hide after the fade so the panel can animate away */
+  transition: opacity 0.16s ease, visibility 0s linear 0.16s;
+}
+.cmd-scrim[data-state='open'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transition: opacity 0.16s ease;
 }
-.cmd-scrim[data-state='open'] { opacity: 1; }
 [data-theme='light'] .cmd-scrim { background: rgba(20, 18, 34, 0.28); }
 
 .cmd-panel {
@@ -482,14 +490,79 @@ button { font-family: inherit; }
   overflow-y: auto;
   padding: 8px;
   min-height: 84px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
 }
 .cmd-hint {
   margin: 0;
-  padding: 26px 12px;
+  padding: 34px 12px;
   text-align: center;
   color: var(--text-mute);
   font-size: 13px;
 }
+
+/* --- grouped results ------------------------------------------------- */
+.cmd-group { margin-bottom: 4px; }
+.cmd-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.cmd-group-key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.cmd-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.cmd-row-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--surface-hover);
+  color: var(--text-dim);
+  font-size: 15px;
+  flex: none;
+}
+.cmd-row-label { flex: 1; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmd-row-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-mute);
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.cmd-row-enter { color: var(--accent-strong); font-size: 15px; opacity: 0; flex: none; }
+
+.cmd-row[data-active='true'] {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+.cmd-row[data-active='true'] .cmd-row-icon { background: var(--accent); color: #fff; }
+.cmd-row[data-active='true'] .cmd-row-enter { opacity: 1; }
 
 .cmd-foot {
   display: flex;

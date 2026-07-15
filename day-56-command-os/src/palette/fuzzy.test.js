@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { score, isBoundary, rankItems } from './fuzzy.js'
+import { score, isBoundary, matchCommand, rankCommands } from './fuzzy.js'
 
 describe('score', () => {
   it('returns null when the query is not a subsequence', () => {
@@ -51,27 +51,45 @@ describe('isBoundary', () => {
   })
 })
 
-describe('rankItems', () => {
+describe('matchCommand', () => {
+  it('scores the label and returns its highlight indices', () => {
+    const m = matchCommand({ label: 'Change theme' }, 'theme')
+    expect(m).not.toBeNull()
+    expect(m.indices).toEqual([7, 8, 9, 10, 11]) // "theme" in "Change theme"
+  })
+
+  it('falls back to keywords with no highlight, ranked below a label match', () => {
+    const kwOnly = matchCommand({ label: 'Toggle sidebar', keywords: 'hide nav' }, 'nav')
+    expect(kwOnly.indices).toEqual([]) // matched via keywords, so nothing to highlight
+    const labelMatch = matchCommand({ label: 'Navigation' }, 'nav')
+    expect(labelMatch.score).toBeGreaterThan(kwOnly.score)
+  })
+
+  it('returns null when neither label nor keywords match', () => {
+    expect(matchCommand({ label: 'Toggle sidebar', keywords: 'hide nav' }, 'zzz')).toBeNull()
+  })
+})
+
+describe('rankCommands', () => {
   const items = [
-    { id: 'a', label: 'Toggle sidebar' },
-    { id: 'b', label: 'Change theme' },
-    { id: 'c', label: 'Create document' },
+    { id: 'a', label: 'Toggle sidebar', keywords: 'hide show' },
+    { id: 'b', label: 'Change theme', keywords: 'appearance' },
+    { id: 'c', label: 'Create document', keywords: 'new' },
   ]
-  const getText = (i) => i.label
 
   it('keeps only matches and sorts by descending score', () => {
-    const out = rankItems(items, 'the', getText)
+    const out = rankCommands(items, 'the')
     expect(out.map((r) => r.item.id)).toEqual(['b']) // only "Change theme" contains t-h-e
   })
 
   it('passes everything through, order preserved, for an empty query', () => {
-    const out = rankItems(items, '', getText)
+    const out = rankCommands(items, '')
     expect(out.map((r) => r.item.id)).toEqual(['a', 'b', 'c'])
     expect(out.every((r) => r.score === 0)).toBe(true)
   })
 
-  it('attaches highlight indices to each result', () => {
-    const out = rankItems(items, 'cd', getText)
+  it('attaches label highlight indices to each result', () => {
+    const out = rankCommands(items, 'cd')
     expect(out[0].item.id).toBe('c') // "Create document" -> C(0), d(7)
     expect(out[0].indices.length).toBe(2)
   })

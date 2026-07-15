@@ -70,18 +70,35 @@ export function score(query, target) {
   return { score: total, indices }
 }
 
+const KEYWORD_PENALTY = 40
+
 /**
- * Rank items by fuzzy score against a query, keeping only matches.
- * `getText` extracts the searchable string from each item.
- * With an empty query every item passes through (score 0), order preserved.
+ * Match a command against a query. Score the visible label first so highlight
+ * indices always line up with it; if the label misses, fall back to the hidden
+ * keywords (ranked lower, no highlight). Returns { score, indices } or null.
  */
-export function rankItems(items, query, getText) {
+export function matchCommand(item, query) {
+  const byLabel = score(query, item.label)
+  if (byLabel) return { score: byLabel.score, indices: byLabel.indices }
+  if (item.keywords) {
+    const byKeyword = score(query, item.keywords)
+    if (byKeyword) return { score: byKeyword.score - KEYWORD_PENALTY, indices: [] }
+  }
+  return null
+}
+
+/**
+ * Rank a list of commands ({ label, keywords }) by fuzzy score, keeping only
+ * matches, best first. An empty query passes everything through (score 0) in
+ * its original order.
+ */
+export function rankCommands(items, query) {
   if (!query.trim()) {
     return items.map((item) => ({ item, score: 0, indices: [] }))
   }
   const scored = []
   for (const item of items) {
-    const result = score(query, getText(item))
+    const result = matchCommand(item, query)
     if (result) scored.push({ item, score: result.score, indices: result.indices })
   }
   scored.sort((a, b) => b.score - a.score)

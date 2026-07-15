@@ -1,62 +1,106 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Icon from '../icons.jsx'
+import ResultList from './ResultList.jsx'
+import { rankCommands } from './fuzzy.js'
 
 /**
- * The palette shell: a portalled backdrop + centered panel with a query input.
- * Mounts on open, plays a scale+fade in, and stays mounted through the close
- * animation before unmounting. Grouped results are layered on in later commits.
+ * The palette: a portalled backdrop + panel, fuzzy-filtered grouped results, and
+ * full keyboard control (↑↓ move, Enter run, ⌘+number jump to group, ESC/backdrop
+ * close). It stays mounted and animates purely from the `data-state` attribute,
+ * so open/close never depend on requestAnimationFrame (which throttles in
+ * background tabs).
  */
-export default function CommandPalette({ open, onClose }) {
-  const [render, setRender] = useState(open)
-  const [state, setState] = useState(open ? 'open' : 'closed')
+export default function CommandPalette({ open, onClose, groups }) {
   const [query, setQuery] = useState('')
+  const [selectedId, setSelectedId] = useState(null)
   const inputRef = useRef(null)
-  const panelRef = useRef(null)
 
-  // Mount → next frame flip to "open" so the entry transition runs; on close,
-  // switch to "closed" and unmount once the fade finishes.
+  // Fuzzy-filter each group; drop empty groups.
+  const filtered = useMemo(
+    () =>
+      groups
+        .map((g) => ({ ...g, results: rankCommands(g.items, query) }))
+        .filter((g) => g.results.length > 0),
+    [groups, query],
+  )
+
+  // Flattened view for keyboard traversal across group boundaries.
+  const flat = useMemo(
+    () => filtered.flatMap((g) => g.results.map((r) => ({ item: r.item }))),
+    [filtered],
+  )
+
+  // Active row is derived: honour the user's selection while it's still a valid
+  // result, otherwise fall back to the top row. No effect needed to "reset" it.
+  const activeId = flat.some((f) => f.item.id === selectedId)
+    ? selectedId
+    : flat[0]?.item.id ?? null
+  const activeIndex = flat.findIndex((f) => f.item.id === activeId)
+
+  // Focus the input whenever the palette opens (focus() is not a state update).
   useEffect(() => {
-    if (open) {
-      setRender(true)
-      const id = requestAnimationFrame(() =>
-        requestAnimationFrame(() => setState('open')),
-      )
-      return () => cancelAnimationFrame(id)
-    }
-    setState('closed')
+    if (open) inputRef.current?.focus()
   }, [open])
 
-  // Reset the query each time it opens, and focus the input.
-  useEffect(() => {
-    if (state === 'open') {
-      setQuery('')
-      inputRef.current?.focus()
-    }
-  }, [state])
+  // Every close path clears the query so the next open starts fresh. Done in an
+  // event handler (not an effect) to avoid cascading renders.
+  const close = useCallback(() => {
+    setQuery('')
+    onClose()
+  }, [onClose])
 
-  const handleScrimTransitionEnd = (e) => {
-    if (e.target === e.currentTarget && state === 'closed') setRender(false)
-  }
+  const runItem = useCallback(
+    (item) => {
+      item.run()
+      close()
+    },
+    [close],
+  )
 
   const onKeyDown = useCallback(
     (e) => {
       if (e.key === 'Escape') {
         e.preventDefault()
-        onClose()
+        close()
+        return
+      }
+      if (e.key === 'ArrowDown' || (e.key === 'n' && e.ctrlKey)) {
+        e.preventDefault()
+        if (flat.length) setSelectedId(flat[(activeIndex + 1 + flat.length) % flat.length].item.id)
+        return
+      }
+      if (e.key === 'ArrowUp' || (e.key === 'p' && e.ctrlKey)) {
+        e.preventDefault()
+        if (flat.length) setSelectedId(flat[(activeIndex - 1 + flat.length) % flat.length].item.id)
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        if (flat[activeIndex]) runItem(flat[activeIndex].item)
+        return
+      }
+      // ⌘/Ctrl + number → jump to the first item of that group.
+      if ((e.metaKey || e.ctrlKey) && /^[1-9]$/.test(e.key)) {
+        const g = filtered[Number(e.key) - 1]
+        if (g) {
+          e.preventDefault()
+          setSelectedId(g.results[0].item.id)
+        }
       }
     },
-    [onClose],
+    [flat, activeIndex, filtered, close, runItem],
   )
 
-  if (!render) return null
+  const state = open ? 'open' : 'closed'
+  const hasResults = flat.length > 0
 
   return createPortal(
     <div
       className="cmd-scrim"
       data-state={state}
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
-      onTransitionEnd={handleScrimTransitionEnd}
+      aria-hidden={!open}
+      onMouseDown={(e) => e.target === e.currentTarget && close()}
     >
       <div
         className="cmd-panel"
@@ -64,7 +108,6 @@ export default function CommandPalette({ open, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        ref={panelRef}
         onKeyDown={onKeyDown}
       >
         <div className="cmd-input-row">
@@ -77,18 +120,30 @@ export default function CommandPalette({ open, onClose }) {
             onChange={(e) => setQuery(e.target.value)}
             spellCheck="false"
             autoComplete="off"
+            aria-label="Search commands"
+            tabIndex={open ? 0 : -1}
           />
           <span className="kbd">ESC</span>
         </div>
 
         <div className="cmd-body">
-          <p className="cmd-hint">Type to search — grouped commands arrive next.</p>
+          {hasResults ? (
+            <ResultList
+              groups={filtered}
+              activeId={activeId}
+              onHoverItem={setSelectedId}
+              onRunItem={runItem}
+            />
+          ) : (
+            <p className="cmd-hint">No results for “{query}”.</p>
+          )}
         </div>
 
         <div className="cmd-foot">
           <span className="cmd-foot-item"><span className="kbd">↑↓</span> navigate</span>
           <span className="cmd-foot-item"><span className="kbd">↵</span> select</span>
-          <span className="cmd-foot-item"><span className="kbd">esc</span> close</span>
+          <span className="cmd-foot-item"><span className="kbd">⌘1–9</span> jump</span>
+          <span className="cmd-foot-item cmd-foot-end"><span className="kbd">esc</span> close</span>
         </div>
       </div>
     </div>,

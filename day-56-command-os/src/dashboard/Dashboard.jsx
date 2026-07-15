@@ -1,5 +1,5 @@
 import Icon from '../icons.jsx'
-import { navItems, stats, people, statusTone } from './dashboardData.js'
+import { navItems, stats, statusTone } from './dashboardData.js'
 
 // Deterministic avatar colour from a hue stored on each person.
 const avatarStyle = (hue) => ({
@@ -162,5 +162,3 @@ export default function Dashboard({
     </div>
   )
 }
-
-export { Avatar, people }
