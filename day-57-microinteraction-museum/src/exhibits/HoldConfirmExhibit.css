@@ -1,0 +1,122 @@
+.hold-confirm {
+  display: grid;
+  width: min(100%, 24rem);
+  justify-items: center;
+  gap: 1.1rem;
+  padding: 2rem 1.25rem;
+}
+
+.hold-confirm__button {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem;
+  align-items: center;
+  width: min(100%, 20rem);
+  min-height: 5.4rem;
+  overflow: hidden;
+  padding: 0.8rem 0.9rem 0.8rem 1.3rem;
+  color: var(--paper-bright);
+  text-align: left;
+  touch-action: none;
+  user-select: none;
+  border: 1px solid currentColor;
+  border-radius: 1.15rem;
+  background: #252521;
+  box-shadow: 0 1.15rem 2.8rem rgba(0, 0, 0, 0.24);
+}
+
+.hold-confirm__button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: inherit;
+}
+
+.hold-confirm__button[data-phase='complete'] {
+  background: var(--success);
+}
+
+.hold-confirm__fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--vermilion);
+  will-change: clip-path;
+}
+
+.hold-confirm__button[data-phase='complete'] .hold-confirm__fill {
+  background: #14643e;
+}
+
+.hold-confirm__content,
+.hold-confirm__meter {
+  position: relative;
+  z-index: 1;
+}
+
+.hold-confirm__content {
+  display: grid;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
+.hold-confirm__label {
+  font-size: 0.9rem;
+  font-weight: 690;
+  letter-spacing: -0.01em;
+}
+
+.hold-confirm__duration {
+  font-size: 0.61rem;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  opacity: 0.68;
+}
+
+.hold-confirm__meter {
+  width: 3rem;
+  height: 3rem;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.hold-confirm__meter circle:first-child {
+  opacity: 0.24;
+}
+
+.hold-confirm__meter-progress {
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.hold-confirm__meter path {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hold-confirm__instruction {
+  max-width: 16rem;
+  margin: 0;
+  color: currentColor;
+  font-size: 0.67rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.58;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hold-confirm__fill {
+    will-change: auto;
+  }
+}
