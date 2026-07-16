@@ -1,0 +1,292 @@
+.toast-exhibit {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6.2rem minmax(0, 1fr);
+  gap: clamp(1.15rem, 4vw, 2.4rem);
+  align-items: center;
+  width: min(100% - 2rem, 31rem);
+}
+
+.toast-exhibit__ticket {
+  position: relative;
+  display: grid;
+  align-content: space-between;
+  min-height: 10.5rem;
+  padding: 0.8rem;
+  color: var(--paper-bright, #f8f4ec);
+  background: var(--vermilion, #ef4b32);
+  box-shadow: 0.55rem 0.55rem 0 var(--ink, #171714);
+}
+
+.toast-exhibit__ticket span {
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  writing-mode: vertical-rl;
+}
+
+.toast-exhibit__ticket strong {
+  font-family: 'Newsreader Variable', serif;
+  font-size: 3.2rem;
+  font-weight: 420;
+  line-height: 0.8;
+  letter-spacing: -0.08em;
+}
+
+.toast-exhibit__ticket i {
+  position: absolute;
+  right: -0.35rem;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--paper-bright, #f8f4ec);
+  transform: translateY(-50%);
+}
+
+.toast-exhibit__copy {
+  display: grid;
+  gap: 1rem;
+}
+
+.toast-exhibit__copy p {
+  max-width: 20rem;
+  margin: 0;
+  font-family: 'Newsreader Variable', serif;
+  font-size: 1.18rem;
+  line-height: 1.18;
+}
+
+.toast-exhibit__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100%, 18rem);
+  min-height: 3.2rem;
+  padding: 0.55rem 0.65rem 0.55rem 1rem;
+  color: var(--paper-bright, #f8f4ec);
+  border: 1px solid var(--ink, #171714);
+  background: var(--ink, #171714);
+  font-size: 0.73rem;
+  font-weight: 740;
+  letter-spacing: 0.04em;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.toast-exhibit__trigger > span:last-child {
+  display: grid;
+  place-items: center;
+  min-width: 2.3rem;
+  height: 2.05rem;
+  padding: 0 0.4rem;
+  color: var(--ink, #171714);
+  background: var(--acid, #d9ff52);
+  font-size: 0.65rem;
+}
+
+.toast-exhibit__trigger:hover {
+  box-shadow: 0.32rem 0.32rem 0 var(--cobalt, #1746e8);
+  transform: translate(-0.16rem, -0.16rem);
+}
+
+.toast-exhibit__trigger:active {
+  box-shadow: none;
+  transform: translate(0, 0);
+}
+
+.toast-exhibit__instruction {
+  color: var(--muted, #655f55);
+  font-size: 0.6rem;
+  font-weight: 760;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.toast-exhibit__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.toast-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  pointer-events: none;
+}
+
+.toast-stack {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: min(23rem, calc(100vw - 2rem));
+  height: 17rem;
+  pointer-events: none;
+}
+
+.museum-toast {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) 2.25rem;
+  gap: 0.72rem;
+  align-items: center;
+  width: 100%;
+  min-height: 4.75rem;
+  padding: 0.72rem 0.55rem 0.72rem 0.72rem;
+  overflow: hidden;
+  color: var(--ink, #171714);
+  border: 1px solid var(--ink, #171714);
+  background: var(--paper-bright, #f8f4ec);
+  box-shadow: 0 0.65rem 2rem rgba(19, 17, 13, 0.18);
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: pan-y;
+  transform-origin: 50% 100%;
+}
+
+.museum-toast:active {
+  cursor: grabbing;
+}
+
+.museum-toast__glyph {
+  display: grid;
+  place-items: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  color: white;
+  border-radius: 50%;
+  background: var(--vermilion, #ef4b32);
+  font-size: 1rem;
+  font-weight: 760;
+}
+
+.museum-toast--cobalt .museum-toast__glyph { background: var(--cobalt, #1746e8); }
+.museum-toast--ink .museum-toast__glyph { background: var(--ink, #171714); }
+.museum-toast--success .museum-toast__glyph { background: var(--success, #1a7549); }
+.museum-toast--acid .museum-toast__glyph { color: var(--ink, #171714); background: var(--acid, #d9ff52); }
+
+.museum-toast__copy {
+  display: grid;
+  min-width: 0;
+}
+
+.museum-toast__eyebrow {
+  margin-bottom: 0.12rem;
+  color: var(--muted, #655f55);
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.museum-toast__copy strong {
+  overflow: hidden;
+  font-size: 0.79rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.museum-toast__copy > span:last-child {
+  overflow: hidden;
+  color: var(--muted, #655f55);
+  font-size: 0.68rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.museum-toast__close {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  color: var(--ink, #171714);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.museum-toast__close:hover {
+  color: white;
+  background: var(--ink, #171714);
+}
+
+.museum-toast__timer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: rgba(23, 23, 20, 0.12);
+}
+
+.museum-toast__timer > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--vermilion, #ef4b32);
+  transform-origin: 0 50%;
+  transition: transform 50ms linear;
+}
+
+.toast-stack__overflow,
+.toast-stack__empty {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0.42rem 0.68rem;
+  color: var(--paper-bright, #f8f4ec);
+  border: 1px solid var(--ink, #171714);
+  background: var(--cobalt, #1746e8);
+  box-shadow: 0.2rem 0.2rem 0 var(--ink, #171714);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.toast-stack__empty {
+  color: var(--ink, #171714);
+  background: var(--paper-bright, #f8f4ec);
+}
+
+@media (max-width: 540px) {
+  .toast-exhibit {
+    grid-template-columns: 4.8rem minmax(0, 1fr);
+    width: min(100% - 1.5rem, 28rem);
+  }
+
+  .toast-exhibit__ticket {
+    min-height: 9rem;
+  }
+
+  .toast-exhibit__ticket strong {
+    font-size: 2.55rem;
+  }
+
+  .toast-stack {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    width: calc(100vw - 1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-exhibit__trigger,
+  .museum-toast__timer > span {
+    transition-duration: 1ms;
+  }
+}
