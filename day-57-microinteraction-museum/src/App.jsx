@@ -83,7 +83,7 @@ export default function App() {
         <header className="museum-header">
           <div className="museum-header__topline">
             <span>DAY 57 / 65</span>
-            <span>INTERFACE STUDIES · 2026</span>
+            <span>INTERFACE STUDIES · COLLECTION 08 · 2026</span>
           </div>
           <div className="museum-header__title">
             <h1>
@@ -97,6 +97,21 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        <section className="collection-register" aria-label="Collection register">
+          <div>
+            <span className="collection-register__eyebrow">Curator’s note</span>
+            <p>
+              Good motion is felt before it is noticed. Each object below isolates one
+              small decision—when to resist, when to follow, and when to get out of the way.
+            </p>
+          </div>
+          <dl>
+            <div><dt>Objects</dt><dd>08</dd></div>
+            <div><dt>Medium</dt><dd>DOM / SVG</dd></div>
+            <div><dt>Engine</dt><dd>Spring</dd></div>
+          </dl>
+        </section>
 
         <main id="exhibits" className="exhibit-grid">
           {exhibits.map(({ Component, ...exhibit }) => (
@@ -113,8 +128,19 @@ export default function App() {
         </main>
 
         <footer className="museum-footer">
-          <p>Micro-Interaction Museum</p>
-          <span>Original studies after the craft school of product motion.</span>
+          <div className="museum-footer__lead">
+            <p>Micro-Interaction Museum</p>
+            <h2>Built after the people who made product motion feel inevitable.</h2>
+          </div>
+          <nav className="museum-footer__credits" aria-label="Pattern credits">
+            <a href="https://sonner.emilkowal.ski/">Sonner <span aria-hidden="true">↗</span></a>
+            <a href="https://vaul.emilkowal.ski/">Vaul <span aria-hidden="true">↗</span></a>
+            <a href="https://family.co/">Family <span aria-hidden="true">↗</span></a>
+          </nav>
+          <div className="museum-footer__legal">
+            <span>All eight studies are original, from-scratch recreations—not imported components.</span>
+            <a href="../">Return to the project archive ↑</a>
+          </div>
         </footer>
       </motion.div>
     </div>

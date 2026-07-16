@@ -97,6 +97,7 @@ a {
 }
 
 .museum-header,
+.collection-register,
 .exhibit-grid,
 .museum-footer {
   position: relative;
@@ -194,6 +195,66 @@ a {
   margin: 0 auto;
   padding: 0 clamp(1.25rem, 4vw, 4.5rem) clamp(4rem, 8vw, 8rem);
   gap: clamp(1.1rem, 2vw, 1.75rem);
+}
+
+.collection-register {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(21rem, 0.6fr);
+  gap: clamp(2rem, 7vw, 8rem);
+  max-width: 88rem;
+  margin: 0 auto clamp(2.5rem, 5vw, 5rem);
+  padding: clamp(1.35rem, 2vw, 2rem) clamp(1.25rem, 4vw, 4.5rem);
+  border-block: 1px solid var(--ink);
+}
+
+.collection-register__eyebrow {
+  display: block;
+  margin-bottom: 0.65rem;
+  color: var(--vermilion);
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.collection-register p {
+  max-width: 57rem;
+  margin: 0;
+  font-family: 'Newsreader Variable', serif;
+  font-size: clamp(1.3rem, 2.2vw, 2rem);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+}
+
+.collection-register dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0;
+}
+
+.collection-register dl div {
+  display: grid;
+  align-content: space-between;
+  min-height: 5.2rem;
+  padding-left: 0.8rem;
+  border-left: 1px solid var(--line);
+}
+
+.collection-register dt {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.collection-register dd {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .exhibit-card {
@@ -332,27 +393,87 @@ a {
 }
 
 .museum-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.36fr);
+  gap: clamp(3rem, 8vw, 8rem);
   max-width: 88rem;
   margin: 0 auto;
-  padding: 2rem clamp(1.25rem, 4vw, 4.5rem) 3rem;
+  padding: clamp(3rem, 7vw, 7rem) clamp(1.25rem, 4vw, 4.5rem) 3rem;
   color: var(--paper-bright);
   background: var(--ink);
-  font-size: 0.74rem;
-  letter-spacing: 0.06em;
 }
 
-.museum-footer p {
+.museum-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: clamp(1.25rem, 4vw, 4.5rem);
+  right: clamp(1.25rem, 4vw, 4.5rem);
+  height: 1px;
+  background: rgba(248, 244, 236, 0.28);
+}
+
+.museum-footer__lead p {
   margin: 0;
+  color: var(--vermilion);
+  font-size: 0.68rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.museum-footer span {
+.museum-footer h2 {
+  max-width: 18ch;
+  margin: 1rem 0 0;
+  font-family: 'Newsreader Variable', serif;
+  font-size: clamp(2.2rem, 4.7vw, 5rem);
+  font-weight: 430;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+
+.museum-footer__credits {
+  display: grid;
+  align-content: start;
+  border-top: 1px solid rgba(248, 244, 236, 0.4);
+}
+
+.museum-footer__credits a {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  color: var(--paper-bright);
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(248, 244, 236, 0.22);
+  transition: color 180ms ease, padding 180ms ease;
+}
+
+.museum-footer__credits a:hover {
+  padding-left: 0.5rem;
+  color: var(--acid);
+}
+
+.museum-footer__legal {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-top: 1.5rem;
   color: #aaa398;
-  text-align: right;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  border-top: 1px solid rgba(248, 244, 236, 0.16);
+}
+
+.museum-footer__legal a {
+  color: var(--paper-bright);
+  text-decoration: none;
 }
 
 @keyframes placeholder-pulse {
@@ -373,6 +494,7 @@ a {
 
 @media (max-width: 760px) {
   .museum-header__title,
+  .collection-register,
   .exhibit-grid {
     grid-template-columns: 1fr;
   }
@@ -383,6 +505,18 @@ a {
 
   .museum-header__aside {
     max-width: 21rem;
+  }
+
+  .collection-register {
+    gap: 2rem;
+  }
+
+  .museum-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .museum-footer__legal {
+    flex-direction: column;
   }
 
   .exhibit-card__plaque {

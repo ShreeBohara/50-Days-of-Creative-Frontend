@@ -4,6 +4,12 @@ import { ReplayIcon } from './Icons.jsx'
 
 export function ExhibitCard({ number, title, caption, hint, children, tone = 'paper' }) {
   const [replayKey, setReplayKey] = useState(0)
+  const [announcement, setAnnouncement] = useState('')
+
+  const replay = () => {
+    setReplayKey((value) => value + 1)
+    setAnnouncement(`${title} restarted`)
+  }
 
   return (
     <motion.article
@@ -22,7 +28,7 @@ export function ExhibitCard({ number, title, caption, hint, children, tone = 'pa
           className="icon-button replay-button"
           type="button"
           aria-label={`Replay ${title}`}
-          onClick={() => setReplayKey((value) => value + 1)}
+          onClick={replay}
         >
           <ReplayIcon />
         </button>
@@ -36,6 +42,7 @@ export function ExhibitCard({ number, title, caption, hint, children, tone = 'pa
         <p>{caption}</p>
         <span>{hint}</span>
       </footer>
+      <span className="sr-only" role="status" aria-live="polite">{announcement}</span>
     </motion.article>
   )
 }
