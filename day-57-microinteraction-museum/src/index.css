@@ -10,7 +10,8 @@
   --ink: #171714;
   --muted: #655f55;
   --line: #b8b0a2;
-  --vermilion: #ef4b32;
+  --vermilion: #bd2f20;
+  --vermilion-bright: #ef4b32;
   --cobalt: #1746e8;
   --acid: #d9ff52;
   --success: #1a7549;
@@ -268,6 +269,7 @@ a {
 }
 
 .exhibit-card--ink {
+  --vermilion: var(--vermilion-bright);
   color: var(--paper-bright);
   background: #1b1b18;
 }
@@ -415,7 +417,7 @@ a {
 
 .museum-footer__lead p {
   margin: 0;
-  color: var(--vermilion);
+  color: var(--vermilion-bright);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;

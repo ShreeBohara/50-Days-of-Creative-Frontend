@@ -16,7 +16,19 @@ import './ToastExhibit.css'
 const SWIPE_DISTANCE = 76
 const SWIPE_VELOCITY = 550
 
-function ToastCard({ toast, index, expanded, onDismiss }) {
+function ToastGlyph({ name }) {
+  const paths = {
+    archive: <><path d="M12 4v10m-4-4 4 4 4-4" /><path d="M5 16v3h14v-3" /></>,
+    note: <><path d="M12 4v16M4 12h16M6.4 6.4l11.2 11.2M17.6 6.4 6.4 17.6" /></>,
+    play: <path d="m9 7 8 5-8 5Z" />,
+    check: <path d="m6 12 4 4 8-9" />,
+    dot: <circle cx="12" cy="12" r="5" />,
+  }
+
+  return <svg viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>
+}
+
+function ToastCard({ toast, index, expanded, onDismiss, onHoverChange }) {
   const reducedMotion = useReducedMotion()
   const progress = Math.max(0, Math.min(1, toast.remainingMs / TOAST_DURATION_MS))
   const collapsedY = index * -12
@@ -48,8 +60,10 @@ function ToastCard({ toast, index, expanded, onDismiss }) {
           onDismiss(toast.id)
         }
       }}
+      onPointerEnter={() => onHoverChange(true)}
+      onPointerLeave={() => onHoverChange(false)}
     >
-      <span className="museum-toast__glyph" aria-hidden="true">{toast.glyph}</span>
+      <span className="museum-toast__glyph"><ToastGlyph name={toast.glyph} /></span>
       <span className="museum-toast__copy">
         <span className="museum-toast__eyebrow">{toast.eyebrow}</span>
         <strong>{toast.title}</strong>
@@ -97,8 +111,6 @@ function ToastPortal({ queue, onDismiss, onPausedChange }) {
         aria-label="Museum notifications"
         data-expanded={expanded || undefined}
         data-paused={expanded || undefined}
-        onMouseEnter={() => updatePauseReason('hovered', true)}
-        onMouseLeave={() => updatePauseReason('hovered', false)}
         onFocusCapture={() => updatePauseReason('focused', true)}
         onBlurCapture={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) updatePauseReason('focused', false)
@@ -112,6 +124,7 @@ function ToastPortal({ queue, onDismiss, onPausedChange }) {
               index={index}
               expanded={expanded}
               onDismiss={onDismiss}
+              onHoverChange={(value) => updatePauseReason('hovered', value)}
             />
           ))}
         </AnimatePresence>
@@ -132,11 +145,6 @@ function ToastPortal({ queue, onDismiss, onPausedChange }) {
             </motion.span>
           )}
         </AnimatePresence>
-        {queue.length === 0 && (
-          <motion.p className="toast-stack__empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            Queue clear
-          </motion.p>
-        )}
       </section>
     </div>,
     document.body,
