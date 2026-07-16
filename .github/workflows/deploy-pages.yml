@@ -63,6 +63,7 @@ on:
       - "day-54-mesh-gradient-studio/**"
       - "day-55-split-flap-board/**"
       - "day-56-command-os/**"
+      - "day-57-microinteraction-museum/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -119,6 +120,7 @@ jobs:
             day-44-cartographer/package-lock.json
             day-45-vitrail/package-lock.json
             day-56-command-os/package-lock.json
+            day-57-microinteraction-museum/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -336,6 +338,14 @@ jobs:
         working-directory: day-56-command-os
         run: npm run build
 
+      - name: Install Day 57 app dependencies
+        working-directory: day-57-microinteraction-museum
+        run: npm ci
+
+      - name: Build Day 57 app
+        working-directory: day-57-microinteraction-museum
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -426,6 +436,8 @@ jobs:
           cp -R day-55-split-flap-board _site/
           mkdir -p _site/day-56-command-os
           cp -R day-56-command-os/dist/. _site/day-56-command-os/
+          mkdir -p _site/day-57-microinteraction-museum
+          cp -R day-57-microinteraction-museum/dist/. _site/day-57-microinteraction-museum/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
