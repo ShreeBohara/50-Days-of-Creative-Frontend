@@ -1,0 +1,287 @@
+.dynamic-pill-stage {
+  display: grid;
+  width: 100%;
+  min-height: 20rem;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+}
+
+.dynamic-pill {
+  position: relative;
+  overflow: hidden;
+  color: var(--paper-bright);
+  border: 1px solid rgba(248, 244, 236, 0.64);
+  background: #252521;
+  box-shadow: 0 1.4rem 3.2rem rgba(0, 0, 0, 0.26);
+}
+
+.dynamic-pill--idle {
+  width: 10.5rem;
+  height: 3.75rem;
+  border-radius: 999px;
+}
+
+.dynamic-pill--playing {
+  width: 14rem;
+  height: 3.75rem;
+  border-radius: 999px;
+  background: var(--cobalt);
+}
+
+.dynamic-pill--expanded {
+  width: min(20rem, calc(100% - 0.5rem));
+  height: 13.25rem;
+  border-radius: 1.45rem;
+  background: #20201d;
+}
+
+.dynamic-pill__compact {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  gap: 0.7rem;
+  padding: 0.45rem 0.65rem 0.45rem 0.9rem;
+  color: inherit;
+  text-align: left;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+}
+
+.dynamic-pill__status-dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 0 0.3rem rgba(217, 255, 82, 0.13);
+}
+
+.dynamic-pill__waveform {
+  display: flex;
+  width: 1.8rem;
+  height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.dynamic-pill__waveform span {
+  display: block;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--acid);
+}
+
+.dynamic-pill__compact-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.dynamic-pill__compact-copy strong {
+  overflow: hidden;
+  font-size: 0.71rem;
+  letter-spacing: 0.025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dynamic-pill__compact-copy small {
+  overflow: hidden;
+  margin-top: 0.08rem;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.58;
+}
+
+.dynamic-pill__arrow {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid rgba(248, 244, 236, 0.32);
+  border-radius: 50%;
+  font-size: 0.8rem;
+}
+
+.dynamic-pill__arrow svg {
+  width: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dynamic-pill__expanded {
+  display: grid;
+  height: 100%;
+  align-content: space-between;
+  padding: 1rem;
+}
+
+.dynamic-pill__track-row {
+  display: grid;
+  grid-template-columns: 4.1rem minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.dynamic-pill__art {
+  position: relative;
+  width: 4.1rem;
+  height: 4.1rem;
+  overflow: hidden;
+  border-radius: 0.7rem;
+  background:
+    linear-gradient(145deg, transparent 48%, var(--acid) 49% 55%, transparent 56%),
+    linear-gradient(30deg, var(--vermilion), #ff896e 52%, var(--cobalt));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.dynamic-pill__art::before,
+.dynamic-pill__art span {
+  content: '';
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+}
+
+.dynamic-pill__art::before {
+  inset: 0.72rem;
+}
+
+.dynamic-pill__art span {
+  inset: 1.35rem;
+  background: var(--ink);
+}
+
+.dynamic-pill__track-copy {
+  min-width: 0;
+}
+
+.dynamic-pill__track-copy span {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--acid);
+  font-size: 0.55rem;
+  font-weight: 680;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dynamic-pill__track-copy strong {
+  display: block;
+  overflow: hidden;
+  font-family: 'Newsreader Variable', serif;
+  font-size: 1.28rem;
+  font-weight: 520;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dynamic-pill__track-copy p {
+  margin: 0.05rem 0 0;
+  font-size: 0.67rem;
+  opacity: 0.58;
+}
+
+.dynamic-pill__close,
+.dynamic-pill__controls button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  padding: 0;
+  color: inherit;
+  border: 1px solid rgba(248, 244, 236, 0.3);
+  border-radius: 50%;
+  background: transparent;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.dynamic-pill__close {
+  width: 2.5rem;
+  height: 2.5rem;
+  align-self: start;
+}
+
+.dynamic-pill__close:hover,
+.dynamic-pill__controls button:hover {
+  color: var(--ink);
+  border-color: var(--acid);
+  background: var(--acid);
+}
+
+.dynamic-pill__close svg,
+.dynamic-pill__controls svg {
+  width: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dynamic-pill__timeline {
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(248, 244, 236, 0.18);
+}
+
+.dynamic-pill__timeline span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--vermilion);
+  transform-origin: left;
+}
+
+.dynamic-pill__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.dynamic-pill__controls .dynamic-pill__pause {
+  width: 3rem;
+  height: 3rem;
+  color: var(--ink);
+  border-color: var(--paper-bright);
+  background: var(--paper-bright);
+}
+
+.dynamic-pill-stage__caption {
+  margin: 0;
+  font-size: 0.61rem;
+  font-weight: 680;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.48;
+}
+
+@media (max-width: 390px) {
+  .dynamic-pill__track-row {
+    grid-template-columns: 3.5rem minmax(0, 1fr) 2.5rem;
+    gap: 0.6rem;
+  }
+
+  .dynamic-pill__art {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dynamic-pill__close,
+  .dynamic-pill__controls button {
+    transition-duration: 0.01ms;
+  }
+}
