@@ -1,0 +1,217 @@
+.smart-button-study {
+  position: relative;
+  width: min(32rem, calc(100% - 2rem));
+  overflow: hidden;
+  border: 1px solid rgba(23, 23, 20, 0.72);
+  background: rgba(248, 244, 236, 0.92);
+  box-shadow: 8px 8px 0 rgba(23, 70, 232, 0.14);
+}
+
+.smart-button-study__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.4rem;
+  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid rgba(23, 23, 20, 0.3);
+  color: var(--muted);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.smart-button-study__signal {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.smart-button-study__signal i {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.smart-button-study__signal i[data-phase='loading'] {
+  background: var(--cobalt);
+  box-shadow: 0 0 0 3px rgba(23, 70, 232, 0.14);
+}
+
+.smart-button-study__signal i[data-phase='success'] {
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(26, 117, 73, 0.14);
+}
+
+.smart-button-study__field {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 10.6rem;
+  padding: 1.6rem 1rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(239, 75, 50, 0.1), transparent 44%),
+    linear-gradient(90deg, transparent 49.8%, rgba(23, 23, 20, 0.12) 50%, transparent 50.2%);
+}
+
+.smart-button-study__orbit {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(25rem, 92%);
+  color: rgba(23, 23, 20, 0.3);
+  font-family: 'Newsreader Variable', serif;
+  font-size: 0.72rem;
+}
+
+.smart-button-study__orbit::before {
+  content: '';
+  position: absolute;
+  right: 1rem;
+  left: 1rem;
+  height: 1px;
+  background: rgba(23, 23, 20, 0.16);
+}
+
+.smart-button-study__orbit span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid rgba(23, 23, 20, 0.24);
+  border-radius: 50%;
+  background: var(--paper-bright);
+}
+
+.smart-button {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 7rem;
+  min-height: 3.25rem;
+  padding: 0;
+  overflow: hidden;
+  color: #fffaf1;
+  border: 0;
+  box-shadow: 0 10px 25px rgba(23, 23, 20, 0.23);
+  white-space: nowrap;
+  will-change: width, border-radius;
+}
+
+.smart-button[aria-disabled='true'] {
+  cursor: progress;
+}
+
+.smart-button:focus-visible {
+  outline-color: var(--cobalt);
+  outline-offset: 4px;
+}
+
+.smart-button__phase {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.smart-button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.62rem;
+  padding: 0 1.35rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.smart-button__content svg {
+  flex: 0 0 auto;
+  width: 1.12rem;
+  height: 1.12rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.smart-button__spinner {
+  animation: smart-button-spin 0.78s linear infinite;
+}
+
+.smart-button__spinner circle {
+  opacity: 0.24;
+}
+
+.smart-button__spinner path {
+  opacity: 1;
+}
+
+.smart-button-study__timeline {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.7rem;
+  padding: 0.75rem 0.85rem;
+  border-top: 1px solid rgba(23, 23, 20, 0.3);
+  color: rgba(23, 23, 20, 0.42);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.smart-button-study__timeline span[data-active='true'] {
+  color: var(--vermilion);
+}
+
+.smart-button-study__timeline i {
+  height: 1px;
+  background: rgba(23, 23, 20, 0.18);
+}
+
+.smart-button__measure-rack {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.smart-button__measure-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  white-space: nowrap;
+}
+
+@keyframes smart-button-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 430px) {
+  .smart-button-study {
+    width: calc(100% - 1.25rem);
+  }
+
+  .smart-button-study__meta span:last-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smart-button {
+    will-change: auto;
+  }
+}
