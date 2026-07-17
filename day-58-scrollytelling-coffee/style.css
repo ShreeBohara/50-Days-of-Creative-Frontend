@@ -418,6 +418,51 @@ button {
   line-height: 1.35;
 }
 
+.chart-readout {
+  position: absolute;
+  z-index: 7;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  min-width: 11rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--rule);
+  text-align: right;
+  background: rgba(248, 241, 229, 0.9);
+  box-shadow: 0 18px 45px rgba(66, 39, 25, 0.1);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+
+.chart-readout.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chart-readout span {
+  display: block;
+  color: var(--signal);
+  font-size: 0.56rem;
+  font-weight: 760;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.chart-readout strong {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: "Newsreader", serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.chart-readout p {
+  margin: 0.1rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.65rem;
+}
+
 .finale-card {
   position: absolute;
   z-index: 6;

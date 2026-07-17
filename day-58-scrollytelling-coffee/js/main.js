@@ -20,6 +20,7 @@ const sceneTitle = document.querySelector("[data-scene-title]");
 const finaleCard = document.querySelector("[data-finale-card]");
 const drinkLegend = document.querySelector("[data-drink-legend]");
 const monthCallout = document.querySelector("[data-month-callout]");
+const clockReadout = document.querySelector("[data-clock-readout]");
 const motionToggle = document.querySelector("[data-motion-toggle]");
 const motionLabel = motionToggle?.querySelector("span");
 const steps = [...document.querySelectorAll("[data-step]")];
@@ -109,6 +110,8 @@ function displaySceneMetadata(index) {
   drinkLegend?.setAttribute("aria-hidden", String(index !== 2));
   monthCallout?.classList.toggle("is-visible", index === 3);
   monthCallout?.setAttribute("aria-hidden", String(index !== 3));
+  clockReadout?.classList.toggle("is-visible", index === 4);
+  clockReadout?.setAttribute("aria-hidden", String(index !== 4));
   if (index !== 1) hideTooltip();
 }
 
@@ -193,6 +196,13 @@ function hydrateNarrativeStats() {
   const finaleSummary = document.querySelector("[data-finale-summary]");
   if (finaleSummary) {
     finaleSummary.textContent = `${titleCase(coffeeStats.topDrink)} led the year · ${formatHour(coffeeStats.peakHour)} was the peak.`;
+  }
+
+  const clockPeak = document.querySelector("[data-clock-peak]");
+  const clockDetail = document.querySelector("[data-clock-detail]");
+  if (clockPeak) clockPeak.textContent = formatHour(coffeeStats.peakHour);
+  if (clockDetail) {
+    clockDetail.textContent = `${coffeeStats.hourCounts[coffeeStats.peakHour]} cups · ${Math.round(coffeeStats.morningShare * 100)}% before noon`;
   }
 
   const legendList = drinkLegend?.querySelector("ol");

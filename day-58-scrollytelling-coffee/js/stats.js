@@ -106,6 +106,16 @@ export function buildMonthSeries(summary) {
   }));
 }
 
+export function buildHourSeries(summary) {
+  const counts = summary?.hourCounts ?? [];
+  const maximum = Math.max(...counts, 1);
+  return Array.from({ length: 24 }, (_, hour) => Object.freeze({
+    hour,
+    count: Number(counts[hour]) || 0,
+    density: (Number(counts[hour]) || 0) / maximum,
+  }));
+}
+
 function indexOfMaximum(values) {
   let maximumIndex = 0;
   for (let index = 1; index < values.length; index += 1) {

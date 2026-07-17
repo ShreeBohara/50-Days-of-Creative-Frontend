@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { DRINK_TYPES, coffeeData } from "../js/data.js";
 import {
   buildDrinkLegendItems,
+  buildHourSeries,
   buildMonthSeries,
   buildWeeklyDailyAverages,
   coffeeStats,
@@ -25,6 +26,14 @@ test("monthly series covers January through December and preserves the vacation-
   assert.equal(months[11].month, "December");
   assert.equal(months.reduce((total, { count }) => total + count, 0), 1000);
   assert.equal(Math.max(...months.map(({ count }) => count)), coffeeStats.busiestMonthCount);
+});
+
+test("hour series exposes all 24 densities and the summary peak", () => {
+  const hours = buildHourSeries(coffeeStats);
+  assert.equal(hours.length, 24);
+  assert.equal(hours.reduce((total, { count }) => total + count, 0), 1000);
+  assert.equal(hours.find(({ density }) => density === 1).hour, coffeeStats.peakHour);
+  assert.ok(hours.filter(({ hour }) => hour >= 6 && hour < 12).every(({ density }) => density > 0));
 });
 
 test("weekly trend has 52 ordered bins covering all 365 days and cups", () => {

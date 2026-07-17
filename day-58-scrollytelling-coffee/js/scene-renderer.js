@@ -131,6 +131,21 @@ function drawOverlay(context, overlay) {
       context.arc(overlay.center.x, overlay.center.y, overlay.radius, 0, TAU);
       context.stroke();
       overlay.hours.forEach((hour) => {
+        const angle = -Math.PI / 2 + (hour.hour / 24) * TAU;
+        const inner = overlay.radius + overlay.band * 0.56;
+        const outer = overlay.radius + overlay.band * (0.72 + hour.density * 0.22);
+        context.strokeStyle = `rgba(42, 25, 19, ${0.18 + hour.density * 0.58})`;
+        context.lineWidth = hour.hour % 3 === 0 ? 1.5 : 1;
+        context.beginPath();
+        context.moveTo(
+          overlay.center.x + Math.cos(angle) * inner,
+          overlay.center.y + Math.sin(angle) * inner,
+        );
+        context.lineTo(
+          overlay.center.x + Math.cos(angle) * outer,
+          overlay.center.y + Math.sin(angle) * outer,
+        );
+        context.stroke();
         if (hour.hour % 3 !== 0) return;
         drawLabel(context, hour.label, hour.x, hour.y, {
           align: "center",
