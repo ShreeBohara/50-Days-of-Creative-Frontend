@@ -58,9 +58,10 @@
               tabindex="0"
               role="img"
               aria-describedby="chart-summary"
+              aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home End Escape"
               aria-label="A loose cloud of 1,000 dots, one for every coffee purchased in 2025."
             ></canvas>
-            <output class="cup-tooltip" data-tooltip hidden></output>
+            <div class="cup-tooltip" data-tooltip role="tooltip" hidden></div>
             <aside class="chart-key" data-drink-legend aria-label="Drink type legend" aria-hidden="true">
               <p>Orders by drink</p>
               <ol></ol>

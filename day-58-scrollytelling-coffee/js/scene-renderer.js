@@ -188,7 +188,7 @@ function drawOverlay(context, overlay) {
         context.lineTo(overlay.labels.at(-1).x, y);
         context.stroke();
       });
-      drawLabel(context, "CUPS / DAY", overlay.labels[0].x, overlay.top - 11, {
+      drawLabel(context, "CUPS / DAY", overlay.labels[0].x + 4, overlay.top + 13, {
         align: "left",
         font: '700 9px "Archivo", sans-serif',
       });

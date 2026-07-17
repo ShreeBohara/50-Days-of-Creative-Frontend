@@ -589,7 +589,7 @@ function layoutClock(context) {
         id: 'morning-peak',
         text: `Peak hour · ${formatHour(peakHour.hour)} · ${peakHour.count} cups`,
         x: frame.cx,
-        y: frame.cy,
+        y: frame.cy + clamp(frame.height * 0.07, 22, 36),
         targetX: peakHour.x,
         targetY: peakHour.y,
         align: 'center',

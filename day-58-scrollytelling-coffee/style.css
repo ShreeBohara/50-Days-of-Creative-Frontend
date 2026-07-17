@@ -284,6 +284,10 @@ button {
   touch-action: pan-y;
 }
 
+#coffee-canvas:focus-visible {
+  outline-offset: -5px;
+}
+
 #coffee-canvas[data-interactive="true"] {
   cursor: crosshair;
 }
@@ -792,17 +796,24 @@ h2 {
 
   .visual-panel {
     z-index: 20;
-    top: 0;
-    height: 46svh;
+    top: var(--topbar-height);
+    height: 44svh;
     border-right: 0;
     border-bottom: 1px solid var(--rule);
     border-left: 0;
   }
 
   .visual-heading {
-    top: calc(var(--topbar-height) + 0.6rem);
+    top: 0.6rem;
     right: 0.9rem;
     left: 0.9rem;
+  }
+
+  .chart-key,
+  .chart-callout,
+  .chart-readout,
+  .trend-readout {
+    display: none;
   }
 
   .steps {
@@ -815,7 +826,7 @@ h2 {
   .step {
     align-items: flex-end;
     min-height: 88svh;
-    padding: 38svh 1rem 10svh;
+    padding: 34svh 1rem 10svh;
   }
 
   .step-card {

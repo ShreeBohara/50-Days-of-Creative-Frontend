@@ -69,6 +69,8 @@ const stats = {
 test('all eight scenes return 1,000 finite, in-bounds targets at desktop and mobile sizes', () => {
   const viewports = [
     { width: 760, height: 900 },
+    { width: 594, height: 768 },
+    { width: 768, height: 464 },
     { width: 375, height: 280 },
   ];
 
