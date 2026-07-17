@@ -3,11 +3,19 @@ import assert from "node:assert/strict";
 
 import { DRINK_TYPES, coffeeData } from "../js/data.js";
 import {
+  buildDrinkLegendItems,
   buildWeeklyDailyAverages,
   coffeeStats,
   summarizeDataset,
   summarizeCoffeeData,
 } from "../js/stats.js";
+
+test("drink legend items keep the canonical order and reconcile all cups", () => {
+  const legend = buildDrinkLegendItems(coffeeStats);
+  assert.deepEqual(legend.map(({ drink }) => drink), [...DRINK_TYPES]);
+  assert.equal(legend.reduce((total, { count }) => total + count, 0), 1000);
+  assert.equal(legend.reduce((total, { share }) => total + share, 0), 1);
+});
 
 test("weekly trend has 52 ordered bins covering all 365 days and cups", () => {
   const bins = buildWeeklyDailyAverages(coffeeData);

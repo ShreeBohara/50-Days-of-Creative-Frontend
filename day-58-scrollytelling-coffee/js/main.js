@@ -6,10 +6,10 @@ import {
   positionTooltip,
 } from "./interactions.js";
 import ParticleEngine from "./particle-engine.js";
-import { SCENE_IDS, computeScene } from "./scenes.js";
+import { DRINK_COLORS, SCENE_IDS, computeScene } from "./scenes.js";
 import SceneOverlayRenderer from "./scene-renderer.js";
 import { createScrollyController } from "./scrolly.js";
-import { coffeeStats } from "./stats.js";
+import { buildDrinkLegendItems, coffeeStats } from "./stats.js";
 
 const canvas = document.querySelector("#coffee-canvas");
 const canvasWrap = document.querySelector(".canvas-wrap");
@@ -18,6 +18,7 @@ const chartSummary = document.querySelector("#chart-summary");
 const sceneIndex = document.querySelector("[data-scene-index]");
 const sceneTitle = document.querySelector("[data-scene-title]");
 const finaleCard = document.querySelector("[data-finale-card]");
+const drinkLegend = document.querySelector("[data-drink-legend]");
 const motionToggle = document.querySelector("[data-motion-toggle]");
 const motionLabel = motionToggle?.querySelector("span");
 const steps = [...document.querySelectorAll("[data-step]")];
@@ -103,6 +104,8 @@ function displaySceneMetadata(index) {
   canvas.dataset.interactive = String(index === 1);
   finaleCard?.classList.toggle("is-visible", index === 7);
   finaleCard?.setAttribute("aria-hidden", String(index !== 7));
+  drinkLegend?.classList.toggle("is-visible", index === 2);
+  drinkLegend?.setAttribute("aria-hidden", String(index !== 2));
   if (index !== 1) hideTooltip();
 }
 
@@ -187,6 +190,21 @@ function hydrateNarrativeStats() {
   const finaleSummary = document.querySelector("[data-finale-summary]");
   if (finaleSummary) {
     finaleSummary.textContent = `${titleCase(coffeeStats.topDrink)} led the year · ${formatHour(coffeeStats.peakHour)} was the peak.`;
+  }
+
+  const legendList = drinkLegend?.querySelector("ol");
+  if (legendList) {
+    const items = buildDrinkLegendItems(coffeeStats).map(({ drink, count, share }) => {
+      const item = document.createElement("li");
+      const label = document.createElement("span");
+      const value = document.createElement("strong");
+      item.style.setProperty("--swatch", DRINK_COLORS[drink]);
+      label.textContent = titleCase(drink);
+      value.textContent = `${count} · ${Math.round(share * 100)}%`;
+      item.append(label, value);
+      return item;
+    });
+    legendList.replaceChildren(...items);
   }
 }
 

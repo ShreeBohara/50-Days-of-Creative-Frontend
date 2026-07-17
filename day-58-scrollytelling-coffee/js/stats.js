@@ -87,6 +87,17 @@ function countsForKeys(keys) {
   return Object.fromEntries(keys.map((key) => [key, 0]));
 }
 
+export function buildDrinkLegendItems(summary) {
+  const counts = summary?.typeCounts ?? {};
+  const total = Number(summary?.totalCups) || 0;
+
+  return DRINK_TYPES.map((drink) => Object.freeze({
+    drink,
+    count: Number(counts[drink]) || 0,
+    share: total ? (Number(counts[drink]) || 0) / total : 0,
+  }));
+}
+
 function indexOfMaximum(values) {
   let maximumIndex = 0;
   for (let index = 1; index < values.length; index += 1) {
