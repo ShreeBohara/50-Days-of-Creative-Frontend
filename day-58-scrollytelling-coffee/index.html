@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f1e6d3" />
+    <meta
+      name="description"
+      content="One year and 1,000 cups of coffee, told through a scroll-driven canvas data essay."
+    />
+    <title>One Year of Coffee — Day 58</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#story-steps">Skip to the story</a>
+
+    <header class="topbar">
+      <a class="archive-link" href="../" aria-label="Back to the 50 Days gallery">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+          <path d="m15 5-7 7 7 7" />
+        </svg>
+        <span>50 Days / 058</span>
+      </a>
+      <p class="edition-mark">A small-data field note · 2025</p>
+      <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+          <path d="M8 5v14M16 5v14" />
+        </svg>
+        <span>Pause motion</span>
+      </button>
+    </header>
+
+    <nav class="progress-rail" aria-label="Story chapters">
+      <ol>
+        <li><button type="button" data-step-target="0" aria-label="Chapter 1: One Year of Coffee" aria-current="step"><span>01</span></button></li>
+        <li><button type="button" data-step-target="1" aria-label="Chapter 2: Every dot is a coffee"><span>02</span></button></li>
+        <li><button type="button" data-step-target="2" aria-label="Chapter 3: Five drinks, one habit"><span>03</span></button></li>
+        <li><button type="button" data-step-target="3" aria-label="Chapter 4: It became routine"><span>04</span></button></li>
+        <li><button type="button" data-step-target="4" aria-label="Chapter 5: I am a morning person"><span>05</span></button></li>
+        <li><button type="button" data-step-target="5" aria-label="Chapter 6: The trend was up"><span>06</span></button></li>
+        <li><button type="button" data-step-target="6" aria-label="Chapter 7: That one Tuesday"><span>07</span></button></li>
+        <li><button type="button" data-step-target="7" aria-label="Chapter 8: A year, held in one cup"><span>08</span></button></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section class="scrolly" aria-label="One Year of Coffee data story">
+        <figure class="visual-panel" aria-labelledby="visual-title">
+          <div class="visual-heading" aria-hidden="true">
+            <span class="scene-index" data-scene-index>01 / 08</span>
+            <span class="scene-title" data-scene-title>One Year of Coffee</span>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas
+              id="coffee-canvas"
+              tabindex="0"
+              role="img"
+              aria-describedby="chart-summary"
+              aria-label="A loose cloud of 1,000 dots, one for every coffee purchased in 2025."
+            ></canvas>
+            <output class="cup-tooltip" data-tooltip hidden></output>
+            <div class="finale-card" data-finale-card aria-hidden="true">
+              <span>One year, distilled</span>
+              <strong>1,000 cups</strong>
+              <p data-finale-summary>A habit, made visible.</p>
+            </div>
+          </div>
+
+          <figcaption id="chart-summary" class="sr-only" aria-live="polite">
+            Chapter 1 of 8. One thousand coffee purchases float as individual dots.
+          </figcaption>
+        </figure>
+
+        <article class="steps" id="story-steps">
+          <section class="step is-active" id="step-1" data-scene="intro" data-step="0">
+            <div class="step-card step-card--hero">
+              <p class="step-kicker">One ordinary year · 2025</p>
+              <h1>One year<br />of coffee.</h1>
+              <p class="step-deck">1,000 cups. One addiction, visualized.</p>
+              <p class="step-body">This is a portrait of a routine, assembled from receipts that never existed—but feel as though they might have.</p>
+              <span class="scroll-cue">Scroll to pour <span aria-hidden="true">↓</span></span>
+            </div>
+          </section>
+
+          <section class="step" id="step-2" data-scene="grid" data-step="1">
+            <div class="step-card">
+              <p class="step-kicker">The unit</p>
+              <h2>Every dot is a coffee.</h2>
+              <p class="step-body">Not an average. Not an estimate. One mark for every order, lined up like a year of tiny decisions.</p>
+              <p class="step-note">Move across the grid—or focus it and use the arrow keys—to inspect a cup.</p>
+            </div>
+          </section>
+
+          <section class="step" id="step-3" data-scene="drinks" data-step="2">
+            <div class="step-card">
+              <p class="step-kicker">The order</p>
+              <h2>Five drinks, one habit.</h2>
+              <p class="step-body">Espresso for urgency. Filter for work. Lattes for the long afternoons. The menu changed; the ritual did not.</p>
+              <dl class="inline-stat"><div><dt>Top order</dt><dd data-stat="top-drink">—</dd></div><div><dt>Share</dt><dd data-stat="top-drink-share">—</dd></div></dl>
+            </div>
+          </section>
+
+          <section class="step" id="step-4" data-scene="months" data-step="3">
+            <div class="step-card">
+              <p class="step-kicker">The calendar</p>
+              <h2>It became routine.</h2>
+              <p class="step-body">Month by month, the stacks grew taller. Only a late-December escape broke the cadence.</p>
+              <dl class="inline-stat"><div><dt>Busiest month</dt><dd data-stat="busiest-month">—</dd></div><div><dt>Cups</dt><dd data-stat="busiest-month-count">—</dd></div></dl>
+            </div>
+          </section>
+
+          <section class="step" id="step-5" data-scene="clock" data-step="4">
+            <div class="step-card">
+              <p class="step-kicker">The clock</p>
+              <h2>I am a morning person.</h2>
+              <p class="step-body">Or coffee made me one. The day glows brightest before most inboxes have warmed up.</p>
+              <dl class="inline-stat"><div><dt>Peak hour</dt><dd data-stat="peak-hour">—</dd></div><div><dt>Morning share</dt><dd data-stat="morning-share">—</dd></div></dl>
+            </div>
+          </section>
+
+          <section class="step" id="step-6" data-scene="trend" data-step="5">
+            <div class="step-card">
+              <p class="step-kicker">The slope</p>
+              <h2>The trend was up.</h2>
+              <p class="step-body">A weekly pulse became a climb: a little more often, a little less negotiable, until habit looked like momentum.</p>
+              <dl class="inline-stat"><div><dt>First half</dt><dd data-stat="first-half">—</dd></div><div><dt>Second half</dt><dd data-stat="second-half">—</dd></div></dl>
+            </div>
+          </section>
+
+          <section class="step" id="step-7" data-scene="outlier" data-step="6">
+            <div class="step-card">
+              <p class="step-kicker">The exception</p>
+              <h2>That one Tuesday.</h2>
+              <p class="step-body">September 16. Seven separate cups. Whatever happened that day, decaf was not the answer.</p>
+              <dl class="inline-stat"><div><dt>Date</dt><dd>Sep 16</dd></div><div><dt>Tally</dt><dd>7 cups</dd></div></dl>
+            </div>
+          </section>
+
+          <section class="step" id="step-8" data-scene="finale" data-step="7">
+            <div class="step-card step-card--finale">
+              <p class="step-kicker">The reckoning</p>
+              <h2>A year, held in one cup.</h2>
+              <p class="step-body">A thousand small purchases resolve into one familiar silhouette. Repetition, it turns out, has a shape.</p>
+              <dl class="inline-stat"><div><dt>Total spent</dt><dd data-stat="total-spend">—</dd></div><div><dt>Daily average</dt><dd data-stat="daily-average">—</dd></div></dl>
+              <a class="replay-link" href="#step-1">Read it again <span aria-hidden="true">↑</span></a>
+            </div>
+          </section>
+
+          <footer class="story-footer">
+            <p>Day 58 of Creative Frontend</p>
+            <p>Data is fictional, patterns are intentional.</p>
+          </footer>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

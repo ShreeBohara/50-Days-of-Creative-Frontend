@@ -1,0 +1,9 @@
+{
+  "name": "day-58-scrollytelling-coffee",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check js/*.js"
+  }
+}
