@@ -522,12 +522,12 @@ button {
   z-index: 6;
   top: 50%;
   left: 50%;
-  width: min(26rem, 72%);
-  padding: 1.5rem;
+  width: min(17rem, 62%);
+  padding: 1.1rem 1.25rem;
   border: 1px solid var(--rule);
   text-align: center;
-  background: rgba(248, 241, 229, 0.9);
-  box-shadow: var(--shadow);
+  background: rgba(248, 241, 229, 0.93);
+  box-shadow: 0 18px 55px rgba(66, 39, 25, 0.15);
   opacity: 0;
   transform: translate(-50%, -42%);
   transition: opacity 400ms ease, transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -550,7 +550,7 @@ button {
   display: block;
   margin: 0.45rem 0;
   font-family: "Newsreader", serif;
-  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-size: clamp(2.3rem, 4.5vw, 4rem);
   font-weight: 390;
   letter-spacing: -0.055em;
 }
@@ -560,6 +560,18 @@ button {
   color: var(--ink-soft);
   font-family: "Newsreader", serif;
   font-style: italic;
+}
+
+.finale-card::after {
+  position: absolute;
+  right: -0.55rem;
+  bottom: -0.55rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 1px solid var(--signal);
+  border-radius: 50%;
+  background: var(--paper-bright);
+  content: "";
 }
 
 .steps {
@@ -865,7 +877,16 @@ h2 {
   }
 
   .finale-card {
-    display: none;
+    width: min(13rem, 62%);
+    padding: 0.75rem;
+  }
+
+  .finale-card strong {
+    font-size: 2rem;
+  }
+
+  .finale-card p {
+    font-size: 0.72rem;
   }
 }
 

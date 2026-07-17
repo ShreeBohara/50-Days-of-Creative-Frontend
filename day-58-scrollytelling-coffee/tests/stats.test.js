@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { DRINK_TYPES, coffeeData } from "../js/data.js";
 import {
   buildDrinkLegendItems,
+  buildFinaleSummary,
   buildHourSeries,
   buildMonthSeries,
   buildTrendComparison,
@@ -43,6 +44,14 @@ test("trend comparison reports the intentionally rising second half", () => {
   assert.equal(trend.change, trend.secondHalf - trend.firstHalf);
   assert.equal(trend.direction, "up");
   assert.ok(trend.changeRate > 0);
+});
+
+test("finale copy is derived from the same summary as every chart", () => {
+  const finale = buildFinaleSummary(coffeeStats);
+  assert.equal(finale.headline, "1,000 cups");
+  assert.match(finale.detail, /spent/);
+  assert.match(finale.detail, new RegExp(coffeeStats.topDrink, "i"));
+  assert.match(finale.detail, new RegExp(`${coffeeStats.peakHour % 12 || 12}:00`));
 });
 
 test("weekly trend has 52 ordered bins covering all 365 days and cups", () => {

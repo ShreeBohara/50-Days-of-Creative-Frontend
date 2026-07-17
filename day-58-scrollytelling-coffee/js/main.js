@@ -9,7 +9,12 @@ import ParticleEngine from "./particle-engine.js";
 import { DRINK_COLORS, SCENE_IDS, computeScene } from "./scenes.js";
 import SceneOverlayRenderer from "./scene-renderer.js";
 import { createScrollyController } from "./scrolly.js";
-import { buildDrinkLegendItems, buildTrendComparison, coffeeStats } from "./stats.js";
+import {
+  buildDrinkLegendItems,
+  buildFinaleSummary,
+  buildTrendComparison,
+  coffeeStats,
+} from "./stats.js";
 
 const canvas = document.querySelector("#coffee-canvas");
 const canvasWrap = document.querySelector(".canvas-wrap");
@@ -62,6 +67,7 @@ let systemReduced = motionPreference.matches;
 let tooltipLocked = false;
 let selectedGridIndex = 0;
 let resizeFrame = null;
+let finaleTimer = null;
 
 function isMotionReduced() {
   return systemReduced || userPaused;
@@ -105,8 +111,7 @@ function displaySceneMetadata(index) {
   if (chartSummary) chartSummary.textContent = `Chapter ${index + 1} of 8. ${SCENE_DESCRIPTIONS[index]}`;
   canvas.setAttribute("aria-label", SCENE_DESCRIPTIONS[index]);
   canvas.dataset.interactive = String(index === 1);
-  finaleCard?.classList.toggle("is-visible", index === 7);
-  finaleCard?.setAttribute("aria-hidden", String(index !== 7));
+  setFinaleVisibility(index === 7);
   drinkLegend?.classList.toggle("is-visible", index === 2);
   drinkLegend?.setAttribute("aria-hidden", String(index !== 2));
   monthCallout?.classList.toggle("is-visible", index === 3);
@@ -119,6 +124,25 @@ function displaySceneMetadata(index) {
   trendReadout?.setAttribute("aria-hidden", String(!trendVisible));
   updateTrendReadout(index);
   if (index !== 1) hideTooltip();
+}
+
+function setFinaleVisibility(visible) {
+  window.clearTimeout(finaleTimer);
+  finaleTimer = null;
+  if (!finaleCard) return;
+
+  if (!visible) {
+    finaleCard.classList.remove("is-visible");
+    finaleCard.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  const reveal = () => {
+    finaleCard.classList.add("is-visible");
+    finaleCard.setAttribute("aria-hidden", "false");
+  };
+  if (isMotionReduced()) reveal();
+  else finaleTimer = window.setTimeout(reveal, 680);
 }
 
 function targetsWithMetadata(scene) {
@@ -218,10 +242,11 @@ function hydrateNarrativeStats() {
   }).format(coffeeStats.totalSpent));
   setStat("daily-average", coffeeStats.dailyAverage.toFixed(2));
 
+  const finaleCopy = buildFinaleSummary(coffeeStats);
+  const finaleTotal = document.querySelector("[data-finale-total]");
   const finaleSummary = document.querySelector("[data-finale-summary]");
-  if (finaleSummary) {
-    finaleSummary.textContent = `${titleCase(coffeeStats.topDrink)} led the year · ${formatHour(coffeeStats.peakHour)} was the peak.`;
-  }
+  if (finaleTotal) finaleTotal.textContent = finaleCopy.headline;
+  if (finaleSummary) finaleSummary.textContent = finaleCopy.detail;
 
   const clockPeak = document.querySelector("[data-clock-peak]");
   const clockDetail = document.querySelector("[data-clock-detail]");
@@ -349,6 +374,7 @@ hydrateNarrativeStats();
 activateScene(0, { immediate: true, reason: "initial" });
 
 window.addEventListener("pagehide", () => {
+  window.clearTimeout(finaleTimer);
   scrolly.destroy();
   engine.destroy();
   motionPreference.removeEventListener?.("change", handleSystemMotion);

@@ -129,6 +129,24 @@ export function buildTrendComparison(summary) {
   });
 }
 
+export function buildFinaleSummary(summary) {
+  const totalCups = Number(summary?.totalCups) || 0;
+  const totalSpent = Number(summary?.totalSpent) || 0;
+  const topDrink = String(summary?.topDrink || "coffee");
+  const peakHour = Number(summary?.peakHour) || 0;
+  const suffix = peakHour >= 12 ? "PM" : "AM";
+  const displayHour = peakHour % 12 || 12;
+
+  return Object.freeze({
+    headline: `${totalCups.toLocaleString("en-US")} cups`,
+    detail: `${new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(totalSpent)} spent · ${topDrink[0].toUpperCase() + topDrink.slice(1)} ordered most · ${displayHour}:00 ${suffix} peak`,
+  });
+}
+
 function indexOfMaximum(values) {
   let maximumIndex = 0;
   for (let index = 1; index < values.length; index += 1) {
