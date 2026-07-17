@@ -179,6 +179,19 @@ function drawOverlay(context, overlay) {
       context.stroke();
       break;
     case "trend-axis":
+      context.strokeStyle = "rgba(42, 25, 19, 0.1)";
+      context.lineWidth = 1;
+      [0, 0.5, 1].forEach((ratio) => {
+        const y = overlay.baseline - (overlay.baseline - overlay.top) * ratio;
+        context.beginPath();
+        context.moveTo(overlay.labels[0].x, y);
+        context.lineTo(overlay.labels.at(-1).x, y);
+        context.stroke();
+      });
+      drawLabel(context, "CUPS / DAY", overlay.labels[0].x, overlay.top - 11, {
+        align: "left",
+        font: '700 9px "Archivo", sans-serif',
+      });
       overlay.labels.forEach((label) => {
         drawLabel(context, label.text, label.x, label.y + 12, {
           align: "center",

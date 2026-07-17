@@ -194,6 +194,7 @@ test('trend state exposes a 52-point line and area with matching weekly totals',
   const scene = computeScene('trend', records, stats, { width: 900, height: 680 });
   const line = scene.overlays.find((item) => item.type === 'trend-line');
   const area = scene.overlays.find((item) => item.type === 'trend-area');
+  const axis = scene.overlays.find((item) => item.type === 'trend-axis');
   const targetCounts = Array(52).fill(0);
 
   scene.targets.forEach((target) => {
@@ -202,6 +203,8 @@ test('trend state exposes a 52-point line and area with matching weekly totals',
 
   assert.equal(line.points.length, 52);
   assert.equal(area.points.length, 52);
+  assert.ok(axis.maxAverage >= Math.max(...line.points.map(({ average }) => average)));
+  assert.ok(axis.top < axis.baseline);
   assert.equal(line.points.reduce((sum, point, week) => sum + point.average * (week === 51 ? 8 : 7), 0), 1000);
   assert.deepEqual(
     line.points.map((point, week) => point.average * (week === 51 ? 8 : 7)),

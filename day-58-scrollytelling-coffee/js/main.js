@@ -9,7 +9,7 @@ import ParticleEngine from "./particle-engine.js";
 import { DRINK_COLORS, SCENE_IDS, computeScene } from "./scenes.js";
 import SceneOverlayRenderer from "./scene-renderer.js";
 import { createScrollyController } from "./scrolly.js";
-import { buildDrinkLegendItems, coffeeStats } from "./stats.js";
+import { buildDrinkLegendItems, buildTrendComparison, coffeeStats } from "./stats.js";
 
 const canvas = document.querySelector("#coffee-canvas");
 const canvasWrap = document.querySelector(".canvas-wrap");
@@ -21,6 +21,7 @@ const finaleCard = document.querySelector("[data-finale-card]");
 const drinkLegend = document.querySelector("[data-drink-legend]");
 const monthCallout = document.querySelector("[data-month-callout]");
 const clockReadout = document.querySelector("[data-clock-readout]");
+const trendReadout = document.querySelector("[data-trend-readout]");
 const motionToggle = document.querySelector("[data-motion-toggle]");
 const motionLabel = motionToggle?.querySelector("span");
 const steps = [...document.querySelectorAll("[data-step]")];
@@ -112,6 +113,11 @@ function displaySceneMetadata(index) {
   monthCallout?.setAttribute("aria-hidden", String(index !== 3));
   clockReadout?.classList.toggle("is-visible", index === 4);
   clockReadout?.setAttribute("aria-hidden", String(index !== 4));
+  const trendVisible = index === 5 || index === 6;
+  trendReadout?.classList.toggle("is-visible", trendVisible);
+  trendReadout?.classList.toggle("is-outlier", index === 6);
+  trendReadout?.setAttribute("aria-hidden", String(!trendVisible));
+  updateTrendReadout(index);
   if (index !== 1) hideTooltip();
 }
 
@@ -175,6 +181,25 @@ function titleCase(value) {
 function formatHour(hour) {
   const suffix = hour >= 12 ? "PM" : "AM";
   return `${hour % 12 || 12}:00 ${suffix}`;
+}
+
+function updateTrendReadout(index) {
+  if (!trendReadout) return;
+  const eyebrow = trendReadout.querySelector("[data-trend-eyebrow]");
+  const value = trendReadout.querySelector("[data-trend-value]");
+  const detail = trendReadout.querySelector("[data-trend-detail]");
+
+  if (index === 6) {
+    eyebrow.textContent = "The outlier";
+    value.textContent = "7 cups";
+    detail.textContent = "Tuesday, September 16";
+    return;
+  }
+
+  const comparison = buildTrendComparison(coffeeStats);
+  eyebrow.textContent = "Second half vs first";
+  value.textContent = `${comparison.changeRate >= 0 ? "+" : ""}${Math.round(comparison.changeRate * 100)}%`;
+  detail.textContent = `${comparison.firstHalf} cups → ${comparison.secondHalf} cups`;
 }
 
 function hydrateNarrativeStats() {

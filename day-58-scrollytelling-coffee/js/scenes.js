@@ -648,7 +648,9 @@ function layoutTrend(context, { quiet = false } = {}) {
       },
       {
         type: 'trend-axis',
+        top: chartTop,
         baseline,
+        maxAverage,
         labels: [
           { text: 'JAN', x: points[0].x, y: frame.bottom },
           { text: 'APR', x: points[13].x, y: frame.bottom },

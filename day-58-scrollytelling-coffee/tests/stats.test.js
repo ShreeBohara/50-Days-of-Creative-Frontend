@@ -6,6 +6,7 @@ import {
   buildDrinkLegendItems,
   buildHourSeries,
   buildMonthSeries,
+  buildTrendComparison,
   buildWeeklyDailyAverages,
   coffeeStats,
   summarizeDataset,
@@ -34,6 +35,14 @@ test("hour series exposes all 24 densities and the summary peak", () => {
   assert.equal(hours.reduce((total, { count }) => total + count, 0), 1000);
   assert.equal(hours.find(({ density }) => density === 1).hour, coffeeStats.peakHour);
   assert.ok(hours.filter(({ hour }) => hour >= 6 && hour < 12).every(({ density }) => density > 0));
+});
+
+test("trend comparison reports the intentionally rising second half", () => {
+  const trend = buildTrendComparison(coffeeStats);
+  assert.equal(trend.firstHalf + trend.secondHalf, 1000);
+  assert.equal(trend.change, trend.secondHalf - trend.firstHalf);
+  assert.equal(trend.direction, "up");
+  assert.ok(trend.changeRate > 0);
 });
 
 test("weekly trend has 52 ordered bins covering all 365 days and cups", () => {

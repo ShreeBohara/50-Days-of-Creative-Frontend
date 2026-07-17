@@ -116,6 +116,19 @@ export function buildHourSeries(summary) {
   }));
 }
 
+export function buildTrendComparison(summary) {
+  const firstHalf = Number(summary?.firstHalfCups) || 0;
+  const secondHalf = Number(summary?.secondHalfCups) || 0;
+  const change = secondHalf - firstHalf;
+  return Object.freeze({
+    firstHalf,
+    secondHalf,
+    change,
+    changeRate: firstHalf ? change / firstHalf : 0,
+    direction: change > 0 ? "up" : change < 0 ? "down" : "flat",
+  });
+}
+
 function indexOfMaximum(values) {
   let maximumIndex = 0;
   for (let index = 1; index < values.length; index += 1) {
