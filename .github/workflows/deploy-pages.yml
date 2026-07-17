@@ -64,6 +64,7 @@ on:
       - "day-55-split-flap-board/**"
       - "day-56-command-os/**"
       - "day-57-microinteraction-museum/**"
+      - "day-58-scrollytelling-coffee/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -438,6 +439,7 @@ jobs:
           cp -R day-56-command-os/dist/. _site/day-56-command-os/
           mkdir -p _site/day-57-microinteraction-museum
           cp -R day-57-microinteraction-museum/dist/. _site/day-57-microinteraction-museum/
+          cp -R day-58-scrollytelling-coffee _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
