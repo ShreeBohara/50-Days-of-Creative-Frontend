@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { DRINK_TYPES, coffeeData } from "../js/data.js";
 import {
   buildDrinkLegendItems,
+  buildMonthSeries,
   buildWeeklyDailyAverages,
   coffeeStats,
   summarizeDataset,
@@ -15,6 +16,15 @@ test("drink legend items keep the canonical order and reconcile all cups", () =>
   assert.deepEqual(legend.map(({ drink }) => drink), [...DRINK_TYPES]);
   assert.equal(legend.reduce((total, { count }) => total + count, 0), 1000);
   assert.equal(legend.reduce((total, { share }) => total + share, 0), 1);
+});
+
+test("monthly series covers January through December and preserves the vacation-shaped total", () => {
+  const months = buildMonthSeries(coffeeStats);
+  assert.equal(months.length, 12);
+  assert.equal(months[0].month, "January");
+  assert.equal(months[11].month, "December");
+  assert.equal(months.reduce((total, { count }) => total + count, 0), 1000);
+  assert.equal(Math.max(...months.map(({ count }) => count)), coffeeStats.busiestMonthCount);
 });
 
 test("weekly trend has 52 ordered bins covering all 365 days and cups", () => {

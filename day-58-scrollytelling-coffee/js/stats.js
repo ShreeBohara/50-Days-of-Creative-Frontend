@@ -15,7 +15,7 @@ const WEEKDAY_ORDER = Object.freeze([
   "Friday",
   "Saturday",
 ]);
-const MONTH_NAMES = Object.freeze([
+export const MONTH_NAMES = Object.freeze([
   "January",
   "February",
   "March",
@@ -95,6 +95,14 @@ export function buildDrinkLegendItems(summary) {
     drink,
     count: Number(counts[drink]) || 0,
     share: total ? (Number(counts[drink]) || 0) / total : 0,
+  }));
+}
+
+export function buildMonthSeries(summary) {
+  return MONTH_NAMES.map((month, index) => Object.freeze({
+    month,
+    shortMonth: month.slice(0, 3),
+    count: Number(summary?.monthCounts?.[index]) || 0,
   }));
 }
 

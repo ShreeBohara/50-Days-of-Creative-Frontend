@@ -19,6 +19,7 @@ const sceneIndex = document.querySelector("[data-scene-index]");
 const sceneTitle = document.querySelector("[data-scene-title]");
 const finaleCard = document.querySelector("[data-finale-card]");
 const drinkLegend = document.querySelector("[data-drink-legend]");
+const monthCallout = document.querySelector("[data-month-callout]");
 const motionToggle = document.querySelector("[data-motion-toggle]");
 const motionLabel = motionToggle?.querySelector("span");
 const steps = [...document.querySelectorAll("[data-step]")];
@@ -106,6 +107,8 @@ function displaySceneMetadata(index) {
   finaleCard?.setAttribute("aria-hidden", String(index !== 7));
   drinkLegend?.classList.toggle("is-visible", index === 2);
   drinkLegend?.setAttribute("aria-hidden", String(index !== 2));
+  monthCallout?.classList.toggle("is-visible", index === 3);
+  monthCallout?.setAttribute("aria-hidden", String(index !== 3));
   if (index !== 1) hideTooltip();
 }
 
