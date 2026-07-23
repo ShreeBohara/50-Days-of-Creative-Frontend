@@ -4,6 +4,7 @@ import { initStickers } from "./stickers.js";
 import { createOdometer } from "./odometer.js";
 import { initGuestbook } from "./guestbook.js";
 import { initWindows } from "./windows.js";
+import { createMusicToggle } from "./music.js";
 
 const store = createStore();
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -47,6 +48,11 @@ if (guestbookForm && guestbookEntries) {
     statusEl: document.querySelector("[data-guestbook-status]"),
     store,
   });
+}
+
+const musicButton = document.querySelector("[data-music-toggle]");
+if (musicButton) {
+  app.music = createMusicToggle(musicButton);
 }
 
 const taskbarButtons = document.querySelector("[data-taskbar-buttons]");

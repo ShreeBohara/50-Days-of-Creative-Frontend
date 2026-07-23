@@ -325,6 +325,64 @@ body {
   color: var(--lime);
 }
 
+.music-toggle {
+  margin-top: 16px;
+  padding: 7px 16px;
+  font-family: var(--font-comic);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--cyan);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--pink-deep);
+  cursor: pointer;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+
+.music-toggle:hover {
+  background: var(--lime);
+}
+
+.music-toggle:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--pink-deep);
+}
+
+.music-toggle:focus-visible {
+  outline: 3px dashed var(--yellow);
+  outline-offset: 3px;
+}
+
+.music-icon::before {
+  content: "🔇 ";
+}
+
+.music-state::before {
+  content: "OFF";
+}
+
+.music-toggle[aria-pressed="true"] .music-icon::before {
+  content: "🔊 ";
+}
+
+.music-toggle[aria-pressed="true"] .music-state::before {
+  content: "ON";
+}
+
+.music-toggle[aria-pressed="true"] {
+  animation: music-bounce 0.86s ease-in-out infinite;
+}
+
+@keyframes music-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 /* ---------------------------------------------------------------- */
 /* Page layout                                                      */
 /* ---------------------------------------------------------------- */
@@ -1070,6 +1128,10 @@ a:hover {
   }
 
   .construction-stripes {
+    animation: none;
+  }
+
+  .music-toggle[aria-pressed="true"] {
     animation: none;
   }
 }
