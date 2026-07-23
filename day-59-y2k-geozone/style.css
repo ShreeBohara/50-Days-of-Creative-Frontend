@@ -153,6 +153,83 @@ body {
   letter-spacing: 0.02em;
 }
 
+/* Chrome effect: three stacked glyph layers.
+   The element's own text stays transparent and only reserves layout;
+   ::before is the dark extrusion below, ::after is the chrome fill with
+   an animated specular glint clipped to the glyphs. The extrusion must
+   be its own layer — text-shadow on the transparent fill layer would
+   bleed through the glyphs. */
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .chrome-title {
+    position: relative;
+    color: transparent;
+  }
+
+  .chrome-title::before,
+  .chrome-title::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .chrome-title::before {
+    z-index: 1;
+    transform: translateY(0.055em);
+    color: #232c4e;
+    text-shadow:
+      0 0.012em 0 #1a2140,
+      0 0.024em 0 #141a33,
+      0 0.036em 0 #0e1226,
+      0 0.05em 0 #080b1a,
+      0 0.09em 0.06em rgba(0, 0, 0, 0.55),
+      0 0 0.55em rgba(255, 43, 214, 0.55),
+      0 0 1.1em rgba(0, 229, 255, 0.35);
+  }
+
+  .chrome-title::after {
+    z-index: 2;
+    background-image:
+      linear-gradient(
+        105deg,
+        transparent 42%,
+        rgba(255, 255, 255, 0.95) 50%,
+        rgba(190, 246, 255, 0.6) 54%,
+        transparent 62%
+      ),
+      linear-gradient(
+        180deg,
+        #f4fbff 0%,
+        #b9e5ff 26%,
+        #5f9fd6 45%,
+        #ffffff 50%,
+        #f7c4ec 55%,
+        #d24fb8 74%,
+        #7a1668 88%,
+        #fbd8f4 100%
+      );
+    background-size: 250% 100%, 100% 100%;
+    background-repeat: no-repeat;
+    background-position: -150% 0, 0 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: chrome-glint 4.6s ease-in-out infinite;
+  }
+}
+
+@keyframes chrome-glint {
+  0%,
+  55% {
+    background-position: -150% 0, 0 0;
+  }
+  85%,
+  100% {
+    background-position: 250% 0, 0 0;
+  }
+}
+
 .tagline {
   max-width: 560px;
   margin: 14px auto 0;
@@ -286,5 +363,9 @@ a:hover {
 @media (prefers-reduced-motion: reduce) {
   .skip-link {
     transition: none;
+  }
+
+  .chrome-title::after {
+    animation: none;
   }
 }
