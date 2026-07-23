@@ -1,5 +1,6 @@
 import { createStore } from "./storage.js";
 import { createSparkleTrail } from "./sparkles.js";
+import { initStickers } from "./stickers.js";
 
 const store = createStore();
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -12,6 +13,11 @@ const app = {
     return reducedMotionQuery.matches;
   },
 };
+
+const stickerLayer = document.querySelector(".sticker-layer");
+if (stickerLayer) {
+  app.stickers = initStickers({ layer: stickerLayer, store });
+}
 
 const sparkleCanvas = document.querySelector(".sparkle-canvas");
 if (sparkleCanvas && finePointerQuery.matches) {
