@@ -1,0 +1,290 @@
+/* ================================================================
+   DAY 59 — SHREE'S CYBER ZONE (Y2K GeoZone)
+   Chaotic on purpose, composed by discipline.
+
+   Z-INDEX BUDGET
+   0    page background
+   1    content flow
+   10   under-construction ribbon
+   200  stickers
+   500+ popup windows (managed counter in js/windows.js)
+   800  marquees + taskbar
+   900  sparkle canvas overlay
+   1000 skip link
+   ================================================================ */
+
+@font-face {
+  font-family: "Bungee";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/bungee-latin-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Comic Neue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/comic-neue-latin-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Comic Neue";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fonts/comic-neue-latin-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "VT323";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/vt323-latin-400.woff2") format("woff2");
+}
+
+:root {
+  --pink: #ff2bd6;
+  --pink-deep: #b3009a;
+  --cyan: #00e5ff;
+  --cyan-deep: #008fb3;
+  --lime: #aaff00;
+  --yellow: #ffe600;
+  --purple-1: #16042e;
+  --purple-2: #2b0a55;
+  --paper: #fff6fd;
+  --ink: #2a0a33;
+  --lcd-green: #39ff5c;
+  --lcd-bg: #04180a;
+
+  --font-display: "Bungee", "Arial Black", sans-serif;
+  --font-comic: "Comic Neue", "Comic Sans MS", cursive;
+  --font-lcd: "VT323", "Courier New", monospace;
+  --font-body: Verdana, Tahoma, Geneva, sans-serif;
+
+  --box-shadow-hard: 6px 6px 0 rgba(0, 229, 255, 0.75), 12px 12px 0 rgba(255, 43, 214, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-color: var(--pink) var(--purple-1);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink);
+  background-color: var(--purple-1);
+  background-image:
+    radial-gradient(1.5px 1.5px at 22px 34px, #ffffff, transparent),
+    radial-gradient(1px 1px at 120px 90px, #ffd7f7, transparent),
+    radial-gradient(2px 2px at 190px 150px, #b7f6ff, transparent),
+    radial-gradient(1px 1px at 70px 190px, #ffffff, transparent),
+    radial-gradient(1.5px 1.5px at 160px 40px, #f2ffb0, transparent),
+    radial-gradient(1px 1px at 40px 120px, #ffffff, transparent),
+    linear-gradient(180deg, #1d0640 0%, var(--purple-1) 45%, #0d0221 100%);
+  background-size:
+    230px 230px,
+    230px 230px,
+    230px 230px,
+    230px 230px,
+    230px 230px,
+    230px 230px,
+    100% 100%;
+  background-attachment: fixed;
+}
+
+/* ---------------------------------------------------------------- */
+/* Skip link                                                        */
+/* ---------------------------------------------------------------- */
+
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 16px;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: var(--yellow);
+  border: 3px solid var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 160ms ease-out;
+}
+
+.skip-link:focus-visible {
+  top: 12px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Masthead                                                         */
+/* ---------------------------------------------------------------- */
+
+.masthead {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 44px 20px 8px;
+  text-align: center;
+}
+
+.est-line {
+  margin: 0 0 6px;
+  color: var(--cyan);
+  font-family: var(--font-comic);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.7);
+}
+
+.site-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6.4vw, 4.4rem);
+  line-height: 1.05;
+  color: #dff3ff;
+  letter-spacing: 0.02em;
+}
+
+.tagline {
+  max-width: 560px;
+  margin: 14px auto 0;
+  color: #ffd7f7;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.tagline strong {
+  color: var(--lime);
+}
+
+/* ---------------------------------------------------------------- */
+/* Page layout                                                      */
+/* ---------------------------------------------------------------- */
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 26px 20px 60px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 288px;
+  gap: 22px;
+  align-items: start;
+}
+
+.col-main,
+.col-side {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Boxes                                                            */
+/* ---------------------------------------------------------------- */
+
+.box {
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: var(--box-shadow-hard);
+}
+
+.box-title {
+  margin: 0;
+  padding: 8px 14px;
+  font-family: var(--font-comic);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
+  background: linear-gradient(90deg, var(--pink) 0%, var(--pink-deep) 55%, var(--cyan-deep) 100%);
+  border-bottom: 3px solid var(--ink);
+}
+
+.box-body {
+  padding: 14px 16px;
+}
+
+.box-body p {
+  margin: 0 0 10px;
+}
+
+.box-body p:last-child {
+  margin-bottom: 0;
+}
+
+.fine-print {
+  font-size: 0.76rem;
+  color: #6d3f78;
+}
+
+.placeholder-note {
+  font-family: var(--font-comic);
+  color: #8a55a0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Webring + footer                                                 */
+/* ---------------------------------------------------------------- */
+
+.webring {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+}
+
+a {
+  color: var(--pink-deep);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--cyan-deep);
+  background: var(--yellow);
+}
+
+.page-foot {
+  padding: 18px 20px 64px;
+  text-align: center;
+  color: #b79ad4;
+  font-size: 0.78rem;
+}
+
+.page-foot a {
+  color: var(--cyan);
+}
+
+.page-foot a:hover {
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------- */
+/* Responsive (fuller pass in the responsive commit)                */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Reduced motion — every animation opt-out lives here              */
+/* ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
