@@ -79,18 +79,31 @@ if (stickerLayer) {
   app.stickers = initStickers({ layer: stickerLayer, store });
 }
 
+function motionAllowed() {
+  return !app.reducedMotion && !document.documentElement.classList.contains("motion-paused");
+}
+
 const sparkleCanvas = document.querySelector(".sparkle-canvas");
 if (sparkleCanvas && finePointerQuery.matches) {
   app.sparkles = createSparkleTrail(sparkleCanvas);
-  app.sparkles.setEnabled(!app.reducedMotion);
+  app.sparkles.setEnabled(motionAllowed());
   window.addEventListener("pointermove", (event) => {
     app.sparkles.handleMove(event.clientX, event.clientY);
   });
 }
 
 reducedMotionQuery.addEventListener("change", () => {
-  app.sparkles?.setEnabled(!app.reducedMotion);
+  app.sparkles?.setEnabled(motionAllowed());
 });
+
+const motionToggle = document.querySelector("[data-motion-toggle]");
+if (motionToggle) {
+  motionToggle.addEventListener("click", () => {
+    const paused = document.documentElement.classList.toggle("motion-paused");
+    motionToggle.setAttribute("aria-pressed", String(paused));
+    app.sparkles?.setEnabled(motionAllowed());
+  });
+}
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {

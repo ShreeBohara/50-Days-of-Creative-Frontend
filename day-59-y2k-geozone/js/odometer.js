@@ -38,8 +38,11 @@ export function createOdometer(root, { width = 6 } = {}) {
   for (let i = 0; i < width; i += 1) addColumn();
 
   function setValue(value, { animate = true } = {}) {
-    const digits = digitsFor(value, width);
+    // Pad to however many columns already exist — columns never shrink,
+    // and a left-aligned shorter digit list would misread by ×10.
+    let digits = digitsFor(value, Math.max(width, columns.length));
     while (columns.length < digits.length) addColumn(true);
+    digits = digitsFor(value, columns.length);
     root.classList.toggle("no-roll", !animate);
     for (let i = 0; i < columns.length; i += 1) {
       const strip = columns[i].firstChild;

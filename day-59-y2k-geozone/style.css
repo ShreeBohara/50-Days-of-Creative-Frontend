@@ -84,6 +84,16 @@ body {
   line-height: 1.65;
   color: var(--ink);
   background-color: var(--purple-1);
+}
+
+/* Starfield lives on its own fixed backdrop instead of a
+   background-attachment: fixed body — that keeps it a static
+   composited layer that never repaints during scroll. */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(1.5px 1.5px at 22px 34px, #ffffff, transparent),
     radial-gradient(1px 1px at 120px 90px, #ffd7f7, transparent),
@@ -100,7 +110,6 @@ body {
     230px 230px,
     230px 230px,
     100% 100%;
-  background-attachment: fixed;
 }
 
 /* ---------------------------------------------------------------- */
@@ -516,7 +525,8 @@ body {
   margin: 8px 0 0;
   font-family: var(--font-comic);
   font-weight: 700;
-  color: var(--cyan-deep);
+  /* darker than --cyan-deep: the form's only feedback needs AA contrast */
+  color: #005f77;
 }
 
 .gb-table-scroll {
@@ -1234,6 +1244,25 @@ a:hover {
   .gb-date {
     display: none;
   }
+}
+
+/* ---------------------------------------------------------------- */
+/* Motion pause (taskbar toggle) — WCAG 2.2.2 mechanism for the     */
+/* marquees and every other looping animation                       */
+/* ---------------------------------------------------------------- */
+
+.taskbar-motion {
+  flex-shrink: 0;
+}
+
+.motion-paused .marquee-track,
+.motion-paused .construction-stripes,
+.motion-paused .sticker::after,
+.motion-paused .chrome-title::after,
+.motion-paused .online-dot,
+.motion-paused .online-live,
+.motion-paused .music-toggle[aria-pressed="true"] {
+  animation-play-state: paused;
 }
 
 /* ---------------------------------------------------------------- */

@@ -37,12 +37,21 @@ export function initWindows({ windows, taskbarButtons, reducedMotion = () => fal
     );
   }
 
+  function rescueFocus(item, fallback) {
+    // Hiding the element that holds focus dumps keyboard users on body;
+    // hand focus to the control that brings the window back.
+    if (item.win.contains(document.activeElement)) {
+      fallback?.focus();
+    }
+  }
+
   function minimize(id) {
     const item = registry.get(id);
     if (!item || item.state !== "open") return;
     item.state = "minimized";
     item.win.classList.add("is-minimized");
     item.button.setAttribute("aria-pressed", "false");
+    rescueFocus(item, item.button);
     hideWhenSettled(item.win);
   }
 
@@ -54,6 +63,7 @@ export function initWindows({ windows, taskbarButtons, reducedMotion = () => fal
     item.win.classList.add("is-closed");
     item.button.setAttribute("aria-pressed", "false");
     item.button.disabled = true;
+    rescueFocus(item, document.querySelector(`[data-win-open="${id}"]`));
     hideWhenSettled(item.win);
   }
 

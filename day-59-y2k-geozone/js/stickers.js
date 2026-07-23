@@ -36,11 +36,12 @@ export function initStickers({ layer, store }) {
   }
 
   function rememberPosition(el, id) {
-    const layerRect = layer.getBoundingClientRect();
-    const rect = el.getBoundingClientRect();
+    // offsetLeft/Top are the untransformed layout box — reading the
+    // bounding rect here would bake the hover/drag scale and tilt into
+    // the saved position and drift the sticker on every reload.
     positions[id] = {
-      xPct: ((rect.left - layerRect.left) / layerRect.width) * 100,
-      yPct: ((rect.top - layerRect.top) / layerRect.height) * 100,
+      xPct: (el.offsetLeft / layer.clientWidth) * 100,
+      yPct: (el.offsetTop / layer.clientHeight) * 100,
     };
     save();
   }
@@ -54,6 +55,8 @@ export function initStickers({ layer, store }) {
     const id = el.dataset.stickerId;
     applyStored(el, id);
 
+    let lastEndWasDrag = false;
+
     createDraggable(el, {
       getBounds: () => {
         const rect = layer.getBoundingClientRect();
@@ -62,6 +65,7 @@ export function initStickers({ layer, store }) {
       // The sticker is itself a button — only ignore other controls.
       ignoreSelector: "a, input, textarea, select",
       onEnd: ({ moved }) => {
+        lastEndWasDrag = moved;
         if (moved) rememberPosition(el, id);
       },
     });
@@ -73,10 +77,41 @@ export function initStickers({ layer, store }) {
       if (event.detail === 0) spin(el);
     });
 
+    // Arrow keys move a focused sticker (the drag affordance's keyboard path).
+    el.addEventListener("keydown", (event) => {
+      const deltas = {
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0],
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1],
+      };
+      const direction = deltas[event.key];
+      if (!direction) return;
+      event.preventDefault();
+      const step = event.shiftKey ? 2 : 14;
+      const next = clampPosition(
+        el.offsetLeft + direction[0] * step,
+        el.offsetTop + direction[1] * step,
+        el.offsetWidth,
+        el.offsetHeight,
+        layer.clientWidth,
+        layer.clientHeight,
+      );
+      el.style.left = `${next.x}px`;
+      el.style.top = `${next.y}px`;
+      rememberPosition(el, id);
+    });
+
     // dblclick is unreliable on touch — detect a manual double tap.
+    // Drag releases land here too (setPointerCapture retargets the
+    // pointerup), so a real drag must not count as a tap.
     let lastTap = 0;
     el.addEventListener("pointerup", (event) => {
       if (event.pointerType !== "touch") return;
+      if (lastEndWasDrag) {
+        lastTap = 0;
+        return;
+      }
       const now = performance.now();
       if (now - lastTap < DOUBLE_TAP_MS) spin(el);
       lastTap = now;

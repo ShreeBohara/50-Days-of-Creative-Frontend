@@ -12,6 +12,7 @@ export function createMusicToggle(button) {
   let ctx = null;
   let master = null;
   let timer = 0;
+  let suspendTimer = 0;
   let stepIndex = 0;
   let nextNoteTime = 0;
   let playing = false;
@@ -54,28 +55,37 @@ export function createMusicToggle(button) {
   }
 
   async function start() {
+    if (playing) return;
+    // Flip state before the await so a mid-resume second click reads
+    // "playing" and routes to stop() instead of double-starting.
+    playing = true;
+    button.setAttribute("aria-pressed", "true");
+    clearTimeout(suspendTimer);
     ensureContext();
     // iOS hands us a suspended context; resume must happen in the gesture.
     if (ctx.state === "suspended") await ctx.resume();
+    if (!playing) return; // stopped while resume() was pending
+    clearInterval(timer);
     master.gain.cancelScheduledValues(ctx.currentTime);
     master.gain.setValueAtTime(MASTER_LEVEL, ctx.currentTime);
     stepIndex = 0;
     nextNoteTime = ctx.currentTime + 0.06;
     schedule();
     timer = setInterval(schedule, LOOKAHEAD_MS);
-    playing = true;
-    button.setAttribute("aria-pressed", "true");
   }
 
   function stop() {
+    playing = false;
+    button.setAttribute("aria-pressed", "false");
     clearInterval(timer);
     if (ctx) {
       master.gain.cancelScheduledValues(ctx.currentTime);
       master.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
-      setTimeout(() => ctx?.suspend(), 150);
+      clearTimeout(suspendTimer);
+      suspendTimer = setTimeout(() => {
+        if (!playing) ctx?.suspend();
+      }, 150);
     }
-    playing = false;
-    button.setAttribute("aria-pressed", "false");
   }
 
   button.addEventListener("click", () => {
@@ -93,6 +103,7 @@ export function createMusicToggle(button) {
       ctx.suspend();
     } else {
       ctx.resume();
+      clearInterval(timer);
       nextNoteTime = ctx.currentTime + 0.06;
       timer = setInterval(schedule, LOOKAHEAD_MS);
     }
