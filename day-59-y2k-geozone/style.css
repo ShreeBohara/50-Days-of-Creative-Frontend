@@ -576,6 +576,265 @@ a:hover {
 }
 
 /* ---------------------------------------------------------------- */
+/* Popup windows (Win-98-ish chrome, Y2K palette)                   */
+/* ---------------------------------------------------------------- */
+
+.win {
+  position: fixed;
+  z-index: 500;
+  width: min(340px, 88vw);
+  background: #ece9f7;
+  border: 2px solid;
+  border-color: #ffffff #4a3a5a #4a3a5a #ffffff;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45);
+  transition: transform 200ms ease-in, opacity 200ms ease-in;
+  transform-origin: 20% 120%;
+}
+
+.win[hidden] {
+  display: none;
+}
+
+.win.is-minimized,
+.win.is-closed {
+  transform: scale(0.06) translateY(320px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.win:focus-visible {
+  outline: 3px dashed var(--cyan);
+  outline-offset: 3px;
+}
+
+.win-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  background: linear-gradient(90deg, #2b1a8f 0%, #7a1668 60%, var(--pink) 100%);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.win.is-dragging .win-titlebar {
+  cursor: grabbing;
+}
+
+.win-titlebar-icon {
+  font-size: 0.85rem;
+}
+
+.win-title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-comic);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.win-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.win-btn {
+  width: 22px;
+  height: 20px;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  background: #d8d2e8;
+  border: 2px solid;
+  border-color: #ffffff #4a3a5a #4a3a5a #ffffff;
+  cursor: pointer;
+}
+
+.win-btn:active {
+  border-color: #4a3a5a #ffffff #ffffff #4a3a5a;
+}
+
+.win-btn-close:hover {
+  background: #ff1744;
+  color: #ffffff;
+}
+
+.win-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+}
+
+.win-body {
+  padding: 12px 14px;
+  font-size: 0.8rem;
+}
+
+.win-body p {
+  margin: 0 0 8px;
+}
+
+.win-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* The classic "my first tiled background" bio */
+.win-body-tiled {
+  background-color: #fff9e8;
+  background-image:
+    radial-gradient(circle at 12px 12px, rgba(255, 43, 214, 0.16) 4px, transparent 5px),
+    radial-gradient(circle at 36px 36px, rgba(0, 229, 255, 0.16) 4px, transparent 5px);
+  background-size: 48px 48px;
+}
+
+.win-links {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.win-links li {
+  margin-bottom: 4px;
+}
+
+.win-links-intro {
+  font-family: var(--font-comic);
+  font-weight: 700;
+}
+
+.win-links-note {
+  font-size: 0.72rem;
+  color: #6d3f78;
+}
+
+.dead-link {
+  color: #6a3fa8;
+  text-decoration: underline;
+  cursor: not-allowed;
+}
+
+.dead-link:hover {
+  text-decoration: line-through;
+}
+
+/* ---------------------------------------------------------------- */
+/* Taskbar                                                          */
+/* ---------------------------------------------------------------- */
+
+.taskbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #e6e0f2 0%, #c9c0dd 100%);
+  border-top: 2px solid #ffffff;
+  box-shadow: 0 -2px 0 #4a3a5a;
+}
+
+.taskbar-start {
+  padding: 4px 10px;
+  font-family: var(--font-comic);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: #d8d2e8;
+  border: 2px solid;
+  border-color: #ffffff #4a3a5a #4a3a5a #ffffff;
+}
+
+.taskbar-buttons {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.taskbar-button {
+  max-width: 180px;
+  padding: 4px 12px;
+  font-family: var(--font-comic);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #d8d2e8;
+  border: 2px solid;
+  border-color: #ffffff #4a3a5a #4a3a5a #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taskbar-button[aria-pressed="true"] {
+  background: #f6f2ff;
+  border-color: #4a3a5a #ffffff #ffffff #4a3a5a;
+}
+
+.taskbar-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.taskbar-button:focus-visible,
+.desktop-icon:focus-visible {
+  outline: 3px solid var(--cyan-deep);
+  outline-offset: 1px;
+}
+
+.taskbar-clock {
+  padding: 4px 10px;
+  font-family: var(--font-lcd);
+  font-size: 1rem;
+  color: var(--ink);
+  border: 2px solid;
+  border-color: #4a3a5a #ffffff #ffffff #4a3a5a;
+}
+
+/* ---------------------------------------------------------------- */
+/* Desktop icons (reopen closed windows)                            */
+/* ---------------------------------------------------------------- */
+
+.desktop-icons {
+  display: flex;
+  gap: 10px;
+}
+
+.desktop-icon {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  flex: 1;
+  padding: 10px 6px;
+  font-family: var(--font-comic);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #f6f2ff;
+  border: 2px dashed transparent;
+  cursor: pointer;
+}
+
+.desktop-icon:hover {
+  border-color: var(--cyan-deep);
+  background: #e8fbff;
+}
+
+.desktop-icon-art {
+  font-size: 1.6rem;
+}
+
+/* ---------------------------------------------------------------- */
 /* Sticker board                                                    */
 /* ---------------------------------------------------------------- */
 
@@ -715,6 +974,10 @@ a:hover {
   }
 
   .digit-strip {
+    transition: none;
+  }
+
+  .win {
     transition: none;
   }
 }

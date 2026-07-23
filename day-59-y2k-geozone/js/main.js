@@ -3,6 +3,7 @@ import { createSparkleTrail } from "./sparkles.js";
 import { initStickers } from "./stickers.js";
 import { createOdometer } from "./odometer.js";
 import { initGuestbook } from "./guestbook.js";
+import { initWindows } from "./windows.js";
 
 const store = createStore();
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,6 +47,19 @@ if (guestbookForm && guestbookEntries) {
     statusEl: document.querySelector("[data-guestbook-status]"),
     store,
   });
+}
+
+const taskbarButtons = document.querySelector("[data-taskbar-buttons]");
+const winElements = [...document.querySelectorAll(".win")];
+if (taskbarButtons && winElements.length) {
+  app.windows = initWindows({
+    windows: winElements,
+    taskbarButtons,
+    reducedMotion: () => app.reducedMotion,
+  });
+  for (const opener of document.querySelectorAll("[data-win-open]")) {
+    opener.addEventListener("click", () => app.windows.open(opener.dataset.winOpen));
+  }
 }
 
 const stickerLayer = document.querySelector(".sticker-layer");
