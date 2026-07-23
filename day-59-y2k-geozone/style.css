@@ -1078,6 +1078,7 @@ a:hover {
   position: absolute;
   inset: 0;
   z-index: 200;
+  overflow: clip;
   pointer-events: none;
 }
 
@@ -1174,12 +1175,64 @@ a:hover {
 }
 
 /* ---------------------------------------------------------------- */
-/* Responsive (fuller pass in the responsive commit)                */
+/* Responsive                                                       */
 /* ---------------------------------------------------------------- */
 
 @media (max-width: 720px) {
   .page {
     grid-template-columns: minmax(0, 1fr);
+    padding-inline: 14px;
+    gap: 18px;
+  }
+
+  .masthead {
+    padding-top: 30px;
+  }
+
+  .construction {
+    max-width: none;
+    margin-inline: 14px;
+  }
+
+  /* Popup windows become in-flow sidebar cards — no fixed positioning
+     to fight the mobile visual viewport. drag.js sees position:static
+     and refuses to drag them. */
+  .win {
+    position: static;
+    width: auto;
+    z-index: auto;
+  }
+
+  .win-titlebar {
+    cursor: default;
+  }
+
+  /* Stickers shrink but stay draggable (pointer events + touch-action). */
+  .sticker {
+    width: calc(var(--size, 72px) * 0.62);
+    height: calc(var(--size, 72px) * 0.62);
+  }
+
+  .marquee-chunk {
+    font-size: 0.72rem;
+  }
+
+  .taskbar {
+    height: 40px;
+    gap: 6px;
+  }
+
+  .taskbar-clock {
+    display: none;
+  }
+
+  .taskbar-button {
+    max-width: 130px;
+    padding-inline: 8px;
+  }
+
+  .gb-date {
+    display: none;
   }
 }
 
