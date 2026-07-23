@@ -1,6 +1,7 @@
 import { createStore } from "./storage.js";
 import { createSparkleTrail } from "./sparkles.js";
 import { initStickers } from "./stickers.js";
+import { createOdometer } from "./odometer.js";
 
 const store = createStore();
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -13,6 +14,27 @@ const app = {
     return reducedMotionQuery.matches;
   },
 };
+
+const HIT_SEED = 4207;
+
+const counterRoot = document.querySelector("[data-hit-counter]");
+if (counterRoot) {
+  const previous = store.getJSON("hits", HIT_SEED);
+  const next = previous + 1;
+  store.setJSON("hits", next);
+  const odometer = createOdometer(counterRoot, { width: 6 });
+  const label = document.querySelector("[data-hit-counter-label]");
+  if (label) label.textContent = `You are visitor number ${next}`;
+  if (app.reducedMotion) {
+    odometer.setValue(next, { animate: false });
+  } else {
+    odometer.setValue(previous, { animate: false });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => odometer.setValue(next));
+    });
+  }
+  app.odometer = odometer;
+}
 
 const stickerLayer = document.querySelector(".sticker-layer");
 if (stickerLayer) {

@@ -311,6 +311,86 @@ body {
 }
 
 /* ---------------------------------------------------------------- */
+/* Hit counter (green LCD odometer)                                 */
+/* ---------------------------------------------------------------- */
+
+.counter-body {
+  text-align: center;
+}
+
+.lcd {
+  position: relative;
+  display: inline-flex;
+  gap: 3px;
+  margin: 2px 0 8px;
+  padding: 8px 12px 6px;
+  font-family: var(--font-lcd);
+  font-size: 2.3rem;
+  color: var(--lcd-green);
+  background: var(--lcd-bg);
+  border: 3px solid #0c2f16;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(57, 255, 92, 0.3);
+}
+
+/* CRT scanlines over the digits */
+.lcd::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 2px,
+    rgba(0, 0, 0, 0.28) 2px 4px
+  );
+  pointer-events: none;
+}
+
+.digit-window {
+  display: block;
+  width: 1ch;
+  height: 1em;
+  overflow: hidden;
+}
+
+.digit-strip {
+  display: block;
+  transition: transform 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lcd.no-roll .digit-strip {
+  transition: none;
+}
+
+.digit-cell {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 0 7px rgba(57, 255, 92, 0.85);
+}
+
+.counter-note {
+  font-size: 0.72rem;
+  color: #6d3f78;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------------- */
 /* Webring + footer                                                 */
 /* ---------------------------------------------------------------- */
 
@@ -484,5 +564,9 @@ a:hover {
 
   .sticker.is-spinning {
     animation: none;
+  }
+
+  .digit-strip {
+    transition: none;
   }
 }
