@@ -311,6 +311,154 @@ body {
 }
 
 /* ---------------------------------------------------------------- */
+/* Guestbook                                                        */
+/* ---------------------------------------------------------------- */
+
+.gb-fields {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.gb-label {
+  display: grid;
+  gap: 4px;
+  font-family: var(--font-comic);
+  font-weight: 700;
+  color: var(--pink-deep);
+}
+
+.gb-input {
+  padding: 8px 10px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.gb-input:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 1px;
+}
+
+.gb-submit {
+  padding: 8px 18px;
+  font-family: var(--font-comic);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--lime);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  cursor: pointer;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+
+.gb-submit:hover {
+  background: var(--yellow);
+}
+
+.gb-submit:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.gb-submit:focus-visible {
+  outline: 3px dashed var(--pink);
+  outline-offset: 3px;
+}
+
+.gb-status {
+  min-height: 1.2em;
+  margin: 8px 0 0;
+  font-family: var(--font-comic);
+  font-weight: 700;
+  color: var(--cyan-deep);
+}
+
+.gb-table-scroll {
+  margin-top: 12px;
+  max-height: 340px;
+  overflow-y: auto;
+  border: 2px solid var(--ink);
+}
+
+.gb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.gb-row td {
+  padding: 8px 10px;
+  border-bottom: 2px dotted rgba(42, 10, 51, 0.35);
+  vertical-align: top;
+}
+
+.gb-icon {
+  width: 1.4em;
+  font-size: 1.05rem;
+}
+
+.gb-name {
+  font-family: var(--font-comic);
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gb-message {
+  overflow-wrap: anywhere;
+}
+
+.gb-date {
+  white-space: nowrap;
+  font-size: 0.72rem;
+  color: #6d3f78;
+}
+
+.gb-actions {
+  width: 2em;
+  text-align: right;
+}
+
+.gb-delete {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background: #ff1744;
+  border: 2px solid var(--ink);
+  cursor: pointer;
+}
+
+.gb-delete:hover {
+  background: var(--ink);
+}
+
+.gb-delete:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.gb-color-0 { background: #ffe1f2; }
+.gb-color-1 { background: #e1f6ff; }
+.gb-color-2 { background: #eaffd6; }
+.gb-color-3 { background: #fff3cd; }
+.gb-color-4 { background: #f0e1ff; }
+.gb-color-5 { background: #ffe8d6; }
+.gb-color-6 { background: #dcfff4; }
+.gb-color-7 { background: #ffdede; }
+
+/* ---------------------------------------------------------------- */
 /* Hit counter (green LCD odometer)                                 */
 /* ---------------------------------------------------------------- */
 

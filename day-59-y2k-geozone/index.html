@@ -43,8 +43,27 @@
 
         <section class="box box-guestbook" id="guestbook" aria-labelledby="guestbook-title">
           <h2 class="box-title" id="guestbook-title">✍ My Guestbook</h2>
-          <div class="box-body">
-            <p class="placeholder-note">Guestbook is warming up…</p>
+          <div class="box-body guestbook-body">
+            <form class="gb-form" data-guestbook-form>
+              <div class="gb-fields">
+                <label class="gb-label">
+                  your name
+                  <input class="gb-input" name="name" maxlength="40" autocomplete="off" placeholder="xX_c00lkid_Xx" />
+                </label>
+                <label class="gb-label">
+                  your message
+                  <textarea class="gb-input" name="message" maxlength="280" rows="3" required placeholder="say something nice!! or at least something"></textarea>
+                </label>
+              </div>
+              <button type="submit" class="gb-submit">✒ SIGN IT!</button>
+              <p class="gb-status" data-guestbook-status aria-live="polite"></p>
+            </form>
+            <div class="gb-table-scroll">
+              <table class="gb-table">
+                <caption class="visually-hidden">Guestbook entries</caption>
+                <tbody data-guestbook-entries></tbody>
+              </table>
+            </div>
           </div>
         </section>
       </section>

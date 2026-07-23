@@ -2,6 +2,7 @@ import { createStore } from "./storage.js";
 import { createSparkleTrail } from "./sparkles.js";
 import { initStickers } from "./stickers.js";
 import { createOdometer } from "./odometer.js";
+import { initGuestbook } from "./guestbook.js";
 
 const store = createStore();
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -34,6 +35,17 @@ if (counterRoot) {
     });
   }
   app.odometer = odometer;
+}
+
+const guestbookForm = document.querySelector("[data-guestbook-form]");
+const guestbookEntries = document.querySelector("[data-guestbook-entries]");
+if (guestbookForm && guestbookEntries) {
+  app.guestbook = initGuestbook({
+    form: guestbookForm,
+    tbody: guestbookEntries,
+    statusEl: document.querySelector("[data-guestbook-status]"),
+    store,
+  });
 }
 
 const stickerLayer = document.querySelector(".sticker-layer");
