@@ -104,6 +104,89 @@ body {
 }
 
 /* ---------------------------------------------------------------- */
+/* Marquees + under-construction ribbon                             */
+/* ---------------------------------------------------------------- */
+
+.marquee {
+  overflow: hidden;
+  background: #0d0221;
+  border-top: 2px solid var(--pink);
+  border-bottom: 2px solid var(--pink);
+}
+
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee-scroll 26s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track-reverse {
+  animation-direction: reverse;
+}
+
+.marquee-chunk {
+  padding: 6px 0;
+  font-family: var(--font-comic);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--lime);
+  text-shadow: 0 0 8px rgba(170, 255, 0, 0.5);
+}
+
+.marquee-bottom {
+  position: fixed;
+  inset: auto 0 42px 0;
+  z-index: 800;
+}
+
+.marquee-bottom .marquee-chunk {
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.construction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 560px;
+  margin: 0 auto 18px;
+}
+
+.construction-stripes {
+  flex: 1;
+  height: 14px;
+  border: 2px solid #111111;
+  background: repeating-linear-gradient(45deg, #ffe600 0 12px, #111111 12px 24px);
+  animation: stripes-march 1.1s linear infinite;
+}
+
+/* one 45° stripe period along x = 24px × √2 ≈ 33.94px */
+@keyframes stripes-march {
+  to {
+    background-position: 33.9412px 0;
+  }
+}
+
+.construction-text {
+  padding: 3px 10px;
+  font-family: var(--font-comic);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #111111;
+  background: var(--yellow);
+  border: 2px solid #111111;
+  transform: rotate(-1.2deg);
+}
+
+/* ---------------------------------------------------------------- */
 /* Skip link                                                        */
 /* ---------------------------------------------------------------- */
 
@@ -561,7 +644,7 @@ a:hover {
 }
 
 .page-foot {
-  padding: 18px 20px 64px;
+  padding: 18px 20px 96px;
   text-align: center;
   color: #b79ad4;
   font-size: 0.78rem;
@@ -979,5 +1062,14 @@ a:hover {
 
   .win {
     transition: none;
+  }
+
+  .marquee-track {
+    animation: none;
+    transform: none;
+  }
+
+  .construction-stripes {
+    animation: none;
   }
 }
