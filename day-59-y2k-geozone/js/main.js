@@ -5,6 +5,7 @@ import { createOdometer } from "./odometer.js";
 import { initGuestbook } from "./guestbook.js";
 import { initWindows } from "./windows.js";
 import { createMusicToggle } from "./music.js";
+import { initVisitorMap } from "./visitorMap.js";
 
 const store = createStore();
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -50,6 +51,11 @@ if (guestbookForm && guestbookEntries) {
   });
 }
 
+const onlineCount = document.querySelector("[data-online-count]");
+if (onlineCount) {
+  app.visitorMap = initVisitorMap({ countEl: onlineCount });
+}
+
 const musicButton = document.querySelector("[data-music-toggle]");
 if (musicButton) {
   app.music = createMusicToggle(musicButton);
@@ -87,7 +93,12 @@ reducedMotionQuery.addEventListener("change", () => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) app.sparkles?.suspend();
+  if (document.hidden) {
+    app.sparkles?.suspend();
+    app.visitorMap?.suspend();
+  } else {
+    app.visitorMap?.resume();
+  }
 });
 
 // Debug handle for headless QA (rAF is throttled in hidden tabs).
