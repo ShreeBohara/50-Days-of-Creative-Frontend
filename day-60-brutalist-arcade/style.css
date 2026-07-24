@@ -716,6 +716,18 @@ button {
   background: var(--pink);
 }
 
+.reflex-pad[data-state="done"] {
+  background: var(--volt);
+}
+
+.reflex-avg {
+  font-size: clamp(13px, 2vw, 18px);
+  background: var(--ink);
+  color: var(--volt);
+  padding: 10px 14px;
+  justify-self: center;
+}
+
 .reflex-stamp {
   display: none;
   position: absolute;

@@ -1,7 +1,13 @@
 // GAME 02 — REFLEX DUEL. Red means wait. Green means click. We time you.
 
 import { el, hudStat } from "./dom.js";
-import { MIN_DELAY_MS, ROUNDS, randomDelay } from "./reflexLogic.js";
+import {
+  MIN_DELAY_MS,
+  ROUNDS,
+  average,
+  randomDelay,
+  rankFor,
+} from "./reflexLogic.js";
 
 const PAD_COPY = {
   idle: { title: "ARM", sub: "CLICK TO ARM. GREEN MEANS GO." },
@@ -34,9 +40,11 @@ export function initReflex() {
   pad.dataset.state = "idle";
   const padTitle = el("span", "reflex-title", PAD_COPY.idle.title);
   const padSub = el("span", "reflex-sub arcade", PAD_COPY.idle.sub);
+  const padAvg = el("span", "reflex-avg arcade", "");
+  padAvg.hidden = true;
   const stamp = el("span", "reflex-stamp arcade", "TOO EAGER");
   stamp.setAttribute("aria-hidden", "true");
-  pad.append(padTitle, padSub, stamp);
+  pad.append(padTitle, padAvg, padSub, stamp);
   pad.setAttribute("aria-live", "polite");
 
   // --- recorded times row -----------------------------------------------------
@@ -93,13 +101,28 @@ export function initReflex() {
       }),
     );
     if (state.round >= ROUNDS) {
-      // best-of-5 wrap-up lands in the next commit; loop for now
-      resetRun();
+      finish();
     } else {
       roundStat.set(`${state.round + 1}/${ROUNDS}`);
       setPad("idle");
       padSub.textContent = `CLICK TO ARM ROUND ${state.round + 1}/${ROUNDS}`;
     }
+  }
+
+  function finish() {
+    const avg = average(state.times);
+    const rank = rankFor(avg);
+    setPad("done");
+    padTitle.textContent = rank.name;
+    padAvg.textContent = `AVG ${avg}MS OVER ${ROUNDS}`;
+    padAvg.hidden = false;
+    padSub.textContent = `${rank.tag} — CLICK TO RUN IT BACK`;
+    roundStat.set("DONE");
+    document.dispatchEvent(
+      new CustomEvent("voltage:gameover", {
+        detail: { game: "reflex", value: avg },
+      }),
+    );
   }
 
   function resetRun() {
@@ -111,6 +134,7 @@ export function initReflex() {
       slot.classList.remove("is-filled");
     });
     roundStat.set(`1/${ROUNDS}`);
+    padAvg.hidden = true;
     setPad("idle");
   }
 
@@ -126,6 +150,9 @@ export function initReflex() {
       case "go":
         record();
         break;
+      case "done":
+        resetRun();
+        break;
       default:
         break;
     }
@@ -138,6 +165,18 @@ export function initReflex() {
     forceGo() {
       clearTimeout(state.armTimer);
       go();
+    },
+    completeWith(times) {
+      resetRun();
+      state.times = [...times];
+      state.round = times.length;
+      times.forEach((ms, i) => {
+        if (slots[i]) {
+          slots[i].textContent = `${ms}MS`;
+          slots[i].classList.add("is-filled");
+        }
+      });
+      finish();
     },
     resetRun,
     minDelay: MIN_DELAY_MS,
