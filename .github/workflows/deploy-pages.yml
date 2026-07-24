@@ -66,6 +66,7 @@ on:
       - "day-57-microinteraction-museum/**"
       - "day-58-scrollytelling-coffee/**"
       - "day-59-y2k-geozone/**"
+      - "day-60-brutalist-arcade/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -442,6 +443,7 @@ jobs:
           cp -R day-57-microinteraction-museum/dist/. _site/day-57-microinteraction-museum/
           cp -R day-58-scrollytelling-coffee _site/
           cp -R day-59-y2k-geozone _site/
+          cp -R day-60-brutalist-arcade _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
