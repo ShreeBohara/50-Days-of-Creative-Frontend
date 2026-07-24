@@ -669,6 +669,99 @@ button {
   padding: 8px 12px;
 }
 
+/* ---------- reflex duel ---------- */
+.reflex-pad {
+  position: relative;
+  width: 100%;
+  min-height: clamp(280px, 44vw, 420px);
+  display: grid;
+  place-content: center;
+  gap: 18px;
+  text-align: center;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--shadow-big);
+  overflow: hidden;
+  transition: background-color 60ms steps(2, end);
+}
+
+.reflex-pad:active {
+  transform: translate(4px, 4px);
+  box-shadow: 6px 6px 0 0 var(--ink);
+}
+
+.reflex-title {
+  font-family: var(--font-display);
+  font-size: clamp(52px, 9vw, 120px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.reflex-sub {
+  font-size: clamp(10px, 1.4vw, 13px);
+}
+
+.reflex-pad[data-state="wait"] {
+  background: var(--red);
+  color: var(--white);
+}
+
+.reflex-pad[data-state="go"] {
+  background: var(--green);
+  color: var(--ink);
+  cursor: crosshair;
+}
+
+.reflex-pad[data-state="early"] {
+  background: var(--pink);
+}
+
+.reflex-stamp {
+  display: none;
+  position: absolute;
+  top: 14%;
+  right: 8%;
+  rotate: -12deg;
+  font-size: clamp(14px, 2.6vw, 26px);
+  color: var(--red);
+  background: var(--white);
+  border: 5px solid var(--red);
+  padding: 12px 18px;
+}
+
+.reflex-pad[data-state="early"] .reflex-stamp {
+  display: block;
+  animation: stamp-in 140ms steps(2, end);
+}
+
+@keyframes stamp-in {
+  0% { scale: 2.4; opacity: 0; }
+  100% { scale: 1; opacity: 1; }
+}
+
+.reflex-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.reflex-slot {
+  min-width: 92px;
+  text-align: center;
+  font-size: 12px;
+  padding: 12px 10px;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--shadow);
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.reflex-slot.is-filled {
+  background: var(--volt);
+  color: var(--ink);
+}
+
 /* ---------- footer / nutrition label ---------- */
 .footer {
   padding: var(--section-pad) var(--space);

@@ -4,6 +4,7 @@
 import { initHero } from "./hero.js";
 import { initTicker } from "./ticker.js";
 import { initWhack } from "./whack.js";
+import { initReflex } from "./reflex.js";
 
 function boot() {
   document.documentElement.dataset.js = "ready";
@@ -14,6 +15,7 @@ function boot() {
   initHero();
   initTicker();
   initWhack();
+  initReflex();
 }
 
 requestAnimationFrame(boot);
