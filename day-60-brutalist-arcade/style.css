@@ -369,6 +369,40 @@ button {
   align-items: center;
 }
 
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll var(--ticker-duration, 32s) linear infinite;
+}
+
+.ticker-track.is-paused {
+  animation-play-state: paused;
+}
+
+.ticker-run {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.ticker-item {
+  font-family: var(--font-arcade);
+  font-size: 11px;
+  white-space: nowrap;
+  padding: 14px 0;
+}
+
+.ticker-sep {
+  padding: 0 22px;
+  color: var(--pink);
+}
+
+@keyframes ticker-scroll {
+  to {
+    translate: -50% 0;
+  }
+}
+
 /* ---------- game sections ---------- */
 .game,
 .board {
@@ -495,5 +529,13 @@ button {
 
   .btn-cta.is-shaking {
     animation: none;
+  }
+
+  .ticker-track {
+    animation: none;
+  }
+
+  .ticker-viewport {
+    overflow-x: auto;
   }
 }
