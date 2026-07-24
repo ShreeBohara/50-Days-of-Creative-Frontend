@@ -774,6 +774,94 @@ button {
   color: var(--ink);
 }
 
+/* ---------- memory pairs ---------- */
+.mem-stage {
+  position: relative;
+  max-width: 640px;
+}
+
+.mem-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(8px, 1.6vw, 16px);
+}
+
+.mem-card {
+  aspect-ratio: 1;
+  perspective: 700px;
+  background: transparent;
+  padding: 0;
+}
+
+.mem-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 240ms cubic-bezier(0.6, -0.2, 0.4, 1.4);
+}
+
+.mem-card.is-flipped .mem-inner {
+  transform: rotateY(180deg);
+}
+
+.mem-front,
+.mem-back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  backface-visibility: hidden;
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.mem-front {
+  background: var(--ink);
+  color: var(--lime);
+  font-size: clamp(14px, 2.4vw, 22px);
+}
+
+.mem-card:hover .mem-front {
+  background: var(--pink);
+  color: var(--ink);
+}
+
+.mem-back {
+  background: var(--white);
+  transform: rotateY(180deg);
+}
+
+.mem-icon {
+  width: 52%;
+  height: 52%;
+  fill: var(--ink);
+}
+
+.mem-card.is-matched .mem-back {
+  background: var(--volt);
+  rotate: -2deg;
+}
+
+.mem-card:disabled {
+  cursor: default;
+}
+
+@keyframes mem-shake {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -5px 0; }
+  75% { translate: 5px 0; }
+}
+
+.mem-card.is-wrong {
+  animation: mem-shake 120ms steps(2, end) 2;
+}
+
+.mem-card.is-wrong .mem-back {
+  background: var(--red);
+}
+
 /* ---------- footer / nutrition label ---------- */
 .footer {
   padding: var(--section-pad) var(--space);
