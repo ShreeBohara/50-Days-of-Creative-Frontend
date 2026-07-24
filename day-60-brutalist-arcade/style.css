@@ -1072,6 +1072,112 @@ button {
   animation: screen-shake 100ms steps(4, end);
 }
 
+/* ---------- responsive ---------- */
+@media (max-width: 700px) {
+  :root {
+    --bw: 3px;
+    --shadow-x: 4px;
+    --shadow-y: 4px;
+    --shadow-big: 7px 7px 0 0 var(--ink);
+  }
+
+  .topbar {
+    padding: 8px 12px;
+  }
+
+  .topbar-brand {
+    font-size: 11px;
+  }
+
+  .hero {
+    min-height: 0;
+    padding-top: 84px;
+  }
+
+  .starburst {
+    top: 10px;
+    right: 10px;
+    width: 108px;
+  }
+
+  .starburst-text {
+    font-size: 8px;
+  }
+
+  /* keep the kicker bar from running under the badge */
+  .hero-kicker {
+    max-width: calc(100% - 118px);
+  }
+
+  .hero-cta-row {
+    width: 100%;
+  }
+
+  .hero-cta-row .btn {
+    flex: 1 1 100%;
+  }
+
+  .ticker-pause {
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  .game-hud {
+    gap: 10px;
+  }
+
+  .hud-stat {
+    min-width: 0;
+    flex: 1 1 40%;
+    padding: 8px 10px;
+  }
+
+  .whack-grid {
+    gap: 8px;
+  }
+
+  .game-controls .btn {
+    width: 100%;
+  }
+
+  .game-hint {
+    width: 100%;
+  }
+
+  .reflex-pad {
+    min-height: 230px;
+  }
+
+  .reflex-slot {
+    min-width: 0;
+    flex: 1 1 28%;
+  }
+
+  .board-row {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .board-game {
+    grid-column: 1 / -1;
+  }
+
+  .board-value {
+    justify-self: start;
+  }
+}
+
+/* fatter tap targets on touch hardware */
+@media (pointer: coarse) {
+  .ini-step {
+    height: 44px;
+    width: 54px;
+  }
+
+  .ticker-pause {
+    min-width: 48px;
+  }
+}
+
 /* ---------- motion safety ---------- */
 @media (prefers-reduced-motion: reduce) {
   html {
