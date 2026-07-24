@@ -8,6 +8,7 @@ import { initReflex } from "./reflex.js";
 import { initMemory } from "./memory.js";
 import { initAudio } from "./audio.js";
 import { initShake } from "./shake.js";
+import { initLeaderboard } from "./leaderboard.js";
 
 function boot() {
   document.documentElement.dataset.js = "ready";
@@ -22,6 +23,7 @@ function boot() {
   initMemory();
   initAudio();
   initShake();
+  initLeaderboard();
 }
 
 requestAnimationFrame(boot);
