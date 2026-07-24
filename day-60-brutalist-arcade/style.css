@@ -925,6 +925,19 @@ button {
   font-weight: 600;
 }
 
+/* ---------- screen shake ---------- */
+@keyframes screen-shake {
+  0% { translate: 0 0; }
+  25% { translate: var(--shake-px, 3px) calc(-1 * var(--shake-px, 3px)); }
+  50% { translate: calc(-1 * var(--shake-px, 3px)) var(--shake-px, 3px); }
+  75% { translate: var(--shake-px, 3px) var(--shake-px, 3px); }
+  100% { translate: 0 0; }
+}
+
+.shell.is-shaking {
+  animation: screen-shake 100ms steps(4, end);
+}
+
 /* ---------- motion safety ---------- */
 @media (prefers-reduced-motion: reduce) {
   html {

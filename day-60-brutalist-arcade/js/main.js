@@ -6,6 +6,8 @@ import { initTicker } from "./ticker.js";
 import { initWhack } from "./whack.js";
 import { initReflex } from "./reflex.js";
 import { initMemory } from "./memory.js";
+import { initAudio } from "./audio.js";
+import { initShake } from "./shake.js";
 
 function boot() {
   document.documentElement.dataset.js = "ready";
@@ -18,6 +20,8 @@ function boot() {
   initWhack();
   initReflex();
   initMemory();
+  initAudio();
+  initShake();
 }
 
 requestAnimationFrame(boot);
