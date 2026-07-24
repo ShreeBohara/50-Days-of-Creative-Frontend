@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOLTAGE ⚡ — Brutalist Arcade</title>
+    <meta
+      name="description"
+      content="Day 60 of 50 Days of Creative Frontend — a neubrutalist landing page for a fake energy drink with three playable mini-games."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link
+      rel="preload"
+      href="./fonts/anton-latin-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="./fonts/press-start-2p-latin-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="./fonts/public-sans-latin-wght.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <svg class="icon-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="i-bolt" viewBox="0 0 8 8">
+          <path d="M5 0 1 5h2L3 8l4-5H5z" />
+        </symbol>
+        <symbol id="i-skull" viewBox="0 0 8 8">
+          <path d="M1 0h6v5H6v2H5V6H3v1H2V5H1zM2 2h2v2H2zm3 0h1v2H5z" fill-rule="evenodd" />
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 8 8">
+          <path d="M4 0 5 3h3L5.5 5l1 3L4 6 1.5 8l1-3L0 3h3z" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 8 8">
+          <path d="M4 1 8 4 4 7 0 4zM3 3h2v2H3z" fill-rule="evenodd" />
+        </symbol>
+        <symbol id="i-flame" viewBox="0 0 8 8">
+          <path d="M4 0 6 3l1-1v4L4 8 1 6V3l1 1 1-2z" />
+        </symbol>
+        <symbol id="i-diamond" viewBox="0 0 8 8">
+          <path d="M2 0h4l2 2-4 6-4-6z" />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 8 8">
+          <path d="M3 0h3v1H5v1H4v4h1v1h1v1H3V7H2V6H1V2h1V1h1z" />
+        </symbol>
+        <symbol id="i-target" viewBox="0 0 8 8">
+          <path d="M0 0h8v8H0zM1 1v6h6V1zm1 1h4v4H2zm1 1v2h2V3z" fill-rule="evenodd" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <header class="topbar">
+      <p class="topbar-brand arcade">VOLTAGE&nbsp;⚡</p>
+      <div class="topbar-controls">
+        <button
+          type="button"
+          class="switch"
+          id="mute-switch"
+          aria-pressed="false"
+          aria-label="Sound on. Toggle to mute."
+        >
+          <span class="switch-label">SND</span>
+          <span class="switch-track" aria-hidden="true">
+            <span class="switch-knob"></span>
+          </span>
+          <span class="switch-state" data-mute-state>ON</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell" id="shell">
+      <main>
+        <!-- 1. HERO -->
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-inner">
+            <p class="hero-kicker arcade">NEW!! FLAVOR: RAW ELECTRICITY</p>
+            <h1 class="hero-wordmark" id="hero-title">
+              VOLT<span class="hero-bolt" aria-hidden="true">⚡</span>AGE
+            </h1>
+            <p class="hero-tag">
+              THE ENERGY DRINK THAT VOIDS YOUR WARRANTY. 200% JUICE. 0% MERCY.
+              SIDE EFFECTS INCLUDE WINNING.
+            </p>
+            <div class="hero-cta-row">
+              <button type="button" class="btn btn-cta" id="hero-cta">GRAB A CAN</button>
+              <a class="btn btn-ghost" href="#whack">PLAY THE ARCADE ↓</a>
+            </div>
+          </div>
+          <div class="starburst" aria-hidden="true">
+            <svg class="starburst-spikes" viewBox="0 0 100 100">
+              <polygon
+                points="50,0 57,15 71,4 72,21 89,15 83,31 100,32 88,44 100,56 83,58 90,74 73,71 72,88 58,78 50,95 42,78 28,88 27,71 10,74 17,58 0,56 12,44 0,32 17,31 11,15 28,21 29,4 43,15"
+              />
+            </svg>
+            <p class="starburst-text arcade">100%<br />DIGITAL<br />CAFFEINE</p>
+          </div>
+        </section>
+
+        <!-- 2. TICKER -->
+        <div class="ticker-strip" id="ticker">
+          <button
+            type="button"
+            class="ticker-pause"
+            id="ticker-pause"
+            aria-pressed="false"
+            aria-label="Pause scrolling ticker"
+          >⏸</button>
+          <div class="ticker-viewport" id="ticker-viewport"></div>
+        </div>
+
+        <!-- 3. GAME 1: WHACK-A-DIV -->
+        <section class="game game-whack" id="whack" aria-labelledby="whack-title">
+          <header class="game-head">
+            <p class="game-num arcade" aria-hidden="true">GAME 01</p>
+            <h2 class="game-title" id="whack-title">WHACK-A-DIV</h2>
+            <p class="game-desc">
+              DIVS KEEP POPPING UP. SUPPRESS THEM. THEY GET FASTER. YOU GET 30
+              SECONDS AND THREE MISSES. STREAKS MULTIPLY.
+            </p>
+          </header>
+          <div class="game-frame" id="whack-frame"></div>
+        </section>
+
+        <!-- 4. GAME 2: REFLEX DUEL -->
+        <section class="game game-reflex" id="reflex" aria-labelledby="reflex-title">
+          <header class="game-head">
+            <p class="game-num arcade" aria-hidden="true">GAME 02</p>
+            <h2 class="game-title" id="reflex-title">REFLEX DUEL</h2>
+            <p class="game-desc">
+              WAIT FOR GREEN. CLICK. WE MEASURE THE MILLISECONDS AND JUDGE YOU.
+              BEST OF FIVE. NO EARLY CLICKS, EAGER.
+            </p>
+          </header>
+          <div class="game-frame" id="reflex-frame"></div>
+        </section>
+
+        <!-- 5. GAME 3: MEMORY PAIRS -->
+        <section class="game game-memory" id="memory" aria-labelledby="memory-title">
+          <header class="game-head">
+            <p class="game-num arcade" aria-hidden="true">GAME 03</p>
+            <h2 class="game-title" id="memory-title">MEMORY PAIRS</h2>
+            <p class="game-desc">
+              SIXTEEN CARDS. EIGHT PAIRS. YOUR SHORT-TERM MEMORY VS OUR
+              MARKETING DEPARTMENT. WIN AND WE THROW SQUARES AT YOU.
+            </p>
+          </header>
+          <div class="game-frame" id="memory-frame"></div>
+        </section>
+
+        <!-- 6. LEADERBOARD -->
+        <section class="board" id="board" aria-labelledby="board-title">
+          <header class="game-head">
+            <p class="game-num arcade" aria-hidden="true">HALL OF VOLT</p>
+            <h2 class="game-title" id="board-title">HIGH SCORES</h2>
+            <p class="game-desc">
+              BEST RUNS ON THIS MACHINE. THREE LETTERS, ARCADE RULES. CHOOSE
+              WISELY OR BE "AAA" FOREVER.
+            </p>
+          </header>
+          <div class="board-frame" id="board-frame"></div>
+        </section>
+      </main>
+
+      <!-- 7. FOOTER -->
+      <footer class="footer" aria-labelledby="footer-title">
+        <div class="label" role="table" aria-label="Nutrition facts, satirical">
+          <h2 class="label-title" id="footer-title">NUTRITION FACTS</h2>
+          <p class="label-serving">SERVING SIZE: 1 CAN (473ML OF CONSEQUENCES)</p>
+          <dl class="label-rows">
+            <div class="label-row"><dt>ELECTROLYTES</dt><dd>YES</dd></div>
+            <div class="label-row"><dt>SLEEP</dt><dd>DELETED</dd></div>
+            <div class="label-row"><dt>CAFFEINE</dt><dd>999%&nbsp;DV*</dd></div>
+            <div class="label-row"><dt>BLINKING</dt><dd>OPTIONAL</dd></div>
+            <div class="label-row"><dt>REGRET</dt><dd>0G</dd></div>
+            <div class="label-row"><dt>BORDER-RADIUS</dt><dd>0PX</dd></div>
+          </dl>
+          <p class="label-fine">
+            *DV = DUBIOUS VALUE. VOLTAGE IS NOT A REAL BEVERAGE. NO DIVS WERE
+            PERMANENTLY HARMED. DAY 60 OF
+            <a href="../">50 DAYS OF CREATIVE FRONTEND</a>.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
