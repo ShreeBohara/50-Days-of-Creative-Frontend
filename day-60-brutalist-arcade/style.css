@@ -95,6 +95,7 @@ button {
   cursor: pointer;
   background: none;
   border: none;
+  touch-action: manipulation;
 }
 
 :focus-visible {
@@ -259,10 +260,13 @@ button {
 
 .hero-bolt {
   display: inline-block;
-  color: var(--pink);
-  -webkit-text-stroke: 0;
-  text-shadow:
-    4px 4px 0 var(--ink);
+  width: 0.58em;
+  height: 0.82em;
+  margin: 0 0.015em;
+  vertical-align: baseline;
+  fill: var(--pink);
+  filter: drop-shadow(6px 6px 0 var(--ink));
+  rotate: 6deg;
 }
 
 .hero-tag {
@@ -1198,5 +1202,20 @@ button {
 
   .ticker-viewport {
     overflow-x: auto;
+  }
+
+  .shell.is-shaking,
+  .hud-value.is-bumped,
+  .mem-card.is-wrong,
+  .board-row.is-new {
+    animation: none;
+  }
+
+  .mem-inner {
+    transition: none;
+  }
+
+  .whack-face {
+    transition: none;
   }
 }
