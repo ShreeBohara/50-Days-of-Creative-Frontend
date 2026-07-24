@@ -3,6 +3,7 @@
 
 import { initHero } from "./hero.js";
 import { initTicker } from "./ticker.js";
+import { initWhack } from "./whack.js";
 
 function boot() {
   document.documentElement.dataset.js = "ready";
@@ -12,6 +13,7 @@ function boot() {
 
   initHero();
   initTicker();
+  initWhack();
 }
 
 requestAnimationFrame(boot);

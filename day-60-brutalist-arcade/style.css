@@ -463,6 +463,124 @@ button {
   margin: 0 auto;
 }
 
+/* ---------- shared game chrome ---------- */
+.game-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.hud-stat {
+  display: grid;
+  gap: 6px;
+  min-width: 128px;
+  padding: 10px 14px;
+  background: var(--ink);
+  color: var(--white);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.hud-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--volt);
+}
+
+.hud-value {
+  font-size: clamp(14px, 2vw, 20px);
+}
+
+@keyframes hud-bump {
+  0% { scale: 1; }
+  40% { scale: 1.35; }
+  100% { scale: 1; }
+}
+
+.hud-value.is-bumped {
+  animation: hud-bump 160ms steps(3, end);
+}
+
+.game-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.btn-start {
+  background: var(--volt);
+}
+
+.btn-start:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translate(var(--shadow-x), var(--shadow-y));
+  box-shadow: 0 0 0 0 var(--ink);
+}
+
+/* ---------- whack-a-div ---------- */
+.whack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 2vw, 20px);
+  max-width: 640px;
+}
+
+.whack-cell {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--white);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: grid;
+  place-items: end center;
+}
+
+.whack-cell:hover {
+  background: var(--volt);
+}
+
+.whack-cell:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 0 var(--ink);
+}
+
+.whack-face {
+  width: 74%;
+  height: 64%;
+  display: grid;
+  place-items: center;
+  background: var(--volt);
+  border: var(--bw) solid var(--ink);
+  border-bottom: none;
+  font-size: clamp(10px, 1.6vw, 15px);
+  translate: 0 115%;
+  transition: translate 100ms steps(3, end);
+}
+
+.whack-cell[data-up="true"] .whack-face {
+  translate: 0 0;
+}
+
+.whack-cell[data-up="true"] {
+  background: var(--cyan);
+}
+
+@keyframes squash {
+  0% { scale: 1 1; translate: 0 0; }
+  50% { scale: 1.5 0.25; translate: 0 40%; }
+  100% { scale: 1 0; translate: 0 60%; }
+}
+
+.whack-face.is-squashed {
+  animation: squash 180ms steps(4, end);
+}
+
 /* ---------- footer / nutrition label ---------- */
 .footer {
   padding: var(--section-pad) var(--space);
