@@ -862,6 +862,15 @@ button {
   background: var(--red);
 }
 
+.confetti-canvas {
+  position: absolute;
+  inset: calc(-1 * var(--section-pad)) calc(-1 * var(--space));
+  width: calc(100% + 2 * var(--space));
+  height: calc(100% + 2 * var(--section-pad));
+  pointer-events: none;
+  z-index: 5;
+}
+
 /* ---------- footer / nutrition label ---------- */
 .footer {
   padding: var(--section-pad) var(--space);
