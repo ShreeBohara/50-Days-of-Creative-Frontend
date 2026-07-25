@@ -194,9 +194,42 @@ void main() {
 }
 `;
 
+const MELT = PRELUDE + NOISE_GLSL + `
+/* MELT — everything below the cursor drips downward like wet paint.
+ *
+ * Recipe:
+ *   1. "below" ramps 0 -> 1 over a band under the cursor row
+ *      (v_uv.y grows downward, so below the cursor is uv.y > mouse.y)
+ *   2. each column drips at its own noise-chosen rate, animated
+ *      slowly so the drips wander
+ *   3. the actual melt: COMPRESS the sample UV back toward the cursor
+ *      row. Sampling higher up stretches those rows over the space
+ *      below — the paint pulls down. Velocity feeds the stretch.
+ *   4. a slight noise wobble in x bends the drips; a touch of
+ *      darkening at full stretch reads as wet sheen.
+ */
+void main() {
+  vec2 uv = v_uv;
+
+  float below = smoothstep(0.0, 0.35, uv.y - u_mouse.y);
+  float drip = noise(vec2(uv.x * 24.0, u_time * 0.7));
+  float stretch = below * u_hover
+                * (0.15 + 0.5 * u_velocity)
+                * (0.6 + 0.8 * drip);
+
+  uv.y = u_mouse.y + (uv.y - u_mouse.y) / (1.0 + stretch * 3.0);
+  uv.x += (drip - 0.5) * 0.02 * below * u_hover;
+
+  vec3 color = texture2D(u_texture, cover(uv)).rgb;
+  color *= 1.0 - 0.18 * min(stretch, 1.0); // wet sheen
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
 export const FRAGMENTS = {
   passthrough: PASSTHROUGH,
   ripple: RIPPLE,
   "flow-rgb": FLOW_RGB,
   pixelate: PIXELATE,
+  melt: MELT,
 };

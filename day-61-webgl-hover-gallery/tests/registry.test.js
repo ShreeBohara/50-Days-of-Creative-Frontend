@@ -4,7 +4,7 @@ import { EFFECTS, DEFAULT_EFFECT, resolveEffect } from "../js/effectRegistry.js"
 import { FRAGMENTS, VERTEX_SHADER } from "../js/shaders.js";
 
 test("registry lists the effects in display order", () => {
-  assert.deepEqual(EFFECTS.map((e) => e.id), ["ripple", "flow-rgb", "pixelate"]);
+  assert.deepEqual(EFFECTS.map((e) => e.id), ["ripple", "flow-rgb", "pixelate", "melt"]);
 });
 
 test("only pixelate exposes the invert toggle", () => {
