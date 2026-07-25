@@ -67,6 +67,7 @@ on:
       - "day-58-scrollytelling-coffee/**"
       - "day-59-y2k-geozone/**"
       - "day-60-brutalist-arcade/**"
+      - "day-61-webgl-hover-gallery/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -444,6 +445,7 @@ jobs:
           cp -R day-58-scrollytelling-coffee _site/
           cp -R day-59-y2k-geozone _site/
           cp -R day-60-brutalist-arcade _site/
+          cp -R day-61-webgl-hover-gallery _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
