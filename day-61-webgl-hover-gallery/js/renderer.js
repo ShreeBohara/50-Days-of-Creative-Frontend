@@ -33,6 +33,10 @@ export function createRenderer({ gl, canvas, frames, textures }) {
   }));
 
   let time = 0; // seconds
+  let updater = null; // interactions hook, runs between rect sync and draw
+
+  /* cross-plane uniform values (cursor speed is global by nature) */
+  const globals = { velocity: 0, invert: 0 };
 
   function measure() {
     const sx = window.scrollX;
@@ -77,6 +81,11 @@ export function createRenderer({ gl, canvas, frames, textures }) {
       gl.uniform2f(prog.u.u_uvOffset, crop.offset[0], crop.offset[1]);
       gl.uniform1f(prog.u.u_ratio, r.w / r.h);
       gl.uniform1f(prog.u.u_time, time);
+      gl.uniform2f(prog.u.u_mouse, p.uMouse?.u ?? 0.5, p.uMouse?.v ?? 0.5);
+      gl.uniform1f(prog.u.u_hover, p.uHover ?? 0);
+      gl.uniform1f(prog.u.u_sinceEnter, p.uSinceEnter ?? 0);
+      gl.uniform1f(prog.u.u_velocity, globals.velocity);
+      gl.uniform1f(prog.u.u_invert, globals.invert);
 
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, p.texture);
@@ -87,16 +96,20 @@ export function createRenderer({ gl, canvas, frames, textures }) {
   }
 
   function tick(dtMs) {
-    time += dtMs / 1000;
+    const dtSec = dtMs / 1000;
+    time += dtSec;
     syncRects();
+    if (updater) updater(dtSec);
     draw();
   }
 
   return {
     planes,
+    globals,
     measure,
     tick,
     draw,
+    setUpdater(fn) { updater = fn; },
     setEffect(name) {
       if (programs[name]) activeEffect = name;
     },

@@ -9,6 +9,7 @@ import { buildTextures } from "./textures.js";
 import { formatCaption } from "./textureRecipes.js";
 import { createContext } from "./glCore.js";
 import { createRenderer } from "./renderer.js";
+import { createInteractions } from "./interactions.js";
 import { mountFallback } from "./fallback.js";
 
 function labelFrames(textures, frames) {
@@ -52,6 +53,9 @@ function boot() {
     return;
   }
 
+  const interactions = createInteractions({ renderer });
+  renderer.setUpdater(interactions.update);
+
   renderer.measure();
   renderer.tick(0); // immediate first paint
 
@@ -77,6 +81,9 @@ function boot() {
     step(n = 1) {
       for (let i = 0; i < n; i++) renderer.tick(1000 / 60);
     },
+    setMouse(x, y) {
+      interactions.setMouse(x, y);
+    },
     setEffect(name) {
       renderer.setEffect(name);
       renderer.draw();
@@ -85,6 +92,9 @@ function boot() {
       return {
         effect: renderer.effect,
         time: renderer.time,
+        velocity: renderer.globals.velocity,
+        hover: renderer.planes.map((p) => Number(p.uHover.toFixed(4))),
+        hovered: interactions.hoveredIndex(),
         rects: renderer.planes.map((p) => p.viewRect),
       };
     },

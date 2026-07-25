@@ -57,11 +57,13 @@ vec2 cover(vec2 uv) {
 /* ------------------------------------------------------------------ */
 
 const PASSTHROUGH = PRELUDE + `
-/* Passthrough: no distortion — just the cover-cropped photograph.
- * This is the program planes render with before any effect exists,
- * and the reference for what "settled" looks like. */
+/* Passthrough: no distortion — just the cover-cropped photograph,
+ * with a whisper of brightness on hover so the uniform plumbing is
+ * visible before any real effect exists. Also the reference for what
+ * "settled" looks like. */
 void main() {
   vec3 color = texture2D(u_texture, cover(v_uv)).rgb;
+  color *= 1.0 + 0.06 * u_hover;
   gl_FragColor = vec4(color, 1.0);
 }
 `;
