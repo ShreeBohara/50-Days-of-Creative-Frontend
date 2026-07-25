@@ -68,6 +68,44 @@ void main() {
 }
 `;
 
+/* ------------------------------------------------------------------ */
+
+const RIPPLE = PRELUDE + `
+/* RIPPLE — concentric sine rings radiating from the cursor.
+ *
+ * Recipe:
+ *   1. distance from the cursor, aspect-corrected so rings stay
+ *      circular on non-square planes
+ *   2. a sine wave over that distance, phase-driven by time, gives
+ *      the ring pattern
+ *   3. amplitude = hover gate x entry envelope x spatial falloff.
+ *      The envelope decays with time-since-entry (the splash calms
+ *      down) but cursor velocity re-excites it, so stirring the
+ *      pointer keeps the water moving.
+ *   4. displace the sample UV along the cursor->texel direction and
+ *      brighten wave crests slightly for a liquid read.
+ */
+void main() {
+  vec2 uv = v_uv;
+  vec2 toTexel = (uv - u_mouse) * vec2(u_ratio, 1.0);
+  float dist = length(toTexel);
+  vec2 dir = normalize(toTexel + 1e-6);
+
+  float envelope = min(1.0, exp(-u_sinceEnter * 0.8) + u_velocity * 0.8);
+  float amp = u_hover
+            * envelope
+            * exp(-dist * 4.0);
+
+  float wave = sin(dist * 42.0 - u_time * 5.5);
+  uv += dir * wave * 0.025 * amp;
+
+  vec3 color = texture2D(u_texture, cover(uv)).rgb;
+  color *= 1.0 + wave * amp * 0.35; // crest highlight
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
 export const FRAGMENTS = {
   passthrough: PASSTHROUGH,
+  ripple: RIPPLE,
 };

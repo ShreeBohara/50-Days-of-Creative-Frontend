@@ -10,6 +10,7 @@ import { formatCaption } from "./textureRecipes.js";
 import { createContext } from "./glCore.js";
 import { createRenderer } from "./renderer.js";
 import { createInteractions } from "./interactions.js";
+import { DEFAULT_EFFECT, resolveEffect } from "./effectRegistry.js";
 import { mountFallback } from "./fallback.js";
 
 function labelFrames(textures, frames) {
@@ -55,6 +56,7 @@ function boot() {
 
   const interactions = createInteractions({ renderer });
   renderer.setUpdater(interactions.update);
+  renderer.setEffect(DEFAULT_EFFECT);
 
   renderer.measure();
   renderer.tick(0); // immediate first paint
@@ -85,7 +87,7 @@ function boot() {
       interactions.setMouse(x, y);
     },
     setEffect(name) {
-      renderer.setEffect(name);
+      renderer.setEffect(resolveEffect(name));
       renderer.draw();
     },
     state() {
