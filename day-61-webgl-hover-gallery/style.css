@@ -76,6 +76,20 @@ input {
   outline-offset: 3px;
 }
 
+/* ---------------- GL layer ----------------
+   One fullscreen canvas carries all six planes. It sits ABOVE the page
+   (so an expanded plane can cover everything) but is transparent
+   everywhere it isn't drawing a photo, and never eats the pointer. */
+
+#gl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* ---------------- header ---------------- */
 
 .site-head {
