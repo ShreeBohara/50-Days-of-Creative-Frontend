@@ -156,8 +156,47 @@ void main() {
 }
 `;
 
+const PIXELATE = PRELUDE + `
+/* PIXELATE — the image collapses into mosaic cells near the cursor.
+ *
+ * Recipe:
+ *   1. focus = 1 at the cursor, fading out half a plane away
+ *      (aspect-corrected distance). u_invert flips the field so the
+ *      EDGES pixelate and the cursor carries a window of clarity.
+ *   2. the cell grid is FIXED per frame (velocity sets its density:
+ *      fast cursor = chunkier mosaic). It must not vary per texel —
+ *      a spatially-varying cell count makes neighboring texels snap
+ *      to different lattices and the blocks dissolve into mush.
+ *   3. cursor weighting comes from BLENDING the sharp sample toward
+ *      the block-center sample by focus x hover, with a smoothstep
+ *      to keep the crossfade zone tight.
+ *   Cells are aspect-corrected so they stay square on screen.
+ */
+void main() {
+  vec2 aspect = vec2(u_ratio, 1.0);
+  float dist = distance(v_uv * aspect, u_mouse * aspect);
+
+  /* NB: smoothstep edges must be ascending — reversed edges are
+   * undefined behavior in GLSL (and really do return 0 on some
+   * drivers), so fall-off fields are written as 1.0 - smoothstep. */
+  float focus = 1.0 - smoothstep(0.05, 0.55, dist);
+  focus = mix(focus, 1.0 - focus, u_invert);
+  float amount = focus * u_hover;
+
+  float cells = mix(56.0, 14.0, min(u_velocity, 1.0));
+  vec2 grid = vec2(cells * u_ratio, cells);
+  vec2 snapped = (floor(v_uv * grid) + 0.5) / grid;
+
+  vec3 sharp  = texture2D(u_texture, cover(v_uv)).rgb;
+  vec3 mosaic = texture2D(u_texture, cover(snapped)).rgb;
+
+  gl_FragColor = vec4(mix(sharp, mosaic, smoothstep(0.1, 0.7, amount)), 1.0);
+}
+`;
+
 export const FRAGMENTS = {
   passthrough: PASSTHROUGH,
   ripple: RIPPLE,
   "flow-rgb": FLOW_RGB,
+  pixelate: PIXELATE,
 };

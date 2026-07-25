@@ -90,6 +90,10 @@ function boot() {
       renderer.setEffect(resolveEffect(name));
       renderer.draw();
     },
+    setInvert(on) {
+      renderer.globals.invert = on ? 1 : 0;
+      renderer.draw();
+    },
     state() {
       return {
         effect: renderer.effect,

@@ -6,11 +6,12 @@
 export const EFFECTS = [
   { id: "ripple", label: "Ripple", fragKey: "ripple" },
   { id: "flow-rgb", label: "Flow RGB", fragKey: "flow-rgb" },
+  { id: "pixelate", label: "Pixelate", fragKey: "pixelate", hasInvert: true },
 ];
 
-/* flow-rgb while it is the newest effect — the switcher commit
+/* pixelate while it is the newest effect — the switcher commit
  * settles this back to ripple */
-export const DEFAULT_EFFECT = "flow-rgb";
+export const DEFAULT_EFFECT = "pixelate";
 
 export function resolveEffect(id) {
   return EFFECTS.some((e) => e.id === id) ? id : DEFAULT_EFFECT;

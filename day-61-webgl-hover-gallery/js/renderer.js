@@ -50,7 +50,21 @@ export function createRenderer({ gl, canvas, frames, textures }) {
   /* refresh viewport rects from the document-space cache — runs every
    * tick even when the canvas can't paint (zero-size hidden tab), so
    * hover hit-testing never goes stale */
+  let lastDocW = 0;
+  let lastDocH = 0;
+
   function syncRects() {
+    /* self-healing: any layout-size change (resize events can be
+     * unreliable in embedded panes; scrollbars and font loads reflow
+     * without one) invalidates the document-space cache */
+    const docW = document.documentElement.clientWidth;
+    const docH = document.documentElement.clientHeight;
+    if (docW !== lastDocW || docH !== lastDocH) {
+      lastDocW = docW;
+      lastDocH = docH;
+      if (docW && docH) measure();
+    }
+
     const sx = window.scrollX;
     const sy = window.scrollY;
     for (const p of planes) {

@@ -89,11 +89,15 @@ export function createTextureFrom(gl, source) {
 }
 
 /* Match the backing store to CSS size × capped DPR. Returns false when
- * the canvas has no size yet (hidden preview tab) — skip the draw. */
+ * nothing has a size yet — skip the draw. The documentElement fallback
+ * covers hidden preview panes, where a position:fixed canvas can report
+ * clientWidth 0 while the document itself still lays out. */
 export function resizeToDisplay(gl, canvas, maxDpr = 2) {
   const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
-  const w = Math.floor(canvas.clientWidth * dpr);
-  const h = Math.floor(canvas.clientHeight * dpr);
+  const cssW = canvas.clientWidth || document.documentElement.clientWidth;
+  const cssH = canvas.clientHeight || document.documentElement.clientHeight;
+  const w = Math.floor(cssW * dpr);
+  const h = Math.floor(cssH * dpr);
   if (!w || !h) return false;
   if (canvas.width !== w || canvas.height !== h) {
     canvas.width = w;
