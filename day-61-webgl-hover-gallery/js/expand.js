@@ -22,6 +22,18 @@ export function createExpand({ renderer, interactions, titleEl }) {
   let t = 0;
   let fromRect = null;
   let durations = { open: OPEN_MS, close: CLOSE_MS };
+  let burstEnabled = true; // reduced-motion turns the landing flare off
+  let lastFocus = null;
+
+  /* while a plane is fullscreen, everything underneath is a trap:
+   * clicks would hit the invisible controls, Tab would walk hidden
+   * frames, screen readers would still see the whole grid. inert
+   * removes all three at once. */
+  const inertRegions = [...document.querySelectorAll(".site-head, .grid, .site-foot")];
+
+  function setPageInert(on) {
+    for (const el of inertRegions) el.inert = on;
+  }
 
   function fullscreenRect() {
     return {
@@ -51,6 +63,11 @@ export function createExpand({ renderer, interactions, titleEl }) {
     /* keep current t when re-opening mid-close, else start from grid */
     if (t === 0) fromRect = { ...plane.viewRect };
     setTitle(plane);
+
+    lastFocus = document.activeElement;
+    setPageInert(true);
+    plane.el?.setAttribute("aria-expanded", "true");
+    titleEl?.focus?.({ preventScroll: true });
   }
 
   function close() {
@@ -66,10 +83,19 @@ export function createExpand({ renderer, interactions, titleEl }) {
       if (t <= 0) {
         t = 0;
         phase = "idle";
-        /* landing burst: the active effect flares and decays */
         const plane = renderer.planes[index];
-        if (plane?.hover) plane.hover.pulse();
-        interactions?.velocity.spike(1);
+        /* landing burst: the active effect flares and decays */
+        if (burstEnabled) {
+          if (plane?.hover) plane.hover.pulse();
+          interactions?.velocity.spike(1);
+          /* on touch there is no pointer to move away — park it so
+           * the burst can drain instead of pinning at full hover */
+          interactions?.parkIfTouch?.();
+        }
+        plane?.el?.setAttribute("aria-expanded", "false");
+        setPageInert(false);
+        if (lastFocus?.focus) lastFocus.focus({ preventScroll: true });
+        lastFocus = null;
         index = -1;
       }
     }
@@ -99,8 +125,9 @@ export function createExpand({ renderer, interactions, titleEl }) {
     open,
     close,
     update,
-    setDurations(openMs, closeMs) {
+    setDurations(openMs, closeMs, burst = true) {
       durations = { open: openMs, close: closeMs };
+      burstEnabled = burst;
     },
     get active() { return phase !== "idle"; },
     get phase() { return phase; },

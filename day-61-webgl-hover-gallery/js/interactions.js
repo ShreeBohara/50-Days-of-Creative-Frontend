@@ -14,6 +14,14 @@ export function createInteractions({ renderer }) {
   const mouse = { x: -1e4, y: -1e4 }; // parked far offscreen until first move
   const velocity = createVelocityTracker();
   let lastMoveTime = null;
+  let hoverCap = 1; // reduced-motion drops this to 0: static render, no chase
+  let lastPointerType = "mouse";
+
+  window.addEventListener(
+    "pointerdown",
+    (e) => { lastPointerType = e.pointerType || "mouse"; },
+    { passive: true },
+  );
 
   for (const p of renderer.planes) {
     p.hover = createHoverState();
@@ -44,7 +52,7 @@ export function createInteractions({ renderer }) {
 
     for (const p of renderer.planes) {
       const r = p.viewRect;
-      const hovered = !!r && hitTest(mouse.x, mouse.y, r);
+      const hovered = hoverCap > 0 && !!r && hitTest(mouse.x, mouse.y, r);
 
       p.uHover = p.hover.update(hovered, dtSec);
       p.uSinceEnter = p.hover.sinceEnter;
@@ -61,11 +69,38 @@ export function createInteractions({ renderer }) {
     renderer.globals.velocity = vel;
   }
 
+  /* Touch pointers never leave — a lifted finger fires no pointerleave,
+   * so the stored tap point would keep hit-testing true forever and pin
+   * the pulse at full strength. Parking the pointer offscreen after a
+   * touch interaction lets the release decay actually run. */
+  function parkIfTouch() {
+    if (lastPointerType !== "mouse") {
+      mouse.x = -1e4;
+      mouse.y = -1e4;
+    }
+  }
+
+  /* touch path: a tap pulses the tapped plane — hover slams to 1 with
+   * a velocity spike, then the normal release decay drains it */
+  function pulsePlane(i) {
+    const p = renderer.planes[i];
+    if (!p?.hover || !p.viewRect) return;
+    const uv = localMouseUV(mouse.x, mouse.y, p.viewRect);
+    p.uMouse.u = uv.u;
+    p.uMouse.v = uv.v;
+    p.hover.pulse();
+    velocity.spike(1);
+    parkIfTouch();
+  }
+
   return {
     mouse,
     velocity,
     update,
     setMouse,
+    pulsePlane,
+    parkIfTouch,
+    setHoverCap(cap) { hoverCap = cap; },
     hoveredIndex() {
       const i = renderer.planes.findIndex(
         (p) => p.viewRect && hitTest(mouse.x, mouse.y, p.viewRect),

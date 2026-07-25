@@ -33,6 +33,7 @@ export function createRenderer({ gl, canvas, frames, textures }) {
   }));
 
   let time = 0; // seconds
+  let timeScale = 1; // reduced-motion freezes the ambient clock
   let updater = null; // interactions hook, runs between rect sync and draw
   let expand = null; // { index, rect, openness } while a plane is expanding
 
@@ -130,7 +131,7 @@ export function createRenderer({ gl, canvas, frames, textures }) {
 
   function tick(dtMs) {
     const dtSec = dtMs / 1000;
-    time += dtSec;
+    time += dtSec * timeScale;
     syncRects();
     if (updater) updater(dtSec);
     draw();
@@ -144,6 +145,7 @@ export function createRenderer({ gl, canvas, frames, textures }) {
     draw,
     setUpdater(fn) { updater = fn; },
     setExpand(v) { expand = v; },
+    setTimeScale(s) { timeScale = s; },
     setEffect(name) {
       if (programs[name]) activeEffect = name;
     },

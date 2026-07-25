@@ -217,6 +217,7 @@ input {
   z-index: 1;
   width: 100%;
   background: transparent;
+  touch-action: manipulation; /* no double-tap zoom delay on tap-pulse */
 }
 
 /* the generated texture canvas (scaffold + GL-fallback view) */
@@ -358,4 +359,61 @@ input {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(26, 24, 21, 0.55);
+}
+
+/* the JS freezes clocks and tweens; these are the CSS-side leftovers */
+@media (prefers-reduced-motion: reduce) {
+  .expand-title,
+  .cursor-dot {
+    transition: none;
+  }
+}
+
+/* ---------------- responsive ---------------- */
+
+/* roomier touch targets where there is no fine pointer */
+@media (pointer: coarse) {
+  .effect-select {
+    padding: 12px 34px 12px 14px;
+  }
+
+  .ctl-invert input {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-head {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .controls {
+    padding-top: 0;
+  }
+
+  .grid {
+    row-gap: 64px;
+  }
+
+  /* single column — every frame full width, offsets flattened */
+  .work:nth-of-type(n) {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  .work::before {
+    font-size: 64px;
+    top: -0.45em;
+  }
+
+  .expand-title {
+    padding: 22vh 20px 5vh;
+  }
+
+  .site-foot {
+    flex-direction: column;
+    gap: 6px;
+  }
 }

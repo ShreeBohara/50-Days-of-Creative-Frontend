@@ -54,15 +54,21 @@ function buildControls(renderer) {
   return { apply, setInvert };
 }
 
-function labelFrames(textures, frames) {
+/* GL mode: frames are buttons that open fullscreen. Fallback mode:
+ * they are plain images. */
+function labelFrames(textures, frames, interactive) {
   textures.forEach(({ recipe }, i) => {
     const frame = frames[i];
     if (!frame) return;
-    frame.setAttribute("role", "img");
-    frame.setAttribute(
-      "aria-label",
-      `${formatCaption(i, recipe.title)} — ${recipe.subtitle}`,
-    );
+    const caption = `${formatCaption(i, recipe.title)} — ${recipe.subtitle}`;
+    if (interactive) {
+      frame.setAttribute("role", "button");
+      frame.setAttribute("aria-label", `${caption}. View fullscreen.`);
+      frame.setAttribute("aria-expanded", "false");
+    } else {
+      frame.setAttribute("role", "img");
+      frame.setAttribute("aria-label", caption);
+    }
   });
 }
 
@@ -71,12 +77,11 @@ function boot() {
   const frames = [...document.querySelectorAll(".frame")];
   const glCanvas = document.getElementById("gl");
 
-  labelFrames(textures, frames);
-
   const gl = glCanvas ? createContext(glCanvas) : null;
 
   if (!gl) {
     if (glCanvas) glCanvas.remove();
+    labelFrames(textures, frames, false);
     mountFallback(textures, frames);
     window.gallery = { version: "day-61", mode: "fallback" };
     return;
@@ -90,10 +95,13 @@ function boot() {
      * still deserves the static gallery */
     console.error("day-61: GL boot failed, falling back —", err);
     glCanvas.remove();
+    labelFrames(textures, frames, false);
     mountFallback(textures, frames);
     window.gallery = { version: "day-61", mode: "fallback", error: String(err) };
     return;
   }
+
+  labelFrames(textures, frames, true);
 
   const interactions = createInteractions({ renderer });
   const expand = createExpand({
@@ -108,18 +116,42 @@ function boot() {
     cursor.update();
   });
   const controls = buildControls(renderer);
+  const motionState = { reduced: false };
 
   /* one click path: expanded (or expanding) -> collapse; otherwise the
    * plane under the pointer expands. Click coordinates refresh the
-   * stored pointer first so touch taps resolve the right plane. */
+   * stored pointer first so taps resolve the right plane.
+   *
+   * Touch has no hover, so it gets a two-step dance instead: first tap
+   * PULSES the plane (the active effect flares and decays in place),
+   * second tap on the same plane expands it. */
+  let armedIndex = null;
   window.addEventListener("click", (e) => {
+    if (contextDead) return;
+    /* clicks born in the header controls are UI, not gallery clicks —
+     * Firefox dispatches <option> picks as bubbling clicks at the
+     * dropdown's on-screen coordinates, which can land inside a plane */
+    if (e.target instanceof Element && e.target.closest(".site-head")) return;
     if (expand.active) {
       expand.close();
+      armedIndex = null;
       return;
     }
     interactions.setMouse(e.clientX, e.clientY, e.timeStamp);
     const i = interactions.hoveredIndex();
-    if (i !== null) expand.open(i);
+    if (i === null) {
+      armedIndex = null;
+      return;
+    }
+    const isTouch =
+      e.pointerType === "touch" || e.sourceCapabilities?.firesTouchEvents;
+    if (isTouch && !motionState.reduced && armedIndex !== i) {
+      armedIndex = i;
+      interactions.pulsePlane(i);
+      return;
+    }
+    expand.open(i);
+    armedIndex = null;
   });
 
   window.addEventListener("keydown", (e) => {
@@ -130,6 +162,7 @@ function boot() {
   frames.forEach((frame, i) => {
     frame.setAttribute("tabindex", "0");
     frame.addEventListener("keydown", (e) => {
+      if (contextDead) return;
       if (e.key !== "Enter" && e.key !== " ") return;
       e.preventDefault();
       if (expand.active) expand.close();
@@ -137,11 +170,31 @@ function boot() {
     });
   });
 
+  /* GPU took the context away (tab backgrounding, memory pressure,
+   * driver reset). Without preventDefault there is no restore event,
+   * and re-uploading everything isn't worth it for a gallery — degrade
+   * to the static fallback the no-GL path already provides. */
+  let contextDead = false;
+  glCanvas.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault();
+    if (contextDead) return;
+    contextDead = true;
+    glCanvas.remove();
+    labelFrames(textures, frames, false);
+    frames.forEach((f) => {
+      f.removeAttribute("tabindex");
+      f.removeAttribute("aria-expanded");
+    });
+    mountFallback(textures, frames);
+    if (window.gallery) window.gallery.mode = "fallback-context-lost";
+  });
+
   renderer.measure();
   renderer.tick(0); // immediate first paint
 
   let last = performance.now();
   function loop(now) {
+    if (contextDead) return; // context lost — the static fallback took over
     const dt = Math.min(now - last, 100); // clamp tab-switch jumps
     last = now;
     renderer.tick(dt);
@@ -154,6 +207,20 @@ function boot() {
     /* caption fonts change item heights — re-measure once they land */
     document.fonts.ready.then(() => renderer.measure());
   }
+
+  /* reduced motion: no breathing, frozen ambient clock, no hover
+   * chase (static render), a quick no-burst expand */
+  const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function applyMotionPrefs() {
+    const reduced = motionQuery.matches;
+    motionState.reduced = reduced;
+    renderer.globals.breathe = !reduced;
+    renderer.setTimeScale(reduced ? 0 : 1);
+    interactions.setHoverCap(reduced ? 0 : 1);
+    expand.setDurations(reduced ? 150 : 650, reduced ? 150 : 480, !reduced);
+  }
+  motionQuery.addEventListener?.("change", applyMotionPrefs);
+  applyMotionPrefs();
 
   /* headless-QA controller: drives the same tick as the rAF loop */
   window.gallery = {
