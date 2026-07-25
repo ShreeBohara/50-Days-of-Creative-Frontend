@@ -20,7 +20,12 @@
       <p class="head-sub">Selected work — six procedural frames · <em>Aperture 61</em></p>
     </div>
     <nav class="controls" aria-label="Shader effect controls">
-      <!-- effect switcher mounts here -->
+      <label class="ctl-label" for="effect-select">Lens</label>
+      <select id="effect-select" class="effect-select"></select>
+      <label class="ctl-invert" id="invert-wrap" hidden>
+        <input type="checkbox" id="invert-check" />
+        <span>invert field</span>
+      </label>
     </nav>
   </header>
 

@@ -10,8 +10,47 @@ import { formatCaption } from "./textureRecipes.js";
 import { createContext } from "./glCore.js";
 import { createRenderer } from "./renderer.js";
 import { createInteractions } from "./interactions.js";
-import { DEFAULT_EFFECT, resolveEffect } from "./effectRegistry.js";
+import { EFFECTS, DEFAULT_EFFECT, resolveEffect } from "./effectRegistry.js";
 import { mountFallback } from "./fallback.js";
+
+/* dropdown + invert checkbox. Everything funnels through apply() so the
+ * <select>, the QA controller and the renderer can never disagree. */
+function buildControls(renderer) {
+  const select = document.getElementById("effect-select");
+  const invertWrap = document.getElementById("invert-wrap");
+  const invertCheck = document.getElementById("invert-check");
+  if (!select || !invertWrap || !invertCheck) {
+    return { apply() {}, setInvert() {} };
+  }
+
+  for (const effect of EFFECTS) {
+    const option = document.createElement("option");
+    option.value = effect.id;
+    option.textContent = effect.label;
+    select.appendChild(option);
+  }
+
+  function apply(id) {
+    const resolved = resolveEffect(id);
+    const def = EFFECTS.find((e) => e.id === resolved);
+    select.value = resolved;
+    invertWrap.hidden = !def.hasInvert;
+    renderer.setEffect(def.fragKey);
+    renderer.draw();
+  }
+
+  function setInvert(on) {
+    invertCheck.checked = !!on;
+    renderer.globals.invert = on ? 1 : 0;
+    renderer.draw();
+  }
+
+  select.addEventListener("change", () => apply(select.value));
+  invertCheck.addEventListener("change", () => setInvert(invertCheck.checked));
+
+  apply(DEFAULT_EFFECT);
+  return { apply, setInvert };
+}
 
 function labelFrames(textures, frames) {
   textures.forEach(({ recipe }, i) => {
@@ -56,7 +95,7 @@ function boot() {
 
   const interactions = createInteractions({ renderer });
   renderer.setUpdater(interactions.update);
-  renderer.setEffect(DEFAULT_EFFECT);
+  const controls = buildControls(renderer);
 
   renderer.measure();
   renderer.tick(0); // immediate first paint
@@ -87,12 +126,10 @@ function boot() {
       interactions.setMouse(x, y);
     },
     setEffect(name) {
-      renderer.setEffect(resolveEffect(name));
-      renderer.draw();
+      controls.apply(name);
     },
     setInvert(on) {
-      renderer.globals.invert = on ? 1 : 0;
-      renderer.draw();
+      controls.setInvert(on);
     },
     state() {
       return {

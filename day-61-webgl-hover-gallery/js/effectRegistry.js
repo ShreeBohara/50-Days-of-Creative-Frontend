@@ -10,9 +10,7 @@ export const EFFECTS = [
   { id: "melt", label: "Melt", fragKey: "melt" },
 ];
 
-/* melt while it is the newest effect — the switcher commit settles
- * this back to ripple */
-export const DEFAULT_EFFECT = "melt";
+export const DEFAULT_EFFECT = "ripple";
 
 export function resolveEffect(id) {
   return EFFECTS.some((e) => e.id === id) ? id : DEFAULT_EFFECT;

@@ -127,6 +127,63 @@ input {
   color: var(--accent);
 }
 
+/* ---------------- effect controls ---------------- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 10px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ctl-label {
+  color: rgba(26, 24, 21, 0.55);
+}
+
+.effect-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--ink);
+  background-color: transparent;
+  padding: 8px 30px 8px 12px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+  /* chevron as inline SVG so no extra request, recolorable via CSS */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%231a1815' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.effect-select:hover {
+  background-color: rgba(198, 95, 61, 0.08);
+}
+
+.ctl-invert {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: rgba(26, 24, 21, 0.72);
+}
+
+/* the author display rule would defeat the hidden attribute otherwise */
+.ctl-invert[hidden] {
+  display: none;
+}
+
+.ctl-invert input {
+  accent-color: var(--accent);
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+}
+
 /* ---------------- editorial grid ---------------- */
 
 .grid {
