@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shree Bohara — Selected Work · Day 61</title>
+  <meta name="description" content="A WebGL hover-distortion photography gallery. Six procedural frames on GPU planes — ripple, flow, pixelate and melt shaders under the cursor." />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preload" href="./fonts/gloock-latin-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="./fonts/dm-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <header class="site-head">
+    <div class="head-id">
+      <h1 class="head-name">Shree&nbsp;Bohara</h1>
+      <p class="head-sub">Selected work — six procedural frames · <em>Aperture 61</em></p>
+    </div>
+    <nav class="controls" aria-label="Shader effect controls">
+      <!-- effect switcher mounts here -->
+    </nav>
+  </header>
+
+  <noscript><p class="noscript-note">These frames are generated in the browser — JavaScript required.</p></noscript>
+
+  <main class="grid" id="grid">
+    <figure class="work" data-num="01">
+      <div class="frame" data-slot="0"></div>
+      <figcaption class="caption"><span class="cap-num">01</span><span class="cap-sep">—</span>Dusk Ridge</figcaption>
+    </figure>
+
+    <figure class="work" data-num="02">
+      <div class="frame" data-slot="1"></div>
+      <figcaption class="caption"><span class="cap-num">02</span><span class="cap-sep">—</span>Sea Level</figcaption>
+    </figure>
+
+    <figure class="work" data-num="03">
+      <div class="frame" data-slot="2"></div>
+      <figcaption class="caption"><span class="cap-num">03</span><span class="cap-sep">—</span>Figure I</figcaption>
+    </figure>
+
+    <figure class="work" data-num="04">
+      <div class="frame" data-slot="3"></div>
+      <figcaption class="caption"><span class="cap-num">04</span><span class="cap-sep">—</span>Analog Grid</figcaption>
+    </figure>
+
+    <figure class="work" data-num="05">
+      <div class="frame" data-slot="4"></div>
+      <figcaption class="caption"><span class="cap-num">05</span><span class="cap-sep">—</span>Night Signal</figcaption>
+    </figure>
+
+    <figure class="work" data-num="06">
+      <div class="frame" data-slot="5"></div>
+      <figcaption class="caption"><span class="cap-num">06</span><span class="cap-sep">—</span>Botanic Shadow</figcaption>
+    </figure>
+  </main>
+
+  <footer class="site-foot">
+    <p>Every frame is drawn in-browser at load — no photographs were harmed.</p>
+    <p class="foot-meta">Day 61 · 50 Days of Creative Frontend</p>
+  </footer>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

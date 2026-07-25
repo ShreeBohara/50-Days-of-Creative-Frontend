@@ -1,0 +1,208 @@
+/* ============================================================
+   Day 61 — WebGL Hover Gallery
+   Warm near-white photography gallery. The images themselves
+   live on GL planes; this sheet only dresses the paper around
+   them (header, captions, chrome).
+   ============================================================ */
+
+@font-face {
+  font-family: "Gloock";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/gloock-latin-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/dm-mono-latin-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fonts/dm-mono-latin-500.woff2") format("woff2");
+}
+
+:root {
+  --paper: #f4f1ec;
+  --ink: #1a1815;
+  --accent: #c65f3d;
+  --hairline: #d9d4cb;
+  --ink-ghost: rgba(26, 24, 21, 0.08);
+  --serif: "Gloock", "Iowan Old Style", Georgia, serif;
+  --mono: "DM Mono", "SF Mono", Menlo, monospace;
+  --gutter: clamp(16px, 4vw, 56px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100vh;
+  padding: 0 var(--gutter);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+a,
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------------- header ---------------- */
+
+.site-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(24px, 4vh, 48px) 0 clamp(28px, 5vh, 64px);
+}
+
+.head-name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(34px, 5.4vw, 72px);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+}
+
+.head-sub {
+  margin-top: 10px;
+  font-size: clamp(11px, 1.1vw, 13px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(26, 24, 21, 0.62);
+}
+
+.head-sub em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.noscript-note {
+  padding: 12px 0 32px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+/* ---------------- editorial grid ---------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: clamp(12px, 2.4vw, 32px);
+  row-gap: clamp(56px, 12vh, 140px);
+  padding-bottom: clamp(64px, 12vh, 160px);
+}
+
+.work {
+  position: relative;
+}
+
+/* oversized ghost numeral behind each frame */
+.work::before {
+  content: attr(data-num);
+  position: absolute;
+  top: -0.52em;
+  left: -0.08em;
+  z-index: 0;
+  font-family: var(--serif);
+  font-size: clamp(72px, 11vw, 168px);
+  line-height: 1;
+  color: var(--ink-ghost);
+  pointer-events: none;
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: transparent;
+}
+
+/* the generated texture canvas (scaffold + GL-fallback view) */
+.frame > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.caption {
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(26, 24, 21, 0.78);
+}
+
+.cap-num {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.cap-sep {
+  margin: 0 8px;
+  color: rgba(26, 24, 21, 0.35);
+}
+
+/* asymmetric placement — mixed spans, offsets, aspects */
+.work:nth-of-type(1) { grid-column: 1 / 8; }
+.work:nth-of-type(1) .frame { aspect-ratio: 4 / 3; }
+
+.work:nth-of-type(2) { grid-column: 9 / 13; margin-top: 22vh; }
+.work:nth-of-type(2) .frame { aspect-ratio: 3 / 4; }
+
+.work:nth-of-type(3) { grid-column: 2 / 6; margin-top: 4vh; }
+.work:nth-of-type(3) .frame { aspect-ratio: 3 / 4; }
+
+.work:nth-of-type(4) { grid-column: 7 / 13; margin-top: 16vh; }
+.work:nth-of-type(4) .frame { aspect-ratio: 16 / 9; }
+
+.work:nth-of-type(5) { grid-column: 1 / 5; margin-top: 6vh; }
+.work:nth-of-type(5) .frame { aspect-ratio: 1 / 1; }
+
+.work:nth-of-type(6) { grid-column: 6 / 12; margin-top: 14vh; }
+.work:nth-of-type(6) .frame { aspect-ratio: 3 / 2; }
+
+/* ---------------- footer ---------------- */
+
+.site-foot {
+  border-top: 1px solid var(--hairline);
+  padding: 20px 0 36px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(26, 24, 21, 0.55);
+}

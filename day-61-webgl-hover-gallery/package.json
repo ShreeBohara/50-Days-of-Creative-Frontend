@@ -1,0 +1,9 @@
+{
+  "name": "day-61-webgl-hover-gallery",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "for f in js/*.js; do node --check \"$f\" || exit 1; done"
+  }
+}
