@@ -314,6 +314,38 @@ input {
   color: rgba(244, 241, 236, 0.75);
 }
 
+/* ---------------- soft lens cursor ---------------- */
+
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor-dot {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: #fff;
+  mix-blend-mode: difference;
+  transform: scale(1);
+  transition: transform 0.25s ease;
+}
+
+.cursor-dot.is-over {
+  transform: scale(2.5);
+}
+
 /* ---------------- footer ---------------- */
 
 .site-foot {

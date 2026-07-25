@@ -10,6 +10,7 @@ import { formatCaption } from "./textureRecipes.js";
 import { createContext } from "./glCore.js";
 import { createRenderer } from "./renderer.js";
 import { createInteractions } from "./interactions.js";
+import { createCursor } from "./cursor.js";
 import { createExpand } from "./expand.js";
 import { EFFECTS, DEFAULT_EFFECT, resolveEffect } from "./effectRegistry.js";
 import { mountFallback } from "./fallback.js";
@@ -100,9 +101,11 @@ function boot() {
     interactions,
     titleEl: document.getElementById("expand-title"),
   });
+  const cursor = createCursor({ interactions });
   renderer.setUpdater((dtSec) => {
     interactions.update(dtSec);
     expand.update(dtSec);
+    cursor.update();
   });
   const controls = buildControls(renderer);
 

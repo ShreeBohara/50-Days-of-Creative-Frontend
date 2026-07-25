@@ -6,7 +6,7 @@
 
 import { buildProgram, createQuad, createTextureFrom, resizeToDisplay } from "./glCore.js";
 import { VERTEX_SHADER, FRAGMENTS } from "./shaders.js";
-import { rectToClip, viewportRect, coverUV } from "./rectLogic.js";
+import { rectToClip, viewportRect, coverUV, inflateRect } from "./rectLogic.js";
 
 export function createRenderer({ gl, canvas, frames, textures }) {
   const programs = {};
@@ -36,8 +36,9 @@ export function createRenderer({ gl, canvas, frames, textures }) {
   let updater = null; // interactions hook, runs between rect sync and draw
   let expand = null; // { index, rect, openness } while a plane is expanding
 
-  /* cross-plane uniform values (cursor speed is global by nature) */
-  const globals = { velocity: 0, invert: 0 };
+  /* cross-plane uniform values (cursor speed is global by nature).
+   * breathe gates the idle scale sine (reduced-motion turns it off) */
+  const globals = { velocity: 0, invert: 0, breathe: true };
 
   function measure() {
     const sx = window.scrollX;
@@ -110,7 +111,13 @@ export function createRenderer({ gl, canvas, frames, textures }) {
 
     for (const p of planes) {
       if (expand && expand.index === p.index) continue; // drawn last
-      drawPlane(p, p.viewRect, 1);
+      /* idle breathing: ±2% scale on a slow sine, phase-offset per
+       * plane so the grid never pulses in lockstep */
+      let rect = p.viewRect;
+      if (globals.breathe && rect) {
+        rect = inflateRect(rect, 1 + 0.02 * Math.sin(0.8 * time + p.index * 1.7));
+      }
+      drawPlane(p, rect, 1);
     }
 
     /* the expanding plane rides on top with its distortion settling
