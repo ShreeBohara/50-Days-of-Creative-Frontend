@@ -264,6 +264,56 @@ input {
 .work:nth-of-type(6) { grid-column: 6 / 12; margin-top: 14vh; }
 .work:nth-of-type(6) .frame { aspect-ratio: 3 / 2; }
 
+/* ---------------- expanded-plane title ----------------
+   Rides above the GL layer; the plane itself is the backdrop. A soft
+   scrim baked into the container keeps the type legible on any photo. */
+
+.expand-title {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 18vh var(--gutter) 6vh;
+  pointer-events: none;
+  color: var(--paper);
+  background: linear-gradient(
+    to top,
+    rgba(26, 24, 21, 0.62),
+    rgba(26, 24, 21, 0)
+  );
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.expand-title.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.et-num {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: rgba(244, 241, 236, 0.65);
+}
+
+.et-name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(36px, 6vw, 84px);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  margin: 6px 0 10px;
+}
+
+.et-sub {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 236, 0.75);
+}
+
 /* ---------------- footer ---------------- */
 
 .site-foot {

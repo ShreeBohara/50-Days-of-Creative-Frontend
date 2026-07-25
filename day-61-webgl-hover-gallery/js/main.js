@@ -10,6 +10,7 @@ import { formatCaption } from "./textureRecipes.js";
 import { createContext } from "./glCore.js";
 import { createRenderer } from "./renderer.js";
 import { createInteractions } from "./interactions.js";
+import { createExpand } from "./expand.js";
 import { EFFECTS, DEFAULT_EFFECT, resolveEffect } from "./effectRegistry.js";
 import { mountFallback } from "./fallback.js";
 
@@ -94,8 +95,44 @@ function boot() {
   }
 
   const interactions = createInteractions({ renderer });
-  renderer.setUpdater(interactions.update);
+  const expand = createExpand({
+    renderer,
+    interactions,
+    titleEl: document.getElementById("expand-title"),
+  });
+  renderer.setUpdater((dtSec) => {
+    interactions.update(dtSec);
+    expand.update(dtSec);
+  });
   const controls = buildControls(renderer);
+
+  /* one click path: expanded (or expanding) -> collapse; otherwise the
+   * plane under the pointer expands. Click coordinates refresh the
+   * stored pointer first so touch taps resolve the right plane. */
+  window.addEventListener("click", (e) => {
+    if (expand.active) {
+      expand.close();
+      return;
+    }
+    interactions.setMouse(e.clientX, e.clientY, e.timeStamp);
+    const i = interactions.hoveredIndex();
+    if (i !== null) expand.open(i);
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") expand.close();
+  });
+
+  /* keyboard path: frames are focusable, Enter/Space expands */
+  frames.forEach((frame, i) => {
+    frame.setAttribute("tabindex", "0");
+    frame.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      if (expand.active) expand.close();
+      else expand.open(i);
+    });
+  });
 
   renderer.measure();
   renderer.tick(0); // immediate first paint
@@ -131,6 +168,12 @@ function boot() {
     setInvert(on) {
       controls.setInvert(on);
     },
+    expand(i) {
+      expand.open(i);
+    },
+    collapse() {
+      expand.close();
+    },
     state() {
       return {
         effect: renderer.effect,
@@ -138,6 +181,7 @@ function boot() {
         velocity: renderer.globals.velocity,
         hover: renderer.planes.map((p) => Number(p.uHover.toFixed(4))),
         hovered: interactions.hoveredIndex(),
+        expand: { phase: expand.phase, index: expand.index },
         rects: renderer.planes.map((p) => p.viewRect),
       };
     },

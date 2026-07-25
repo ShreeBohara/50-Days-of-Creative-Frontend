@@ -34,6 +34,7 @@ export function createRenderer({ gl, canvas, frames, textures }) {
 
   let time = 0; // seconds
   let updater = null; // interactions hook, runs between rect sync and draw
+  let expand = null; // { index, rect, openness } while a plane is expanding
 
   /* cross-plane uniform values (cursor speed is global by nature) */
   const globals = { velocity: 0, invert: 0 };
@@ -83,20 +84,19 @@ export function createRenderer({ gl, canvas, frames, textures }) {
     const prog = programs[activeEffect];
     gl.useProgram(prog.program);
 
-    for (const p of planes) {
-      const r = p.viewRect;
-      if (!r || !r.w || !r.h) continue;
+    function drawPlane(p, rect, hoverScale) {
+      if (!rect || !rect.w || !rect.h) return;
 
-      const clip = rectToClip(r, vw, vh);
-      const crop = coverUV(r.w, r.h);
+      const clip = rectToClip(rect, vw, vh);
+      const crop = coverUV(rect.w, rect.h);
 
       gl.uniform4f(prog.u.u_rect, clip.x, clip.y, clip.w, clip.h);
       gl.uniform2f(prog.u.u_uvScale, crop.scale[0], crop.scale[1]);
       gl.uniform2f(prog.u.u_uvOffset, crop.offset[0], crop.offset[1]);
-      gl.uniform1f(prog.u.u_ratio, r.w / r.h);
+      gl.uniform1f(prog.u.u_ratio, rect.w / rect.h);
       gl.uniform1f(prog.u.u_time, time);
       gl.uniform2f(prog.u.u_mouse, p.uMouse?.u ?? 0.5, p.uMouse?.v ?? 0.5);
-      gl.uniform1f(prog.u.u_hover, p.uHover ?? 0);
+      gl.uniform1f(prog.u.u_hover, (p.uHover ?? 0) * hoverScale);
       gl.uniform1f(prog.u.u_sinceEnter, p.uSinceEnter ?? 0);
       gl.uniform1f(prog.u.u_velocity, globals.velocity);
       gl.uniform1f(prog.u.u_invert, globals.invert);
@@ -106,6 +106,18 @@ export function createRenderer({ gl, canvas, frames, textures }) {
       gl.uniform1i(prog.u.u_texture, 0);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    for (const p of planes) {
+      if (expand && expand.index === p.index) continue; // drawn last
+      drawPlane(p, p.viewRect, 1);
+    }
+
+    /* the expanding plane rides on top with its distortion settling
+     * toward zero as it approaches fullscreen */
+    if (expand) {
+      const p = planes[expand.index];
+      drawPlane(p, expand.rect, 1 - expand.openness);
     }
   }
 
@@ -124,6 +136,7 @@ export function createRenderer({ gl, canvas, frames, textures }) {
     tick,
     draw,
     setUpdater(fn) { updater = fn; },
+    setExpand(v) { expand = v; },
     setEffect(name) {
       if (programs[name]) activeEffect = name;
     },
