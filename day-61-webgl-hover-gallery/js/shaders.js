@@ -68,6 +68,28 @@ void main() {
 }
 `;
 
+/* Inline hash-based value noise — no textures, no libraries. Shared by
+ * the shaders that want organic variation (flow, melt).
+ *   hash: sin-dot fract scrambler, the classic one-liner
+ *   noise: bilinear interpolation of hashed lattice corners with a
+ *          smoothstep fade — cheap, smooth, good enough at our scales */
+const NOISE_GLSL = `
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash(i),                 hash(i + vec2(1.0, 0.0)), u.x),
+    mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
+`;
+
 /* ------------------------------------------------------------------ */
 
 const RIPPLE = PRELUDE + `
@@ -105,7 +127,37 @@ void main() {
 }
 `;
 
+const FLOW_RGB = PRELUDE + NOISE_GLSL + `
+/* FLOW RGB — noise-driven UV drift toward the cursor with the three
+ * color channels sampled at separated offsets (chromatic smear).
+ *
+ * Recipe:
+ *   1. dir points from this texel toward the cursor — the drift axis
+ *   2. animated value noise turns the straight drift into a wandering
+ *      current (centered on 0 so the image doesn't slide overall)
+ *   3. R and B sample slightly ahead of / behind G along the drift
+ *      axis; the spread widens with cursor velocity, so a fast swipe
+ *      tears the channels apart and a still cursor almost refocuses.
+ */
+void main() {
+  vec2 uv = v_uv;
+  vec2 dir = normalize(u_mouse - uv + 1e-6);
+
+  float n = noise(uv * 6.0 + u_time * 0.4);
+  vec2 flow = dir * (n - 0.5) * 0.09 * u_hover;
+
+  float spread = (0.004 + 0.028 * u_velocity) * u_hover;
+
+  float r = texture2D(u_texture, cover(uv + flow + dir * spread)).r;
+  float g = texture2D(u_texture, cover(uv + flow)).g;
+  float b = texture2D(u_texture, cover(uv + flow - dir * spread)).b;
+
+  gl_FragColor = vec4(r, g, b, 1.0);
+}
+`;
+
 export const FRAGMENTS = {
   passthrough: PASSTHROUGH,
   ripple: RIPPLE,
+  "flow-rgb": FLOW_RGB,
 };
