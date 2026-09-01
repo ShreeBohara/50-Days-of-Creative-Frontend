@@ -45,12 +45,21 @@ function FramePump() {
   return null
 }
 
-export default function Scene() {
+export default function Scene({ tier = 'desktop', reducedMotion = false, onGlLost }) {
+  const mobile = tier === 'mobile'
   return (
     <Canvas
       camera={{ position: [0, 0.35, 3.4], fov: 42 }}
-      dpr={[1, 2]}
+      dpr={mobile ? [1, 1.5] : [1, 2]}
       gl={{ antialias: true, preserveDrawingBuffer: true }}
+      onCreated={({ gl }) => {
+        // mobile browsers reclaim GL contexts routinely; without this
+        // handler the page would just freeze on a dead canvas
+        gl.domElement.addEventListener('webglcontextlost', (e) => {
+          e.preventDefault()
+          onGlLost?.()
+        })
+      }}
     >
       <color attach="background" args={['#060309']} />
       {/* dim fill so the dark side never reads as a hole in the page */}
@@ -59,16 +68,17 @@ export default function Scene() {
       <directionalLight position={[2.5, 3, 2]} intensity={1.1} color="#ffd9c4" />
       {/* cool rim from behind-right to carve the silhouette out of the dark */}
       <pointLight position={[-3, -1, -2.5]} intensity={6} color="#6a4dff" />
-      <Blob />
-      <Floor />
-      <Effects />
+      <Blob detail={mobile ? 32 : 64} idle={reducedMotion ? 0 : 1} />
+      {/* the reflector renders the scene twice — desktop only */}
+      {!mobile && <Floor />}
+      <Effects multisampling={mobile ? 0 : 4} />
       <FramePump />
       <OrbitControls
         enablePan={false}
         minDistance={2.1}
         maxDistance={6.5}
         maxPolarAngle={Math.PI / 2 + 0.12}
-        autoRotate
+        autoRotate={!reducedMotion}
         autoRotateSpeed={0.55}
         enableDamping
         dampingFactor={0.08}

@@ -7,7 +7,7 @@ import { themeState } from '../themes.js'
 // detail 64 => ~82k triangles: dense enough that per-vertex noise
 // displacement reads as a smooth liquid surface, cheap enough for a
 // vertex shader. The mobile perf tier lowers this later.
-export default function Blob({ detail = 64 }) {
+export default function Blob({ detail = 64, idle = 1 }) {
   const matRef = useRef(null)
   // Created once; the material holds this exact object, so per-frame
   // updates go through matRef (mutating render values is off-limits).
@@ -18,6 +18,7 @@ export default function Blob({ detail = 64 }) {
     if (!u) return
     const t = state.clock.elapsedTime
     u.u_time.value = t
+    u.u_idle.value = idle
     // single sampler per frame: the blob pulls the envelope-smoothed
     // bands; everything else (spectrum strip, bloom) reads engine.levels
     const levels = sampleLevels(t)

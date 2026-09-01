@@ -163,3 +163,74 @@
   text-transform: uppercase;
   font-size: 0.72rem;
 }
+
+/* ---- 2D fallback ---- */
+
+.fallback-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fallback-badge {
+  position: absolute;
+  top: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-dim);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- small screens ---- */
+
+@media (max-width: 640px) {
+  .chrome {
+    padding: 1rem 1.1rem;
+  }
+
+  .day-badge {
+    display: none;
+  }
+
+  .controls {
+    bottom: 2.9rem;
+    max-width: 96vw;
+  }
+
+  .controls-row {
+    gap: 0.65rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .slider input[type='range'] {
+    width: 76px;
+  }
+
+  .start-overlay {
+    bottom: 12%;
+    font-size: 0.7rem;
+    padding: 0.7rem 1.1rem 0.7rem 0.8rem;
+  }
+
+  .spectrum-strip {
+    height: 34px;
+  }
+}
+
+/* ---- reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .start-ring,
+  .scream.is-screaming,
+  .mode-tab.is-waiting {
+    animation: none;
+  }
+}

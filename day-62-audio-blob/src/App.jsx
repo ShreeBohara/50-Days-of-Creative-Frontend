@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Scene from './scene/Scene.jsx'
+import Fallback2D from './Fallback2D.jsx'
 import Controls from './ui/Controls.jsx'
 import SpectrumStrip from './ui/SpectrumStrip.jsx'
 import { enterSynthMode, enterFileMode } from './audio/inputs.js'
@@ -7,9 +8,33 @@ import './App.css'
 
 const dragHasFiles = (e) => e.dataTransfer?.types?.includes('Files')
 
+function detectWebGL() {
+  // ?force2d=1 lets anyone (and QA) exercise the fallback deliberately
+  if (new URLSearchParams(window.location.search).has('force2d')) return false
+  try {
+    const c = document.createElement('canvas')
+    return Boolean(c.getContext('webgl2') || c.getContext('webgl'))
+  } catch {
+    return false
+  }
+}
+
 export default function App() {
   const [running, setRunning] = useState(false)
   const [dragging, setDragging] = useState(false)
+  const [glOk, setGlOk] = useState(detectWebGL)
+
+  // coarse pointer or a small screen → lighter geometry, no reflector
+  const tier = useMemo(() => {
+    const coarse = window.matchMedia('(pointer: coarse)').matches
+    const small = Math.min(window.screen.width, window.screen.height) < 768
+    return coarse || small ? 'mobile' : 'desktop'
+  }, [])
+
+  const reducedMotion = useMemo(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    [],
+  )
 
   const begin = () => {
     // must happen inside the click: browsers gate AudioContext on a gesture
@@ -60,8 +85,17 @@ export default function App() {
 
   return (
     <div className="stage">
-      <Scene />
+      {glOk ? (
+        <Scene
+          tier={tier}
+          reducedMotion={reducedMotion}
+          onGlLost={() => setGlOk(false)}
+        />
+      ) : (
+        <Fallback2D />
+      )}
       <div className="vignette" />
+      {!glOk && <span className="fallback-badge">flat mode — webgl unavailable</span>}
       <header className="chrome chrome-top">
         <div>
           <h1 className="wordmark">RESONANCE</h1>
