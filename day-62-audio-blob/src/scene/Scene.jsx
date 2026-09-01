@@ -1,15 +1,6 @@
 import { Canvas } from '@react-three/fiber'
-
-// Placeholder body — swapped for the audio-reactive shader blob in the
-// blob-geometry stage. Exists so lighting can be tuned against a real surface.
-function ProtoBlob() {
-  return (
-    <mesh>
-      <icosahedronGeometry args={[1, 8]} />
-      <meshStandardMaterial color="#241a38" roughness={0.25} metalness={0.55} />
-    </mesh>
-  )
-}
+import { OrbitControls } from '@react-three/drei'
+import Blob from './Blob.jsx'
 
 export default function Scene() {
   return (
@@ -25,7 +16,16 @@ export default function Scene() {
       <directionalLight position={[2.5, 3, 2]} intensity={1.1} color="#ffd9c4" />
       {/* cool rim from behind-right to carve the silhouette out of the dark */}
       <pointLight position={[-3, -1, -2.5]} intensity={6} color="#6a4dff" />
-      <ProtoBlob />
+      <Blob />
+      <OrbitControls
+        enablePan={false}
+        minDistance={2.1}
+        maxDistance={6.5}
+        autoRotate
+        autoRotateSpeed={0.55}
+        enableDamping
+        dampingFactor={0.08}
+      />
     </Canvas>
   )
 }
