@@ -55,6 +55,10 @@ export function ensureContext() {
   // light hardware-side smoothing; the musical feel comes from our
   // attack/release envelopes on top
   analyser.smoothingTimeConstant = 0.45
+  // widen the byte mapping's dynamic range: the default -100..-30 dB
+  // pegs at 255 for anything near full scale, flat-lining the bass
+  analyser.minDecibels = -85
+  analyser.maxDecibels = -12
 
   const bus = ctx.createGain()
   const monitor = ctx.createGain()
@@ -86,6 +90,11 @@ export function screamTest() {
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x))
 
+// Per-band makeup gain: real spectra tilt downward with frequency
+// (hats measure far quieter than bass in dB), so raw band energies
+// are trimmed up so an average mix exercises the full 0..1 range.
+const BAND_TRIM = { bass: 1.0, mid: 1.7, high: 4.0 }
+
 // Called once per rendered frame. Reads the analyser, buckets to
 // bands, applies sensitivity + scream override, then envelopes.
 export function sampleLevels(nowSec) {
@@ -106,9 +115,9 @@ export function sampleLevels(nowSec) {
     const bands = computeBands(engine.freqData, engine.bins)
     const s = engine.sensitivity
     target = {
-      bass: clamp01(bands.bass * s),
-      mid: clamp01(bands.mid * s),
-      high: clamp01(bands.high * s),
+      bass: clamp01(bands.bass * s * BAND_TRIM.bass),
+      mid: clamp01(bands.mid * s * BAND_TRIM.mid),
+      high: clamp01(bands.high * s * BAND_TRIM.high),
       loud: clamp01(bands.loud * s),
     }
   } else {
@@ -128,4 +137,9 @@ export function sampleLevels(nowSec) {
   L.high = follow(L.high, target.high, dt, opts)
   L.loud = follow(L.loud, target.loud, dt, opts)
   return L
+}
+
+// QA visibility: lets DevTools inspect live levels and routing
+if (typeof window !== 'undefined') {
+  window.resonance = { ...(window.resonance || {}), engine }
 }

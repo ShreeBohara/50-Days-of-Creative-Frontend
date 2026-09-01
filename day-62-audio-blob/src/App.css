@@ -78,3 +78,53 @@
   border-radius: 999px;
   white-space: nowrap;
 }
+
+/* ---- start overlay ---- */
+
+.start-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 1.4rem 0.8rem 0.9rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.start-overlay:hover {
+  border-color: var(--accent);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.start-ring {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #0a0510;
+  font-size: 0.8rem;
+  animation: ring-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ring-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 92, 51, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(255, 92, 51, 0);
+  }
+}
