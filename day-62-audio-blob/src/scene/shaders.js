@@ -272,9 +272,10 @@ void main() {
   // specular ping
   color += vec3(spec * 0.35);
 
-  // manual gamma while there is no post chain
-  // (the bloom composer takes over output encoding next stage)
-  color = pow(color, vec3(1.0 / 2.2));
-  gl_FragColor = vec4(color, 1.0);
+  // output stays LINEAR: the post chain (EffectComposer) blooms in HDR
+  // and performs the sRGB output encoding in its final pass. The 0.78
+  // scale sits the body below the bloom threshold so only rim, spikes
+  // and speculars actually glow.
+  gl_FragColor = vec4(color * 0.78, 1.0);
 }
 `
