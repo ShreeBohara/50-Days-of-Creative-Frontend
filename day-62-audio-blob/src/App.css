@@ -1,0 +1,80 @@
+/* ============================================================
+   App chrome — everything overlaid on the fullscreen canvas
+   ============================================================ */
+
+.stage {
+  position: relative;
+  height: 100%;
+}
+
+.stage > div:first-child {
+  position: absolute !important;
+  inset: 0;
+}
+
+/* soft vignette so the chrome sits on calmer corners */
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 42%,
+    transparent 55%,
+    rgba(3, 1, 6, 0.55) 100%
+  );
+}
+
+.chrome {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.4rem 1.6rem;
+  pointer-events: none;
+}
+
+.chrome > * {
+  pointer-events: auto;
+}
+
+.chrome-top {
+  top: 0;
+}
+
+.chrome-bottom {
+  bottom: 0;
+  align-items: flex-end;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 640;
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  letter-spacing: 0.14em;
+  line-height: 1;
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tagline {
+  margin-top: 0.45rem;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.day-badge {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}

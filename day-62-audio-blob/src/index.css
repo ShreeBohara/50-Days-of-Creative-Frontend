@@ -1,0 +1,54 @@
+/* ============================================================
+   RESONANCE — day 62 · global tokens + reset
+   Dark listening-room aesthetic: near-black violet, ember →
+   violet spectral accents, Unbounded display + Azeret Mono UI.
+   ============================================================ */
+
+:root {
+  --bg: #060309;
+  --bg-raise: #0e0817;
+  --ink: #f4eeff;
+  --ink-dim: #9d8fc0;
+  --line: rgba(244, 238, 255, 0.14);
+  /* theme-driven accents — JS swaps these when the color theme changes */
+  --accent: #ff5c33;
+  --accent-2: #8c5cff;
+  --panel: rgba(16, 10, 26, 0.72);
+  --font-display: 'Unbounded Variable', system-ui, sans-serif;
+  --font-mono: 'Azeret Mono', ui-monospace, 'SF Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
