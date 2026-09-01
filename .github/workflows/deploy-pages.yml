@@ -68,6 +68,7 @@ on:
       - "day-59-y2k-geozone/**"
       - "day-60-brutalist-arcade/**"
       - "day-61-webgl-hover-gallery/**"
+      - "day-62-audio-blob/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -125,6 +126,7 @@ jobs:
             day-45-vitrail/package-lock.json
             day-56-command-os/package-lock.json
             day-57-microinteraction-museum/package-lock.json
+            day-62-audio-blob/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -350,6 +352,14 @@ jobs:
         working-directory: day-57-microinteraction-museum
         run: npm run build
 
+      - name: Install Day 62 app dependencies
+        working-directory: day-62-audio-blob
+        run: npm ci
+
+      - name: Build Day 62 app
+        working-directory: day-62-audio-blob
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -446,6 +456,8 @@ jobs:
           cp -R day-59-y2k-geozone _site/
           cp -R day-60-brutalist-arcade _site/
           cp -R day-61-webgl-hover-gallery _site/
+          mkdir -p _site/day-62-audio-blob
+          cp -R day-62-audio-blob/dist/. _site/day-62-audio-blob/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
