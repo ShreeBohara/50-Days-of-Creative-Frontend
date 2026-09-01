@@ -12,7 +12,7 @@ export default function Blob({ detail = 64 }) {
   // updates go through matRef (mutating render values is off-limits).
   const uniforms = useMemo(() => createBlobUniforms(), [])
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const u = matRef.current?.uniforms
     if (!u) return
     const t = state.clock.elapsedTime
@@ -23,6 +23,11 @@ export default function Blob({ detail = 64 }) {
     u.u_bass.value = levels.bass
     u.u_mid.value = levels.mid
     u.u_high.value = levels.high
+    u.u_loud.value = levels.loud
+    // spectral balance eases slowly so the body color drifts rather
+    // than strobes; +0.06 keeps the ratio stable in near-silence
+    const balance = levels.high / (levels.bass + levels.high + 0.06)
+    u.u_balance.value += (balance - u.u_balance.value) * Math.min(1, delta * 2.5)
   })
 
   return (

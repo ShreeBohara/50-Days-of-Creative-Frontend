@@ -1,6 +1,25 @@
-import { Canvas } from '@react-three/fiber'
+import { useEffect } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import Blob from './Blob.jsx'
+
+// QA bridge: browsers pause requestAnimationFrame in hidden tabs, which
+// freezes the frameloop and makes automated visual checks impossible.
+// resonance.pump(n) advances n frames by hand through R3F's advance().
+function FramePump() {
+  const advance = useThree((s) => s.advance)
+  useEffect(() => {
+    const pump = (n = 1) => {
+      let t = performance.now()
+      for (let i = 0; i < n; i += 1) {
+        t += 16.7
+        advance(t)
+      }
+    }
+    window.resonance = { ...(window.resonance || {}), pump }
+  }, [advance])
+  return null
+}
 
 export default function Scene() {
   return (
@@ -17,6 +36,7 @@ export default function Scene() {
       {/* cool rim from behind-right to carve the silhouette out of the dark */}
       <pointLight position={[-3, -1, -2.5]} intensity={6} color="#6a4dff" />
       <Blob />
+      <FramePump />
       <OrbitControls
         enablePan={false}
         minDistance={2.1}

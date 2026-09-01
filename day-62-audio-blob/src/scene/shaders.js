@@ -1,3 +1,5 @@
+import { Color } from 'three'
+
 // ============================================================
 // Blob shaders — the heart of day 62.
 //
@@ -22,6 +24,14 @@ export function createBlobUniforms() {
     u_high: { value: 0 },
     // 0..1 idle-motion scale (reduced-motion support turns it down)
     u_idle: { value: 1 },
+    // spectral balance: 0 = all bass … 1 = all treble
+    u_balance: { value: 0.35 },
+    // overall loudness — brightens the fresnel rim (bloom fuel)
+    u_loud: { value: 0 },
+    // 3-stop spectral gradient (theme system swaps these)
+    u_colorLow: { value: new Color('#ff3d1f') },
+    u_colorMid: { value: new Color('#8a4dff') },
+    u_colorHigh: { value: new Color('#4fd8ff') },
   }
 }
 
@@ -192,12 +202,22 @@ void main() {
 `
 
 // ------------------------------------------------------------
-// FRAGMENT — placeholder lambert shaded by the rebuilt normal,
-// with displacement-based depth so the noise reads clearly.
-// Fresnel, spectral color, and iridescence arrive next.
+// FRAGMENT — the blob's skin:
+//   · spectral base color: a 3-stop gradient (low → mid → high)
+//     scrubbed by the bass/treble balance of what's playing
+//   · lambert key + blinn specular off the rebuilt normal
+//   · iridescent sheen: cosine palette driven by view angle,
+//     strongest at grazing angles (cheap thin-film feel)
+//   · fresnel rim that brightens with loudness — bloom fuel
 // ------------------------------------------------------------
 export const fragmentShader = /* glsl */ `
 precision highp float;
+
+uniform float u_balance; // 0 = all bass … 1 = all treble
+uniform float u_loud;    // overall loudness
+uniform vec3 u_colorLow;
+uniform vec3 u_colorMid;
+uniform vec3 u_colorHigh;
 
 varying vec3 v_normal;
 varying vec3 v_viewDir;
@@ -205,20 +225,56 @@ varying vec3 v_objPos;
 varying float v_disp;
 varying float v_spike;
 
+const float TAU = 6.28318530718;
+
 void main() {
   vec3 N = normalize(v_normal);
-  // matches the JSX key light direction so the shaded body agrees
-  // with the rest of the scene while the real shading is built
-  vec3 L = normalize(vec3(2.5, 3.0, 2.0));
+  vec3 V = normalize(v_viewDir);
+  float facing = max(dot(N, V), 0.0);
+
+  // spectral base: bass-heavy music sits in the low colors,
+  // treble-heavy slides through violet into cyan
+  vec3 base = u_balance < 0.5
+    ? mix(u_colorLow, u_colorMid, u_balance * 2.0)
+    : mix(u_colorMid, u_colorHigh, u_balance * 2.0 - 1.0);
+
+  // lighting — a studio key that rides over the viewer's shoulder:
+  // OrbitControls + auto-rotate mean the camera circles the blob, so a
+  // world-fixed light would leave the visible side in shadow half the
+  // time. Blending the key toward the view direction keeps the facing
+  // hemisphere lit from every angle while preserving directionality.
+  vec3 L = normalize(normalize(vec3(2.5, 3.0, 2.0)) + V * 1.4);
   float diff = max(dot(N, L), 0.0);
+  vec3 H = normalize(L + V);
+  float spec = pow(max(dot(N, H), 0.0), 64.0);
 
-  vec3 shadow = vec3(0.05, 0.03, 0.10);
-  vec3 lit    = vec3(0.36, 0.22, 0.52);
-  vec3 base = mix(shadow, lit, diff);
+  vec3 color = base * (0.16 + 0.84 * diff);
 
-  // valleys darken, crests lighten — sells the relief even unlit
-  base *= 0.75 + v_disp * 1.4;
+  // valleys darken, crests lighten — relief without any AO pass
+  color *= 0.72 + v_disp * 1.5;
 
-  gl_FragColor = vec4(base, 1.0);
+  // silence dims the body to an ember; sound switches it on
+  color *= 0.40 + 0.60 * clamp(u_loud * 1.7, 0.0, 1.0);
+
+  // needle spikes read hot: pulled toward the treble color
+  color = mix(color, u_colorHigh * 1.6, clamp(v_spike * 1.4, 0.0, 0.85));
+
+  // iridescent sheen — hue rotates with view angle, grazing only
+  vec3 irid = 0.5 + 0.5 * cos(TAU * (facing * 1.6 + vec3(0.0, 0.33, 0.67)));
+  color += irid * (1.0 - facing) * 0.06;
+
+  // fresnel rim — the loudness-driven glow bloom will feed on.
+  // Tinted by the spectral gradient so it never fights the body color.
+  float fres = pow(1.0 - facing, 3.0);
+  vec3 rim = mix(mix(u_colorLow, u_colorMid, 0.5), u_colorHigh, u_balance);
+  color += rim * fres * (0.35 + u_loud * 1.1);
+
+  // specular ping
+  color += vec3(spec * 0.35);
+
+  // manual gamma while there is no post chain
+  // (the bloom composer takes over output encoding next stage)
+  color = pow(color, vec3(1.0 / 2.2));
+  gl_FragColor = vec4(color, 1.0);
 }
 `
