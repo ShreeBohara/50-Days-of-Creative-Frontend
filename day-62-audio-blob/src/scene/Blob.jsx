@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { createBlobUniforms, vertexShader, fragmentShader } from './shaders.js'
 import { sampleLevels } from '../audio/engine.js'
+import { themeState } from '../themes.js'
 
 // detail 64 => ~82k triangles: dense enough that per-vertex noise
 // displacement reads as a smooth liquid surface, cheap enough for a
@@ -28,6 +29,12 @@ export default function Blob({ detail = 64 }) {
     // than strobes; +0.06 keeps the ratio stable in near-silence
     const balance = levels.high / (levels.bass + levels.high + 0.06)
     u.u_balance.value += (balance - u.u_balance.value) * Math.min(1, delta * 2.5)
+    // glide the gradient stops toward the active theme
+    const th = themeState.current
+    const k = Math.min(1, delta * 3)
+    u.u_colorLow.value.lerp(th.lowColor, k)
+    u.u_colorMid.value.lerp(th.midColor, k)
+    u.u_colorHigh.value.lerp(th.highColor, k)
   })
 
   return (

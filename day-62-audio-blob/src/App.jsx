@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import Scene from './scene/Scene.jsx'
+import Controls from './ui/Controls.jsx'
+import SpectrumStrip from './ui/SpectrumStrip.jsx'
 import { enterSynthMode, enterFileMode } from './audio/inputs.js'
 import './App.css'
 
@@ -67,12 +69,15 @@ export default function App() {
         </div>
         <span className="day-badge">DAY 62 / 65</span>
       </header>
-      {!running && (
+      {running ? (
+        <Controls />
+      ) : (
         <button className="start-overlay" onClick={begin}>
           <span className="start-ring">▶</span>
           <span className="start-label">press play — the blob is listening</span>
         </button>
       )}
+      <SpectrumStrip />
       {dragging && (
         <div className="dropzone">
           <p className="dropzone-title">drop the track</p>
