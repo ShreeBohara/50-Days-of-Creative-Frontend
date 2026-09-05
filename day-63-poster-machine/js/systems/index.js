@@ -7,8 +7,9 @@
 // `draw` is pure canvas work in 1200×1600 poster units; poster.js sets the
 // transform, so systems never think about pixels.
 import { swiss } from "./swiss.js";
+import { flow } from "./flow.js";
 
-export const SYSTEMS = [swiss];
+export const SYSTEMS = [swiss, flow];
 export const DEFAULT_SYSTEM = SYSTEMS[0].id;
 export const SYSTEM_IDS = SYSTEMS.map((system) => system.id);
 
