@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Poster Machine — Day 63</title>
+  <meta name="description" content="Seeded generative poster tool — Day 63 of 50 Days of Creative Frontend. Five visual systems, readable seed codes, palette and layout locks, and 2400×3200 print-res export." />
+  <meta name="theme-color" content="#d9d9d5" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preload" href="./fonts/hanken-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="./fonts/red-hat-mono-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#panel">Skip to controls</a>
+
+  <div class="studio" id="studio">
+    <header class="site-head">
+      <a class="back-link" href="../" aria-label="Back to the 50 Days gallery">&larr; 50 Days</a>
+      <h1 class="head-title">Poster Machine <span class="head-num">/ 63</span></h1>
+      <p class="head-sub">Seeded generative posters &middot; five systems &middot; print-res export</p>
+    </header>
+
+    <main class="stage" id="stage" aria-label="Poster preview">
+      <div class="poster-wrap" id="poster-wrap">
+        <canvas id="poster" role="img" aria-label="Generated poster"></canvas>
+        <canvas id="poster-ghost" aria-hidden="true"></canvas>
+      </div>
+      <p class="stage-status" id="stage-status"></p>
+    </main>
+
+    <aside class="panel" id="panel" aria-label="Poster controls">
+      <section class="panel-section section-seed" aria-labelledby="seed-title">
+        <h2 class="section-title" id="seed-title"><span>Seed</span><span class="section-hint">every code is a poster</span></h2>
+        <p class="seed-readout" id="seed-readout" aria-live="polite">—</p>
+        <button class="btn btn-accent" id="reroll-button" type="button">
+          <span>Reroll</span>
+          <kbd class="kbd" aria-hidden="true">space</kbd>
+        </button>
+      </section>
+      <div id="controls-mount"></div>
+    </aside>
+  </div>
+
+  <div class="sr-only" id="live-region" aria-live="polite"></div>
+  <noscript><p class="noscript-note">Posters are generated in the browser — JavaScript required.</p></noscript>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
