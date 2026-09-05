@@ -15,6 +15,7 @@ import { mountSeedControls } from "./seedControls.js";
 import { encodeCode, decodeCode } from "./seedCode.js";
 import { mountExportControls } from "./exportControls.js";
 import { exportBlob, renderExportCanvas } from "./exportPng.js";
+import { mountGallery } from "./gallery.js";
 
 const $ = (selector) => document.querySelector(selector);
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -30,6 +31,13 @@ const view = createPosterView({
   stage: $("#stage"),
   wrap: $("#poster-wrap"),
   reducedMotion: () => motionQuery.matches,
+});
+
+const gallery = mountGallery({
+  container: $("#gallery-mount"),
+  emptyEl: $("#gallery-empty"),
+  onRestore: (snapshot) => apply(restore(state, snapshot), { fade: true }),
+  announce,
 });
 
 /* Panel sections. Each mount gets `update(updater)` and reports back via sync(state). */
@@ -55,6 +63,7 @@ function syncUi() {
   rerollButton.disabled = !canReroll(state);
   stageStatus.textContent = codeOf(state);
   for (const section of sections) section.sync(state);
+  gallery.sync(state, codeOf(state));
   const hash = `#${codeOf(state)}`;
   if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
 }
@@ -85,6 +94,7 @@ function doReroll() {
     return;
   }
   apply(reroll(state), { fade: true });
+  gallery.push({ code: codeOf(state), snapshot: snapshotOf(state) });
 }
 
 async function waitForFonts() {
@@ -105,6 +115,7 @@ async function boot() {
   view.render(state, codeOf(state));
   syncUi();
   systemPicker.renderNow(state);
+  gallery.push({ code: codeOf(state), snapshot: snapshotOf(state) });
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       view.rerender();
@@ -131,6 +142,7 @@ async function boot() {
     lock: (which) => apply(toggleLock(state, which)),
     restore: (snapshot) => apply(restore(state, snapshot)),
     renderSync: () => view.rerender(),
+    history: () => gallery.entries(),
     exportBlob: () => exportBlob(state, { code: codeOf(state) }),
     exportCanvas: (width = 2400) => renderExportCanvas(state, {
       code: codeOf(state), width, height: Math.round((width * 4) / 3),

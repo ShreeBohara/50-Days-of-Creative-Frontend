@@ -509,9 +509,77 @@ button, input, select, textarea {
   color: var(--muted);
 }
 
+/* ---- gallery strip ---- */
+
+.strip {
+  grid-area: strip;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 104px;
+  padding: 8px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.strip-label {
+  flex: none;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.strip-items {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px;
+}
+
+.strip-empty {
+  margin: 0;
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.gallery-item {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+}
+.gallery-item:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+.gallery-item[aria-current="true"] {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.gallery-item canvas {
+  display: block;
+  width: 54px;
+  height: 72px;
+  border-radius: 2px;
+}
+.gallery-code {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: center;
+}
+
 /* ---- motion ---- */
 
 @media (prefers-reduced-motion: reduce) {
   #poster-ghost.is-showing.is-fading { transition: none; }
-  .btn { transition: none; }
+  .btn, .gallery-item { transition: none; }
 }
