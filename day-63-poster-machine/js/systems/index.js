@@ -10,8 +10,9 @@ import { swiss } from "./swiss.js";
 import { flow } from "./flow.js";
 import { bauhaus } from "./bauhaus.js";
 import { terrain } from "./terrain.js";
+import { glitch } from "./glitch.js";
 
-export const SYSTEMS = [swiss, flow, bauhaus, terrain];
+export const SYSTEMS = [swiss, flow, bauhaus, terrain, glitch];
 export const DEFAULT_SYSTEM = SYSTEMS[0].id;
 export const SYSTEM_IDS = SYSTEMS.map((system) => system.id);
 
