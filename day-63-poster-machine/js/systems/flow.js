@@ -35,10 +35,10 @@ export const flow = {
       ctx.moveTo(points[0].x, points[0].y);
       for (let k = 1; k < points.length; k += 1) ctx.lineTo(points[k].x, points[k].y);
       if (inside) {
-        ctx.lineWidth = 2.4 + 1.8 * stroke.jitter;
+        ctx.lineWidth = Math.max(2.4 + 1.8 * stroke.jitter, frame.hairline);
         ctx.strokeStyle = stroke.jitter < plan.accentShare ? insideColors[0] : insideColors[1];
       } else {
-        ctx.lineWidth = 1.2 + 0.9 * stroke.jitter;
+        ctx.lineWidth = Math.max(1.2 + 0.9 * stroke.jitter, frame.hairline * 0.8);
         ctx.strokeStyle = plan.inkOutside
           ? outsideInk
           : withAlpha(palette.colors[stroke.colorIdx], 0.75);

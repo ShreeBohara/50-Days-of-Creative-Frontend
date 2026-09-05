@@ -36,9 +36,9 @@ function layoutHeadline(ctx, lines, plan, g, family) {
   };
 }
 
-function drawGrid(ctx, g, ink) {
+function drawGrid(ctx, g, ink, hairline) {
   ctx.strokeStyle = withAlpha(ink, 0.1);
-  ctx.lineWidth = 1;
+  ctx.lineWidth = hairline;
   ctx.beginPath();
   for (let c = 0; c <= g.cols; c += 1) {
     const x = gridlineX(g, c);
@@ -92,7 +92,7 @@ export const swiss = {
     const { W, H, M, palette, text, fonts } = frame;
     const g = gridGeometry(plan.cols, plan.rows, W, H, M);
 
-    if (plan.showGrid) drawGrid(ctx, g, palette.ink);
+    if (plan.showGrid) drawGrid(ctx, g, palette.ink, frame.hairline);
 
     const raw = plan.caps ? text.headline.toUpperCase() : text.headline;
     const layout = layoutHeadline(ctx, breakHeadline(raw, plan.lineCount), plan, g, fonts.display);
@@ -131,7 +131,7 @@ export const swiss = {
     /* The one rule line. */
     const rule = ruleLine(plan, g);
     ctx.strokeStyle = palette.ink;
-    ctx.lineWidth = rule.thickness;
+    ctx.lineWidth = Math.max(rule.thickness, frame.hairline);
     ctx.lineCap = "butt";
     ctx.beginPath();
     ctx.moveTo(rule.x1, rule.y1);

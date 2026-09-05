@@ -322,6 +322,82 @@ button, input, select, textarea {
   letter-spacing: 0.08em;
 }
 
+/* ---- locks ---- */
+
+.lock-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lock {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.lock:hover { color: var(--ink); }
+.lock[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+/* ---- system picker ---- */
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mini {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  padding: 4px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.mini:hover { border-color: var(--line-strong); }
+.mini[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.mini canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 2px;
+  background: #fff;
+}
+.mini-name {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---- palette swatches ---- */
 
 .swatch-grid {

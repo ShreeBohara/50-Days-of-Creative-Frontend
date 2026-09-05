@@ -31,12 +31,21 @@
 
     <aside class="panel" id="panel" aria-label="Poster controls">
       <section class="panel-section section-seed" aria-labelledby="seed-title">
-        <h2 class="section-title" id="seed-title"><span>Seed</span><span class="section-hint">every code is a poster</span></h2>
+        <h2 class="section-title" id="seed-title"><span>Seed</span><span class="section-hint" id="seed-hint">every code is a poster</span></h2>
         <p class="seed-readout" id="seed-readout" aria-live="polite">—</p>
         <button class="btn btn-accent" id="reroll-button" type="button">
           <span>Reroll</span>
           <kbd class="kbd" aria-hidden="true">space</kbd>
         </button>
+        <div class="lock-row" id="locks-mount" role="group" aria-label="Locks"></div>
+      </section>
+      <section class="panel-section" aria-labelledby="text-title">
+        <h2 class="section-title" id="text-title"><span>Text</span><span class="section-hint">headline drives every system</span></h2>
+        <div id="text-mount"></div>
+      </section>
+      <section class="panel-section" aria-labelledby="system-title">
+        <h2 class="section-title" id="system-title"><span>System</span><span class="section-hint" id="system-name"></span></h2>
+        <div class="mini-grid" id="system-mount"></div>
       </section>
       <section class="panel-section" aria-labelledby="palette-title">
         <h2 class="section-title" id="palette-title"><span>Palette</span><span class="section-hint" id="palette-name"></span></h2>

@@ -59,6 +59,8 @@ export function createFrame(state, { scale = 1, code = "", layerFactory } = {}) 
     H: POSTER_H,
     M: MARGIN,
     scale,
+    // Thinnest line that still covers a device pixel, in poster units.
+    hairline: Math.max(1, 1 / scale),
     palette: resolvePalette(state.palette),
     text: { ...state.text, code },
     fonts: { display: DISPLAY_FAMILY, mono: MONO_FAMILY },

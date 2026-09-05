@@ -31,7 +31,7 @@ export const terrain = {
       ctx.moveTo(points[0].x, points[0].y);
       for (let k = 1; k < points.length; k += 1) ctx.lineTo(points[k].x, points[k].y);
       ctx.strokeStyle = depthColor(plan, palette, i);
-      ctx.lineWidth = plan.strokeWidth;
+      ctx.lineWidth = Math.max(plan.strokeWidth, frame.hairline);
       ctx.stroke();
     }
 

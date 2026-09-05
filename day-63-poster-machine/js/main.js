@@ -8,6 +8,9 @@ import { DISPLAY_FAMILY, MONO_FAMILY } from "./text.js";
 import { resolvePalette } from "./palettes.js";
 import { mountPaletteControls } from "./paletteControls.js";
 import { mountFinishControls } from "./finishControls.js";
+import { mountTextControls } from "./textControls.js";
+import { mountSystemPicker } from "./systemPicker.js";
+import { mountRerollControls } from "./rerollControls.js";
 
 const $ = (selector) => document.querySelector(selector);
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -27,7 +30,14 @@ const view = createPosterView({
 });
 
 /* Panel sections. Each mount gets `update(updater)` and reports back via sync(state). */
+const systemPicker = mountSystemPicker({ container: $("#system-mount"), nameEl: $("#system-name"), onChange: update, announce });
 const sections = [
+  mountRerollControls({
+    button: rerollButton, locksContainer: $("#locks-mount"), hintEl: $("#seed-hint"),
+    onReroll: doReroll, onChange: update, announce,
+  }),
+  mountTextControls({ container: $("#text-mount"), onChange: update }),
+  systemPicker,
   mountPaletteControls({ container: $("#palette-mount"), nameEl: $("#palette-name"), onChange: update, announce }),
   mountFinishControls({ container: $("#finish-mount"), onChange: update }),
 ];
@@ -66,11 +76,6 @@ function doReroll() {
   apply(reroll(state), { fade: true });
 }
 
-function isTypingTarget(target) {
-  return target instanceof Element
-    && Boolean(target.closest("input, textarea, select, button, [contenteditable]"));
-}
-
 async function waitForFonts() {
   if (!document.fonts || typeof document.fonts.load !== "function") return;
   const loads = Promise.all([
@@ -87,16 +92,13 @@ async function boot() {
   view.measure();
   view.render(state, codeOf(state));
   syncUi();
+  systemPicker.renderNow(state);
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => view.rerender());
+    document.fonts.ready.then(() => {
+      view.rerender();
+      systemPicker.renderNow(state);
+    });
   }
-
-  rerollButton.addEventListener("click", doReroll);
-  window.addEventListener("keydown", (event) => {
-    if (event.code !== "Space" || event.repeat || isTypingTarget(event.target)) return;
-    event.preventDefault();
-    doReroll();
-  });
 
   /* Headless QA controller — drives the same functions the UI uses. */
   window.posterMachine = {
