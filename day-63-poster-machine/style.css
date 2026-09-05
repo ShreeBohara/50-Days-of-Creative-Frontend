@@ -577,6 +577,95 @@ button, input, select, textarea {
   text-align: center;
 }
 
+/* ---- responsive ---- */
+
+@media (max-width: 1100px) {
+  :root { --panel-w: 300px; }
+  .head-sub { display: none; }
+}
+
+@media (max-width: 900px) {
+  html, body {
+    height: auto;
+    overflow: auto;
+  }
+
+  .studio {
+    height: auto;
+    min-height: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: var(--head-h) auto auto auto;
+    grid-template-areas:
+      "head"
+      "stage"
+      "strip"
+      "panel";
+  }
+
+  .stage {
+    height: 68dvh;
+    min-height: 420px;
+    padding: 20px;
+  }
+
+  .panel {
+    overflow: visible;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Keep the seed code and Reroll within reach while scrolling the panel. */
+  .section-seed {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--panel);
+    box-shadow: 0 8px 16px -12px rgb(0 0 0 / 30%);
+  }
+
+  .strip {
+    min-height: 0;
+    padding: 8px 14px;
+  }
+  .strip-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+  .gallery-item canvas {
+    width: 48px;
+    height: 64px;
+  }
+  .gallery-code { display: none; }
+
+  .stage-status { display: none; }
+}
+
+@media (max-width: 480px) {
+  :root { --head-h: 52px; }
+  .site-head { gap: 12px; padding: 0 14px; }
+  .head-title { font-size: 15px; }
+  .panel-section { padding: 14px; }
+  .swatch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .swatch-name { font-size: 9px; }
+  .seed-input { font-size: 16px; } /* 16px stops iOS zooming into the field */
+  .input { font-size: 16px; }
+}
+
+@media (pointer: coarse) {
+  .btn, .lock, .btn-icon { min-height: 44px; }
+  .swatch, .mini, .gallery-item { min-height: 44px; }
+  .input { min-height: 44px; }
+  .range { height: 32px; }
+  .toggle { width: 22px; height: 22px; }
+  .gallery-item:hover, .swatch:hover, .mini:hover { transform: none; }
+}
+
+@media (max-height: 640px) and (min-width: 901px) {
+  :root { --head-h: 48px; }
+  .strip { min-height: 84px; }
+  .gallery-item canvas { width: 42px; height: 56px; }
+}
+
 /* ---- motion ---- */
 
 @media (prefers-reduced-motion: reduce) {

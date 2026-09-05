@@ -16,6 +16,7 @@ import { encodeCode, decodeCode } from "./seedCode.js";
 import { mountExportControls } from "./exportControls.js";
 import { exportBlob, renderExportCanvas } from "./exportPng.js";
 import { mountGallery } from "./gallery.js";
+import { getSystem } from "./systems/index.js";
 
 const $ = (selector) => document.querySelector(selector);
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -24,6 +25,7 @@ let state = createInitialState();
 const announce = createAnnouncer($("#live-region"));
 const stageStatus = $("#stage-status");
 const rerollButton = $("#reroll-button");
+const posterCanvas = $("#poster");
 
 const view = createPosterView({
   canvas: $("#poster"),
@@ -62,6 +64,8 @@ const codeOf = encodeCode;
 function syncUi() {
   rerollButton.disabled = !canReroll(state);
   stageStatus.textContent = codeOf(state);
+  posterCanvas.setAttribute("aria-label",
+    `${getSystem(state.system).name} poster "${state.text.headline}", code ${codeOf(state)}`);
   for (const section of sections) section.sync(state);
   gallery.sync(state, codeOf(state));
   const hash = `#${codeOf(state)}`;
