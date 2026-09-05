@@ -69,6 +69,7 @@ on:
       - "day-60-brutalist-arcade/**"
       - "day-61-webgl-hover-gallery/**"
       - "day-62-audio-blob/**"
+      - "day-63-poster-machine/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -458,6 +459,7 @@ jobs:
           cp -R day-61-webgl-hover-gallery _site/
           mkdir -p _site/day-62-audio-blob
           cp -R day-62-audio-blob/dist/. _site/day-62-audio-blob/
+          cp -R day-63-poster-machine _site/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
