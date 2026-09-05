@@ -13,6 +13,8 @@ import { mountSystemPicker } from "./systemPicker.js";
 import { mountRerollControls } from "./rerollControls.js";
 import { mountSeedControls } from "./seedControls.js";
 import { encodeCode, decodeCode } from "./seedCode.js";
+import { mountExportControls } from "./exportControls.js";
+import { exportBlob, renderExportCanvas } from "./exportPng.js";
 
 const $ = (selector) => document.querySelector(selector);
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -42,6 +44,9 @@ const sections = [
   systemPicker,
   mountPaletteControls({ container: $("#palette-mount"), nameEl: $("#palette-name"), onChange: update, announce }),
   mountFinishControls({ container: $("#finish-mount"), onChange: update }),
+  mountExportControls({
+    container: $("#export-mount"), getState: () => state, getCode: () => codeOf(state), announce,
+  }),
 ];
 
 const codeOf = encodeCode;
@@ -126,6 +131,10 @@ async function boot() {
     lock: (which) => apply(toggleLock(state, which)),
     restore: (snapshot) => apply(restore(state, snapshot)),
     renderSync: () => view.rerender(),
+    exportBlob: () => exportBlob(state, { code: codeOf(state) }),
+    exportCanvas: (width = 2400) => renderExportCanvas(state, {
+      code: codeOf(state), width, height: Math.round((width * 4) / 3),
+    }),
     size: () => view.size,
     canvas: () => view.canvas,
   };
