@@ -8,8 +8,9 @@
 // transform, so systems never think about pixels.
 import { swiss } from "./swiss.js";
 import { flow } from "./flow.js";
+import { bauhaus } from "./bauhaus.js";
 
-export const SYSTEMS = [swiss, flow];
+export const SYSTEMS = [swiss, flow, bauhaus];
 export const DEFAULT_SYSTEM = SYSTEMS[0].id;
 export const SYSTEM_IDS = SYSTEMS.map((system) => system.id);
 
