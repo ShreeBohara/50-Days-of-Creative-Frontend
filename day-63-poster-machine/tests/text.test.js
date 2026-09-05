@@ -19,7 +19,9 @@ test("breakHeadline keeps a one-line request whole", () => {
 
 test("breakHeadline splits a single word to reach the line count", () => {
   assert.deepEqual(breakHeadline("VOLTAGE", 2), ["VOLT", "AGE"]);
-  assert.deepEqual(breakHeadline("VOLTAGE", 3), ["VO", "LT", "AGE"]);
+  assert.deepEqual(breakHeadline("VOLTAGE", 3), ["VOLT", "AGE"]);
+  assert.deepEqual(breakHeadline("ORCHESTRA", 2), ["ORCHE", "STRA"]);
+  assert.deepEqual(breakHeadline("Night Shift", 3), ["Night", "Shift"]);
 });
 
 test("breakHeadline balances words across lines", () => {

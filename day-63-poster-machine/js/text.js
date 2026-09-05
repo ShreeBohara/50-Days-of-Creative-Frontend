@@ -44,7 +44,7 @@ export function breakHeadline(str, lines = 1) {
       if (parts[i].text.length > parts[longest].text.length) longest = i;
     }
     const part = parts[longest];
-    if (part.text.length < 4) break;
+    if (part.text.length < 6) break; // both halves keep at least 3 letters
     const cut = Math.ceil(part.text.length / 2);
     parts.splice(longest, 1,
       { text: part.text.slice(0, cut), glue: part.glue },
