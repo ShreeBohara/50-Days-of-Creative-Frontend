@@ -11,6 +11,8 @@ import { mountFinishControls } from "./finishControls.js";
 import { mountTextControls } from "./textControls.js";
 import { mountSystemPicker } from "./systemPicker.js";
 import { mountRerollControls } from "./rerollControls.js";
+import { mountSeedControls } from "./seedControls.js";
+import { encodeCode, decodeCode } from "./seedCode.js";
 
 const $ = (selector) => document.querySelector(selector);
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -18,7 +20,6 @@ const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 let state = createInitialState();
 const announce = createAnnouncer($("#live-region"));
 const stageStatus = $("#stage-status");
-const seedReadout = $("#seed-readout");
 const rerollButton = $("#reroll-button");
 
 const view = createPosterView({
@@ -32,6 +33,7 @@ const view = createPosterView({
 /* Panel sections. Each mount gets `update(updater)` and reports back via sync(state). */
 const systemPicker = mountSystemPicker({ container: $("#system-mount"), nameEl: $("#system-name"), onChange: update, announce });
 const sections = [
+  mountSeedControls({ container: $("#seed-mount"), onChange: update, announce }),
   mountRerollControls({
     button: rerollButton, locksContainer: $("#locks-mount"), hintEl: $("#seed-hint"),
     onReroll: doReroll, onChange: update, announce,
@@ -42,16 +44,20 @@ const sections = [
   mountFinishControls({ container: $("#finish-mount"), onChange: update }),
 ];
 
-/* Until the seed-code commit lands, the readout shows the raw layout seed. */
-function codeOf(current) {
-  return current.layoutSeed.toString(16).toUpperCase().padStart(5, "0");
-}
+const codeOf = encodeCode;
 
 function syncUi() {
-  seedReadout.textContent = codeOf(state);
   rerollButton.disabled = !canReroll(state);
-  stageStatus.textContent = `${state.system} · ${state.layoutSeed}`;
+  stageStatus.textContent = codeOf(state);
   for (const section of sections) section.sync(state);
+  const hash = `#${codeOf(state)}`;
+  if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
+}
+
+/** A valid code in the URL hash restores that poster before the first paint. */
+function stateFromHash(base) {
+  const result = decodeCode(window.location.hash.slice(1));
+  return result.ok ? restore(base, result) : base;
 }
 
 /** Applies a new state; `fade` crossfades from the previous poster. */
@@ -88,6 +94,7 @@ async function waitForFonts() {
 
 async function boot() {
   document.documentElement.dataset.js = "ready";
+  state = stateFromHash(state);
   await waitForFonts();
   view.measure();
   view.render(state, codeOf(state));
@@ -105,6 +112,11 @@ async function boot() {
     version: "day-63",
     state: () => snapshotOf(state),
     code: () => codeOf(state),
+    setCode: (code) => {
+      const result = decodeCode(code);
+      if (result.ok) apply(restore(state, result));
+      return result.ok;
+    },
     reroll: () => doReroll(),
     setSystem: (id) => apply(setSystem(state, id)),
     setPalette: (palette) => apply(setPalette(state, palette)),

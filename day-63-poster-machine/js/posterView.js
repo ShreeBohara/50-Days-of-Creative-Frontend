@@ -43,10 +43,16 @@ export function createPosterView({
     ghost.classList.remove("is-showing", "is-fading");
   }
 
-  function render(state, code = "") {
+  function paint(state, code) {
     last = { state, code };
     if (size.width === 0 && !measure()) return null;
     return renderPoster(ctx, state, { scale: size.scale, code });
+  }
+
+  /** Immediate re-render; any crossfade in flight is dismissed. */
+  function render(state, code = "") {
+    endFade();
+    return paint(state, code);
   }
 
   function rerender() {
@@ -59,7 +65,7 @@ export function createPosterView({
     endFade();
     ghostCtx.drawImage(canvas, 0, 0);
     ghost.classList.add("is-showing");
-    const result = render(state, code);
+    const result = paint(state, code);
     requestAnimationFrame(() => ghost.classList.add("is-fading"));
     fadeTimer = setTimeout(endFade, FADE_FALLBACK_MS);
     return result;

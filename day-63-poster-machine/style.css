@@ -314,12 +314,34 @@ button, input, select, textarea {
   opacity: 0.75;
 }
 
-.seed-readout {
-  margin: 0 0 12px;
-  font-family: var(--mono);
-  font-size: 22px;
+.seed-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.seed-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.seed-input.is-invalid {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgb(255 75 31 / 25%);
+}
+
+.btn-icon {
+  padding: 8px 10px;
+  flex: none;
+}
+
+.seed-error {
+  margin: -6px 0 10px;
+  color: var(--accent);
+  font-size: 11px;
 }
 
 /* ---- locks ---- */
