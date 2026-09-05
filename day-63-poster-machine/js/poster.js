@@ -6,6 +6,7 @@ import { createSimplexNoise } from "./noise.js";
 import { resolvePalette } from "./palettes.js";
 import { getSystem } from "./systems/index.js";
 import { DISPLAY_FAMILY, MONO_FAMILY } from "./text.js";
+import { applyFinish } from "./finish.js";
 
 export const POSTER_W = 1200;
 export const POSTER_H = 1600;
@@ -76,10 +77,10 @@ export function planPoster(state) {
 /**
  * Renders `state` into `ctx` at `scale` (device px per poster unit).
  * Fills the whole canvas with the palette background first, then draws the
- * poster clipped to the page. `finish` (grain/paper) is applied when present.
+ * poster clipped to the page. `finish: false` skips grain/paper (minis).
  */
 export function renderPoster(ctx, state, options = {}) {
-  const { scale = 1, code = "", finish = true, layerFactory, applyFinish } = options;
+  const { scale = 1, code = "", finish = true, layerFactory } = options;
   const frame = createFrame(state, { scale, code, layerFactory });
   const { system, plan } = planPoster(state);
   ctx.save();
@@ -95,7 +96,7 @@ export function renderPoster(ctx, state, options = {}) {
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   system.draw(ctx, frame, plan);
-  if (finish && applyFinish) applyFinish(ctx, frame, state.finish);
+  if (finish) applyFinish(ctx, frame, state.finish);
   ctx.restore();
   return { frame, plan, system };
 }

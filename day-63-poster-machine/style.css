@@ -322,6 +322,81 @@ button, input, select, textarea {
   letter-spacing: 0.08em;
 }
 
+/* ---- palette swatches ---- */
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.swatch:hover { border-color: var(--line-strong); }
+.swatch[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+.swatch-strip {
+  display: flex;
+  height: 22px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 8%);
+}
+.swatch-strip span { flex: 1; }
+
+.swatch-name {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- finish ---- */
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.field-value { color: var(--ink); }
+
+.range {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.field-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.toggle {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--ink);
+}
+
 /* ---- motion ---- */
 
 @media (prefers-reduced-motion: reduce) {

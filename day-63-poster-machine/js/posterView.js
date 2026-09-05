@@ -8,7 +8,7 @@ const STAGE_PAD = 32;
 const FADE_FALLBACK_MS = 260;
 
 export function createPosterView({
-  canvas, ghost, stage, wrap, applyFinish, reducedMotion = () => false,
+  canvas, ghost, stage, wrap, reducedMotion = () => false,
 }) {
   const ctx = canvas.getContext("2d", { alpha: false });
   const ghostCtx = ghost.getContext("2d", { alpha: false });
@@ -46,7 +46,7 @@ export function createPosterView({
   function render(state, code = "") {
     last = { state, code };
     if (size.width === 0 && !measure()) return null;
-    return renderPoster(ctx, state, { scale: size.scale, code, applyFinish });
+    return renderPoster(ctx, state, { scale: size.scale, code });
   }
 
   function rerender() {

@@ -5,6 +5,9 @@ import { createInitialState, reroll, canReroll, setSystem, setPalette, setText, 
 import { createPosterView } from "./posterView.js";
 import { createAnnouncer } from "./dom.js";
 import { DISPLAY_FAMILY, MONO_FAMILY } from "./text.js";
+import { resolvePalette } from "./palettes.js";
+import { mountPaletteControls } from "./paletteControls.js";
+import { mountFinishControls } from "./finishControls.js";
 
 const $ = (selector) => document.querySelector(selector);
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -23,6 +26,12 @@ const view = createPosterView({
   reducedMotion: () => motionQuery.matches,
 });
 
+/* Panel sections. Each mount gets `update(updater)` and reports back via sync(state). */
+const sections = [
+  mountPaletteControls({ container: $("#palette-mount"), nameEl: $("#palette-name"), onChange: update, announce }),
+  mountFinishControls({ container: $("#finish-mount"), onChange: update }),
+];
+
 /* Until the seed-code commit lands, the readout shows the raw layout seed. */
 function codeOf(current) {
   return current.layoutSeed.toString(16).toUpperCase().padStart(5, "0");
@@ -32,6 +41,7 @@ function syncUi() {
   seedReadout.textContent = codeOf(state);
   rerollButton.disabled = !canReroll(state);
   stageStatus.textContent = `${state.system} · ${state.layoutSeed}`;
+  for (const section of sections) section.sync(state);
 }
 
 /** Applies a new state; `fade` crossfades from the previous poster. */
@@ -41,6 +51,11 @@ function apply(next, { fade = false } = {}) {
   if (fade) view.crossfade(state, codeOf(state));
   else view.render(state, codeOf(state));
   syncUi();
+}
+
+/** Applies `updater(state)`; the shape every control uses. */
+function update(updater, options) {
+  apply(updater(state), options);
 }
 
 function doReroll() {
@@ -93,6 +108,7 @@ async function boot() {
     setPalette: (palette) => apply(setPalette(state, palette)),
     setText: (patch) => apply(setText(state, patch)),
     setFinish: (patch) => apply(setFinish(state, patch)),
+    palette: () => resolvePalette(state.palette),
     lock: (which) => apply(toggleLock(state, which)),
     restore: (snapshot) => apply(restore(state, snapshot)),
     renderSync: () => view.rerender(),
