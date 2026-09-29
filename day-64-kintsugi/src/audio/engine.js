@@ -63,11 +63,11 @@ const MAX_VOICES = 24
 const NOISE_SECONDS = 2
 const DUST_DENSITY = 450 // clicks per second in the dust buffer
 
-// A stolen voice fades with this time constant; a new voice that
-// inherits its still-sounding panner starts after the fade, so the
-// old tail never jumps to the new position.
+// A stolen voice fades with this time constant and its sources stop
+// 6τ in (−52 dB). A new voice that inherits its panner starts only
+// then, so the old tail never jumps to the new position.
 const STEAL_TAU = 0.01
-const STEAL_DELAY = 0.04
+const STEAL_STOP = STEAL_TAU * 6
 
 // A context made inside the first gesture may report 'suspended'
 // until its resume() settles; sounds from that gesture still go.
@@ -79,6 +79,9 @@ const LISTENER_EPS = 1e-4
 const TAIL = (TAIL_DB / 20) * Math.LN10
 
 const clock = () => (globalThis.performance ? globalThis.performance.now() : Date.now())
+
+// Public methods take an options object; null or junk reads as {}.
+const args = (o) => (o !== null && typeof o === 'object' ? o : {})
 
 // ------------------------------------------------------------
 // Voice — the handle synth recipes build on
@@ -94,6 +97,7 @@ export class Voice {
     this.noise = buffers.noise
     this.dust = buffers.dust
     this.sources = []
+    this.stops = [] // each source's scheduled stop, parallel to `sources`
     this.slot = null
     this.pos = null
     this.stolen = false
@@ -103,6 +107,7 @@ export class Voice {
   hold(node, stopAt) {
     node.stop(stopAt)
     this.sources.push(node)
+    this.stops.push(stopAt)
     if (stopAt > this.end) this.end = stopAt
   }
 
@@ -338,12 +343,29 @@ function suspendSoon() {
 
 // The context is created here even when muted — this is the call
 // that runs inside a user gesture, so a later unmute (which may not
-// arrive with a gesture) only has to resume it.
+// arrive with a gesture) only has to resume it. If building the
+// graph fails the engine stays silent for the session rather than
+// throwing out of every pointerdown.
+let broken = false
+
 function unlock() {
   if (!ctx) {
-    ctx = createContext()
-    if (!ctx) return false
-    build(ctx)
+    if (broken) return false
+    const c = createContext()
+    if (!c) return false
+    try {
+      build(c)
+    } catch (err) {
+      broken = true
+      console.warn('[audio] disabled:', err)
+      try {
+        settle(c.close())
+      } catch {
+        // nothing left to release
+      }
+      return false
+    }
+    ctx = c
   }
   if (ctx.state === 'closed') return false
   if (poseDirty) applyListener()
@@ -375,14 +397,22 @@ function setMuted(value) {
 // Listener
 // ------------------------------------------------------------
 
-const isDirection = (v) => v && Math.hypot(v[0], v[1], v[2]) > 1e-6
+// Unit vector, or null for anything degenerate. Normalising keeps
+// the params in float32 range (AudioParam setters throw on ±Inf).
+function direction(v) {
+  const d = toVec3(v)
+  const len = d ? Math.hypot(d[0], d[1], d[2]) : 0
+  if (!(len > 1e-6 && len < Infinity)) return null
+  return [d[0] / len, d[1] / len, d[2] / len]
+}
 
-function setListener({ position, forward, up } = {}) {
+function setListener(camera) {
+  const { position, forward, up } = args(camera)
   if (position != null) pose.set(clampPosition(position), 0)
-  const f = toVec3(forward)
-  if (isDirection(f)) pose.set(f, 3)
-  const u = toVec3(up)
-  if (isDirection(u)) pose.set(u, 6)
+  const f = direction(forward)
+  if (f) pose.set(f, 3)
+  const u = direction(up)
+  if (u) pose.set(u, 6)
   poseDirty = true
   if (!ctx || ctx.state === 'closed') return
   applyListener()
@@ -403,8 +433,10 @@ function applyListener() {
     return
   }
   if (pose.every((x, i) => Math.abs(x - applied[i]) < LISTENER_EPS)) return
-  // pre-2021 Safari / Firefox: the old setter API
+  // pre-2021 Safari / Firefox: the old setter API. Neither API at all
+  // leaves the listener at its default rather than throwing per frame.
   const L = ctx.listener
+  if (typeof L.setPosition !== 'function') return
   L.setPosition(pose[0], pose[1], pose[2])
   L.setOrientation(pose[3], pose[4], pose[5], pose[6], pose[7], pose[8])
   applied.set(pose)
@@ -415,7 +447,7 @@ function place(panner, [x, y, z], t) {
     panner.positionX.setValueAtTime(x, t)
     panner.positionY.setValueAtTime(y, t)
     panner.positionZ.setValueAtTime(z, t)
-  } else {
+  } else if (typeof panner.setPosition === 'function') {
     panner.setPosition(x, y, z)
   }
 }
@@ -436,6 +468,7 @@ function reap(now) {
     }
     v.out.disconnect()
     v.sources.length = 0
+    v.stops.length = 0
     if (v.slot && v.slot.voice === v) v.slot.voice = null
   }
   voices.length = keep
@@ -444,14 +477,18 @@ function reap(now) {
 function steal(v, now) {
   v.stolen = true
   v.out.gain.setTargetAtTime(0, now, STEAL_TAU)
-  const stopAt = now + STEAL_TAU * 6 // −52 dB into the fade
-  for (const s of v.sources) {
+  const stopAt = now + STEAL_STOP
+  v.sources.forEach((s, i) => {
+    // a later stop() replaces the earlier one, so only ever shorten:
+    // a grain due to end sooner would otherwise run on to stopAt
+    if (v.stops[i] <= stopAt) return
     try {
-      s.stop(stopAt) // a later stop() call replaces the earlier one
+      s.stop(stopAt)
+      v.stops[i] = stopAt
     } catch {
       // older webkit throws on a second stop(); the source ends on its own schedule
     }
-  }
+  })
   v.end = Math.min(v.end, stopAt)
   v.gain = 0
 }
@@ -461,22 +498,26 @@ function openVoice(position) {
   const now = ctx.currentTime
   reap(now)
 
+  // Placed voices need a panner first: if the one they get is still
+  // sounding, stealing its voice already makes room under the cap,
+  // and a second steal from the global pool would be one too many.
+  const slot = position == null ? null : slots[pickVoice(slots.map((s) => s.voice), now)]
+  const prev = slot ? slot.voice : null
+  const inherits = prev !== null && prev.end > now
+  if (inherits && !prev.stolen) steal(prev, now)
+
   const live = voices.filter((v) => !v.stolen)
   if (live.length >= MAX_VOICES) steal(live[pickVoice(live, now)], now)
 
   const out = ctx.createGain()
-  if (position == null) {
+  if (!slot) {
     out.connect(mix)
     return new Voice(ctx, now, out, buffers)
   }
 
-  const slot = slots[pickVoice(slots.map((s) => s.voice), now)]
-  let start = now
-  const prev = slot.voice
-  if (prev && prev.end > now) {
-    if (!prev.stolen) steal(prev, now)
-    start = now + STEAL_DELAY
-  }
+  // wait for the inherited voice's sources to stop (its `end`, which
+  // steal() pulled in to at most STEAL_STOP from now)
+  const start = inherits ? Math.max(now, prev.end) : now
   const pos = clampPosition(position)
   place(slot.panner, pos, start)
   out.connect(slot.panner)
@@ -516,9 +557,11 @@ function emit(position, play) {
 // Loops
 // ------------------------------------------------------------
 
+// Mute and a hidden tab fade the loops but leave them armed, so a
+// stroke still in progress picks its sound back up (see Loop).
 function stopLoops() {
-  brush?.stop()
-  burnish?.stop()
+  brush?.fade()
+  burnish?.fade()
 }
 
 function brushLoop() {
@@ -541,32 +584,36 @@ export const audio = {
   isMuted: () => muted,
   setListener,
 
-  ring(opts = {}) {
-    emit(opts.position, (v) => playRing(v, opts))
+  ring(opts) {
+    const o = args(opts)
+    emit(o.position, (v) => playRing(v, o))
   },
 
-  clatter({ impulse, size, position } = {}) {
+  clatter(opts) {
     if (!ready()) return
+    const { impulse, size, position } = args(opts)
     const gain = clatterGain(impulse)
     if (gain <= 0) return
     if (!clatterGate.tryAcquire(ctx.currentTime, bucketKey(position))) return
     emit(position, (v) => playClatter(v, { gain, size }))
   },
 
-  crack(opts = {}) {
-    emit(opts.position, (v) => playCrack(v, opts))
+  crack(opts) {
+    const o = args(opts)
+    emit(o.position, (v) => playCrack(v, o))
   },
-  tok(opts = {}) {
-    emit(opts.position, (v) => playTok(v, opts))
+  tok(opts) {
+    const o = args(opts)
+    emit(o.position, (v) => playTok(v, o))
   },
-  snap(opts = {}) {
-    emit(opts.position, playSnap)
+  snap(opts) {
+    emit(args(opts).position, playSnap)
   },
-  reject(opts = {}) {
-    emit(opts.position, playReject)
+  reject(opts) {
+    emit(args(opts).position, playReject)
   },
-  lid(opts = {}) {
-    emit(opts.position, playLid)
+  lid(opts) {
+    emit(args(opts).position, playLid)
   },
 
   silk() {
@@ -584,8 +631,10 @@ export const audio = {
     emit(null, (v) => playGoldSift(v, amount01))
   },
 
+  // start() re-arms even while muted, so an unmute mid-stroke is heard;
+  // an update after brushStop() stays silent until the next start.
   brushStart() {
-    if (ready()) brushLoop().start()
+    if (ctx) brushLoop().start(ready())
   },
   brushUpdate(speed01) {
     if (ready()) brushLoop().update(speed01)
@@ -594,7 +643,7 @@ export const audio = {
     brush?.stop()
   },
   burnishStart() {
-    if (ready()) burnishLoop().start()
+    if (ctx) burnishLoop().start(ready())
   },
   burnishUpdate(speed01) {
     if (ready()) burnishLoop().update(speed01)

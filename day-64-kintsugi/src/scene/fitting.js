@@ -49,7 +49,9 @@ export class Fitting {
     this.anims = new Map() // id -> { kind, t, dur, fromPos, fromQuat }
     this.hold = null
     this.spin = null
-    this.active = false
+    this.active = false // the fitting interaction itself
+    this.riding = false // placed pieces (or the intact bowl) pinned to the assembly
+    this.intact = null // hairline: the whole bowl rides the assembly
     this.ghostId = null
     this.idle = 0
     this.elapsed = 0
@@ -85,6 +87,7 @@ export class Fitting {
     const v = this.variant
     if (!v || this.active) return
     this.active = true
+    this.riding = true
     this.adjacency = buildAdjacency(v.json)
     this.anchorId = v.json.anchor
     this.placed.clear()
@@ -118,6 +121,32 @@ export class Fitting {
     window.removeEventListener('pointermove', this._move)
     window.removeEventListener('pointerup', this._up)
     window.removeEventListener('pointercancel', this._up)
+  }
+
+  /** Hairline: the unbroken bowl rights itself into the slot and rides A. */
+  rideIntact(body) {
+    this.intact = body
+    this.riding = true
+    this.yaw = this.yawTarget = 0
+    const t = body.translation()
+    body.setBodyType(this.rapier.RigidBodyType.KinematicPositionBased, true)
+    this.anims.set('intact', {
+      kind: 'rise',
+      t: 0,
+      dur: ANCHOR_RISE * 0.8,
+      fromPos: new THREE.Vector3(t.x, t.y, t.z),
+      fromQuat: new THREE.Quaternion().copy(body.rotation()),
+      body,
+    })
+  }
+
+  reset() {
+    this.end()
+    this.riding = false
+    this.intact = null
+    this.placed.clear()
+    this.anims.clear()
+    this.yaw = this.yawTarget = 0
   }
 
   // --------------------------------------------------------------- input
@@ -290,7 +319,7 @@ export class Fitting {
   // ---------------------------------------------------------------- frame
 
   frame(dt) {
-    if (!this.active) return
+    if (!this.riding) return
     this.elapsed += dt
     if (!this.hold) this.idle += dt
 
@@ -306,10 +335,14 @@ export class Fitting {
       body.setNextKinematicTranslation(this.homeWorld(id, _a))
       body.setNextKinematicRotation(this.assembly.quaternion)
     }
+    if (this.intact && !this.anims.has('intact')) {
+      this.intact.setNextKinematicTranslation(this.assembly.position)
+      this.intact.setNextKinematicRotation(this.assembly.quaternion)
+    }
 
     // anchor rise, snaps, auto-fit flights
     for (const [id, an] of this.anims) {
-      const body = this.body(id)
+      const body = an.body ?? this.body(id)
       if (!body) {
         this.anims.delete(id)
         continue
@@ -317,7 +350,7 @@ export class Fitting {
       an.t += dt
       const k = Math.min(1, an.t / an.dur)
       const e = ease(k)
-      const home = this.homeWorld(id, _a)
+      const home = an.body ? _a.copy(this.assembly.position) : this.homeWorld(id, _a)
       _b.lerpVectors(an.fromPos, home, e)
       if (an.kind !== 'snap') _b.y += Math.sin(Math.PI * k) * (an.kind === 'rise' ? 0.05 : 0.06)
       _q.slerpQuaternions(an.fromQuat, this.assembly.quaternion, an.kind === 'snap' ? e : Math.min(1, e * 1.4))
@@ -325,10 +358,11 @@ export class Fitting {
       body.setNextKinematicRotation(_q)
       if (k >= 1) {
         this.anims.delete(id)
-        this.placedDone(id)
+        if (!an.body) this.placedDone(id)
       }
     }
 
+    if (!this.active) return
     if (this.hold) this.frameHold(dt)
     this.catchStrays()
 

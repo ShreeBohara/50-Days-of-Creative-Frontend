@@ -36,12 +36,13 @@ export const DROP_TICKS = Object.freeze([0.15, 0.3, 0.45])
 
 const isSpeed = (v) => Number.isFinite(v) && v >= 0
 
-// Bucket an impact. Invalid impact speeds (NaN, ±Infinity,
-// negative) are treated as a gentle set-down. An invalid
-// releaseSpeed is ignored (treated as "not a throw").
+// Bucket an impact. Any invalid input (NaN, ±Infinity, negative,
+// non-number) is treated as a gentle set-down: garbage from the
+// physics layer should never break the bowl. An omitted
+// releaseSpeed defaults to 0 (a plain drop).
 export function classifyImpact({ impactSpeed, releaseSpeed = 0 } = {}) {
-  if (!isSpeed(impactSpeed)) return SEVERITY.SET
-  const thrown = isSpeed(releaseSpeed) && releaseSpeed >= THROW_SPEED
+  if (!isSpeed(impactSpeed) || !isSpeed(releaseSpeed)) return SEVERITY.SET
+  const thrown = releaseSpeed >= THROW_SPEED
 
   if (impactSpeed >= FLING_SPEED) return SEVERITY.FLING
   if (impactSpeed >= DROP_SPEED) return thrown ? SEVERITY.FLING : SEVERITY.DROP

@@ -26,17 +26,23 @@ function link(adj, a, b) {
 
 // Map<id, Set<id>>, symmetric, no self-loops. Every shard in
 // json.shards gets a key, even an (unexpected) isolated one.
+// When shards are listed, a neighbour or seam naming an id that
+// isn't one of them is dropped: a phantom node would sit in the
+// assembly order forever and isAssembled could never come true.
 export function buildAdjacency(json) {
   const adj = new Map()
-  for (const shard of json?.shards ?? []) {
-    if (!Number.isInteger(shard?.id)) continue
+  const shards = (json?.shards ?? []).filter((s) => Number.isInteger(s?.id))
+  const known = shards.length > 0 ? new Set(shards.map((s) => s.id)) : null
+  const ok = (id) => Number.isInteger(id) && (!known || known.has(id))
+
+  for (const shard of shards) {
     if (!adj.has(shard.id)) adj.set(shard.id, new Set())
     for (const nb of shard.neighbors ?? []) {
-      if (Number.isInteger(nb)) link(adj, shard.id, nb)
+      if (ok(nb)) link(adj, shard.id, nb)
     }
   }
   for (const seam of json?.seams ?? []) {
-    if (Number.isInteger(seam?.a) && Number.isInteger(seam?.b)) link(adj, seam.a, seam.b)
+    if (ok(seam?.a) && ok(seam?.b)) link(adj, seam.a, seam.b)
   }
   return adj
 }

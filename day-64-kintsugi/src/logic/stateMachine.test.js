@@ -122,6 +122,24 @@ describe('transition', () => {
     expect(transition(s, { type: 'IMPACT', severity: 'shatter' })).toBe(s)
   })
 
+  it('event names from Object.prototype are illegal, not phases', () => {
+    for (const phase of PHASES) {
+      const s = at(phase)
+      for (const type of ['toString', 'constructor', '__proto__', 'hasOwnProperty', 'valueOf']) {
+        expect(transition(s, { type }), `${phase}:${type}`).toBe(s)
+      }
+    }
+    const weird = { ...createInitialState(), phase: '__proto__' }
+    expect(transition(weird, { type: 'hasOwnProperty' })).toBe(weird)
+  })
+
+  it('LOAD_SHELF ignores a severity that could not have broken a bowl', () => {
+    const s = at('veiled', { severity: null })
+    expect(transition(s, { type: 'LOAD_SHELF', severity: 'set' }).severity).toBeNull()
+    expect(transition(s, { type: 'LOAD_SHELF', severity: 'shatter' }).severity).toBeNull()
+    expect(transition(s, { type: 'LOAD_SHELF', severity: 'hairline' }).severity).toBe('hairline')
+  })
+
   it('never mutates the input state', () => {
     const s = Object.freeze(at('held'))
     expect(() => transition(s, { type: 'IMPACT', severity: 'drop' })).not.toThrow()

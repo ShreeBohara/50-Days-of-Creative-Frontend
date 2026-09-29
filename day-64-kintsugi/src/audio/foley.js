@@ -190,14 +190,19 @@ export const LOOP_IDLE_MS = 400
 const now = () => (globalThis.performance ? globalThis.performance.now() : Date.now())
 
 // Lifecycle around a patch factory `patch(host)` that returns
-// { set(speed01, t), release(t) }. update() restarts a stopped loop,
-// so a stroke that paused long enough to trip the watchdog resumes
-// as soon as it moves again.
+// { set(speed01, t), release(t) }. Two ways to go quiet:
+//   stop() — the stroke is over (pointerup). Updates are ignored
+//            until the next start(), so a stale pointermove that
+//            lands after the stop can't restart the sound.
+//   fade() — the watchdog, a hidden tab, mute. The loop stays armed:
+//            a stroke that paused long enough to trip the watchdog
+//            resumes as soon as it moves again.
 export class Loop {
   constructor(host, patch) {
     this.host = host
     this.patch = patch
     this.live = null
+    this.ended = false
     this.last = 0
     this.timer = 0
     this.check = this.check.bind(this)
@@ -207,23 +212,36 @@ export class Loop {
     return this.live !== null
   }
 
-  start() {
-    if (!this.live) this.live = this.patch(this.host)
+  // `play` false only re-arms (a start that arrived while muted).
+  start(play = true) {
+    this.ended = false
+    if (!play) return
+    this.open()
     this.touch()
   }
 
   update(speed01) {
-    if (!this.live) this.live = this.patch(this.host)
+    if (this.ended) return
+    this.open()
     this.live.set(clamp01(speed01), this.host.ctx.currentTime)
     this.touch()
   }
 
   stop() {
+    this.ended = true
+    this.fade()
+  }
+
+  fade() {
     clearTimeout(this.timer)
     this.timer = 0
     if (!this.live) return
     this.live.release(this.host.ctx.currentTime)
     this.live = null
+  }
+
+  open() {
+    if (!this.live) this.live = this.patch(this.host)
   }
 
   // One pending timer at most: when it fires it re-arms for whatever
@@ -236,7 +254,7 @@ export class Loop {
   check() {
     this.timer = 0
     const idle = now() - this.last
-    if (idle >= LOOP_IDLE_MS - 1) this.stop()
+    if (idle >= LOOP_IDLE_MS - 1) this.fade()
     else this.timer = setTimeout(this.check, LOOP_IDLE_MS - idle)
   }
 }

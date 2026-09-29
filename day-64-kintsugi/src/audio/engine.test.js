@@ -12,7 +12,7 @@ class FakeParam {
     this.events = []
   }
   push(type, v, t, extra) {
-    if (!Number.isFinite(t) || (typeof v === 'number' && !Number.isFinite(v))) {
+    if (!Number.isFinite(t) || (typeof v === 'number' && !Number.isFinite(Math.fround(v)))) {
       throw new TypeError(`non-finite automation: ${type} ${v} @ ${t}`)
     }
     this.events.push({ type, v, t, ...extra })
@@ -137,6 +137,21 @@ class FakeContext {
   }
 }
 
+// pre-AudioParam listener (older Safari, Firefox), and one with no API at all
+class LegacyContext extends FakeContext {
+  constructor() {
+    super()
+    this.listener = { setPosition: vi.fn(), setOrientation: vi.fn() }
+  }
+}
+
+class BareListenerContext extends FakeContext {
+  constructor() {
+    super()
+    this.listener = {}
+  }
+}
+
 let store
 
 async function load(stored) {
@@ -159,6 +174,14 @@ async function unlocked(stored) {
 }
 
 const masterOf = (ctx) => ctx.of('gain').find((g) => g.outputs.includes(ctx.destination))
+
+// follow a source's first output down to the panner it plays through
+function pannerOf(node) {
+  for (let n = node, hops = 0; n && hops < 8; n = n.outputs[0], hops += 1) {
+    if (n.kind === 'panner') return n
+  }
+  return null
+}
 
 afterEach(() => {
   vi.useRealTimers()
@@ -194,6 +217,20 @@ describe('before unlock', () => {
     expect(audio.stats().state).toBe('none')
   })
 
+  it('null or junk options are harmless, locked or not', async () => {
+    const audio = await load()
+    const junk = (a) => {
+      a.setListener(null)
+      for (const m of ['ring', 'clatter', 'crack', 'tok', 'snap', 'reject', 'lid']) {
+        a[m](null)
+        a[m](42)
+      }
+    }
+    expect(() => junk(audio)).not.toThrow()
+    audio.unlock()
+    expect(() => junk(audio)).not.toThrow()
+  })
+
   it('defaults to sound on', async () => {
     const audio = await load()
     expect(audio.isMuted()).toBe(false)
@@ -207,6 +244,30 @@ describe('unlock and the master chain', () => {
     audio.unlock()
     audio.unlock()
     expect(FakeContext.instances).toHaveLength(1)
+  })
+
+  it('a graph that fails to build leaves the engine silent instead of throwing', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const audio = await load()
+    vi.spyOn(FakeContext.prototype, 'createConvolver').mockImplementation(() => {
+      throw new Error('no convolver')
+    })
+    expect(audio.unlock()).toBe(false)
+    expect(FakeContext.instances[0].state).toBe('closed')
+    expect(() => {
+      audio.setListener({ position: [0, 0, 1] })
+      audio.ring({ position: [0, 0, 0] })
+      audio.clatter({ impulse: 0.05, size: 0.03 })
+      audio.brushStart()
+      audio.brushUpdate(0.5)
+      audio.brushStop()
+      audio.setMuted(true)
+      audio.setMuted(false)
+    }).not.toThrow()
+    // and it doesn't build a fresh context on every gesture
+    expect(audio.unlock()).toBe(false)
+    expect(FakeContext.instances).toHaveLength(1)
+    expect(warn).toHaveBeenCalledTimes(1)
   })
 
   it('resumes a suspended context on the next gesture', async () => {
@@ -347,7 +408,7 @@ describe('voice limits', () => {
     expect(cut.length).toBeGreaterThan(0)
   })
 
-  it('shares 12 panners among placed voices, delaying a voice that inherits a sounding one', async () => {
+  it('shares 12 panners; a voice inheriting a sounding one waits until its sources stop', async () => {
     const { audio, ctx } = await unlocked()
     for (let i = 0; i < 20; i += 1) audio.tok({ position: [i * 0.1, 0, 0] })
     const stats = audio.stats()
@@ -355,7 +416,42 @@ describe('voice limits', () => {
     expect(stats.voices).toBe(12)
     const late = ctx.of('osc').filter((o) => o.startAt > 0)
     expect(late.length).toBeGreaterThan(0)
-    for (const o of late) expect(o.startAt).toBeCloseTo(0.04, 9)
+    for (const o of late) expect(o.startAt).toBeCloseTo(0.06, 9)
+    // a panner that changed hands moved only once everything it was
+    // carrying had stopped, so no old tail jumps to the new position
+    const sources = [...ctx.of('osc'), ...ctx.of('buffer')]
+    let handovers = 0
+    for (const p of ctx.of('panner')) {
+      const moves = p.positionX.events.map((e) => e.t)
+      if (moves.length < 2) continue
+      handovers += 1
+      const lastMove = Math.max(...moves)
+      for (const s of sources.filter((x) => pannerOf(x) === p && x.startAt < lastMove)) {
+        expect(s.stopAt).toBeLessThanOrEqual(lastMove + 1e-9)
+      }
+    }
+    expect(handovers).toBeGreaterThan(0)
+  })
+
+  it('a placed voice taking over a sounding panner steals only that voice', async () => {
+    const { audio, ctx } = await unlocked()
+    for (let i = 0; i < 12; i += 1) audio.chime()
+    for (let i = 0; i < 12; i += 1) audio.tok({ position: [i * 0.1, 0, 0] })
+    expect(audio.stats().voices).toBe(24)
+    audio.tok({ position: [2, 0, 0] })
+    expect(audio.stats().voices).toBe(24)
+    const faded = ctx.of('gain').filter((g) => g.gain.events.some((e) => e.type === 'target' && e.v === 0))
+    expect(faded).toHaveLength(1)
+  })
+
+  it('stealing only ever shortens a source, never lets it run on', async () => {
+    const { audio, ctx } = await unlocked()
+    for (let i = 0; i < 12; i += 1) audio.snap({ position: [i * 0.1, 0, 0] })
+    const before = new Map([...ctx.of('osc'), ...ctx.of('buffer')].map((s) => [s, s.stopAt]))
+    ctx.currentTime = 0.02 // steal lands at 0.08; the snap's click grain was due off at ~0.065
+    audio.tok({ position: [5, 0, 0] })
+    for (const [s, stopAt] of before) expect(s.stopAt).toBeLessThanOrEqual(stopAt)
+    expect([...before].some(([s, stopAt]) => s.stopAt < stopAt)).toBe(true)
   })
 
   it('rate-limits clatter to 40 a second overall', async () => {
@@ -475,7 +571,34 @@ describe('listener', () => {
     const L = FakeContext.instances[0].listener
     expect(L.positionY.last.v).toBeCloseTo(0.3, 9)
     expect(L.positionZ.last.v).toBeCloseTo(0.6, 9)
-    expect(L.forwardZ.last.v).toBeCloseTo(-0.9, 9)
+    expect(L.forwardZ.last.v).toBeCloseTo(-0.9 / Math.hypot(0.45, 0.9), 9) // unit length
+  })
+
+  it('normalises orientation, so an overflowing vector cannot reach a param', async () => {
+    const { audio, ctx } = await unlocked()
+    expect(() => audio.setListener({ position: [0, 0, 1], forward: [0, 0, -1e300], up: [0, 3, 0] })).not.toThrow()
+    expect(ctx.listener.forwardZ.last.v).toBe(-1)
+    expect(ctx.listener.upY.last.v).toBe(1)
+  })
+
+  it('falls back to setPosition / setOrientation without listener AudioParams', async () => {
+    const audio = await load()
+    vi.stubGlobal('AudioContext', LegacyContext)
+    audio.unlock()
+    const L = FakeContext.instances[0].listener
+    audio.setListener({ position: [0, 0.3, 0.6], forward: [0, 0, -2], up: [0, 1, 0] })
+    expect(L.setPosition).toHaveBeenLastCalledWith(0, 0.3, 0.6)
+    expect(L.setOrientation).toHaveBeenLastCalledWith(0, 0, -1, 0, 1, 0)
+    const writes = L.setPosition.mock.calls.length
+    audio.setListener({ position: [0, 0.3, 0.6], forward: [0, 0, -1], up: [0, 1, 0] })
+    expect(L.setPosition.mock.calls.length).toBe(writes) // pose unchanged: nothing written
+  })
+
+  it('a listener with neither API is left alone rather than throwing every frame', async () => {
+    const audio = await load()
+    vi.stubGlobal('AudioContext', BareListenerContext)
+    audio.unlock()
+    expect(() => audio.setListener({ position: [0, 0, 1], forward: [0, 0, -1], up: [0, 1, 0] })).not.toThrow()
   })
 
   it('only writes the params that moved, and accepts Vector3-like objects', async () => {
@@ -553,6 +676,32 @@ describe('continuous loops', () => {
     audio.brushUpdate(0.4)
     expect(audio.stats().loops).toBe(1)
     expect(loopSources(ctx)).toHaveLength(4)
+  })
+
+  it('an update landing after brushStop stays silent until the next brushStart', async () => {
+    const { audio, ctx } = await unlocked()
+    audio.brushStart()
+    audio.brushUpdate(0.6)
+    audio.brushStop()
+    audio.brushUpdate(0.6) // stale pointermove after pointerup
+    expect(audio.stats().loops).toBe(0)
+    expect(loopSources(ctx)).toHaveLength(2)
+    audio.brushStart()
+    audio.brushUpdate(0.4)
+    expect(audio.stats().loops).toBe(1)
+  })
+
+  it('mute fades a stroke but leaves it armed for when sound comes back', async () => {
+    const { audio } = await unlocked()
+    audio.burnishStart()
+    audio.burnishUpdate(0.5)
+    audio.setMuted(true)
+    expect(audio.stats().loops).toBe(0)
+    audio.burnishUpdate(0.5)
+    expect(audio.stats().loops).toBe(0)
+    audio.setMuted(false)
+    audio.burnishUpdate(0.5)
+    expect(audio.stats().loops).toBe(1)
   })
 
   it('muting stops running loops', async () => {

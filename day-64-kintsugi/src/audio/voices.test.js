@@ -177,6 +177,13 @@ describe('pickVoice', () => {
     expect(pickVoice(pool, 1)).toBe(1)
   })
 
+  it('still returns a valid index when levels are not comparable', () => {
+    // NaN gains read as loud (1); an all-Infinity pool used to fall through to -1
+    expect(voiceLevel({ start: 0, end: 2, gain: NaN }, 0)).toBe(1)
+    expect(pickVoice([{ start: 0, end: 2, gain: NaN }, { start: 0, end: 2, gain: 0.1 }], 1)).toBe(1)
+    expect(pickVoice([{ start: 0, end: Infinity, gain: Infinity }, { start: 0, end: Infinity, gain: Infinity }], 1)).toBe(0)
+  })
+
   it('does not mutate the pool', () => {
     const pool = [{ start: 0, end: 2, gain: 0.3 }, null]
     const snapshot = JSON.stringify(pool)

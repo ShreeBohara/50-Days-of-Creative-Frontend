@@ -76,7 +76,8 @@ export function voiceLevel(v, now) {
   if (!v || !(v.end > now)) return 0
   const span = v.end - v.start
   const t = span > 0 && Number.isFinite(span) ? clamp01((now - v.start) / span) : 0
-  const gain = v.gain == null ? 1 : Math.max(0, v.gain)
+  // unknown (missing or NaN) gain counts as loud, so it isn't stolen first
+  const gain = v.gain == null || Number.isNaN(v.gain) ? 1 : Math.max(0, v.gain)
   return gain * 10 ** ((-TAIL_DB / 20) * t)
 }
 
@@ -84,7 +85,8 @@ export function voiceLevel(v, now) {
 // or finished slots win outright; otherwise the voice that is
 // quietest right now — which folds in "ends soonest", since a
 // voice near its end is deep into its decay. Ties go to the one
-// that ends first. Returns -1 for an empty pool.
+// that ends first. Returns -1 only for an empty pool: a full pool
+// always yields a valid index, even if every level is Infinity.
 export function pickVoice(pool, now) {
   let best = -1
   let bestLevel = Infinity
@@ -93,7 +95,7 @@ export function pickVoice(pool, now) {
     const v = pool[i]
     if (!v || !(v.end > now)) return i
     const level = voiceLevel(v, now)
-    if (level < bestLevel || (level === bestLevel && v.end < bestEnd)) {
+    if (best === -1 || level < bestLevel || (level === bestLevel && v.end < bestEnd)) {
       best = i
       bestLevel = level
       bestEnd = v.end

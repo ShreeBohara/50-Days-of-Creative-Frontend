@@ -33,6 +33,16 @@ describe('releaseVelocity', () => {
     expect(v.vx).toBeCloseTo(0.25, 9)
   })
 
+  it('reaches back past samples that share the final timestamp', () => {
+    // pointerup stamped the same ms as the last move, nothing else in the window.
+    const v = releaseVelocity([
+      { x: 0, y: 0, t: 0 },
+      { x: 40, y: 0, t: 200 },
+      { x: 40, y: 0, t: 200 },
+    ])
+    expect(v.vx).toBeCloseTo(0.2, 9)
+  })
+
   it('is zero for 0 or 1 samples, or samples sharing a timestamp', () => {
     expect(releaseVelocity([])).toEqual({ vx: 0, vy: 0 })
     expect(releaseVelocity([{ x: 5, y: 5, t: 10 }])).toEqual({ vx: 0, vy: 0 })

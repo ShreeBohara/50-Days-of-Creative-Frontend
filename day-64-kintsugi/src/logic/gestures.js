@@ -24,7 +24,9 @@ const clean = (samples) => (Array.isArray(samples) ? samples.filter(valid) : [])
 
 // Least-squares slope of x(t) and y(t) over the trailing window —
 // steadier than first/last when pointer events jitter. If the
-// window holds a single sample, the one before it is pulled in.
+// window holds a single timestamp (one sample, or a pointerup
+// stamped the same ms as the last move), earlier samples are
+// pulled in until there is a time span to fit.
 export function releaseVelocity(samples, windowMs = RELEASE_WINDOW_MS) {
   const pts = clean(samples)
   if (pts.length < 2) return { vx: 0, vy: 0 }
@@ -32,7 +34,7 @@ export function releaseVelocity(samples, windowMs = RELEASE_WINDOW_MS) {
   const tEnd = pts[pts.length - 1].t
   let start = pts.length - 1
   while (start > 0 && pts[start - 1].t >= tEnd - windowMs) start -= 1
-  if (start === pts.length - 1) start -= 1
+  while (start > 0 && pts[start].t === tEnd) start -= 1
   const win = pts.slice(start)
 
   let mt = 0

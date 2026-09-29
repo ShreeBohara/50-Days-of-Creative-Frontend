@@ -119,7 +119,7 @@ vImpact = aImpact;
 /** The crack race: a dark hairline that grows outward from the impact point. */
 export function makeCrackMaterial() {
   const uniforms = {
-    uWidth: { value: 0.00032 },
+    uWidth: { value: 0.00042 },
     uLift: { value: 0.00012 },
     uFront: { value: 0 },
   }
@@ -153,16 +153,19 @@ export function makeCrackMaterial() {
 }
 
 /**
- * Lacquer → gold → burnish, per seam. uState texel i = (fill m, gold 0..1,
- * polish 0..1, wet 0..1). Gold arrives patchily (a hash threshold along the
- * seam) so dust visibly accumulates rather than switching on.
+ * Lacquer → gold → burnish, per seam. uState texel i = (lo m, hi m, gold 0..1,
+ * polish 0..1): lacquer covers the arclength interval [lo, hi] (it spreads
+ * both ways from where the brush touched). Gold arrives patchily (a hash
+ * threshold along the seam) so dust visibly accumulates rather than switching
+ * on. uWet is 1 while the lacquer is still tacky (lacquer + gild phases).
  */
 export function makeSeamMaterial(stateTexture, count) {
   const uniforms = {
-    uWidth: { value: 0.00085 },
+    uWidth: { value: 0.00095 },
     uLift: { value: 0.00016 },
     uState: { value: stateTexture },
     uCount: { value: count },
+    uWet: { value: 1 },
     uUrushi: { value: PALETTE.urushi },
     uGoldMatte: { value: PALETTE.goldMatte },
     uGoldPolished: { value: PALETTE.goldPolished },
@@ -173,7 +176,7 @@ export function makeSeamMaterial(stateTexture, count) {
     metalness: 0,
     clearcoat: 1,
     clearcoatRoughness: 0.06,
-    envMapIntensity: 1.25,
+    envMapIntensity: 2.1, // thin gold only reads as gold if it catches the room
   })
   m.polygonOffset = true
   m.polygonOffsetFactor = -3
@@ -188,11 +191,13 @@ export function makeSeamMaterial(stateTexture, count) {
         `#include <common>
         uniform sampler2D uState;
         uniform float uCount;
+        uniform float uWet;
         uniform vec3 uUrushi;
         uniform vec3 uGoldMatte;
         uniform vec3 uGoldPolished;
         varying float vSeam;
         varying float vArc;
+        varying float vImpact;
         float seamHash(float x) { return fract(sin(x * 127.1 + 311.7) * 43758.5453); }
         float seamNoise(float x) {
           float i = floor(x); float f = fract(x);
@@ -204,22 +209,31 @@ export function makeSeamMaterial(stateTexture, count) {
         '#include <color_fragment>',
         `#include <color_fragment>
         vec4 st = seamState();
-        if (vArc > st.r) discard;
+        if (st.g <= st.r || vArc < st.r || vArc > st.g) discard;
         float n = seamNoise(vArc * 900.0) * 0.6 + seamNoise(vArc * 3100.0 + 7.0) * 0.4;
-        float g = smoothstep(n - 0.06, n + 0.06, st.g);
-        float wetEdge = smoothstep(0.0025, 0.0, st.r - vArc) * st.a;
-        vec3 gold = mix(uGoldMatte, uGoldPolished, st.b);
+        float g = smoothstep(n - 0.06, n + 0.06, st.b);
+        // the freshest lacquer at either spreading end is glossier and brighter
+        float edge = min(vArc - st.r, st.g - vArc);
+        float wetEdge = smoothstep(0.0025, 0.0, edge) * uWet;
+        vec3 gold = mix(uGoldMatte, uGoldPolished, st.a);
         diffuseColor.rgb = mix(uUrushi * (1.0 + wetEdge * 0.35), gold, g);`,
       )
       .replace(
         '#include <roughnessmap_fragment>',
         `#include <roughnessmap_fragment>
-        roughnessFactor = mix(0.16 - wetEdge * 0.08, mix(0.62, 0.14, st.b), g);`,
+        roughnessFactor = mix(0.16 - wetEdge * 0.08, mix(0.58, 0.24, st.a), g);`,
       )
       .replace(
         '#include <metalnessmap_fragment>',
         `#include <metalnessmap_fragment>
         metalnessFactor = g;`,
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        // where a crack folds over the rim the interpolated normal can collapse;
+        // a NaN here blooms into a coloured star, so fall back to the view vector
+        `#include <normal_fragment_begin>
+        if (any(isnan(normal)) || dot(normal, normal) < 1e-6) normal = normalize(vViewPosition);`,
       )
       .replace(
         '#include <lights_physical_fragment>',

@@ -58,7 +58,9 @@ export function buildRibbonGeometry(seams) {
       t.subVectors(c, a)
       if (t.lengthSq() < 1e-14) t.set(1, 0, 0)
       t.normalize()
-      nrm.fromArray(s.nrm, i * 3).normalize()
+      nrm.fromArray(s.nrm, i * 3)
+      if (nrm.lengthSq() < 1e-12) nrm.set(0, 1, 0)
+      nrm.normalize()
       b.crossVectors(t, nrm)
       if (b.lengthSq() < 1e-12) b.set(0, 1, 0)
       b.normalize()
@@ -82,14 +84,16 @@ export function buildRibbonGeometry(seams) {
         v++
       }
     }
+    // wound so the face normal is +N (B × T = N with B = T × N): front faces
+    // point out of the glaze, toward anyone looking at the seam
     for (let i = 0; i < s.n - 1; i++) {
       const p = base + i * 2
       index[k++] = p
-      index[k++] = p + 2
-      index[k++] = p + 1
       index[k++] = p + 1
       index[k++] = p + 2
+      index[k++] = p + 1
       index[k++] = p + 3
+      index[k++] = p + 2
     }
   })
 
@@ -109,7 +113,7 @@ export function buildRibbonGeometry(seams) {
   return g
 }
 
-/** Per-seam state texture: texel i = (fill m, gold, polish, wet). */
+/** Per-seam state texture: texel i = (lacquer lo m, lacquer hi m, gold, polish). */
 export function makeSeamState(count) {
   const data = new Float32Array(Math.max(1, count) * 4)
   const tex = new THREE.DataTexture(data, Math.max(1, count), 1, THREE.RGBAFormat, THREE.FloatType)

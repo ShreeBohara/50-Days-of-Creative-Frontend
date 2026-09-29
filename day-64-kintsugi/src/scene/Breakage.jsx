@@ -202,6 +202,11 @@ export default function Breakage() {
           userData={{ shardId: it.id }}
         >
           <mesh
+            ref={(m) => {
+              rt.shardMeshes ??= new Map()
+              if (m) rt.shardMeshes.set(it.id, m)
+              else rt.shardMeshes.delete(it.id)
+            }}
             geometry={it.geometry}
             material={materials}
             castShadow

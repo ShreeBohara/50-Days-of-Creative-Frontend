@@ -42,10 +42,13 @@ describe('classifyImpact', () => {
     expect(classifyImpact()).toBe(SEVERITY.SET)
   })
 
-  it('ignores a garbage release speed', () => {
-    expect(classifyImpact({ impactSpeed: 2.5, releaseSpeed: NaN })).toBe(SEVERITY.DROP)
-    expect(classifyImpact({ impactSpeed: 2.5, releaseSpeed: -9 })).toBe(SEVERITY.DROP)
-    expect(classifyImpact({ impactSpeed: 2.5, releaseSpeed: Infinity })).toBe(SEVERITY.DROP)
+  it('treats a garbage release speed as a set-down too (contract: any invalid input)', () => {
+    for (const releaseSpeed of [NaN, -9, Infinity, null, '3']) {
+      expect(classifyImpact({ impactSpeed: 2.5, releaseSpeed })).toBe(SEVERITY.SET)
+    }
+    // Omitted means "not thrown", not invalid.
+    expect(classifyImpact({ impactSpeed: 2.5, releaseSpeed: undefined })).toBe(SEVERITY.DROP)
+    expect(classifyImpact({ impactSpeed: 2.5, releaseSpeed: 0 })).toBe(SEVERITY.DROP)
   })
 
   it('exports thresholds in ascending order', () => {

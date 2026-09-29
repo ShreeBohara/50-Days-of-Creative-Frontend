@@ -65,7 +65,9 @@ export function transition(state, event) {
   const { phase } = state
 
   if (type === 'LOAD_SHELF') {
-    return { ...state, phase: 'keep', fromShelf: true, severity: event.severity ?? state.severity }
+    // A shelf bowl was broken by definition; ignore a bogus severity.
+    const severity = BREAKING.has(event.severity) ? event.severity : state.severity
+    return { ...state, phase: 'keep', fromShelf: true, severity }
   }
 
   if (type === 'IMPACT') {
@@ -85,6 +87,9 @@ export function transition(state, event) {
     return phase === 'keep' ? createInitialState() : state
   }
 
-  const next = EDGES[phase]?.[type]
+  // Own keys only: an event named 'toString' or 'constructor' must
+  // not find Object.prototype and turn into a phase.
+  const edges = Object.hasOwn(EDGES, phase) ? EDGES[phase] : null
+  const next = edges && Object.hasOwn(edges, type) ? edges[type] : null
   return next ? { ...state, phase: next } : state
 }

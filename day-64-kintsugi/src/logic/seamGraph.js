@@ -131,7 +131,8 @@ export function pointAt(seam, s, out) {
 
   const res = out ?? { pos: [0, 0, 0], nrm: [0, 0, 0] }
   const i3 = i * 3
-  const j3 = i3 + 3
+  // A hand-built one-point seam has no next point; lerp to itself.
+  const j3 = i + 1 < n ? i3 + 3 : i3
   for (let c = 0; c < 3; c += 1) {
     res.pos[c] = pos[i3 + c] + (pos[j3 + c] - pos[i3 + c]) * t
     res.nrm[c] = nrm[i3 + c] + (nrm[j3 + c] - nrm[i3 + c]) * t
@@ -196,11 +197,7 @@ export function maxImpactDist(seams) {
 // `along` is the fractional point index (index + t). An empty
 // polyline reports dist = Infinity so any corridor test fails.
 export function nearestOnPolyline2D(xy, p) {
-  return nearestOn(xy, Math.floor(xy.length / 2), p)
-}
-
-// Same, over the first n points only.
-function nearestOn(xy, n, p) {
+  const n = Math.floor(xy.length / 2)
   if (n === 0) return { index: -1, t: 0, dist: Infinity, along: -1 }
   if (n === 1) {
     const dist = Math.hypot(p.x - xy[0], p.y - xy[1])
@@ -221,30 +218,75 @@ function nearestOn(xy, n, p) {
   return best
 }
 
-// Metres of seam per screen pixel around segment i. A segment
-// seen end-on projects to ~0 px, so walk outwards to the nearest
-// segment with real screen length; 0 if the whole seam is a dot.
+// Closest point to p on the stretch of the polyline whose arclength
+// lies in [lo, hi]. Real seams run up the outer wall, over the rim
+// and back down the inner wall, so on screen a seam lies on top of
+// itself; a whole-polyline search would snap to the other half and
+// the brush would go dead. Each segment's parameter is clamped to
+// its slice of the window, so the answer (s) is always inside it.
+// A segment seen end-on has no direction to project along, so it
+// answers with its point nearest the wet edge `wet`.
+function nearestInRange(xy, arclen, n, p, lo, hi, wet) {
+  if (n === 1) {
+    const inside = arclen[0] >= lo && arclen[0] <= hi
+    return { i: 0, s: arclen[0], dist: inside ? Math.hypot(p.x - xy[0], p.y - xy[1]) : Infinity }
+  }
+  let best = { i: 0, s: lo, dist: Infinity }
+  for (let i = 0; i < n - 1; i += 1) {
+    const s0 = arclen[i]
+    const span = arclen[i + 1] - s0
+    if (s0 > hi || s0 + span < lo) continue
+    const tMin = span > 0 ? Math.max(0, (lo - s0) / span) : 0
+    const tMax = span > 0 ? Math.min(1, (hi - s0) / span) : 0
+    const ax = xy[i * 2]
+    const ay = xy[i * 2 + 1]
+    const dx = xy[i * 2 + 2] - ax
+    const dy = xy[i * 2 + 3] - ay
+    const len2 = dx * dx + dy * dy
+    const raw =
+      len2 > 0 ? ((p.x - ax) * dx + (p.y - ay) * dy) / len2 : span > 0 ? (wet - s0) / span : 0
+    const t = Math.min(tMax, Math.max(tMin, raw))
+    const dist = Math.hypot(p.x - (ax + dx * t), p.y - (ay + dy * t))
+    // `<` so NaN (a point behind the camera) never wins.
+    if (dist < best.dist) best = { i, s: s0 + span * t, dist }
+  }
+  return best
+}
+
+// Below this much screen length the metres-per-pixel ratio is
+// meaningless: a sliver seen nearly end-on would turn a 5 px
+// stroke into metres of lacquer.
+const MIN_SCALE_PX = 4
+
+// Metres of seam per screen pixel around segment i, averaged over
+// neighbouring segments (growing outwards) until they cover at
+// least MIN_SCALE_PX on screen. A whole seam shorter than that
+// on screen is treated as MIN_SCALE_PX long, so a short scrub
+// over it still fills it instead of dividing by ~0.
 function metresPerPixel(xy, arclen, n, i) {
-  for (let r = 0; r < n - 1; r += 1) {
+  let px = 0
+  let metres = 0
+  for (let r = 0; r < n - 1 && px < MIN_SCALE_PX; r += 1) {
     for (const j of r === 0 ? [i] : [i - r, i + r]) {
       if (j < 0 || j >= n - 1) continue
-      const px = Math.hypot(xy[j * 2 + 2] - xy[j * 2], xy[j * 2 + 3] - xy[j * 2 + 1])
-      if (px > 1e-6) return (arclen[j + 1] - arclen[j]) / px
+      px += Math.hypot(xy[j * 2 + 2] - xy[j * 2], xy[j * 2 + 3] - xy[j * 2 + 1])
+      metres += arclen[j + 1] - arclen[j]
     }
   }
-  return 0
+  // NaN px (a point behind the camera) means no usable scale.
+  return Number.isFinite(px) ? metres / Math.max(px, MIN_SCALE_PX) : 0
 }
 
 // One brush sample of the lacquer stroke. `fill` is how far
 // along the seam (metres) the lacquer has already run; returns
 // the new fill, never lower than `fill`, never past the end.
 //
-// The pointer only counts while it is inside the corridor and
-// near the wet edge (between a little behind it and lookAheadM
-// ahead) — you can't paint the far end of a crack first. When
-// it counts, the fill jumps to the pointer's projection and is
-// also nudged forward by the stroke distance, so short
-// scrubbing strokes along the seam still make progress.
+// The pointer only counts while it is within the corridor of
+// the stretch near the wet edge (from a little behind it to
+// lookAheadM ahead) — you can't paint the far end of a crack
+// first. When it counts, the fill jumps to the pointer's
+// projection onto that stretch and is also nudged forward by the
+// stroke distance, so short scrubbing strokes still progress.
 export function lacquerStep({
   xy,
   arclen,
@@ -255,23 +297,30 @@ export function lacquerStep({
   gain = 1.6,
   strokePx = 0,
 }) {
-  const n = Math.min(arclen.length, Math.floor(xy.length / 2))
-  if (n === 0) return 0
-  const length = arclen[n - 1]
+  // The seam's length comes from the full arclength table, even if
+  // fewer screen points were supplied — otherwise a short `xy`
+  // would clamp (i.e. shrink) an existing fill.
+  const length = arclen.length > 0 ? arclen[arclen.length - 1] : 0
   const f = Number.isFinite(fill) ? Math.min(length, Math.max(0, fill)) : 0
+  const n = Math.min(arclen.length, Math.floor(xy.length / 2))
+  if (n === 0) return f
   if (!pointer || !Number.isFinite(pointer.x) || !Number.isFinite(pointer.y)) return f
 
-  const near = nearestOn(xy, n, pointer)
+  const ahead = Number.isFinite(lookAheadM) ? Math.max(0, lookAheadM) : 0.012
+  const lo = f - LACQUER_BACK_SLACK
+  const hi = f + ahead
+  const near = nearestInRange(xy, arclen, n, pointer, lo, hi, f)
   if (!(near.dist <= corridorPx)) return f
-
-  const i = near.index
-  const s = n === 1 ? arclen[0] : arclen[i] + (arclen[i + 1] - arclen[i]) * near.t
-  if (s < f - LACQUER_BACK_SLACK || s > f + lookAheadM) return f
+  // Pinned to a window edge that isn't an end of the seam: the
+  // pointer's foot lies outside the window (too far ahead or
+  // behind), it's merely close to the edge — doesn't count.
+  const EPS = 1e-9
+  if ((lo > arclen[0] && near.s <= lo + EPS) || (hi < length && near.s >= hi - EPS)) return f
 
   const stroke = Number.isFinite(strokePx) && strokePx > 0 ? strokePx : 0
-  const strokeM = n > 1 ? stroke * metresPerPixel(xy, arclen, n, i) : 0
+  const strokeM = n > 1 ? stroke * metresPerPixel(xy, arclen, n, near.i) : 0
   const g = Number.isFinite(gain) && gain > 0 ? gain : 0
-  const next = Math.max(f, s, f + strokeM * g)
+  const next = Math.max(f, near.s, f + strokeM * g)
   return Math.min(length, next)
 }
 

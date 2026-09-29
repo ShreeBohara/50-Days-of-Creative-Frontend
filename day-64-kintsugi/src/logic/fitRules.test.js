@@ -48,6 +48,16 @@ describe('buildAdjacency', () => {
     expect(ids(adj.keys())).toEqual([0, 1, 2, 3, 4, 5])
   })
 
+  it('drops ids that are not listed shards, so assembly can finish', () => {
+    const phantom = buildAdjacency({
+      shards: [{ id: 0, neighbors: [1, 99] }, { id: 1, neighbors: [0] }],
+      seams: [{ a: 1, b: 42 }],
+    })
+    expect(ids(phantom.keys())).toEqual([0, 1])
+    expect(ids(phantom.get(0))).toEqual([1])
+    expect(isAssembled(new Set([0, 1]), phantom, 0)).toBe(true)
+  })
+
   it('tolerates empty or partial input', () => {
     expect(buildAdjacency({}).size).toBe(0)
     expect(buildAdjacency(null).size).toBe(0)

@@ -13,6 +13,13 @@ const D = 0.3
 const RIM = 0.012
 const WALL = 0.012
 
+function toolOf(o) {
+  for (let n = o; n; n = n.parent) {
+    if (n.name === 'brush' || n.name === 'jar' || n.name === 'burnisher') return n.name
+  }
+  return null
+}
+
 export default function Tray() {
   const gltf = useGLTF(ASSETS.trayTools)
 
@@ -38,7 +45,23 @@ export default function Tray() {
 
   return (
     <>
-      <primitive object={gltf.scene} />
+      <primitive
+        object={gltf.scene}
+        onPointerDown={(e) => {
+          const name = toolOf(e.object)
+          if (!name || !rt.craft?.stage) return
+          e.stopPropagation()
+          e.nativeEvent.__kintsugiHit = true
+          rt.craft.pickTool(name)
+        }}
+        onPointerOver={(e) => {
+          const name = toolOf(e.object)
+          if (name && rt.craft?.stage && !rt.craft.tool) document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = ''
+        }}
+      />
       <RigidBody name="tray" type="fixed" colliders={false} friction={0.7} restitution={0.12}>
         <CuboidCollider args={[W / 2 + 0.2, 0.2, D / 2 + 0.2]} position={[0, -0.2 - 0.0012, 0]} />
         <CuboidCollider args={[WALL / 2, RIM, D / 2]} position={[W / 2 - WALL / 2, 0, 0]} />

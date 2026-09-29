@@ -1,4 +1,7 @@
+import fs from 'node:fs'
 import { describe, it, expect } from 'vitest'
+import { buildAdjacency, assemblyOrder } from './fitRules.js'
+import { VARIANT_IDS, variantId, zoneFromLocalPoint } from './impactZone.js'
 import {
   prepareSeams,
   pointAt,
@@ -144,6 +147,11 @@ describe('pointAt', () => {
     expect(Math.hypot(...p.nrm)).toBeCloseTo(1, 6)
     const [s2] = prepareSeams([rawSeam({ n: 2, normals: [[0, 0, 1], [0, 0, -1]] })])
     expect(pointAt(s2, s2.length / 2).nrm).toEqual([0, 0, 1])
+  })
+
+  it('stays finite on a hand-built one-point seam', () => {
+    const dot = { n: 1, pos: new Float32Array([1, 2, 3]), nrm: new Float32Array([0, 1, 0]), arclen: new Float32Array([0]), length: 0 }
+    expect(pointAt(dot, 5)).toMatchObject({ pos: [1, 2, 3], nrm: [0, 1, 0], index: 0, t: 0 })
   })
 
   it('writes into a caller-owned out object', () => {
@@ -322,9 +330,55 @@ describe('lacquerStep', () => {
     expect(Number.isFinite(f)).toBe(true)
     expect(f).toBeGreaterThan(0)
 
+    // A whole seam seen as a dot counts as MIN_SCALE_PX (4 px) long:
+    // no divide-by-zero, and a 1 px scrub fills a bounded amount.
     const dot = new Float32Array(22).fill(5)
-    const g = lacquerStep({ ...base, xy: dot, fill: 0, pointer: { x: 5, y: 5 }, strokePx: 10 })
-    expect(g).toBe(0)
+    const g = lacquerStep({ ...base, xy: dot, fill: 0, pointer: { x: 5, y: 5 }, strokePx: 1 })
+    expect(g).toBeCloseTo((seam.length / 4) * 1.6, 6)
+    expect(lacquerStep({ ...base, xy: dot, fill: 0, pointer: { x: 5, y: 5 }, strokePx: 50 })).toBe(seam.length)
+  })
+
+  it('never shrinks the fill when screen points are missing', () => {
+    expect(step({ xy: new Float32Array(0), fill: 0.01, pointer: { x: 0, y: 100 } })).toBe(0.01)
+    // Only the first 6 points projected: the fill still belongs to the whole seam.
+    const partial = xy.slice(0, 12)
+    expect(step({ xy: partial, fill: 0.012, pointer: { x: 50, y: 100 } })).toBe(0.012)
+  })
+
+  it('follows a seam that folds back over itself on screen', () => {
+    // Up the outer wall (points 0–5), back down the inner wall
+    // (6–10) along the same screen line — how rim-crossing seams
+    // look from the side. The wet edge is on the way back.
+    const fold = new Float32Array(22)
+    for (let i = 0; i < 11; i += 1) {
+      fold[i * 2] = (i <= 5 ? i : 10 - i) * 10
+      fold[i * 2 + 1] = 100
+    }
+    const f = step({ xy: fold, fill: 0.0105, pointer: { x: 20, y: 100 } })
+    expect(f).toBeCloseTo(0.012, 6)
+  })
+
+  it('does not count a pointer just past the look-ahead edge', () => {
+    // 3 px beyond the 12 mm window edge — well inside the corridor.
+    expect(step({ fill: 0, pointer: { x: 83, y: 100 }, corridorPx: 24 })).toBe(0)
+    expect(step({ fill: 0, pointer: { x: 77, y: 100 }, corridorPx: 24 })).toBeCloseTo(0.01155, 6)
+    // A NaN look-ahead falls back to the default instead of removing the bound.
+    expect(step({ fill: 0, pointer: { x: 100, y: 100 }, lookAheadM: NaN, corridorPx: 24 })).toBe(0)
+  })
+
+  it('a sliver seen nearly end-on cannot fling the fill to the end', () => {
+    const sliver = new Float32Array(xy)
+    sliver[4] = 10.001 // segment 1 is 0.001 px long on screen
+    const f = step({ xy: sliver, fill: 0.0015, pointer: { x: 10.0005, y: 100 }, strokePx: 5 })
+    expect(f).toBeLessThan(0.004)
+    expect(f).toBeGreaterThan(0.0015)
+  })
+
+  it('an end-on stretch at the wet edge still takes paint', () => {
+    const flat = new Float32Array(xy)
+    for (let i = 0; i < 4; i += 1) flat[i * 2] = 0
+    const f = step({ xy: flat, fill: 0.0045, pointer: { x: 0, y: 100 }, strokePx: 10 })
+    expect(f).toBeGreaterThan(0.0045)
   })
 
   it('is monotone and bounded under a random scribble', () => {
@@ -358,5 +412,67 @@ describe('lengths', () => {
     expect(filledLength(seams, [-1, NaN])).toBe(0)
     expect(filledLength(seams, new Map([[1, 0.002]]))).toBeCloseTo(0.002, 6)
     expect(filledLength(seams, undefined)).toBe(0)
+  })
+})
+
+describe('real pipeline output (public/data/seams)', () => {
+  const dir = new URL('../../public/data/seams/', import.meta.url)
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'))
+  const load = (f) => JSON.parse(fs.readFileSync(new URL(f, dir), 'utf8'))
+
+  it('ships all twelve variants and every one prepares cleanly', () => {
+    expect(files.map((f) => f.replace('.json', '')).sort()).toEqual([...VARIANT_IDS].sort())
+    for (const f of files) {
+      const json = load(f)
+      const seams = prepareSeams(json)
+      expect(seams.length, f).toBeGreaterThan(0)
+      expect(variantId(json.zone, json.severity), f).toBe(json.variant)
+      expect(zoneFromLocalPoint(json.impact), f).toBe(json.zone)
+      const { order, unreachable } = assemblyOrder(buildAdjacency(json), json.anchor)
+      expect(unreachable, f).toEqual([])
+      expect(order, f).toHaveLength(json.shards.length)
+    }
+  })
+
+  it('the brush can trace every seam seen side-on, where it folds over the rim', () => {
+    // Orthographic side view along each seam's own mean azimuth, so
+    // the outer-wall and inner-wall halves overlap on screen (a
+    // phone-sized bowl: walls ~8 px apart), traced with ±6 px of
+    // hand wobble. The synthetic fold test above pins the failure
+    // mode; this runs the same brush over every shipped seam.
+    const PX_PER_M = 1500
+    const JITTER = 6
+    const rnd = mulberry32(2026)
+    for (const f of files) {
+      for (const s of prepareSeams(load(f))) {
+        let cx = 0
+        let cz = 0
+        for (let i = 0; i < s.n; i += 1) {
+          cx += s.pos[i * 3]
+          cz += s.pos[i * 3 + 2]
+        }
+        const phi = Math.atan2(cx, cz)
+        const xy = new Float32Array(s.n * 2)
+        for (let i = 0; i < s.n; i += 1) {
+          // Screen x runs tangentially, screen y is height.
+          xy[i * 2] = (s.pos[i * 3] * Math.cos(phi) - s.pos[i * 3 + 2] * Math.sin(phi)) * PX_PER_M
+          xy[i * 2 + 1] = -s.pos[i * 3 + 1] * PX_PER_M
+        }
+        let fill = 0
+        let prev = null
+        for (let i = 0; i < s.n; i += 1) {
+          const pointer = {
+            x: xy[i * 2] + (rnd() * 2 - 1) * JITTER,
+            y: xy[i * 2 + 1] + (rnd() * 2 - 1) * JITTER,
+          }
+          const strokePx = prev ? Math.hypot(pointer.x - prev.x, pointer.y - prev.y) : 0
+          prev = pointer
+          const next = lacquerStep({ xy, arclen: s.arclen, fill, pointer, strokePx })
+          expect(next).toBeGreaterThanOrEqual(fill)
+          fill = next
+        }
+        expect(fill, `${f} seam ${s.id}`).toBeGreaterThan(s.length - 0.002)
+      }
+    }
   })
 })

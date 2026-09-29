@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo } from 'react'
 import { useThree } from '@react-three/fiber'
-import { ContactShadows, Environment, useTexture } from '@react-three/drei'
+import { Environment, useTexture } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import * as THREE from 'three'
 import { ASSETS } from './assets.js'
@@ -11,6 +11,7 @@ import Tray from './Tray.jsx'
 import Bowl from './Bowl.jsx'
 import Breakage from './Breakage.jsx'
 import FitLayer from './FitLayer.jsx'
+import CraftLayer from './Craft.jsx'
 import Listener from './Listener.jsx'
 import { rt } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
@@ -88,16 +89,8 @@ export default function Stage() {
           <Bowl />
           <Breakage />
           <FitLayer />
+          <CraftLayer />
         </Physics>
-        <ContactShadows
-          position={[0, 0.0004, 0]}
-          scale={0.5}
-          far={0.12}
-          blur={2.4}
-          opacity={0.55}
-          resolution={512}
-          color="#120c08"
-        />
       </Suspense>
       <Effects />
     </>
