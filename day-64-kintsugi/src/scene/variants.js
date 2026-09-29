@@ -62,20 +62,45 @@ function buildShards(gltf, json) {
   })
 }
 
+const seamCache = new Map()
+
+/** Promise<{ json, seams }> — just the crack graph (the shelf needs no shards). */
+export function loadSeams(id) {
+  if (!seamCache.has(id)) {
+    const p = fetch(ASSETS.seams(id))
+      .then((r) => {
+        if (!r.ok) throw new Error(`seams ${id}: ${r.status}`)
+        return r.json()
+      })
+      .then((json) => ({ json, seams: prepareSeams(json) }))
+    p.catch(() => seamCache.delete(id))
+    seamCache.set(id, p)
+  }
+  return seamCache.get(id)
+}
+
 /** Promise<{ id, json, seams, shards }> — cached per variant id. */
 export function loadVariant(id) {
   if (!cache.has(id)) {
-    const p = Promise.all([
-      fetch(ASSETS.seams(id)).then((r) => {
-        if (!r.ok) throw new Error(`seams ${id}: ${r.status}`)
-        return r.json()
-      }),
-      loader.loadAsync(ASSETS.fracture(id)),
-    ]).then(([json, gltf]) => ({ id, json, seams: prepareSeams(json), shards: buildShards(gltf, json) }))
+    const p = Promise.all([loadSeams(id), loader.loadAsync(ASSETS.fracture(id))]).then(([{ json, seams }, gltf]) => ({
+      id,
+      json,
+      seams,
+      shards: buildShards(gltf, json),
+    }))
     p.catch(() => cache.delete(id)) // let a later attempt retry
     cache.set(id, p)
   }
   return cache.get(id)
+}
+
+/** The seams a hairline crack uses: the few that start nearest the impact. */
+export function hairlineSeams(seams, count = 3) {
+  return seams
+    .map((s, i) => ({ i, d: Math.min(...s.impactDist) }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, count)
+    .map((x) => x.i)
 }
 
 export function prefetch(ids) {

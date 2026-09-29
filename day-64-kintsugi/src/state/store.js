@@ -5,6 +5,7 @@
 
 import { useSyncExternalStore } from 'react'
 import { transition } from '../logic/stateMachine.js'
+import { addToShelf, loadShelf, recordFor } from './shelf.js'
 
 function createStore(initial) {
   let state = initial
@@ -45,6 +46,8 @@ export const store = createStore({
   physicsReady: false,
   announce: '', // aria-live text
   keepRecord: null, // the shelf record once kept
+  shelf: loadShelf(),
+  run: 0, // bumped by "begin again" — the whole stage remounts fresh
 })
 
 // Select a primitive (or a stable reference) — never build objects in `sel`.
@@ -65,6 +68,49 @@ export function announce(text) {
   // re-announce identical strings by toggling a zero-width suffix
   const prev = store.get().announce
   store.set({ announce: text === prev.replace(/\u200b$/, '') ? text + '\u200b' : text })
+}
+
+/** Keep: record the mended bowl, put it on the shelf. */
+export function keepBowl() {
+  const s = store.get()
+  const hairline = s.severity === 'hairline'
+  const seams = rt.craft?.seams ?? []
+  const goldMm = seams.reduce((a, x) => a + x.length, 0) * 1000
+  try {
+    const entry = recordFor({
+      variant: s.variant,
+      order: rt.fit?.order ?? [],
+      pieces: hairline ? 1 : s.pieces,
+      goldMm,
+      hairline,
+    })
+    store.set({ keepRecord: entry, shelf: addToShelf(entry) })
+  } catch (err) {
+    console.warn('could not keep this bowl', err)
+  }
+}
+
+/** Begin again: fresh store state and a remounted stage (new physics world). */
+export function beginAgain() {
+  rt.clock.scale = 1
+  rt.variant = null
+  rt.activeSeams = null
+  rt.shardBodies = null
+  rt.shardMeshes = null
+  rt.seams = null
+  rt.lastImpact = null
+  store.set((s) => ({
+    phase: 'veiled',
+    severity: null,
+    variant: null,
+    tool: null,
+    pieces: 0,
+    placed: 0,
+    progress: 0,
+    hint: null,
+    keepRecord: null,
+    run: s.run + 1,
+  }))
 }
 
 // The mutable runtime shared by scene components (never read during render).

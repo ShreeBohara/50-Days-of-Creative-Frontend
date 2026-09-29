@@ -3,15 +3,30 @@ import * as THREE from 'three'
 import { useEffect } from 'react'
 import Stage from './scene/Stage.jsx'
 import Overlay from './ui/Overlay.jsx'
-import { dispatch } from './state/store.js'
+import { dispatch, store, useStore } from './state/store.js'
+import { takeFriendFromHash } from './state/shelf.js'
+import { audio } from './audio/engine.js'
 
 const DEBUG = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search)
 
 export default function App() {
+  const run = useStore((s) => s.run)
   useEffect(() => {
     // until the fukusa veil lands, the bowl is simply there
     const t = setTimeout(() => dispatch({ type: 'UNVEIL' }), 400)
     return () => clearTimeout(t)
+  }, [run])
+  useEffect(() => {
+    // a #bowl= link from a friend lands on this shelf
+    const got = takeFriendFromHash()
+    if (got) {
+      store.set({ shelf: got.shelf, hint: 'a bowl from a friend is on your shelf' })
+      setTimeout(() => store.get().hint === 'a bowl from a friend is on your shelf' && store.set({ hint: null }), 5200)
+    }
+    // touch browsers only grant audio on pointerup, not pointerdown
+    const unlock = () => audio.unlock()
+    window.addEventListener('pointerup', unlock)
+    return () => window.removeEventListener('pointerup', unlock)
   }, [])
   return (
     <>
@@ -25,7 +40,7 @@ export default function App() {
         gl.toneMapping = THREE.NoToneMapping // AgX happens in the composer
       }}
     >
-      <Stage />
+      <Stage key={run} />
     </Canvas>
     <Overlay />
     </>

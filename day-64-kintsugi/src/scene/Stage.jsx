@@ -12,6 +12,7 @@ import Bowl from './Bowl.jsx'
 import Breakage from './Breakage.jsx'
 import FitLayer from './FitLayer.jsx'
 import CraftLayer from './Craft.jsx'
+import Shelf from './Shelf.jsx'
 import Listener from './Listener.jsx'
 import { rt } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
@@ -91,6 +92,7 @@ export default function Stage() {
           <FitLayer />
           <CraftLayer />
         </Physics>
+        <Shelf />
       </Suspense>
       <Effects />
     </>

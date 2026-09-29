@@ -35,13 +35,14 @@ export default function CameraRig() {
     const polar = THREE.MathUtils.degToRad(aspect < 1 ? v.polar - 8 : v.polar)
     const drift = Math.sin(state.clock.elapsedTime * 0.1) * 0.012 // the slow museum drift
     const yaw = v.yaw + drift
+    const flip = rt.fit?.flip ?? 0 // a flipped bowl is lifted: follow it up
     tmp.pos.set(
       v.target[0] + fitDist * Math.sin(polar) * Math.sin(yaw),
-      v.target[1] + fitDist * Math.cos(polar),
+      v.target[1] + fitDist * Math.cos(polar) + flip * 0.03,
       v.target[2] + fitDist * Math.sin(polar) * Math.cos(yaw),
     )
     easing.damp3(camera.position, tmp.pos, 0.6, dt)
-    tmp.look.set(...v.target)
+    tmp.look.set(v.target[0], v.target[1] + flip * 0.028, v.target[2])
     easing.damp3(tmp.cur, tmp.look, 0.5, dt)
     camera.lookAt(tmp.cur)
   })

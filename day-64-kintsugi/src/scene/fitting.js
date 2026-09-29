@@ -32,6 +32,7 @@ const LIFT = 0.018
 const _a = new THREE.Vector3()
 const _b = new THREE.Vector3()
 const _q = new THREE.Quaternion()
+const _xAxis = new THREE.Vector3(1, 0, 0)
 const _c1 = { x: 0, y: 0 }
 const _c2 = { x: 0, y: 0 }
 
@@ -46,6 +47,9 @@ export class Fitting {
     this.yaw = 0
     this.yawTarget = 0
     this.placed = new Set()
+    this.order = [] // ids in the order they were fitted (the share code keeps it)
+    this.flip = 0 // 0 upright … 1 turned over to show the foot
+    this.flipTarget = 0
     this.anims = new Map() // id -> { kind, t, dur, fromPos, fromQuat }
     this.hold = null
     this.spin = null
@@ -91,6 +95,7 @@ export class Fitting {
     this.adjacency = buildAdjacency(v.json)
     this.anchorId = v.json.anchor
     this.placed.clear()
+    this.order = []
     this.anims.clear()
     this.elapsed = 0
     this.idle = 0
@@ -145,8 +150,10 @@ export class Fitting {
     this.riding = false
     this.intact = null
     this.placed.clear()
+    this.order = []
     this.anims.clear()
     this.yaw = this.yawTarget = 0
+    this.flip = this.flipTarget = 0
   }
 
   // --------------------------------------------------------------- input
@@ -196,9 +203,17 @@ export class Fitting {
     window.addEventListener('pointercancel', this._up)
   }
 
-  /** Drag on empty space turns the assembly. */
+  /** Turn the mended bowl over to show its foot and kiln seal (and back). */
+  toggleFlip() {
+    if (!this.riding) return
+    this.flipTarget = this.flipTarget > 0.5 ? 0 : 1
+  }
+
+  /** Drag on empty space turns the assembly (while mending, and once kept). */
   onEmptyDown(e) {
-    if (!this.active || this.hold || store.get().phase !== 'fitting') return
+    const phase = store.get().phase
+    const can = (this.active && phase === 'fitting') || (this.riding && phase === 'keep')
+    if (!can || this.hold) return
     this.spin = { pid: e.pointerId, x: e.clientX, yaw0: this.yawTarget }
     window.addEventListener('pointermove', this._move)
     window.addEventListener('pointerup', this._up)
@@ -272,6 +287,7 @@ export class Fitting {
 
   placedDone(id) {
     this.placed.add(id)
+    this.order.push(id)
     this.idle = 0
     this.ghostId = null
     const n = this.placed.size
@@ -323,9 +339,14 @@ export class Fitting {
     this.elapsed += dt
     if (!this.hold) this.idle += dt
 
-    // assembly turns toward its target yaw (critically damped)
+    // assembly turns toward its target yaw (critically damped); a flip lifts
+    // it off the tray and turns it foot-up toward the viewer
     this.yaw += (this.yawTarget - this.yaw) * (1 - Math.exp(-dt / 0.28))
-    this.assembly.quaternion.setFromAxisAngle(THREE.Object3D.DEFAULT_UP, this.yaw)
+    this.flip += (this.flipTarget - this.flip) * (1 - Math.exp(-dt / 0.35))
+    const f = this.flip
+    _q.setFromAxisAngle(_xAxis, -Math.PI * 0.82 * f)
+    this.assembly.quaternion.setFromAxisAngle(THREE.Object3D.DEFAULT_UP, this.yaw).premultiply(_q)
+    this.assembly.position.set(BOWL_SLOT[0], 0.0015 + f * 0.095 + Math.sin(Math.PI * f) * 0.02, BOWL_SLOT[2] + f * 0.02)
     this.assembly.updateMatrixWorld(true)
 
     // placed pieces ride the assembly

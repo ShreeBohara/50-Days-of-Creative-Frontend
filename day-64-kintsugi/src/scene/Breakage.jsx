@@ -4,7 +4,7 @@ import { RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import { buildRibbonGeometry } from './ribbons.js'
 import { makeCrackMaterial, makeFracture } from './materials.js'
-import { loadVariant, prefetch } from './variants.js'
+import { hairlineSeams, loadVariant, prefetch } from './variants.js'
 import { audio } from '../audio/engine.js'
 import { SEVERITY } from '../logic/severity.js'
 import { VARIANT_IDS, variantId, zoneFromLocalPoint } from '../logic/impactZone.js'
@@ -14,20 +14,10 @@ import { CERAMIC_DENSITY } from './geometry.js'
 
 const RACE_SECONDS = 0.45 // real time; the world is frozen while cracks run
 const RAMP_SECONDS = 0.55 // then time eases back from 0.25× to 1×
-const HAIRLINE_SEAMS = 3
 
 function hash01(n) {
   const s = Math.sin(n * 91.345 + 17.1) * 43758.5453
   return s - Math.floor(s)
-}
-
-/** The seams a hairline crack uses: the few that start nearest the impact. */
-function hairlineSeams(seams) {
-  return seams
-    .map((s, i) => ({ i, d: Math.min(...s.impactDist) }))
-    .sort((a, b) => a.d - b.d)
-    .slice(0, HAIRLINE_SEAMS)
-    .map((x) => x.i)
 }
 
 function splitBowl(r, setSpawn) {

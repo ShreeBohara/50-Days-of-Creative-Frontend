@@ -5,7 +5,7 @@ import { buildRibbonGeometry, makeSeamState } from './ribbons.js'
 import { makeCrackMaterial, makeSeamMaterial } from './materials.js'
 import { Craft, MAX_DUST } from './craft.js'
 import { SEVERITY } from '../logic/severity.js'
-import { rt, store } from '../state/store.js'
+import { keepBowl, rt, store } from '../state/store.js'
 
 const _o = new THREE.Object3D()
 
@@ -81,6 +81,7 @@ export default function CraftLayer() {
         if (built) built.seamMat.userData.uniforms.uWet.value = 0
       } else if (phase === 'keep') {
         ctl.setStage(null)
+        keepBowl()
         // the hairline crack under the gold no longer needs drawing
         if (built) built.crack.visible = false
       }

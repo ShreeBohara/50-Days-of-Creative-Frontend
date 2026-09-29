@@ -42,7 +42,12 @@ export default function FitLayer() {
     }
     const key = (ev) => {
       if ((ev.key === 'm' || ev.key === 'M') && store.get().phase === 'fitting') ctl.autoFitNext()
+      if ((ev.key === 'f' || ev.key === 'F') && store.get().phase === 'keep') ctl.toggleFlip()
     }
+    const dbl = () => {
+      if (store.get().phase === 'keep') ctl.toggleFlip()
+    }
+    gl.domElement.addEventListener('dblclick', dbl)
     window.addEventListener('pointerdown', down)
     window.addEventListener('keydown', key)
     return () => {
@@ -50,6 +55,7 @@ export default function FitLayer() {
       ctl.end()
       window.removeEventListener('pointerdown', down)
       window.removeEventListener('keydown', key)
+      gl.domElement.removeEventListener('dblclick', dbl)
       rt.fit = null
     }
   }, [ctl, rapier, camera, gl])
