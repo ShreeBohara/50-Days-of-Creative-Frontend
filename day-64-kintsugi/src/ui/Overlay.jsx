@@ -37,6 +37,11 @@ export default function Overlay() {
   const word = STAGE_WORD[phase] ?? ''
   const [muted, setMuted] = useState(() => audio.isMuted())
   const craft = phase === 'lacquer' || phase === 'gild' || phase === 'burnish'
+  const mendable = phase === 'fitting' && hint === 'tap the word to mend the rest'
+  const mendRest = () => {
+    rt.fit?.mendTheRest()
+    document.getElementById('stage')?.focus()
+  }
 
   useEffect(() => {
     document.documentElement.dataset.phase = phase
@@ -45,25 +50,34 @@ export default function Overlay() {
   return (
     <div className="overlay" aria-hidden={false}>
       <div className="stage-word" data-empty={word ? undefined : ''}>
-        {phase === 'fitting' && hint ? (
-          <button
-            key={word}
-            type="button"
-            className="stage-word__text stage-word__button"
-            onClick={() => {
-              rt.fit?.mendTheRest()
-              document.getElementById('stage')?.focus()
-            }}
-          >
-            {word}
-          </button>
-        ) : (
-          <span key={word} className="stage-word__text">
-            {word}
-          </span>
-        )}
+        {/* One element whatever the hint says (a swap would remount the word and
+            replay its entrance); it only becomes a control when mending the
+            rest is actually on offer. */}
+        <span
+          key={word}
+          className={mendable ? 'stage-word__text stage-word__button' : 'stage-word__text'}
+          role={mendable ? 'button' : undefined}
+          tabIndex={mendable ? 0 : undefined}
+          onClick={mendable ? mendRest : undefined}
+          onKeyDown={
+            mendable
+              ? (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    mendRest()
+                  }
+                }
+              : undefined
+          }
+        >
+          {word}
+        </span>
         <span className="stage-word__rule" style={{ '--p': craft ? progress : 1 }} />
-        {hint ? <span className="stage-word__hint">{hint}</span> : null}
+        {/* a fixed slot: hints fade in and out and change text in place, so the
+            word above never jumps (the lift readout changes every centimetre) */}
+        <span className="stage-word__hint" data-on={hint ? '' : undefined} aria-hidden={hint ? undefined : true}>
+          {hint ?? '\u00a0'}
+        </span>
         {phase === 'keep' && kept ? (
           <div className="keep">
             <p className="keep__colophon">

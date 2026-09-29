@@ -54,10 +54,22 @@
   text-shadow: 0 1px 14px rgba(20, 12, 8, 0.85);
   font-family: var(--font-mono);
   font-size: 11px;
+  line-height: 16px;
+  min-height: 16px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-dim);
-  animation: word-in 700ms var(--ease-out) both;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.stage-word__hint[data-on] {
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes word-in {
@@ -94,9 +106,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stage-word__text,
-  .stage-word__hint {
+  .stage-word__text {
     animation: none;
+  }
+
+  .stage-word__hint {
+    transition: none;
+    transform: none;
   }
 }
 

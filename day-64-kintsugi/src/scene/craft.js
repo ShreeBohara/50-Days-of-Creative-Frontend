@@ -12,7 +12,7 @@
 import * as THREE from 'three'
 import { audio } from '../audio/engine.js'
 import { announce, dispatch, rt, store } from '../state/store.js'
-import { rayFromClient } from '../input/pointer.js'
+import { canvasRect, rayFromClient } from '../input/pointer.js'
 
 const CORRIDOR = { mouse: 26, touch: 44 } // px either side of a crack
 const LACQUER_GAIN = 2.4 // metres of spread per metre of stroke
@@ -30,7 +30,23 @@ const _toCam = new THREE.Vector3()
 const _down = new THREE.Vector3(0, -1, 0)
 const _q = new THREE.Quaternion()
 const _up = new THREE.Vector3(0, 1, 0)
+const _right = new THREE.Vector3()
+const _back = new THREE.Vector3()
+const _target = new THREE.Vector3()
+const _quat = new THREE.Quaternion()
+const _axis = new THREE.Vector3()
+const _mouthT = new THREE.Vector3()
+const _mouthL = new THREE.Vector3()
+const _handle = new THREE.Vector3()
+const _plane = new THREE.Plane()
+const _planeAt = new THREE.Vector3(-0.012, 0.05, 0.03)
+const _xAxis = new THREE.Vector3(1, 0, 0)
+const _hinge = new THREE.Vector3(0, 0.028, -0.0188) // back edge of the jar mouth, jar-local
+const _seamW = new THREE.Vector3()
+const TOOL_POS_TAU = 0.018 // s: the tip stays under the hand
+const TOOL_ROT_TAU = 0.06 // s: the handle swings a little behind it
 const raycaster = new THREE.Raycaster()
+raycaster.firstHitOnly = true
 
 function hash(n) {
   const s = Math.sin(n * 12.9898 + 78.233) * 43758.5453
@@ -110,6 +126,7 @@ export class Craft {
     if (!obj) return
     this.tool = name
     this.toolPose = { p: obj.position.clone(), q: obj.quaternion.clone() }
+    this.lastHit = null
     if (name === 'jar') this.lidOpen = 0
     this.canvas.style.cursor = 'none'
     store.set({ tool: name, hint: null })
@@ -200,6 +217,7 @@ export class Craft {
   }
 
   complete() {
+    if (!this.state || !this.tex || this.done) return
     // finish the last few percent with a satisfying sweep rather than hunting
     const s = this.state
     for (let i = 0; i < this.seams.length; i++) {
@@ -274,7 +292,7 @@ export class Craft {
 
   projectSeams() {
     const cam = this.camera
-    const rect = this.canvas.getBoundingClientRect()
+    const rect = canvasRect(this.canvas)
     const mw = this.parent.matrixWorld
     _m.copy(mw)
     _nm.getNormalMatrix(mw)
@@ -309,8 +327,13 @@ export class Craft {
     return best
   }
 
+  /** World position of seam point { i, k } (a scratch vector). */
+  seamWorld({ i, k }) {
+    return _seamW.fromArray(this.seams[i].pos, k * 3).applyMatrix4(this.parent.matrixWorld)
+  }
+
   pxPerMetre(worldPoint) {
-    const rect = this.canvas.getBoundingClientRect()
+    const rect = canvasRect(this.canvas)
     const depth = this.camera.position.distanceTo(worldPoint)
     // projectionMatrix[5] = cot(fov/2) × loupe zoom, so strokes stay honest under the loupe
     return ((rect.height / 2) * this.camera.projectionMatrix.elements[5]) / depth
@@ -336,15 +359,19 @@ export class Craft {
     if (this.done) return
 
     let changed = false
-    if (this.tool === 'brush' && p.down && hit) {
+    // A stroke counts wherever it runs within the corridor of a visible seam,
+    // even just past the silhouette where the bowl itself isn't under the
+    // pointer — cracks that reach the rim can be brushed right to the edge.
+    if (this.tool === 'brush' && p.down) {
       this.projectSeams()
       const near = this.nearest(p.touch ? CORRIDOR.touch : CORRIDOR.mouse)
-      audio.brushUpdate(Math.min(1, stroke / 18))
+      if (hit || near) audio.brushUpdate(Math.min(1, stroke / 18))
       if (near) {
         const s = this.seams[near.i]
         const st = this.state
         const at = s.arclen[near.k]
-        const grow = (stroke / this.pxPerMetre(hit.point)) * LACQUER_GAIN * 0.5 + dt * 0.004
+        const where = hit ? hit.point : this.seamWorld(near)
+        const grow = (stroke / this.pxPerMetre(where)) * LACQUER_GAIN * 0.5 + dt * 0.004
         let lo = st[near.i * 4]
         let hi = st[near.i * 4 + 1]
         if (hi <= lo) {
@@ -357,14 +384,14 @@ export class Craft {
         st[near.i * 4 + 1] = hi
         changed = true
       }
-    } else if (this.tool === 'burnisher' && p.down && hit) {
+    } else if (this.tool === 'burnisher' && p.down) {
       this.projectSeams()
       const near = this.nearest(p.touch ? CORRIDOR.touch + 10 : CORRIDOR.mouse + 8)
-      audio.burnishUpdate(Math.min(1, stroke / 22))
+      if (hit || near) audio.burnishUpdate(Math.min(1, stroke / 22))
       if (near && stroke > 0.5) {
         const i = near.i
         const L = Math.max(this.lengths[i], 0.02)
-        const rub = (stroke / this.pxPerMetre(hit.point)) * 2.8
+        const rub = (stroke / this.pxPerMetre(hit ? hit.point : this.seamWorld(near))) * 2.8
         this.state[i * 4 + 3] = Math.min(1, this.state[i * 4 + 3] + rub / L)
         changed = true
       }
@@ -396,54 +423,60 @@ export class Craft {
     if (!this.tool) return
     const obj = rt.tools?.[this.tool]
     if (!obj) return
+    // per-frame scratch vectors are module temporaries: no garbage while a tool
+    // is in hand, so no collector pauses mid-stroke
     const cam = this.camera
-    const right = _v.set(1, 0, 0).applyQuaternion(cam.quaternion).clone()
-    const back = new THREE.Vector3(0, 0, 1).applyQuaternion(cam.quaternion)
-    const target = new THREE.Vector3()
-    const quat = new THREE.Quaternion()
+    const right = _right.set(1, 0, 0).applyQuaternion(cam.quaternion)
+    const back = _back.set(0, 0, 1).applyQuaternion(cam.quaternion)
+    const target = _target
+    const quat = _quat
     if (this.tool === 'jar') {
       // The jar hovers over the rim — pointer x slides it round the near side —
       // tilted to pour; the bowl turns beneath it, so one slow revolution
       // passes every crack under the stream of gold.
       const A = rt.assembly
-      const rect = this.canvas.getBoundingClientRect()
+      const rect = canvasRect(this.canvas)
       const u = THREE.MathUtils.clamp(((this.pointer.x - rect.left) / rect.width - 0.5) * 2, -1, 1)
       const camAz = Math.atan2(cam.position.x - A.position.x, cam.position.z - A.position.z)
       const phi = camAz + u * 0.9
       this.pourAz = phi
-      const mouthTarget = new THREE.Vector3(Math.sin(phi) * 0.057, 0.132, Math.cos(phi) * 0.057).add(A.position)
+      const mouthTarget = _mouthT.set(Math.sin(phi) * 0.057, 0.132, Math.cos(phi) * 0.057).add(A.position)
       const tilt = this.pointer.down ? 1.05 : 0.45
       // tip toward the bowl's axis
-      const axis = new THREE.Vector3(Math.cos(phi), 0, -Math.sin(phi))
-      quat.setFromAxisAngle(axis, tilt)
-      const mouthLocal = new THREE.Vector3(0, 0.03, 0).applyQuaternion(quat)
+      quat.setFromAxisAngle(_axis.set(Math.cos(phi), 0, -Math.sin(phi)), tilt)
+      const mouthLocal = _mouthL.set(0, 0.03, 0).applyQuaternion(quat)
       target.copy(mouthTarget).sub(mouthLocal)
       this.lidOpen += ((this.pointer.down ? 1 : 0.6) - this.lidOpen) * (1 - Math.exp(-dt / 0.12))
       this.poseLid(this.lidOpen)
-      this.mouth = obj.localToWorld(new THREE.Vector3(0, 0.03, 0))
+      this.mouth = obj.localToWorld((this.mouth ?? new THREE.Vector3()).set(0, 0.03, 0))
     } else {
       // brush / agate: tip on the glaze under the pointer, handle toward you
       const tipLocal = this.tool === 'brush' ? 0.1415 : 0.1125
       const lift = this.pointer.down ? 0.0006 : 0.006
+      this.lastHit ??= new THREE.Vector3().copy(_planeAt)
       if (hit) {
-        _n.copy(hit.face?.normal ?? _up).transformDirection(hit.object.matrixWorld)
+        // the interpolated (smooth-shaded) normal, so the tip doesn't twitch
+        // from facet to facet
+        _n.copy(hit.normal ?? hit.face?.normal ?? _up).transformDirection(hit.object.matrixWorld)
         target.copy(hit.point).addScaledVector(_n, lift)
+        this.lastHit.copy(hit.point)
       } else {
-        // off the bowl it floats on a camera-facing plane just in front of it
-        const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(back, new THREE.Vector3(-0.012, 0.05, 0.03))
+        // off the bowl it glides on a camera-facing plane through where it
+        // last touched, instead of jumping to a fixed depth
+        _plane.setFromNormalAndCoplanarPoint(back, this.lastHit)
         const ray = rayFromClient(this.pointer.x, this.pointer.y, cam, this.canvas)
-        if (!ray.intersectPlane(plane, target)) target.set(0, 0.1, 0.1)
+        if (!ray.intersectPlane(_plane, target)) target.copy(this.lastHit)
+        target.addScaledVector(back, lift)
       }
-      const handleDir = new THREE.Vector3().addScaledVector(right, 0.35).addScaledVector(_up, 0.85).addScaledVector(back, 0.35).normalize()
+      const handleDir = _handle.set(0, 0, 0).addScaledVector(right, 0.35).addScaledVector(_up, 0.85).addScaledVector(back, 0.35).normalize()
       // a small idle waver makes the tool feel held by a hand
       handleDir.x += Math.sin(time * 1.7) * 0.02
       handleDir.normalize()
-      quat.setFromUnitVectors(_up, handleDir.clone().negate())
+      quat.setFromUnitVectors(_up, _toCam.copy(handleDir).negate())
       target.addScaledVector(handleDir, tipLocal)
     }
-    const k = 1 - Math.exp(-dt / 0.045)
-    this.toolPose.p.lerp(target, k)
-    this.toolPose.q.slerp(quat, 1 - Math.exp(-dt / 0.08))
+    this.toolPose.p.lerp(target, 1 - Math.exp(-dt / TOOL_POS_TAU))
+    this.toolPose.q.slerp(quat, 1 - Math.exp(-dt / TOOL_ROT_TAU))
     obj.position.copy(this.toolPose.p)
     obj.quaternion.copy(this.toolPose.q)
   }
@@ -452,10 +485,9 @@ export class Craft {
     const lid = rt.tools?.lid
     if (!lid) return
     if (!this.lidRest) this.lidRest = { p: lid.position.clone(), q: lid.quaternion.clone() }
-    const hinge = new THREE.Vector3(0, 0.028, -0.0188) // back edge of the jar mouth, jar-local
     const angle = -open * 1.9
-    _q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), angle)
-    lid.position.copy(this.lidRest.p).sub(hinge).applyQuaternion(_q).add(hinge)
+    _q.setFromAxisAngle(_xAxis, angle)
+    lid.position.copy(this.lidRest.p).sub(_hinge).applyQuaternion(_q).add(_hinge)
     lid.quaternion.copy(_q).multiply(this.lidRest.q)
   }
 

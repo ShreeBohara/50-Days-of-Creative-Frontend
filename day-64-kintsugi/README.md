@@ -31,7 +31,14 @@ Keyboard: Space lifts/lets go · arrows, W/S, Q/E move and twist · T rings · M
 - `blender/render_fallback.py`: a Cycles turntable of a mended bowl with raised gold seams. It's used as the no-WebGL fallback and as the social card.
 - `scripts/pack.mjs`: gltf-transform meshopt compression plus WebP textures. `scripts/check-assets.mjs` gates CI: shard counts, symmetric adjacency connected from the anchor, seam integrity, and size budgets.
 
-**Runtime**: React 19, React Three Fiber 9, drei 10, Rapier (via @react-three/rapier) and postprocessing (N8AO, bloom, SMAA, AgX). Physics is stepped by hand, so time can stop for the moment of impact. The seams are one ribbon geometry, widened in the shader. Each seam's state (lacquered interval, gold, polish) lives in a single float texel. All sound is synthesized with Web Audio (no samples): modal-synthesis ring tones pitched by where you strike, HRTF-panned shard clatter, crack, brush, sift, burnish, and a small synthesized room reverb.
+**Runtime**: React 19, React Three Fiber 9, drei 10, Rapier (via @react-three/rapier) and postprocessing (half-resolution bloom, AgX, SMAA). Physics is stepped by hand, so time can stop for the moment of impact. The seams are one ribbon geometry, widened in the shader. Each seam's state (lacquered interval, gold, polish) lives in a single float texel. All sound is synthesized with Web Audio (no samples): modal-synthesis ring tones pitched by where you strike, HRTF-panned shard clatter, crack, brush, sift, burnish, and a small synthesized room reverb.
+
+**Smoothness** comes from doing no work at the moments that matter:
+- **Shaders:** every program the ritual will need is compiled, off the main thread, before the silk can be lifted. The compile targets the composer's own render target, so the variants built are the ones actually drawn, and the program count stays flat from load to shelf.
+- **Physics:** it runs on a fixed 1/120 s tick with interpolated drawing, so a drop behaves the same at 60 Hz and 120 Hz and the slow-motion break stays smooth.
+- **Fracture sets:** all 12 are parsed in idle time, never while the bowl is in hand. Each shard's collision hull comes from a few hundred support points (within 0.6 mm of the true hull) instead of every vertex. The shards are mounted, hidden, while the cracks race.
+- **Shadows:** the spot shadow is re-rendered only on frames where something that casts it moved.
+- **Resolution:** it follows a pixel budget and only changes at a cut.
 
 Imperative controllers (`bowlHold.js`, `fitting.js`, `craft.js`, `veil.js`) keep per-frame mutation out of React. Pure logic (`src/logic/`: impact severity, zones, seam graphs, fit rules, share codes with a Reed–Solomon check symbol, the phase machine, gestures, colophon) is covered by Vitest.
 
@@ -40,11 +47,11 @@ Imperative controllers (`bowlHold.js`, `fitting.js`, `craft.js`, `veil.js`) keep
 ```bash
 npm install
 npm run dev          # http://localhost:5173/50-Days-of-Creative-Frontend/day-64-kintsugi/
-npm test             # 282 unit tests (logic, audio, cloth)
+npm test             # 313 unit tests (logic, audio, cloth, hulls, mass properties)
 npm run lint
 ```
 
-Useful URL flags: `?debug=1` (exposes `window.__d64`), `?tier=C` (phone quality), `?nowebgl=1` (the fallback page), `?fx=noao,nobloom,nograin`.
+Useful URL flags: `?debug=1` (exposes `window.__d64`), `?perf=1` (frame pacing per ritual phase: `__perf.table()` in the console), `?tier=C` (phone quality), `?nowebgl=1` (the fallback page), `?fx=ao,nobloom,nograin,nosmaa`, `?shadow=0`.
 
 ### Rebuild the 3D assets
 
