@@ -70,6 +70,7 @@ on:
       - "day-61-webgl-hover-gallery/**"
       - "day-62-audio-blob/**"
       - "day-63-poster-machine/**"
+      - "day-64-kintsugi/**"
       - ".github/workflows/deploy-pages.yml"
       - "README.md"
   workflow_dispatch:
@@ -128,6 +129,7 @@ jobs:
             day-56-command-os/package-lock.json
             day-57-microinteraction-museum/package-lock.json
             day-62-audio-blob/package-lock.json
+            day-64-kintsugi/package-lock.json
 
       - name: Install Day 03 app dependencies
         working-directory: day-03-solar-system
@@ -361,6 +363,18 @@ jobs:
         working-directory: day-62-audio-blob
         run: npm run build
 
+      - name: Install Day 64 app dependencies
+        working-directory: day-64-kintsugi
+        run: npm ci
+
+      - name: Check Day 64 generated assets
+        working-directory: day-64-kintsugi
+        run: npm run check-assets
+
+      - name: Build Day 64 app
+        working-directory: day-64-kintsugi
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -460,6 +474,8 @@ jobs:
           mkdir -p _site/day-62-audio-blob
           cp -R day-62-audio-blob/dist/. _site/day-62-audio-blob/
           cp -R day-63-poster-machine _site/
+          mkdir -p _site/day-64-kintsugi
+          cp -R day-64-kintsugi/dist/. _site/day-64-kintsugi/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v4
