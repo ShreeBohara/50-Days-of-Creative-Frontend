@@ -9,3 +9,5 @@ dist-ssr
 blender/_previews/
 blender/_work/
 blender/textures/bowl_*.png
+blender/__pycache__/
+blender/textures/tray_*.png

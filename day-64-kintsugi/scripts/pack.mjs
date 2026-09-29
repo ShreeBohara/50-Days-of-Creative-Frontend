@@ -46,7 +46,7 @@ async function main() {
   const fracDir = join(WORK, 'fracture')
   if (await exists(fracDir)) {
     for (const f of (await readdir(fracDir)).filter((n) => n.endsWith('.glb')).sort()) {
-      jobs.push([join('fracture', f), join('fracture', f), 300])
+      jobs.push([join('fracture', f), join('fracture', f), 400])
     }
   }
 
@@ -61,7 +61,7 @@ async function main() {
     const doc = await io.read(from)
     await doc.transform(
       dedup(),
-      prune({ keepLeaves: true }),
+      prune({ keepLeaves: true, keepAttributes: true }), // shards ship untextured but need their UVs
       weld(),
       textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^normalTexture$/, quality: 94 }),
       textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^(?!normalTexture$).*/, quality: 88 }),
