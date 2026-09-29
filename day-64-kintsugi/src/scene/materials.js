@@ -56,6 +56,22 @@ export function makeCeramic(src) {
   return m
 }
 
+/** Gold dust flakes (instanced). */
+export function makeFlakeMaterial() {
+  return new THREE.MeshStandardMaterial({ color: '#e9c26a', metalness: 1, roughness: 0.28, side: THREE.DoubleSide })
+}
+
+/** The pulsing hint ghost of the next piece while mending. */
+export function makeGhostMaterial() {
+  return new THREE.MeshBasicMaterial({
+    color: '#f6e7c8',
+    transparent: true,
+    opacity: 0.2,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  })
+}
+
 let clayTex = null
 function clayGrain() {
   if (clayTex) return clayTex

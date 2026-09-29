@@ -6,6 +6,7 @@ import Breakage from './Breakage.jsx'
 import FitLayer from './FitLayer.jsx'
 import CraftLayer from './Craft.jsx'
 import Shelf from './Shelf.jsx'
+import Grounding from './Grounding.jsx'
 
 // Everything that needs Rapier (its WASM is ~2 MB inlined) lives in this lazily
 // loaded chunk, so the silk veil can draw from the first, lighter one.
@@ -21,6 +22,7 @@ export default function PhysicsScene() {
         <CraftLayer />
       </Physics>
       <Shelf />
+      <Grounding />
     </>
   )
 }

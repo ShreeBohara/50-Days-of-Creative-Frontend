@@ -23,6 +23,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "three": "^0.186.1",
+    "three-mesh-bvh": "^0.8.3",
     "three-stdlib": "^2.36.1"
   },
   "devDependencies": {

@@ -40,6 +40,9 @@ export default function Tray() {
         o.material.envMapIntensity = 0.9
         if (o.material.map) o.material.map.anisotropy = 8
       }
+      // only the tools answer the pointer; the 11k-triangle tray itself is
+      // never picked, so it shouldn't be ray-tested on every move
+      if (!toolOf(o)) o.raycast = () => {}
     })
     rt.tools = {
       brush: gltf.scene.getObjectByName('brush'),

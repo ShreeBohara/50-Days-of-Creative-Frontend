@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { buildRibbonGeometry, makeSeamState } from './ribbons.js'
-import { makeCrackMaterial, makeSeamMaterial } from './materials.js'
+import { makeCrackMaterial, makeFlakeMaterial, makeSeamMaterial } from './materials.js'
 import { Craft, MAX_DUST } from './craft.js'
 import { SEVERITY } from '../logic/severity.js'
 import { keepBowl, rt, store } from '../state/store.js'
@@ -34,8 +34,7 @@ export default function CraftLayer() {
   const dust = useMemo(() => makeDust(), [])
   const flake = useMemo(() => {
     const g = new THREE.PlaneGeometry(0.0009, 0.0007)
-    const m = new THREE.MeshStandardMaterial({ color: '#e9c26a', metalness: 1, roughness: 0.28, side: THREE.DoubleSide })
-    return { g, m }
+    return { g, m: makeFlakeMaterial() }
   }, [])
 
   useEffect(() => {

@@ -9,10 +9,14 @@ import Veil from './Veil.jsx'
 import Listener from './Listener.jsx'
 import { rt, store } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
+import ShadowGate from './ShadowGate.jsx'
+import PerfProbe from './PerfProbe.jsx'
+import { extrasFor, warmUp } from './warmup.js'
 
 const PhysicsScene = lazy(() => import('./PhysicsScene.jsx'))
 
 const DEBUG = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search)
+const PERF = typeof location !== 'undefined' && /[?&]perf=1/.test(location.search)
 
 // 2700 K dusk key light through a shoji lattice — the only shadow caster.
 // The display light follows the visitor's clock: cool morning, neutral noon,
@@ -43,7 +47,7 @@ function KeyLight({ tier }) {
         decay={2}
         angle={0.3}
         penumbra={0.65}
-        castShadow
+        castShadow={!/[?&]shadow=0/.test(location.search)}
         shadow-mapSize={tier === 'C' ? [1024, 1024] : [2048, 2048]}
         shadow-bias={-0.00035}
         shadow-normalBias={0.0015}
@@ -65,12 +69,24 @@ function Lights({ tier }) {
   )
 }
 
-// Mounted inside the Suspense boundary: everything heavy has arrived.
+// Mounted last inside the Suspense boundary: everything heavy has arrived.
+// Compile every program the ritual will need before the silk can come off.
 function Loaded() {
+  const gl = useThree((s) => s.gl)
+  const scene = useThree((s) => s.scene)
+  const camera = useThree((s) => s.camera)
   useEffect(() => {
-    store.set({ loaded: true })
-    return () => store.set({ loaded: false })
-  }, [])
+    let alive = true
+    warmUp(gl, scene, camera, extrasFor(rt.ceramic)).then((ms) => {
+      if (!alive) return
+      rt.warmupMs = Math.round(ms)
+      store.set({ loaded: true })
+    })
+    return () => {
+      alive = false
+      store.set({ loaded: false })
+    }
+  }, [gl, scene, camera])
   return null
 }
 
@@ -88,14 +104,15 @@ export default function Stage({ tier = 'A' }) {
       <color attach="background" args={['#1f1712']} />
       <fog attach="fog" args={['#1f1712', 0.75, 1.6]} />
       <CameraBinder />
+      <ShadowGate />
       {DEBUG ? <DebugHandle /> : null}
+      {PERF ? <PerfProbe /> : null}
       <CameraRig />
       <Listener />
       {/* the veil and a soft pre-light render before any asset arrives */}
       <Veil />
       <directionalLight position={[-0.5, 0.8, 0.5]} intensity={1.1} color="#ffd2a6" />
       <Suspense fallback={null}>
-        <Loaded />
         <Environment
           files={ASSETS.hdri}
           environmentIntensity={0.55}
@@ -103,8 +120,9 @@ export default function Stage({ tier = 'A' }) {
         />
         <Lights tier={tier} />
         <PhysicsScene />
+        <Loaded />
       </Suspense>
-      <Effects tier={tier} />
+      <Effects />
     </>
   )
 }
