@@ -18,6 +18,11 @@ const BUDGET_KB = {
   'models/tray_tools.glb': 1600,
   'hdri/pine_attic_1k.hdr': 1700,
   'textures/shoji_gobo.png': 800,
+  // Tier D fallback + social card (render_fallback.py)
+  'fallback/poster.jpg': 200,
+  'fallback/loop.webm': 1500,
+  'fallback/loop.mp4': 1500,
+  'og.jpg': 300,
 }
 
 const errors = []

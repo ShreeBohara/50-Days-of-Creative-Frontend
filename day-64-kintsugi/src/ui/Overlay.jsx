@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { STAGE_WORD } from '../logic/stateMachine.js'
 import { audio } from '../audio/engine.js'
-import { beginAgain, rt, store, useStore } from '../state/store.js'
+import { announce, beginAgain, rt, store, useStore } from '../state/store.js'
 import { formatColophon } from '../logic/colophon.js'
 import { shareUrl } from '../state/shelf.js'
 import './overlay.css'
@@ -11,20 +11,20 @@ import './overlay.css'
 
 async function share(code) {
   const url = shareUrl(code)
-  let said = 'link copied'
   try {
     if (navigator.share) {
       await navigator.share({ title: 'Kintsugi', text: 'A bowl I broke and mended in gold.', url })
-      said = null
-    } else {
-      await navigator.clipboard.writeText(url)
+      return
     }
-  } catch {
-    said = url // clipboard blocked: show the link itself
-  }
-  if (said) {
-    store.set({ hint: said })
-    setTimeout(() => store.get().hint === said && store.set({ hint: null }), 3200)
+    await navigator.clipboard.writeText(url)
+    store.set({ hint: 'link copied' })
+    announce('Share link copied.')
+    setTimeout(() => store.get().hint === 'link copied' && store.set({ hint: null }), 3200)
+  } catch (err) {
+    if (err?.name === 'AbortError') return // the share sheet was dismissed
+    // no share sheet, no clipboard: hand over the link to copy by hand
+    store.set({ shareUrl: url })
+    announce('Here is the share link to copy.')
   }
 }
 export default function Overlay() {
@@ -33,6 +33,7 @@ export default function Overlay() {
   const progress = useStore((s) => s.progress)
   const announceText = useStore((s) => s.announce)
   const kept = useStore((s) => s.keepRecord)
+  const manualUrl = useStore((s) => s.shareUrl)
   const word = STAGE_WORD[phase] ?? ''
   const [muted, setMuted] = useState(() => audio.isMuted())
   const craft = phase === 'lacquer' || phase === 'gild' || phase === 'burnish'
@@ -45,7 +46,15 @@ export default function Overlay() {
     <div className="overlay" aria-hidden={false}>
       <div className="stage-word" data-empty={word ? undefined : ''}>
         {phase === 'fitting' && hint ? (
-          <button key={word} type="button" className="stage-word__text stage-word__button" onClick={() => rt.fit?.autoFitNext()}>
+          <button
+            key={word}
+            type="button"
+            className="stage-word__text stage-word__button"
+            onClick={() => {
+              rt.fit?.mendTheRest()
+              document.getElementById('stage')?.focus()
+            }}
+          >
             {word}
           </button>
         ) : (
@@ -64,10 +73,26 @@ export default function Overlay() {
               <button type="button" className="keep__link" onClick={() => share(kept.code)}>
                 share
               </button>
-              <button type="button" className="keep__link" onClick={() => beginAgain()}>
+              <button
+                type="button"
+                className="keep__link"
+                onClick={() => {
+                  beginAgain()
+                  document.getElementById('stage')?.focus()
+                }}
+              >
                 begin again
               </button>
             </div>
+            {manualUrl ? (
+              <input
+                className="keep__url"
+                readOnly
+                value={manualUrl}
+                aria-label="share link"
+                onFocus={(e) => e.target.select()}
+              />
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -80,6 +105,7 @@ export default function Overlay() {
           const next = !muted
           audio.setMuted(next)
           setMuted(next)
+          document.getElementById('stage')?.focus() // Space goes back to the bowl
         }}
       >
         {muted ? 'sound off' : 'sound on'}

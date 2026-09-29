@@ -9,6 +9,13 @@
       content="Day 64 of Creative Frontend: KINTSUGI — hold a hand-thrown tea bowl, drop it, gather the shards, and mend it in lacquer and gold."
     />
     <meta name="theme-color" content="#1f1712" />
+    <meta property="og:title" content="Kintsugi · Day 64" />
+    <meta
+      property="og:description"
+      content="Hold a hand-thrown tea bowl, drop it, gather the pieces, and mend it in lacquer and gold."
+    />
+    <meta property="og:image" content="https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-64-kintsugi/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>Kintsugi · Day 64</title>
     <script>
       // Tier D gate — decided before React loads. No WebGL2 (or ?nowebgl=1)
@@ -24,7 +31,14 @@
             ok = false
           }
         }
-        if (!ok) document.documentElement.classList.add('no-webgl')
+        if (!ok) {
+          document.documentElement.classList.add('no-webgl')
+          document.addEventListener('DOMContentLoaded', function () {
+            var t = document.getElementById('fallback-media')
+            var slot = document.querySelector('.fallback__media')
+            if (t && slot) slot.appendChild(t.content.cloneNode(true))
+          })
+        }
       })()
     </script>
   </head>
@@ -32,18 +46,22 @@
     <div id="root"></div>
 
     <main class="fallback" aria-labelledby="fallback-title">
-      <video
-        class="fallback__video"
-        autoplay
-        muted
-        loop
-        playsinline
-        poster="./fallback/poster.jpg"
-        aria-label="A tea bowl falls onto a wooden tray, breaks, and is mended with seams of gold."
-      >
-        <source src="./fallback/loop.webm" type="video/webm" />
-        <source src="./fallback/loop.mp4" type="video/mp4" />
-      </video>
+      <!-- inert until the gate picks Tier D: WebGL visitors never fetch it -->
+      <template id="fallback-media">
+        <video
+          class="fallback__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster="/fallback/poster.jpg"
+          aria-label="A tea bowl mended with seams of gold turns slowly on a wooden tray."
+        >
+          <source src="/fallback/loop.webm" type="video/webm" />
+          <source src="/fallback/loop.mp4" type="video/mp4" />
+        </video>
+      </template>
+      <div class="fallback__media"></div>
       <div class="fallback__text">
         <h1 id="fallback-title">Kintsugi</h1>
         <p>

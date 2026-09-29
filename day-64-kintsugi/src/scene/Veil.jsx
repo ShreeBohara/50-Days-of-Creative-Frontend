@@ -15,6 +15,9 @@ export default function Veil() {
     return () => {
       ctl.unbind()
       rt.veil = null
+      ctl.geometry.dispose()
+      ctl.material.normalMap?.dispose()
+      ctl.material.dispose()
     }
   }, [ctl, camera, gl])
 

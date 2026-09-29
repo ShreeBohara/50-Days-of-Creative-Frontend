@@ -16,15 +16,30 @@ import { rt, store, useStore } from '../state/store.js'
 // burnished gold. Tap one and it rings (the duller tone of a mended bowl) and
 // its colophon appears under the word.
 const SCALE = 0.3
-const Z = -0.118
+
+// Kept bowls stand clear of the working bowl's silhouette (a bowl behind it
+// is hidden from the camera): a 2 × 3 block at the tray's left end, or — on
+// portrait screens, which only see the middle of the tray — a column of the
+// three newest just left of the bowl.
+function slot(i) {
+  if (rt.portrait) return i < 3 ? [-0.1, -0.115 + i * 0.04] : null
+  return [i % 2 === 0 ? -0.178 : -0.133, -0.112 + Math.floor(i / 2) * 0.042]
+}
 
 function MiniBowl({ entry, index, geometry, material }) {
   const [gold, setGold] = useState(null)
-  const d = useMemo(() => describe(entry), [entry])
+  // keep() re-reads the whole shelf, so every entry is a new object: key the
+  // work on what the bowl is, not on object identity
+  const { code, date, friend, hairline, pieces, goldMm } = entry
+  const d = useMemo(
+    () => describe({ code, date, friend, hairline, pieces, goldMm }),
+    [code, date, friend, hairline, pieces, goldMm],
+  )
 
   useEffect(() => {
     if (!d) return
     let alive = true
+    let made = null
     loadSeams(d.variantId)
       .then(({ seams }) => {
         if (!alive) return
@@ -37,27 +52,36 @@ function MiniBowl({ entry, index, geometry, material }) {
         tex.needsUpdate = true
         const mat = makeSeamMaterial(tex, list.length)
         mat.userData.uniforms.uWet.value = 0
-        setGold({ geometry: buildRibbonGeometry(list), material: mat })
+        made = { geometry: buildRibbonGeometry(list), material: mat, tex }
+        // a friend's code carries no length: the seams themselves know it
+        made.goldMm = list.reduce((a, s) => a + s.length, 0) * 1000
+        setGold(made)
       })
       .catch(() => {})
     return () => {
       alive = false
+      if (made) {
+        made.geometry.dispose()
+        made.material.dispose()
+        made.tex.dispose()
+      }
     }
   }, [d])
 
-  if (!d) return null
-  // left to right, clear of the gold jar; tighter on portrait screens
-  const x = rt.portrait ? -0.105 + index * 0.042 : -0.172 + index * 0.055
+  const at = slot(index)
+  if (!d || !at) return null
+  const [x, z] = at
   const yaw = index * 1.9 + 0.4
   const label = `${d.friend ? 'a bowl from a friend' : 'your bowl'} · ${formatColophon({
     pieces: d.pieces,
-    goldMm: d.goldMm,
+    goldMm: d.goldMm ?? gold?.goldMm,
     date: d.date,
     hairline: d.hairline,
+    dayOnly: d.friend,
   })}`
   return (
     <group
-      position={[x, 0, Z]}
+      position={[x, 0, z]}
       rotation={[0, yaw, 0]}
       scale={SCALE}
       onPointerDown={(e) => {
@@ -92,7 +116,7 @@ export default function Shelf() {
   return (
     <group>
       {shelf.map((entry, i) => (
-        <MiniBowl key={entry.code} entry={entry} index={i} geometry={geometry} material={material ?? fallback} />
+        <MiniBowl key={`${entry.code}-${entry.date}`} entry={entry} index={i} geometry={geometry} material={material ?? fallback} />
       ))}
     </group>
   )

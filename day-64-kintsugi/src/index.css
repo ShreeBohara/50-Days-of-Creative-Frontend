@@ -145,6 +145,10 @@ button {
   margin: 0 auto;
 }
 
+.fallback__media .fallback__video {
+  display: block;
+}
+
 .fallback__video {
   width: 100%;
   aspect-ratio: 16 / 10;

@@ -42,7 +42,7 @@ export default function FitLayer() {
     }
     const key = (ev) => {
       if ((ev.key === 'm' || ev.key === 'M') && store.get().phase === 'fitting') ctl.autoFitNext()
-      if ((ev.key === 'f' || ev.key === 'F') && store.get().phase === 'keep') ctl.toggleFlip()
+      if ((ev.key === 'f' || ev.key === 'F') && !ev.repeat && store.get().phase === 'keep') ctl.toggleFlip()
     }
     const dbl = () => {
       if (store.get().phase === 'keep') ctl.toggleFlip()
@@ -60,8 +60,11 @@ export default function FitLayer() {
     }
   }, [ctl, rapier, camera, gl])
 
-  useFrame((state, dt) => {
-    ctl.frame(dt)
+  // before the physics step (priority -10), so this frame's step applies this
+  // frame's kinematic targets and the seam ribbons never lead the shards
+  useFrame((_, dt) => ctl.frame(dt), -20)
+
+  useFrame((state) => {
     const g = ghost.current
     if (!g) return
     const id = ctl.ghostId

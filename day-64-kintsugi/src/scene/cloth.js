@@ -6,6 +6,7 @@
 export const GRID = 30 // particles per side
 export const SIZE = 0.3 // metres
 const REST = SIZE / (GRID - 1)
+const drapeCache = new Map()
 
 // Outer silhouette of the chawan (r at height y), a coarse lookup is plenty
 // for a draped cloth; the mouth is treated as closed (silk spans it).
@@ -56,11 +57,12 @@ export class Cloth {
         this.prev.set([x, y, z], k * 3)
       }
     }
-    this.constraints = []
+    // constraints in flat typed arrays: a, b, rest length, stiffness
+    const list = []
     const add = (a, b, stiff) => {
       const dx = this.pos[a * 3] - this.pos[b * 3]
       const dz = this.pos[a * 3 + 2] - this.pos[b * 3 + 2]
-      this.constraints.push([a, b, Math.hypot(dx, dz), stiff])
+      list.push(a, b, Math.sqrt(dx * dx + dz * dz), stiff)
     }
     for (let j = 0; j < GRID; j++) {
       for (let i = 0; i < GRID; i++) {
@@ -75,7 +77,39 @@ export class Cloth {
         if (j + 2 < GRID) add(k, k + GRID * 2, 0.08)
       }
     }
+    const m = list.length / 4
+    this.m = m
+    this.ca = new Int32Array(m)
+    this.cb = new Int32Array(m)
+    this.crest = new Float32Array(m)
+    this.cstiff = new Float32Array(m)
+    for (let c = 0; c < m; c++) {
+      this.ca[c] = list[c * 4]
+      this.cb[c] = list[c * 4 + 1]
+      this.crest[c] = list[c * 4 + 2]
+      this.cstiff[c] = list[c * 4 + 3]
+    }
     this.rest = REST
+  }
+
+  /**
+   * A cloth already draped over the bowl. The drape is deterministic, so it is
+   * simulated once per page and copied into every new cloth ("begin again"
+   * remounts the veil) instead of re-running ~260 steps on the main thread.
+   */
+  static draped(opts = {}, steps = 260) {
+    const key = JSON.stringify(opts)
+    let d = drapeCache.get(key)
+    if (!d) {
+      const c = new Cloth(opts)
+      for (let i = 0; i < steps; i++) c.step(1 / 120, 8)
+      d = { pos: c.pos.slice(), prev: c.prev.slice() }
+      drapeCache.set(key, d)
+    }
+    const c = new Cloth(opts)
+    c.pos.set(d.pos)
+    c.prev.set(d.pos) // at rest
+    return c
   }
 
   grab(k, target) {
@@ -104,25 +138,32 @@ export class Cloth {
       prev[i + 2] = z
     }
     const pin = this.pinned[0]
+    const { ca, cb, crest, cstiff, m } = this
     for (let it = 0; it < iterations; it++) {
-      for (const [a, b, rest, stiff] of this.constraints) {
+      for (let c = 0; c < m; c++) {
+        const a = ca[c]
+        const b = cb[c]
         const ia = a * 3
         const ib = b * 3
         const dx = pos[ib] - pos[ia]
         const dy = pos[ib + 1] - pos[ia + 1]
         const dz = pos[ib + 2] - pos[ia + 2]
-        const d = Math.hypot(dx, dy, dz) || 1e-9
+        const d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-9
+        const rest = crest[c]
+        const stiff = cstiff[c]
         // stretching resists fully; compression barely (cloth buckles)
         const diff = ((d - rest) / d) * (d > rest ? stiff : stiff * 0.15) * 0.5
         const wa = a === pin ? 0 : 1
         const wb = b === pin ? 0 : 1
         const w = wa + wb || 1
-        pos[ia] += dx * diff * (2 * wa) / w
-        pos[ia + 1] += dy * diff * (2 * wa) / w
-        pos[ia + 2] += dz * diff * (2 * wa) / w
-        pos[ib] -= dx * diff * (2 * wb) / w
-        pos[ib + 1] -= dy * diff * (2 * wb) / w
-        pos[ib + 2] -= dz * diff * (2 * wb) / w
+        const fa = (diff * 2 * wa) / w
+        const fb = (diff * 2 * wb) / w
+        pos[ia] += dx * fa
+        pos[ia + 1] += dy * fa
+        pos[ia + 2] += dz * fa
+        pos[ib] -= dx * fb
+        pos[ib + 1] -= dy * fb
+        pos[ib + 2] -= dz * fb
       }
       if (pin >= 0) pos.set(this.pinTarget, pin * 3)
       this.collide()
@@ -145,7 +186,7 @@ export class Cloth {
       const z = pos[i + 2] - center[2]
       const y = pos[i + 1] - center[1]
       if (y > BOWL_TOP + pad) continue
-      const r = Math.hypot(x, z)
+      const r = Math.sqrt(x * x + z * z)
       const R = bowlRadiusAt(Math.max(0, y)) + pad
       if (r >= R) continue
       const toTop = BOWL_TOP + pad - y

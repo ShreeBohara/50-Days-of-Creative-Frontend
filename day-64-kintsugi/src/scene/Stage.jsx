@@ -1,23 +1,16 @@
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Environment, useTexture } from '@react-three/drei'
-import { Physics } from '@react-three/rapier'
 import * as THREE from 'three'
 import { ASSETS } from './assets.js'
 import CameraRig from './CameraRig.jsx'
 import Effects from './Effects.jsx'
-import PhysicsClock from './PhysicsClock.jsx'
-import Tray from './Tray.jsx'
-import Bowl from './Bowl.jsx'
-import Breakage from './Breakage.jsx'
-import FitLayer from './FitLayer.jsx'
-import CraftLayer from './Craft.jsx'
-import Shelf from './Shelf.jsx'
 import Veil from './Veil.jsx'
-import { store } from '../state/store.js'
 import Listener from './Listener.jsx'
-import { rt } from '../state/store.js'
+import { rt, store } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
+
+const PhysicsScene = lazy(() => import('./PhysicsScene.jsx'))
 
 const DEBUG = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search)
 
@@ -109,15 +102,7 @@ export default function Stage({ tier = 'A' }) {
           environmentRotation={[0, 0.9, 0]}
         />
         <Lights tier={tier} />
-        <Physics paused timeStep="vary" gravity={[0, -9.81, 0]}>
-          <PhysicsClock />
-          <Tray />
-          <Bowl />
-          <Breakage />
-          <FitLayer />
-          <CraftLayer />
-        </Physics>
-        <Shelf />
+        <PhysicsScene />
       </Suspense>
       <Effects tier={tier} />
     </>

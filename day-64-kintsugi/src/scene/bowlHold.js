@@ -7,7 +7,8 @@ import * as THREE from 'three'
 import { audio } from '../audio/engine.js'
 import { classifyImpact, SEVERITY } from '../logic/severity.js'
 import { TAP_MAX_MS, TAP_SLOP_PX } from '../logic/gestures.js'
-import { dispatch, rt, store } from '../state/store.js'
+import { announce, dispatch, rt, store } from '../state/store.js'
+import { BOWL_SLOT } from './geometry.js'
 import { facingPlane, pointOnPlane } from '../input/pointer.js'
 
 export const BOWL_HEIGHT = 0.086
@@ -59,7 +60,7 @@ export class BowlHold {
   }
 
   hover(on) {
-    if (!this.canvas || this.h) return
+    if (!this.canvas || this.h || rt.craft?.tool) return
     this.canvas.style.cursor = on && store.get().phase === 'intact' ? 'grab' : ''
   }
 
@@ -72,6 +73,7 @@ export class BowlHold {
   onPointerDown(e) {
     if (store.get().phase !== 'intact' || this.h || !this.mesh) return
     e.stopPropagation()
+    e.nativeEvent.__kintsugiHit = true // the long-press loupe must leave this press alone
     audio.unlock()
     this.h = {
       mode: 'pending',
@@ -151,7 +153,9 @@ export class BowlHold {
     const t = this.body.translation()
     this.h = { mode: 'pending', id: 'keys', keys: true, x: 0, y: 0, x0: 0, y0: 0, t0: performance.now() }
     this.startLift()
-    this.h.keyTarget = new THREE.Vector3(t.x, t.y + 0.1, t.z)
+    // 4 cm: comfortably below the ~8.6 cm a hairline needs, so Space, Space sets it down
+    this.h.keyTarget = new THREE.Vector3(t.x, t.y + 0.04, t.z)
+    announce('Lifted 4 centimetres. W raises, S lowers; Space lets go.')
     return true
   }
 
@@ -162,6 +166,7 @@ export class BowlHold {
     h.keyTarget.x = THREE.MathUtils.clamp(h.keyTarget.x + dx, -TRAY_X, TRAY_X)
     h.keyTarget.y = THREE.MathUtils.clamp(h.keyTarget.y + dy, 0.001, MAX_LIFT)
     h.keyTarget.z = THREE.MathUtils.clamp(h.keyTarget.z + dz, -TRAY_Z, TRAY_Z)
+    if (dy) announce(`${Math.round(h.keyTarget.y * 100)} centimetres up.`)
   }
 
   keyTwist(d) {
@@ -236,6 +241,7 @@ export class BowlHold {
   frame(dt) {
     const h = this.h
     const b = this.body
+    if (!h && b) this.recover()
     if (!h || !b) return
     // press-and-hold without moving also picks it up
     if (h.mode === 'pending' && performance.now() - h.t0 > TAP_MAX_MS) this.startLift()
@@ -274,6 +280,19 @@ export class BowlHold {
     }
   }
 
+  /** A throw that misses the tray would fall forever: bring it back to its slot. */
+  recover() {
+    const phase = store.get().phase
+    if (phase !== 'intact' || !this.body.isEnabled()) return
+    const t = this.body.translation()
+    if (t.y > -0.03 && Math.abs(t.x) < 0.2 && Math.abs(t.z) < 0.14) return
+    this.body.setTranslation({ x: BOWL_SLOT[0], y: 0.04, z: BOWL_SLOT[2] }, true)
+    this.body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true)
+    this.body.setLinvel({ x: 0, y: 0, z: 0 }, true)
+    this.body.setAngvel({ x: 0, y: 0, z: 0 }, true)
+    announce('The bowl missed the tray and is back in its place.')
+  }
+
   onCollision(other) {
     const phase = store.get().phase
     if (phase !== 'intact' && phase !== 'held') return
@@ -310,6 +329,7 @@ export class BowlHold {
     rt.lastImpact = info
     if (severity === SEVERITY.SET) {
       audio.tok({ position: info.impactWorld.toArray(), strength: Math.min(1, impactSpeed / 1.3) })
+      if (impactSpeed > 0.6) announce('Set down, unbroken.')
       return
     }
     rt.onBreak?.(info)

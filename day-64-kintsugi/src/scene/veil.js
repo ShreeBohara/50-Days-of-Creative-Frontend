@@ -7,7 +7,7 @@ import * as THREE from 'three'
 import { Cloth, GRID } from './cloth.js'
 import { BOWL_SLOT } from './geometry.js'
 import { audio } from '../audio/engine.js'
-import { announce, dispatch, store } from '../state/store.js'
+import { announce, dispatch, rt, store } from '../state/store.js'
 import { facingPlane, pointOnPlane } from '../input/pointer.js'
 
 function twill(size = 128) {
@@ -66,8 +66,7 @@ function gridGeometry() {
 
 export class VeilCtl {
   constructor() {
-    this.cloth = new Cloth({ center: [BOWL_SLOT[0], 0, BOWL_SLOT[2]], yaw: 0.35 })
-    for (let i = 0; i < 260; i++) this.cloth.step(1 / 120, 8) // drape before the first frame
+    this.cloth = Cloth.draped({ center: [BOWL_SLOT[0], 0, BOWL_SLOT[2]], yaw: 0.35 }) // draped before the first frame
     this.geometry = gridGeometry()
     this.geometry.attributes.position.array.set(this.cloth.pos)
     this.geometry.computeVertexNormals()
@@ -116,7 +115,7 @@ export class VeilCtl {
   }
 
   hover(on) {
-    if (!this.canvas || this.grabbed) return
+    if (!this.canvas || this.grabbed || rt.craft?.tool) return
     this.canvas.style.cursor = on && this.ready() ? 'grab' : ''
   }
 
@@ -159,7 +158,7 @@ export class VeilCtl {
   }
 
   onKey(e) {
-    if ((e.key === 'Enter' || e.key === ' ') && this.ready() && !this.auto) {
+    if ((e.key === 'Enter' || e.key === ' ') && !e.repeat && this.ready() && !this.auto) {
       e.preventDefault()
       this.reveal()
     }
@@ -209,9 +208,11 @@ export class VeilCtl {
         this.auto = null
       }
     }
-    const sub = 2
+    // resting silk needs only a light touch; a pull gets the full solve
+    const busy = this.grabbed || this.auto || this.leaving
+    const sub = busy ? 2 : 1
     const h = Math.min(dt, 1 / 30) / sub
-    for (let i = 0; i < sub; i++) c.step(h, 8)
+    for (let i = 0; i < sub; i++) c.step(h, busy ? 8 : 5)
     const pos = this.geometry.attributes.position
     pos.array.set(c.pos)
     pos.needsUpdate = true
@@ -220,6 +221,7 @@ export class VeilCtl {
     // revealed: once the mouth of the bowl is clear, the silk fades away
     if (!this.leaving && loaded && c.coverage() < 0.12) {
       this.leaving = true
+      this.mesh.castShadow = false // shadows ignore opacity; don't let one linger
       c.release()
       dispatch({ type: 'UNVEIL' })
       announce('The cloth is off. Hold the bowl.')

@@ -32,7 +32,10 @@ export function bindKeyboard() {
   }
 
   const down = (e) => {
-    if (e.target instanceof HTMLElement && e.target.closest('button, a, input, textarea')) return
+    // a focused control keeps its own Enter/Space; every other key still
+    // drives the ritual (focus can sit on "sound on" and the bowl still lifts)
+    const control = e.target instanceof HTMLElement && e.target.closest('button, a, input, textarea')
+    if (control && (e.key === 'Enter' || e.key === ' ' || e.target.closest('input, textarea'))) return
     if (e.metaKey || e.ctrlKey) return
     const phase = store.get().phase
     const k = e.key
@@ -40,7 +43,8 @@ export function bindKeyboard() {
     let used = true
     if (phase === 'intact' || phase === 'held') {
       if ((k === ' ' || k === 'Enter') && hold) {
-        if (!hold.keyRelease()) hold.keyLift()
+        // a held key auto-repeats; only a fresh press toggles lift / let go
+        if (!e.repeat && !hold.keyRelease()) hold.keyLift()
       } else if (k === 'ArrowLeft') hold?.keyMove(-STEP, 0, 0)
       else if (k === 'ArrowRight') hold?.keyMove(STEP, 0, 0)
       else if (k === 'ArrowUp') hold?.keyMove(0, 0, -STEP)
@@ -93,11 +97,24 @@ export function bindKeyboard() {
     }
     if ((e.key === 'l' || e.key === 'L') && rt.loupe) rt.loupe.active = false
   }
+  // focus leaving the window swallows the keyup: never leave a tool working
+  const blur = () => {
+    if (space) {
+      space = false
+      audio.brushStop()
+      audio.burnishStop()
+    }
+    if (rt.loupe && !rt.loupe.alt) rt.loupe.active = false
+  }
   window.addEventListener('keydown', down)
   window.addEventListener('keyup', up)
+  window.addEventListener('blur', blur)
+  document.addEventListener('visibilitychange', blur)
   return () => {
     window.removeEventListener('keydown', down)
     window.removeEventListener('keyup', up)
+    window.removeEventListener('blur', blur)
+    document.removeEventListener('visibilitychange', blur)
     cancelAnimationFrame(raf)
   }
 }

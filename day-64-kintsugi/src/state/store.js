@@ -47,6 +47,7 @@ export const store = createStore({
   announce: '', // aria-live text
   keepRecord: null, // the shelf record once kept
   shelf: loadShelf(),
+  shareUrl: null, // shown for manual copying when share + clipboard both fail
   run: 0, // bumped by "begin again" — the whole stage remounts fresh
 })
 
@@ -109,6 +110,7 @@ export function beginAgain() {
     progress: 0,
     hint: null,
     keepRecord: null,
+    shareUrl: null,
     run: s.run + 1,
   }))
 }

@@ -46,6 +46,7 @@ export default function Breakage() {
   const settle = useRef(null)
   const bodies = useRef(new Map())
   const fracture = useMemo(() => makeFracture(), [])
+  useEffect(() => () => fracture.dispose(), [fracture])
 
   // Warm the cache with the six drop variants once the bowl is first lifted;
   // fling sets (a hard throw) load on demand while the moment of impact holds.
@@ -66,7 +67,7 @@ export default function Breakage() {
       rt.clock.scale = 0 // the instant of impact, held
       audio.crack({ position: info.impactWorld.toArray(), severity: info.severity })
       try {
-        navigator.vibrate?.(20)
+        if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(20)
       } catch {
         // no haptics here
       }
@@ -77,9 +78,20 @@ export default function Breakage() {
       try {
         data = await loadVariant(id)
       } catch (err) {
-        console.error(err)
-        rt.clock.scale = 1
-        return
+        // a failed fetch mid-break (a fling on a flaky connection): fall back to
+        // this zone's drop set, prefetched on the first lift — and if even that
+        // is gone, undo the impact rather than hang in the frozen instant
+        console.warn(err)
+        try {
+          data = await loadVariant(variantId(zone, SEVERITY.DROP))
+          store.set({ variant: data.id })
+        } catch (err2) {
+          console.error(err2)
+          rt.clock.scale = 1
+          store.set({ phase: 'intact', severity: null, variant: null })
+          announce('The bowl survived — the pieces could not be loaded.')
+          return
+        }
       }
       rt.variant = data
       const hair = info.severity === SEVERITY.HAIRLINE
@@ -108,6 +120,10 @@ export default function Breakage() {
       if (k >= 1) {
         race.current = null
         if (r.hair) {
+          // Craft draws its own crack line over the unbroken bowl
+          r.crack.removeFromParent()
+          r.crack.geometry.dispose()
+          r.mat.dispose()
           rt.clock.scale = 1
           const n = rt.activeSeams.length
           announce(`A hairline crack. ${n} seam${n === 1 ? '' : 's'} to mend.`)

@@ -28,6 +28,7 @@ export default function Bowl() {
     rt.ceramic = material
     return () => {
       rt.bowl = null
+      material.dispose() // a fresh glaze material is made per run
     }
   }, [ctl, rapier, camera, gl, material])
 

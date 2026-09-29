@@ -29,9 +29,10 @@ function saveShelf(list) {
   }
 }
 
-/** Newest first; the same code is never shelved twice. */
+/** Newest first. A friend's link is shelved once; your own bowls can share a
+ * code (same variant, fit order and day) and are still different bowls. */
 export function addToShelf(entry) {
-  const list = loadShelf().filter((e) => e.code !== entry.code)
+  const list = loadShelf().filter((e) => !(entry.friend && e.code === entry.code))
   list.unshift(entry)
   const out = list.slice(0, SHELF_MAX)
   saveShelf(out)

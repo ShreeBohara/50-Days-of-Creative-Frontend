@@ -82,3 +82,11 @@ describe('shelfLabel', () => {
     expect(shelfLabel(null)).toBe('your bowl')
   })
 })
+
+describe('dayOnly dates (share codes carry only a UTC day)', () => {
+  it('prints the UTC calendar day with no clock time', () => {
+    const d = new Date(Date.UTC(2026, 8, 28))
+    expect(formatDate(d, { dayOnly: true })).toBe('28 Sep 2026')
+    expect(formatColophon({ pieces: 8, goldMm: 1407, date: d, dayOnly: true })).toBe('8 pieces · 1407 mm of gold · 28 Sep 2026')
+  })
+})

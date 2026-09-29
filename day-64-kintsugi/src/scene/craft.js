@@ -25,6 +25,9 @@ const _v = new THREE.Vector3()
 const _n = new THREE.Vector3()
 const _cam = new THREE.Vector3()
 const _m = new THREE.Matrix4()
+const _nm = new THREE.Matrix3()
+const _toCam = new THREE.Vector3()
+const _down = new THREE.Vector3(0, -1, 0)
 const _q = new THREE.Quaternion()
 const _up = new THREE.Vector3(0, 1, 0)
 const raycaster = new THREE.Raycaster()
@@ -48,7 +51,6 @@ export class Craft {
     this.dustCount = 0
     this.progressT = 0
     this.done = false
-    this.toolHome = new Map()
     this._move = (e) => this.onMove(e)
     this._down = (e) => this.onDown(e)
     this._up = (e) => this.onUp(e)
@@ -99,18 +101,25 @@ export class Craft {
       audio.reject({})
       const hint = { brush: 'the brush first', jar: 'the gold is in the jar', burnisher: 'the agate polishes' }[want]
       store.set({ hint })
+      announce(`Not that one: ${hint}.`)
       setTimeout(() => store.get().hint === hint && store.set({ hint: null }), 2200)
       return
     }
     if (this.tool === name) return
     const obj = rt.tools?.[name]
     if (!obj) return
-    if (!this.toolHome.has(name)) this.toolHome.set(name, { p: obj.position.clone(), q: obj.quaternion.clone() })
     this.tool = name
     this.toolPose = { p: obj.position.clone(), q: obj.quaternion.clone() }
     if (name === 'jar') this.lidOpen = 0
     this.canvas.style.cursor = 'none'
     store.set({ tool: name, hint: null })
+    announce(
+      {
+        brush: 'Brush in hand. Brush the cracks, or hold Space.',
+        jar: 'Gold in hand. Hold to sift as the bowl turns.',
+        burnisher: 'Agate in hand. Rub the gold, or hold Space.',
+      }[name],
+    )
     if (name === 'jar') audio.lid({ position: obj.position.toArray() })
   }
 
@@ -143,6 +152,9 @@ export class Craft {
     p.y = p.lastY = e.clientY
     p.touch = e.pointerType === 'touch'
     const onBowl = !!this.hitBowl(e.clientX, e.clientY)
+    // the press that just took a tool off the tray (or tapped the shelf) is
+    // not a stroke, a pour or a spin
+    if (e.__kintsugiHit && !onBowl) return
     if (this.tool === 'jar' || onBowl) {
       p.down = true
       if (this.tool === 'brush') audio.brushStart()
@@ -265,16 +277,16 @@ export class Craft {
     const rect = this.canvas.getBoundingClientRect()
     const mw = this.parent.matrixWorld
     _m.copy(mw)
-    const nmat = new THREE.Matrix3().getNormalMatrix(mw)
+    _nm.getNormalMatrix(mw)
     cam.getWorldPosition(_cam)
     for (let i = 0; i < this.seams.length; i++) {
       const s = this.seams[i]
       const out = this.screen[i]
       for (let k = 0; k < s.n; k++) {
         _v.fromArray(s.pos, k * 3).applyMatrix4(_m)
-        _n.fromArray(s.nrm, k * 3).applyMatrix3(nmat).normalize()
-        const toCam = _cam.clone().sub(_v).normalize()
-        out.face[k] = _n.dot(toCam) > 0.08 ? 1 : 0
+        _n.fromArray(s.nrm, k * 3).applyMatrix3(_nm).normalize()
+        _toCam.subVectors(_cam, _v).normalize()
+        out.face[k] = _n.dot(_toCam) > 0.08 ? 1 : 0
         _v.project(cam)
         out.xy[k * 2] = rect.left + (_v.x * 0.5 + 0.5) * rect.width
         out.xy[k * 2 + 1] = rect.top + (-_v.y * 0.5 + 0.5) * rect.height
@@ -300,7 +312,8 @@ export class Craft {
   pxPerMetre(worldPoint) {
     const rect = this.canvas.getBoundingClientRect()
     const depth = this.camera.position.distanceTo(worldPoint)
-    return rect.height / 2 / (Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * depth)
+    // projectionMatrix[5] = cot(fov/2) × loupe zoom, so strokes stay honest under the loupe
+    return ((rect.height / 2) * this.camera.projectionMatrix.elements[5]) / depth
   }
 
   frame(dt, time) {
@@ -317,7 +330,7 @@ export class Craft {
       if (rt.fit) rt.fit.yawTarget = this.spin.yaw0 + (p.x - this.spin.x) * 0.012
     }
 
-    const hit = this.tool && p.x >= 0 ? this.hitBowl(p.x, p.y) : null
+    const hit = this.tool && this.tool !== 'jar' && p.x >= 0 ? this.hitBowl(p.x, p.y) : null
     this.frameTool(dt, hit, time)
     this.frameReturn(dt)
     if (this.done) return
@@ -450,7 +463,7 @@ export class Craft {
     const r = this.returning
     if (!r) return
     const obj = rt.tools?.[r.name]
-    const home = this.toolHome.get(r.name)
+    const home = rt.toolHome?.(r.name) // the tray's current layout (portrait-aware)
     if (!obj || !home) {
       this.returning = null
       return
@@ -476,6 +489,12 @@ export class Craft {
     const d = this.dust
     if (!d || !this.mouth) return
     const n = Math.min(Math.round(DUST_RATE * dt + Math.random()), 12)
+    if (!n) return
+    // every flake leaves the mouth within 12 mm: one ray finds the landing for
+    // the whole batch, each flake then offsets it by its own spread
+    raycaster.set(this.mouth, _down)
+    const hits = raycaster.intersectObjects(rt.craftMeshes?.() ?? [], false)
+    const hit = hits[0]?.point
     for (let j = 0; j < n; j++) {
       const i = d.next
       d.next = (d.next + 1) % MAX_DUST
@@ -491,15 +510,12 @@ export class Craft {
       d.life[i] = 0
       d.spin[i] = hash(i + 9.1) * 6.28
       d.seq += 0.618
-      // where will it land? cast straight down once
-      raycaster.set(_v.fromArray(d.pos, i * 3), new THREE.Vector3(0, -1, 0))
-      const hits = raycaster.intersectObjects(rt.craftMeshes?.() ?? [], false)
-      d.land[i] = hits.length ? hits[0].point.y : 0.0005
-      d.onBowl[i] = hits.length ? 1 : 0
-      if (hits.length) {
-        d.hit[i * 3] = hits[0].point.x
-        d.hit[i * 3 + 1] = hits[0].point.y
-        d.hit[i * 3 + 2] = hits[0].point.z
+      d.land[i] = hit ? hit.y : 0.0005
+      d.onBowl[i] = hit ? 1 : 0
+      if (hit) {
+        d.hit[i * 3] = hit.x + (d.pos[i * 3] - this.mouth.x)
+        d.hit[i * 3 + 1] = hit.y
+        d.hit[i * 3 + 2] = hit.z + (d.pos[i * 3 + 2] - this.mouth.z)
       }
     }
   }

@@ -13,10 +13,13 @@ export const SEP = ' · '
 
 const pad2 = (n) => String(n).padStart(2, '0')
 
-// "28 Sep 2026 · 19:42" in local time.
-export function formatDate(date) {
+// "28 Sep 2026 · 19:42" in local time. With dayOnly, just the UTC calendar
+// day — a share code only knows the day, so inventing a local clock time (or
+// sliding the date across midnight) would be a lie.
+export function formatDate(date, { dayOnly = false } = {}) {
   const d = date instanceof Date ? date : new Date(date)
   if (Number.isNaN(d.getTime())) return ''
+  if (dayOnly) return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
   const day = `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
   return `${day}${SEP}${pad2(d.getHours())}:${pad2(d.getMinutes())}`
 }
@@ -33,10 +36,10 @@ export function piecesPhrase(pieces, hairline) {
   return n === 1 ? '1 piece' : `${n} pieces`
 }
 
-export function formatColophon({ pieces, goldMm, date, hairline } = {}) {
+export function formatColophon({ pieces, goldMm, date, hairline, dayOnly = false } = {}) {
   const mm = Number.isFinite(goldMm) ? Math.max(0, Math.round(goldMm)) : 0
   const parts = [piecesPhrase(pieces, hairline), `${mm} mm of gold`]
-  const when = formatDate(date ?? new Date())
+  const when = formatDate(date ?? new Date(), { dayOnly })
   if (when) parts.push(when)
   return parts.join(SEP)
 }

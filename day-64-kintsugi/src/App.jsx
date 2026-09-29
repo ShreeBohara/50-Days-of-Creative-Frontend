@@ -46,10 +46,12 @@ export default function App() {
   }, [])
   return (
     <>
-      <a className="keys-hint" href="#how">
+      <a className="keys-hint" href="#stage">
         keyboard: space lifts · arrows move · M mends · B J A tools · hold space to work · F turns it over
       </a>
       <div
+        id="stage"
+        tabIndex={0}
         className="stage-wrap"
         role="application"
         aria-label="Kintsugi. A hand-thrown tea bowl on a wooden tray, under a silk cloth."

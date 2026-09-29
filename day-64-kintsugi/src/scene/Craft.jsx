@@ -67,6 +67,20 @@ export default function CraftLayer() {
       built = { crack, seam, geo, seamMat, crackMat, tex, parent }
       rt.seams = built
       ctl.attach({ seams, state: data, tex, parent, dust })
+      // turn the cracks toward the viewer: the circular mean of the seams'
+      // midpoint azimuths (a hairline's few seams can start on the far side)
+      let sx = 0
+      let sz = 0
+      for (const s of seams) {
+        const m = Math.floor(s.n / 2)
+        sx += s.pos[m * 3] * s.length
+        sz += s.pos[m * 3 + 2] * s.length
+      }
+      if (rt.fit && Math.hypot(sx, sz) > 1e-6) {
+        const az = Math.atan2(sx, sz)
+        const y = rt.fit.yaw
+        rt.fit.yawTarget = y + Math.atan2(Math.sin(-az - y), Math.cos(-az - y))
+      }
     }
     const unsub = store.subscribe(() => {
       const phase = store.get().phase
@@ -90,13 +104,33 @@ export default function CraftLayer() {
       unsub()
       ctl.unbind()
       rt.craft = null
+      // "begin again" remounts the stage: free this run's GPU resources
+      if (built) {
+        built.crack.removeFromParent()
+        built.seam.removeFromParent()
+        built.geo.dispose()
+        built.tex.dispose()
+        built.seamMat.dispose()
+        built.crackMat.dispose()
+        rt.seams = null
+      }
     }
   }, [ctl, camera, gl, dust])
+
+  useEffect(
+    () => () => {
+      flake.g.dispose()
+      flake.m.dispose()
+    },
+    [flake],
+  )
 
   useFrame((state, dt) => {
     ctl.frame(dt, state.clock.elapsedTime)
     const m = dustMesh.current
     if (!m) return
+    // nothing airborne and nothing drawn last frame: skip the 166 KB upload
+    if (m.count === 0 && !dust.state.some(Boolean)) return
     let n = 0
     for (let i = 0; i < MAX_DUST; i++) {
       const s = dust.state[i]
@@ -111,8 +145,23 @@ export default function CraftLayer() {
       m.setMatrixAt(n++, _o.matrix)
     }
     m.count = n
+    m.instanceMatrix.clearUpdateRanges()
+    m.instanceMatrix.addUpdateRange(0, Math.max(1, n) * 16)
     m.instanceMatrix.needsUpdate = true
   })
 
-  return <instancedMesh ref={dustMesh} args={[flake.g, flake.m, MAX_DUST]} frustumCulled={false} castShadow={false} />
+  return (
+    <instancedMesh
+      ref={(m) => {
+        dustMesh.current = m
+        if (m) {
+          m.count = 0
+          m.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+        }
+      }}
+      args={[flake.g, flake.m, MAX_DUST]}
+      frustumCulled={false}
+      castShadow={false}
+    />
+  )
 }

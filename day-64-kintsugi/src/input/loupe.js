@@ -25,11 +25,15 @@ export function bindLoupe(canvas) {
   const down = (e) => {
     pos(e)
     // long-press on empty canvas (nothing claimed it) opens the loupe on touch
-    if (e.pointerType !== 'touch' || e.__kintsugiHit || e.target !== canvas) return
+    if (press) clearTimeout(press.timer)
+    press = null
+    if (e.pointerType !== 'touch' || !e.isPrimary || e.__kintsugiHit || e.target !== canvas) return
     press = {
       x: e.clientX,
       y: e.clientY,
       timer: setTimeout(() => {
+        // a hold that a bowl lift, a dragged shard, a spin or a tool owns is not a loupe
+        if (rt.held || rt.fit?.hold || rt.fit?.spin || rt.craft?.tool || rt.veil?.grabbed) return
         l.active = true
       }, LONG_PRESS_MS),
     }

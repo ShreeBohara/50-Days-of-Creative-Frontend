@@ -100,8 +100,8 @@ export class Fitting {
     this.elapsed = 0
     this.idle = 0
     this.ghostId = null
-    // start the assembly turned toward where the anchor already lies, so it
-    // rights itself instead of spinning round
+    this.autoAll = false
+    this.catchStrays() // anything flung past the walls comes back before we start
     const body = this.body(this.anchorId)
     if (!body) return
     const t = body.translation()
@@ -159,7 +159,7 @@ export class Fitting {
   // --------------------------------------------------------------- input
 
   hover(id, on) {
-    if (!this.canvas || this.hold) return
+    if (!this.canvas || this.hold || rt.craft?.tool) return
     const can = on && this.active && store.get().phase === 'fitting' && !this.placed.has(id)
     this.canvas.style.cursor = can ? 'grab' : ''
   }
@@ -212,7 +212,10 @@ export class Fitting {
   /** Drag on empty space turns the assembly (while mending, and once kept). */
   onEmptyDown(e) {
     const phase = store.get().phase
-    const can = (this.active && phase === 'fitting') || (this.riding && phase === 'keep')
+    const craft = phase === 'lacquer' || phase === 'gild' || phase === 'burnish'
+    // (with a tool in hand the craft controller owns presses instead)
+    const can =
+      (this.active && phase === 'fitting') || (this.riding && (phase === 'keep' || (craft && !rt.craft?.tool)))
     if (!can || this.hold) return
     this.spin = { pid: e.pointerId, x: e.clientX, yaw0: this.yawTarget }
     window.addEventListener('pointermove', this._move)
@@ -296,7 +299,7 @@ export class Fitting {
     if (id !== this.anchorId) {
       audio.snap({ position: this.homeWorld(id).toArray() })
       try {
-        navigator.vibrate?.(8)
+        if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(8)
       } catch {
         // no haptics here
       }
@@ -304,10 +307,12 @@ export class Fitting {
     }
     if (n === total) {
       this.ghostId = null
+      this.autoAll = false
       store.set({ hint: null })
       setTimeout(() => {
         if (store.get().phase === 'fitting') {
           this.end()
+          store.set({ hint: null })
           dispatch({ type: 'ALL_PLACED' })
           announce('Every piece is home. Lacquer the seams.')
         }
@@ -315,7 +320,13 @@ export class Fitting {
     }
   }
 
-  /** "Mend the rest": fly the next piece home. */
+  /** "Mend the rest": keep flying pieces home until the bowl is whole. */
+  mendTheRest() {
+    this.autoAll = true
+    this.autoFitNext()
+  }
+
+  /** Fly the next piece home (M). */
   autoFitNext() {
     if (!this.active || this.hold) return false
     const id = nextAutoFit(this.placed, this.adjacency, this.anchorId)
@@ -384,6 +395,7 @@ export class Fitting {
       if (k >= 1) {
         this.anims.delete(id)
         if (!an.body) this.placedDone(id)
+        if (this.autoAll && this.active && this.anims.size === 0) this.autoFitNext()
       }
     }
 
@@ -396,7 +408,8 @@ export class Fitting {
     if (phase === 'fitting' && this.placed.size > 0 && this.idle > HINT_AFTER && !this.hold) {
       this.ghostId = nextAutoFit(this.placed, this.adjacency, this.anchorId)
     }
-    if (phase === 'fitting' && this.elapsed > HELP_AFTER && !store.get().hint) {
+    const remaining = this.placed.size < (this.variant?.shards.length ?? 0)
+    if (phase === 'fitting' && remaining && !this.autoAll && this.elapsed > HELP_AFTER && !store.get().hint) {
       store.set({ hint: 'tap the word to mend the rest' })
     }
   }
@@ -417,7 +430,8 @@ export class Fitting {
     const px = Math.hypot(_c1.x - _c2.x, _c1.y - _c2.y)
     const depth = this.camera.position.distanceTo(home)
     const rect = this.canvas.getBoundingClientRect()
-    const pxPerM = rect.height / 2 / (Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * depth)
+    // from the live projection, so the 6× loupe's view offset is accounted for
+    const pxPerM = ((rect.height / 2) * this.camera.projectionMatrix.elements[5]) / depth
     const dist = px / pxPerM
     const tol = h.touch ? SNAP_TOL.touch : SNAP_TOL.mouse
     const radius = h.touch ? MAGNET_RADIUS.touch : MAGNET_RADIUS.mouse
@@ -451,7 +465,8 @@ export class Fitting {
     bodies.forEach((body, id) => {
       if (this.placed.has(id) || this.anims.has(id) || this.hold?.id === id) return
       const t = body.translation()
-      if (t.y < -0.04 || Math.abs(t.x) > 0.26 || Math.abs(t.z) > 0.2) {
+      // the tray's inner walls — past them is the invisible slab margin
+      if (t.y < -0.04 || Math.abs(t.x) > 0.195 || Math.abs(t.z) > 0.135) {
         body.setTranslation({ x: THREE.MathUtils.clamp(t.x, -0.15, 0.15), y: 0.03, z: THREE.MathUtils.clamp(t.z, -0.09, 0.09) }, true)
         body.setLinvel({ x: 0, y: 0, z: 0 }, true)
         body.setAngvel({ x: 0, y: 0, z: 0 }, true)

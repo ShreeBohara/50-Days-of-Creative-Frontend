@@ -51,20 +51,29 @@ export default function Tray() {
     }
     // Portrait screens only see the middle of the tray, so the tools move in
     // close around the bowl (the brush and agate in front, the jar beside it).
-    const home = {}
+    // The cached glTF survives "begin again", so the Blender pose is captured
+    // once per node and every layout starts from it.
     for (const k of ['brush', 'jar', 'burnisher']) {
       const o = rt.tools[k]
-      if (o) home[k] = { p: o.position.clone(), q: o.quaternion.clone() }
+      if (o) o.userData.home ??= { p: o.position.clone(), q: o.quaternion.clone() }
+    }
+    rt.toolHome = (k) => {
+      const o = rt.tools?.[k]
+      const h = o?.userData.home
+      if (!h) return null
+      const p = h.p.clone()
+      if (rt.portrait) p.add(new THREE.Vector3(...PORTRAIT_SHIFT[k]))
+      return { p, q: h.q }
     }
     const layout = () => {
-      const portrait = innerWidth / Math.max(1, innerHeight) < 0.8
-      rt.portrait = portrait
-      for (const k of Object.keys(home)) {
+      // below ~1.25:1 even the landscape framing clips the tray's ends
+      rt.portrait = innerWidth / Math.max(1, innerHeight) < 1.25
+      for (const k of ['brush', 'jar', 'burnisher']) {
         const o = rt.tools[k]
-        if (rt.craft?.tool === k) continue // in hand: leave it
-        o.position.copy(home[k].p)
-        o.quaternion.copy(home[k].q)
-        if (portrait) o.position.add(new THREE.Vector3(...PORTRAIT_SHIFT[k]))
+        if (!o || rt.craft?.tool === k) continue // in hand: leave it
+        const h = rt.toolHome(k)
+        o.position.copy(h.p)
+        o.quaternion.copy(h.q)
       }
     }
     layout()
