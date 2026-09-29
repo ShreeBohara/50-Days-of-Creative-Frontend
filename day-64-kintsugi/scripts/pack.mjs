@@ -61,7 +61,7 @@ async function main() {
     const doc = await io.read(from)
     await doc.transform(
       dedup(),
-      prune(),
+      prune({ keepLeaves: true }),
       weld(),
       textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^normalTexture$/, quality: 94 }),
       textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^(?!normalTexture$).*/, quality: 88 }),
