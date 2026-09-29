@@ -9,6 +9,13 @@ import {
   magnetPull,
   SNAP_TOL,
   MAGNET_RADIUS,
+  SNAP_TOL_PX,
+  MAGNET_EXIT,
+  snapTolerance,
+  magnetRadius,
+  magnetHeld,
+  magnetAssist,
+  approachProgress,
 } from './fitRules.js'
 
 // 0 is the foot. 1 lists 3 but 3 forgets 1; 2–3 only appear as a
@@ -207,5 +214,123 @@ describe('magnetPull', () => {
     expect(SNAP_TOL.mouse).toBeLessThan(MAGNET_RADIUS.mouse)
     expect(SNAP_TOL.touch).toBeLessThan(MAGNET_RADIUS.touch)
     expect(SNAP_TOL.touch).toBeGreaterThan(SNAP_TOL.mouse)
+  })
+})
+
+describe('snapTolerance', () => {
+  it('is SNAP_TOL when the pixel floor is smaller (a big, close view)', () => {
+    // 6 mm at 5000 px/m is 30 px, above the 24 px floor
+    expect(snapTolerance(false, 5000)).toBe(SNAP_TOL.mouse)
+    // 12 mm at 4000 px/m is 48 px, above the 44 px floor
+    expect(snapTolerance(true, 4000)).toBe(SNAP_TOL.touch)
+  })
+
+  it('never drops below the pixel floor on a small view', () => {
+    // a 700 px laptop canvas at fov 28 / 0.5 m is roughly 2800 px/m
+    expect(snapTolerance(false, 2800)).toBeCloseTo(SNAP_TOL_PX.mouse / 2800, 12)
+    expect(snapTolerance(false, 2800) * 2800).toBeCloseTo(SNAP_TOL_PX.mouse, 9)
+    // a portrait phone with the camera pulled back: ~1500 px/m
+    expect(snapTolerance(true, 1500) * 1500).toBeCloseTo(SNAP_TOL_PX.touch, 9)
+    for (const pxPerM of [300, 800, 1500, 2800, 4000, 9000]) {
+      expect(snapTolerance(false, pxPerM) * pxPerM).toBeGreaterThanOrEqual(SNAP_TOL_PX.mouse - 1e-9)
+      expect(snapTolerance(true, pxPerM) * pxPerM).toBeGreaterThanOrEqual(SNAP_TOL_PX.touch - 1e-9)
+      expect(snapTolerance(false, pxPerM)).toBeGreaterThanOrEqual(SNAP_TOL.mouse)
+    }
+  })
+
+  it('touch is at least as forgiving as mouse', () => {
+    for (const pxPerM of [500, 2000, 6000]) {
+      expect(snapTolerance(true, pxPerM)).toBeGreaterThanOrEqual(snapTolerance(false, pxPerM))
+    }
+  })
+
+  it('falls back to SNAP_TOL on a missing or broken scale', () => {
+    for (const bad of [0, -5, NaN, Infinity, undefined]) {
+      expect(snapTolerance(false, bad)).toBe(SNAP_TOL.mouse)
+      expect(snapTolerance(true, bad)).toBe(SNAP_TOL.touch)
+    }
+  })
+})
+
+describe('magnetRadius', () => {
+  it('is MAGNET_RADIUS for the stock tolerances', () => {
+    expect(magnetRadius(false, SNAP_TOL.mouse)).toBe(MAGNET_RADIUS.mouse)
+    expect(magnetRadius(true, SNAP_TOL.touch)).toBe(MAGNET_RADIUS.touch)
+  })
+
+  it('grows with a pixel-floored tolerance so the pull still eases', () => {
+    const tol = snapTolerance(true, 1200) // ~37 mm
+    const r = magnetRadius(true, tol)
+    expect(r).toBeGreaterThan(tol * 2)
+    // the ease between tol and radius is not a step
+    expect(magnetPull((tol + r) / 2, tol, r)).toBeCloseTo(0.5, 10)
+  })
+
+  it('never returns NaN', () => {
+    expect(magnetRadius(false, NaN)).toBe(MAGNET_RADIUS.mouse)
+  })
+})
+
+describe('magnetHeld (hysteresis)', () => {
+  const r = MAGNET_RADIUS.mouse
+
+  it('catches only inside the radius', () => {
+    expect(magnetHeld(r * 1.01, r, false)).toBe(false)
+    expect(magnetHeld(r * 0.99, r, false)).toBe(true)
+  })
+
+  it('lets go only past MAGNET_EXIT × radius', () => {
+    expect(magnetHeld(r * 1.2, r, true)).toBe(true)
+    expect(magnetHeld(r * MAGNET_EXIT * 0.999, r, true)).toBe(true)
+    expect(magnetHeld(r * MAGNET_EXIT, r, true)).toBe(false)
+  })
+
+  it('does not flicker when the distance jitters around the radius', () => {
+    let held = false
+    const trace = [1.1, 1.0, 0.98, 1.02, 0.99, 1.03, 1.01, 1.2, 1.3, 1.34, 1.36, 1.02]
+    const out = trace.map((m) => (held = magnetHeld(r * m, r, held)))
+    expect(out).toEqual([false, false, true, true, true, true, true, true, true, true, false, false])
+  })
+
+  it('is never held at an unknown distance', () => {
+    expect(magnetHeld(NaN, r, true)).toBe(false)
+  })
+})
+
+describe('magnetAssist', () => {
+  const tol = SNAP_TOL.mouse
+  const r = MAGNET_RADIUS.mouse
+
+  it('is 0 unless held, and full inside the tolerance', () => {
+    expect(magnetAssist(tol / 2, tol, r, false)).toBe(0)
+    expect(magnetAssist(tol / 2, tol, r, true)).toBe(1)
+  })
+
+  it('fades to 0 exactly where the hysteresis lets go', () => {
+    const exit = r * MAGNET_EXIT
+    expect(magnetAssist(exit - 1e-6, tol, r, true)).toBeLessThan(1e-6)
+    expect(magnetAssist(exit, tol, r, true)).toBe(0)
+  })
+})
+
+describe('approachProgress', () => {
+  it('is 0 far away, 1 at the magnet edge, smooth between', () => {
+    expect(approachProgress(400, 80, 250)).toBe(0)
+    expect(approachProgress(250, 80, 250)).toBe(0)
+    expect(approachProgress(80, 80, 250)).toBe(1)
+    expect(approachProgress(10, 80, 250)).toBe(1)
+    expect(approachProgress(165, 80, 250)).toBeCloseTo(0.5, 10)
+    let prev = 0
+    for (let px = 250; px >= 80; px -= 5) {
+      const p = approachProgress(px, 80, 250)
+      expect(p).toBeGreaterThanOrEqual(prev - 1e-12)
+      prev = p
+    }
+  })
+
+  it('degrades to a step when near >= far, and 0 on NaN', () => {
+    expect(approachProgress(100, 300, 250)).toBe(1)
+    expect(approachProgress(320, 300, 250)).toBe(0)
+    expect(approachProgress(NaN, 80, 250)).toBe(0)
   })
 })

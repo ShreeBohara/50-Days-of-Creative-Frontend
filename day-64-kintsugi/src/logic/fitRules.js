@@ -16,6 +16,20 @@
 export const SNAP_TOL = Object.freeze({ mouse: 0.006, touch: 0.012 })
 export const MAGNET_RADIUS = Object.freeze({ mouse: 0.024, touch: 0.03 })
 
+// The same tolerance can never shrink below these many CSS px: on a
+// small canvas (or a phone's pulled-back camera) 6 mm is barely a
+// dozen pixels, smaller than a cursor wobble or a fingertip.
+export const SNAP_TOL_PX = Object.freeze({ mouse: 24, touch: 44 })
+
+// Hysteresis: the magnet catches a piece at its radius but lets go
+// only past MAGNET_EXIT × radius, so hovering on the edge can't
+// flicker the pull (or the release outcome) on and off.
+export const MAGNET_EXIT = 1.35
+
+// A pixel-floored tolerance can outgrow the fixed radius; keep the
+// magnet at least this many tolerances wide so the pull still eases.
+const MAGNET_OVER_TOL = 2.5
+
 function link(adj, a, b) {
   if (!adj.has(a)) adj.set(a, new Set())
   if (!adj.has(b)) adj.set(b, new Set())
@@ -121,5 +135,49 @@ export function magnetPull(dist, tol, radius) {
   if (dist <= tol) return 1
   if (!(radius > tol) || dist >= radius) return 0
   const u = (radius - dist) / (radius - tol)
+  return u * u * (3 - 2 * u)
+}
+
+const kindOf = (touch) => (touch ? 'touch' : 'mouse')
+
+// Snap tolerance in metres at the current screen scale (`pxPerM`:
+// CSS px per metre at the home's depth): SNAP_TOL, or the pixel
+// floor converted to metres, whichever is larger.
+export function snapTolerance(touch, pxPerM) {
+  const kind = kindOf(touch)
+  const floor = Number.isFinite(pxPerM) && pxPerM > 0 ? SNAP_TOL_PX[kind] / pxPerM : 0
+  return Math.max(SNAP_TOL[kind], floor)
+}
+
+// Magnet radius in metres for a given tolerance: never tighter than
+// MAGNET_RADIUS, and never so close to the tolerance that the pull
+// becomes a step.
+export function magnetRadius(touch, tol) {
+  return Math.max(MAGNET_RADIUS[kindOf(touch)], (Number.isFinite(tol) ? tol : 0) * MAGNET_OVER_TOL)
+}
+
+// Is the magnet holding the piece this frame? Enter below `radius`,
+// leave only past MAGNET_EXIT × radius.
+export function magnetHeld(dist, radius, wasHeld) {
+  if (!Number.isFinite(dist)) return false
+  return dist < (wasHeld ? radius * MAGNET_EXIT : radius)
+}
+
+// The pull while held: eased over the wider exit span, so it fades
+// to exactly 0 where the hysteresis lets go (the caller smooths the
+// small step up on the frame it catches). 0 when not held.
+export function magnetAssist(dist, tol, radius, held) {
+  return held ? magnetPull(dist, tol, radius * MAGNET_EXIT) : 0
+}
+
+// How far a held piece has come toward home on screen: 0 at `farPx`
+// or beyond, 1 at `nearPx` or closer, smoothstep between. Used to
+// fade the grab offset and blend the drag depth so it arrives
+// centred and at the home's depth.
+export function approachProgress(px, nearPx, farPx) {
+  if (!Number.isFinite(px)) return 0
+  if (px <= nearPx) return 1
+  if (!(farPx > nearPx) || px >= farPx) return 0
+  const u = (farPx - px) / (farPx - nearPx)
   return u * u * (3 - 2 * u)
 }
