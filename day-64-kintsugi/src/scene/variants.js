@@ -18,6 +18,53 @@ loader.setMeshoptDecoder(typeof MeshoptDecoder === 'function' ? MeshoptDecoder()
 
 const cache = new Map()
 
+// Convex-hull input for a shard: the vertex furthest along each of 400 evenly
+// spread directions (within ~0.6 mm of the true hull on the real shards).
+// Rapier then hulls ≤ ~200 points instead of every vertex (the foot shard has
+// ~8,000), which is what used to stall the burst frame.
+const HULL_DIRS = (() => {
+  const n = 400
+  // the six axes exactly (a shard lying flat keeps its full height), then a
+  // Fibonacci sphere
+  const out = new Float32Array((n + 6) * 3)
+  out.set([1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1])
+  const ga = Math.PI * (3 - Math.sqrt(5))
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (2 * (i + 0.5)) / n
+    const r = Math.sqrt(1 - y * y)
+    out.set([Math.cos(ga * i) * r, y, Math.sin(ga * i) * r], (i + 6) * 3)
+  }
+  return out
+})()
+
+export function hullPoints(positions) {
+  const count = positions.length / 3
+  const picked = new Set()
+  for (let d = 0; d < HULL_DIRS.length; d += 3) {
+    const dx = HULL_DIRS[d]
+    const dy = HULL_DIRS[d + 1]
+    const dz = HULL_DIRS[d + 2]
+    let best = -Infinity
+    let bi = 0
+    for (let i = 0, j = 0; i < count; i++, j += 3) {
+      const v = positions[j] * dx + positions[j + 1] * dy + positions[j + 2] * dz
+      if (v > best) {
+        best = v
+        bi = i
+      }
+    }
+    picked.add(bi)
+  }
+  const out = new Float32Array(picked.size * 3)
+  let k = 0
+  for (const i of picked) {
+    out[k++] = positions[i * 3]
+    out[k++] = positions[i * 3 + 1]
+    out[k++] = positions[i * 3 + 2]
+  }
+  return out
+}
+
 function buildShards(gltf, json) {
   const byName = new Map()
   gltf.scene.updateWorldMatrix(true, true)
@@ -40,7 +87,12 @@ function buildShards(gltf, json) {
       for (const k of Object.keys(p.g.attributes)) {
         if (!['position', 'normal', 'uv'].includes(k)) p.g.deleteAttribute(k)
       }
-      if (!p.g.index) p.g.setIndex([...Array(p.g.attributes.position.count).keys()])
+      if (!p.g.index) {
+        const n = p.g.attributes.position.count
+        const idx = new (n > 65535 ? Uint32Array : Uint16Array)(n)
+        for (let i = 0; i < n; i++) idx[i] = i
+        p.g.setIndex(new THREE.BufferAttribute(idx, 1))
+      }
     }
     const geometry = mergeGeometries(
       parts.map((p) => p.g),
@@ -52,6 +104,8 @@ function buildShards(gltf, json) {
     geometry.translate(-com.x, -com.y, -com.z)
     geometry.computeBoundingSphere()
     return {
+      hull: null, // filled in by finishShards, one shard per task
+      size: geometry.boundingSphere.radius * 2,
       id: s.id,
       anchor: s.anchor,
       neighbors: s.neighbors,
@@ -60,6 +114,18 @@ function buildShards(gltf, json) {
       geometry,
     }
   })
+}
+
+// Hull points and the pointer's bounds tree cost a few ms per shard: do them
+// one shard per task, so the renderer gets a frame in between.
+const yieldTask = () => new Promise((r) => setTimeout(r, 0))
+async function finishShards(shards) {
+  for (const s of shards) {
+    await yieldTask()
+    s.hull = hullPoints(s.geometry.attributes.position.array)
+    s.geometry.computeBoundsTree?.()
+  }
+  return shards
 }
 
 const seamCache = new Map()
@@ -82,11 +148,11 @@ export function loadSeams(id) {
 /** Promise<{ id, json, seams, shards }> — cached per variant id. */
 export function loadVariant(id) {
   if (!cache.has(id)) {
-    const p = Promise.all([loadSeams(id), loader.loadAsync(ASSETS.fracture(id))]).then(([{ json, seams }, gltf]) => ({
+    const p = Promise.all([loadSeams(id), loader.loadAsync(ASSETS.fracture(id))]).then(async ([{ json, seams }, gltf]) => ({
       id,
       json,
       seams,
-      shards: buildShards(gltf, json),
+      shards: await finishShards(buildShards(gltf, json)),
     }))
     p.catch(() => cache.delete(id)) // let a later attempt retry
     cache.set(id, p)
@@ -105,4 +171,25 @@ export function hairlineSeams(seams, count = 3) {
 
 export function prefetch(ids) {
   for (const id of ids) loadVariant(id).catch(() => {})
+}
+
+/**
+ * Load variants one at a time in idle slots, so parsing never lands on a
+ * frame that is also answering a drag. `busy()` postpones the next one.
+ */
+export function prefetchIdle(ids, busy = () => false) {
+  const queue = ids.filter((id) => !cache.has(id))
+  const idle = (fn) =>
+    typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 2500 }) : setTimeout(fn, 120)
+  const next = () => {
+    if (!queue.length) return
+    if (busy()) {
+      setTimeout(() => idle(next), 400)
+      return
+    }
+    loadVariant(queue.shift())
+      .catch(() => {})
+      .finally(() => idle(next))
+  }
+  idle(next)
 }
