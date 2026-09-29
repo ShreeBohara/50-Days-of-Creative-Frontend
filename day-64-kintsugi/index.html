@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Day 64 of Creative Frontend: KINTSUGI — hold a hand-thrown tea bowl, drop it, gather the shards, and mend it in lacquer and gold."
+    />
+    <meta name="theme-color" content="#1f1712" />
+    <title>Kintsugi · Day 64</title>
+    <script>
+      // Tier D gate — decided before React loads. No WebGL2 (or ?nowebgl=1)
+      // means the static fallback below is the whole experience.
+      ;(function () {
+        var forced = /[?&]nowebgl=1/.test(location.search)
+        var ok = false
+        if (!forced) {
+          try {
+            var c = document.createElement('canvas')
+            ok = !!(window.WebGL2RenderingContext && c.getContext('webgl2'))
+          } catch (e) {
+            ok = false
+          }
+        }
+        if (!ok) document.documentElement.classList.add('no-webgl')
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <main class="fallback" aria-labelledby="fallback-title">
+      <video
+        class="fallback__video"
+        autoplay
+        muted
+        loop
+        playsinline
+        poster="./fallback/poster.jpg"
+        aria-label="A tea bowl falls onto a wooden tray, breaks, and is mended with seams of gold."
+      >
+        <source src="./fallback/loop.webm" type="video/webm" />
+        <source src="./fallback/loop.mp4" type="video/mp4" />
+      </video>
+      <div class="fallback__text">
+        <h1 id="fallback-title">Kintsugi</h1>
+        <p>
+          Hold a hand-thrown tea bowl, drop it, gather the pieces, and mend the seams in lacquer
+          and gold. This piece needs WebGL2, which this browser didn&rsquo;t provide &mdash; above
+          is a rendered loop of the ritual instead.
+        </p>
+        <p class="fallback__meta">No. 64 &middot; shino chawan &middot; mended in gold</p>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+*.local
+*.log
+.DS_Store
+
+# Blender look-dev renders + bake scratch (never shipped)
+blender/_previews/
+blender/_work/
+blender/textures/bowl_*.png

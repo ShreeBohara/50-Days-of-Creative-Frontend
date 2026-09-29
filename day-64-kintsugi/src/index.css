@@ -1,0 +1,149 @@
+/* ============================================================
+   KINTSUGI — day 64 · global tokens + reset
+   Kaki-shibu dusk: a tea room at the end of the day, shot like
+   museum ceramics. Umber wood, paper light, one saturated accent
+   (gold) that only appears once the visitor has earned it.
+   Shippori Mincho for the single stage word, Chivo Mono for the
+   colophon.
+   ============================================================ */
+
+:root {
+  --umber-deep: #1f1712;
+  --umber: #2c2119;
+  --tray: #4a3526;
+  --tray-edge: #6b4a33;
+  --shoji: #f1e7d3;
+  --glaze: #efe6da;
+  --scorch: #d98c5f;
+  --clay: #b88a63;
+  --urushi: #7a1e12;
+  --gold: #d7a64a;
+  --gold-matte: #b8923f;
+  --fukusa: #2b3350;
+  --ink: #e9dfcf;
+  --ink-dim: #9c8d7a;
+  --hairline: rgba(241, 231, 211, 0.18);
+
+  --font-word: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono: 'Chivo Mono Variable', ui-monospace, 'SF Mono', monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--umber-deep);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--umber-deep);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Tier D: no WebGL2 → the static page is the experience ---------- */
+
+.fallback {
+  display: none;
+}
+
+.no-webgl body {
+  overflow: auto;
+}
+
+.no-webgl #root {
+  display: none;
+}
+
+.no-webgl .fallback {
+  display: grid;
+  min-height: 100%;
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+  padding: 16px 16px 40px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.fallback__video {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: var(--umber);
+  border-radius: 2px;
+}
+
+.fallback__text {
+  max-width: 56ch;
+}
+
+.fallback__text h1 {
+  font-family: var(--font-word);
+  font-weight: 500;
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+.fallback__text p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.fallback__meta {
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fallback__video {
+    display: none;
+  }
+}
