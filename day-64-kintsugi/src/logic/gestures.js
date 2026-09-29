@@ -107,3 +107,23 @@ export function rubEnergy(samples) {
   }
   return energy
 }
+
+// Throw velocity at let-go, in px/ms (Flutter's VelocityTracker rules):
+// a pointer that sat still for more than STOP_MS before release is a
+// set-down — velocity 0, so pausing and letting go never throws. Otherwise
+// the least-squares slope over the trailing THROW_WINDOW_MS. `end` is the
+// pointerup ({ x, y, t }); it joins the fit as a resting sample, so a
+// pointer that slowed just before release throws softer.
+export const STOP_MS = 40
+export const THROW_WINDOW_MS = 100
+
+export function throwVelocity(samples, end, windowMs = THROW_WINDOW_MS) {
+  const pts = clean(samples)
+  if (pts.length === 0) return { vx: 0, vy: 0 }
+  const last = pts[pts.length - 1]
+  if (valid(end)) {
+    if (end.t - last.t > STOP_MS) return { vx: 0, vy: 0 }
+    if (end.t > last.t) pts.push(end)
+  }
+  return releaseVelocity(pts, windowMs)
+}

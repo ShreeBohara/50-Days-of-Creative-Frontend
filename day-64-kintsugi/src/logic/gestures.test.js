@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { classify, releaseVelocity, rubEnergy } from './gestures.js'
+import { STOP_MS, classify, releaseVelocity, rubEnergy, throwVelocity } from './gestures.js'
 
 // Evenly spaced samples along a straight line, every `dt` ms.
 function line({ from = [0, 0], to = [100, 0], ms = 200, dt = 16, t0 = 0 } = {}) {
@@ -145,5 +145,56 @@ describe('rubEnergy', () => {
     expect(rubEnergy([])).toBe(0)
     expect(rubEnergy([{ x: 1, y: 1, t: 0 }])).toBe(0)
     expect(rubEnergy(null)).toBe(0)
+  })
+})
+
+describe('throwVelocity', () => {
+  // A 100 px/100 ms flick with the pointerup `gap` ms after the last move.
+  const flick = (gap = 4) => {
+    const pts = line({ to: [100, -50], ms: 100, dt: 8 })
+    const last = pts[pts.length - 1]
+    return { pts, end: { x: last.x, y: last.y, t: last.t + gap } }
+  }
+
+  it('carries a flick released while moving', () => {
+    const { pts, end } = flick(2)
+    const { vx, vy } = throwVelocity(pts, end)
+    expect(vx).toBeGreaterThan(0.9)
+    expect(vx).toBeLessThanOrEqual(1)
+    expect(vy).toBeCloseTo(vx / -2, 9)
+  })
+
+  it('is exactly zero once the pointer rested longer than STOP_MS', () => {
+    const { pts, end } = flick(STOP_MS + 1)
+    expect(throwVelocity(pts, end)).toEqual({ vx: 0, vy: 0 })
+  })
+
+  it('a pause just short of the cut-off throws softer, never harder', () => {
+    const still = throwVelocity(flick(1).pts, flick(1).end).vx
+    const paused = throwVelocity(flick(STOP_MS - 5).pts, flick(STOP_MS - 5).end).vx
+    expect(paused).toBeGreaterThan(0)
+    expect(paused).toBeLessThan(still * 0.8)
+  })
+
+  it('fits only the trailing window', () => {
+    const slow = line({ to: [20, 0], ms: 400 })
+    const fast = line({ from: [20, 0], to: [220, 0], ms: 100, t0: 400 }).slice(1)
+    const last = fast[fast.length - 1]
+    expect(throwVelocity([...slow, ...fast], { ...last, t: last.t }).vx).toBeCloseTo(2, 6)
+  })
+
+  it('without a pointerup sample it falls back to the move trace', () => {
+    expect(throwVelocity(line({ to: [80, 0], ms: 100 })).vx).toBeCloseTo(0.8, 9)
+    expect(throwVelocity(line({ to: [80, 0], ms: 100 }), { x: NaN, y: 0, t: 1e9 }).vx).toBeCloseTo(0.8, 9)
+  })
+
+  it('is zero for no samples or garbage, and does not touch the caller\'s trace', () => {
+    expect(throwVelocity([], { x: 0, y: 0, t: 0 })).toEqual({ vx: 0, vy: 0 })
+    expect(throwVelocity(null)).toEqual({ vx: 0, vy: 0 })
+    expect(throwVelocity([{ x: 1, y: 1, t: 5 }], { x: 1, y: 1, t: 5 })).toEqual({ vx: 0, vy: 0 })
+    const { pts, end } = flick()
+    const n = pts.length
+    throwVelocity(pts, end)
+    expect(pts.length).toBe(n)
   })
 })
