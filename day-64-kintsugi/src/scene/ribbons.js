@@ -58,7 +58,16 @@ export function buildRibbonGeometry(seams) {
       t.subVectors(c, a)
       if (t.lengthSq() < 1e-14) t.set(1, 0, 0)
       t.normalize()
-      nrm.fromArray(s.nrm, i * 3)
+      // a 5-tap average along the seam: where a crack folds over the rim the
+      // normal swings 180° in a few millimetres, and an unsmoothed ribbon twists
+      nrm.set(0, 0, 0)
+      for (let o = -2; o <= 2; o++) {
+        const j = Math.min(s.n - 1, Math.max(0, i + o))
+        nrm.x += s.nrm[j * 3] * (o === 0 ? 2 : 1)
+        nrm.y += s.nrm[j * 3 + 1] * (o === 0 ? 2 : 1)
+        nrm.z += s.nrm[j * 3 + 2] * (o === 0 ? 2 : 1)
+      }
+      if (nrm.lengthSq() < 1e-12) nrm.fromArray(s.nrm, i * 3)
       if (nrm.lengthSq() < 1e-12) nrm.set(0, 1, 0)
       nrm.normalize()
       b.crossVectors(t, nrm)

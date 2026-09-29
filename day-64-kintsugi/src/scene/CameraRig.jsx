@@ -1,8 +1,9 @@
 import { useFrame, useThree } from '@react-three/fiber'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { easing } from 'maath'
 import { rt, store } from '../state/store.js'
+import { bindLoupe } from '../input/loupe.js'
 
 // Per-phase framing, eased with critically damped springs (no bounce). The
 // rig fits the tray's width to the viewport aspect so portrait phones see the
@@ -24,6 +25,8 @@ function viewFor(phase) {
 export default function CameraRig() {
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
+  const gl = useThree((s) => s.gl)
+  useEffect(() => bindLoupe(gl.domElement), [gl])
   const tmp = useMemo(() => ({ pos: new THREE.Vector3(), look: new THREE.Vector3(), cur: new THREE.Vector3(0, 0.035, 0) }), [])
 
   useFrame((state, dt) => {
@@ -45,6 +48,24 @@ export default function CameraRig() {
     tmp.look.set(v.target[0], v.target[1] + flip * 0.028, v.target[2])
     easing.damp3(tmp.cur, tmp.look, 0.5, dt)
     camera.lookAt(tmp.cur)
+
+    // loupe: a 6× sub-window of the full view, centred on the pointer
+    const l = rt.loupe
+    if (l) {
+      l.amt += ((l.active ? 1 : 0) - l.amt) * (1 - Math.exp(-dt / 0.12))
+      if (l.amt > 0.002) {
+        const zoom = 1 + 5 * l.amt
+        const w = size.width / zoom
+        const h = size.height / zoom
+        const x = THREE.MathUtils.clamp(l.x - w / 2, 0, size.width - w)
+        const y = THREE.MathUtils.clamp(l.y - h / 2, 0, size.height - h)
+        camera.setViewOffset(size.width, size.height, x, y, w, h)
+        document.documentElement.dataset.loupe = ''
+      } else if (camera.view?.enabled) {
+        camera.clearViewOffset()
+        delete document.documentElement.dataset.loupe
+      }
+    }
   })
   return null
 }

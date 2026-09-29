@@ -8,7 +8,6 @@ export const url = (p) => `${BASE}${p}`
 export const ASSETS = {
   bowl: url('models/bowl.glb'),
   trayTools: url('models/tray_tools.glb'),
-  fukusa: url('models/fukusa.glb'),
   hdri: url('hdri/pine_attic_1k.hdr'),
   gobo: url('textures/shoji_gobo.png'),
   fracture: (id) => url(`models/fracture/${id}.glb`),

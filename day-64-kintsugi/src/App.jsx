@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { useEffect } from 'react'
 import Stage from './scene/Stage.jsx'
 import Overlay from './ui/Overlay.jsx'
-import { dispatch, store, useStore } from './state/store.js'
+import { store, useStore } from './state/store.js'
 import { takeFriendFromHash } from './state/shelf.js'
 import { audio } from './audio/engine.js'
 
@@ -11,11 +11,6 @@ const DEBUG = typeof location !== 'undefined' && /[?&]debug=1/.test(location.sea
 
 export default function App() {
   const run = useStore((s) => s.run)
-  useEffect(() => {
-    // until the fukusa veil lands, the bowl is simply there
-    const t = setTimeout(() => dispatch({ type: 'UNVEIL' }), 400)
-    return () => clearTimeout(t)
-  }, [run])
   useEffect(() => {
     // a #bowl= link from a friend lands on this shelf
     const got = takeFriendFromHash()

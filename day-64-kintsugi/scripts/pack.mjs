@@ -23,7 +23,6 @@ const OUT = join(DAY, 'public', 'models')
 const JOBS = [
   ['bowl_raw.glb', 'bowl.glb', 1400],
   ['tray_tools_raw.glb', 'tray_tools.glb', 1600],
-  ['fukusa_raw.glb', 'fukusa.glb', 450],
 ]
 
 async function exists(p) {

@@ -142,3 +142,18 @@
   opacity: 1;
   border-color: var(--gold);
 }
+
+/* the loupe: a round lens vignette while the macro view is up */
+.overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 52%, rgba(12, 8, 6, 0.78) 74%);
+  transition: opacity 220ms var(--ease-out);
+}
+
+[data-loupe] .overlay::after {
+  opacity: 1;
+}

@@ -13,6 +13,8 @@ import Breakage from './Breakage.jsx'
 import FitLayer from './FitLayer.jsx'
 import CraftLayer from './Craft.jsx'
 import Shelf from './Shelf.jsx'
+import Veil from './Veil.jsx'
+import { store } from '../state/store.js'
 import Listener from './Listener.jsx'
 import { rt } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
@@ -60,6 +62,15 @@ function Lights() {
   )
 }
 
+// Mounted inside the Suspense boundary: everything heavy has arrived.
+function Loaded() {
+  useEffect(() => {
+    store.set({ loaded: true })
+    return () => store.set({ loaded: false })
+  }, [])
+  return null
+}
+
 function CameraBinder() {
   const camera = useThree((s) => s.camera)
   useEffect(() => {
@@ -77,7 +88,11 @@ export default function Stage() {
       {DEBUG ? <DebugHandle /> : null}
       <CameraRig />
       <Listener />
+      {/* the veil and a soft pre-light render before any asset arrives */}
+      <Veil />
+      <directionalLight position={[-0.5, 0.8, 0.5]} intensity={1.1} color="#ffd2a6" />
       <Suspense fallback={null}>
+        <Loaded />
         <Environment
           files={ASSETS.hdri}
           environmentIntensity={0.55}

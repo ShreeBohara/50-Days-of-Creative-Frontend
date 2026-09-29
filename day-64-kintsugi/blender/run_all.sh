@@ -10,5 +10,4 @@ run() { "$BLENDER_BIN" -b --factory-startup -P "blender/$1" -- ${2:-} | grep -E 
 run build_bowl.py
 run build_fracture.py
 run build_tray_tools.py
-[ -f blender/build_fukusa.py ] && run build_fukusa.py
 node scripts/pack.mjs
