@@ -1,11 +1,20 @@
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useEffect } from 'react'
 import Stage from './scene/Stage.jsx'
+import Overlay from './ui/Overlay.jsx'
+import { dispatch } from './state/store.js'
 
 const DEBUG = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search)
 
 export default function App() {
+  useEffect(() => {
+    // until the fukusa veil lands, the bowl is simply there
+    const t = setTimeout(() => dispatch({ type: 'UNVEIL' }), 400)
+    return () => clearTimeout(t)
+  }, [])
   return (
+    <>
     <Canvas
       className="stage"
       shadows={{ type: THREE.PCFSoftShadowMap }}
@@ -18,5 +27,7 @@ export default function App() {
     >
       <Stage />
     </Canvas>
+    <Overlay />
+    </>
   )
 }

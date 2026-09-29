@@ -5,6 +5,10 @@ import * as THREE from 'three'
 // Where the bowl rests on the tray (Blender's slot_bowl, in three.js axes).
 export const BOWL_SLOT = [-0.012, 0, -0.004]
 
+// Hull colliders are solid, the bowl is a 5 mm shell: this density gives the
+// intact bowl's hull its real ~0.32 kg (shards scale the same way).
+export const CERAMIC_DENSITY = 420
+
 // meshopt ships KHR_mesh_quantization: positions/normals/uvs arrive as
 // normalised int16/int8 with the scale folded into the node transform. Physics
 // (Rapier hulls read the raw array) and applyMatrix4 (clamps to [-1, 1]) both

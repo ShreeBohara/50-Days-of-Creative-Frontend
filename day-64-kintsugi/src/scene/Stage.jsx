@@ -9,6 +9,7 @@ import Effects from './Effects.jsx'
 import PhysicsClock from './PhysicsClock.jsx'
 import Tray from './Tray.jsx'
 import Bowl from './Bowl.jsx'
+import Listener from './Listener.jsx'
 import { rt } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
 
@@ -71,6 +72,7 @@ export default function Stage() {
       <CameraBinder />
       {DEBUG ? <DebugHandle /> : null}
       <CameraRig />
+      <Listener />
       <Suspense fallback={null}>
         <Environment
           files={ASSETS.hdri}

@@ -4,9 +4,10 @@ import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { ASSETS } from './assets.js'
 import { rt } from '../state/store.js'
 
-// The hinoki tray + tools from Blender. Physics sees the tray as a flat slab
-// (top at y = 0; the 1.5 mm dish is below perception) with a low wall on each
-// side where the rolled rim is.
+// The hinoki tray + tools from Blender. Physics sees the tray as a deep slab
+// (top at y ≈ 0; the 1.5 mm dish is below perception) with a low wall on each
+// side where the rolled rim is. The slab is 40 cm thick on purpose: a shard
+// spawned slightly inside it must always be pushed UP, never out the bottom.
 const W = 0.42
 const D = 0.3
 const RIM = 0.012
@@ -38,8 +39,8 @@ export default function Tray() {
   return (
     <>
       <primitive object={gltf.scene} />
-      <RigidBody type="fixed" colliders={false} friction={0.7} restitution={0.12}>
-        <CuboidCollider args={[W / 2, 0.01, D / 2]} position={[0, -0.01 - 0.0012, 0]} />
+      <RigidBody name="tray" type="fixed" colliders={false} friction={0.7} restitution={0.12}>
+        <CuboidCollider args={[W / 2 + 0.2, 0.2, D / 2 + 0.2]} position={[0, -0.2 - 0.0012, 0]} />
         <CuboidCollider args={[WALL / 2, RIM, D / 2]} position={[W / 2 - WALL / 2, 0, 0]} />
         <CuboidCollider args={[WALL / 2, RIM, D / 2]} position={[-W / 2 + WALL / 2, 0, 0]} />
         <CuboidCollider args={[W / 2, RIM, WALL / 2]} position={[0, 0, D / 2 - WALL / 2]} />
