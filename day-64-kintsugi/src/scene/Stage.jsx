@@ -10,6 +10,7 @@ import PhysicsClock from './PhysicsClock.jsx'
 import Tray from './Tray.jsx'
 import Bowl from './Bowl.jsx'
 import Breakage from './Breakage.jsx'
+import FitLayer from './FitLayer.jsx'
 import Listener from './Listener.jsx'
 import { rt } from '../state/store.js'
 import DebugHandle from './DebugHandle.jsx'
@@ -86,6 +87,7 @@ export default function Stage() {
           <Tray />
           <Bowl />
           <Breakage />
+          <FitLayer />
         </Physics>
         <ContactShadows
           position={[0, 0.0004, 0]}

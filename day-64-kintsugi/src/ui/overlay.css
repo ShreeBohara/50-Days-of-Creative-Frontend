@@ -26,6 +26,12 @@
   animation: word-in 900ms var(--ease-out) both;
 }
 
+.stage-word__button {
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
 .stage-word__rule {
   display: block;
   width: 72px;
@@ -34,7 +40,13 @@
   transition: opacity 600ms var(--ease-out);
 }
 
-.stage-word[data-empty] .stage-word__rule {
+.stage-word[data-empty] .stage-word__button {
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.stage-word__rule {
   opacity: 0;
 }
 

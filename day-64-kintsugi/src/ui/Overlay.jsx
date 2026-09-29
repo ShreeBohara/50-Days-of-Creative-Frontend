@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { STAGE_WORD } from '../logic/stateMachine.js'
 import { audio } from '../audio/engine.js'
-import { useStore } from '../state/store.js'
+import { rt, useStore } from '../state/store.js'
 import './overlay.css'
 
 // The only chrome: one word at a time, one hairline, a sound toggle, and a
@@ -22,9 +22,15 @@ export default function Overlay() {
   return (
     <div className="overlay" aria-hidden={false}>
       <div className="stage-word" data-empty={word ? undefined : ''}>
-        <span key={word} className="stage-word__text">
-          {word}
-        </span>
+        {phase === 'fitting' && hint ? (
+          <button key={word} type="button" className="stage-word__text stage-word__button" onClick={() => rt.fit?.autoFitNext()}>
+            {word}
+          </button>
+        ) : (
+          <span key={word} className="stage-word__text">
+            {word}
+          </span>
+        )}
         <span className="stage-word__rule" style={{ '--p': craft ? progress : 1 }} />
         {hint ? <span className="stage-word__hint">{hint}</span> : null}
       </div>

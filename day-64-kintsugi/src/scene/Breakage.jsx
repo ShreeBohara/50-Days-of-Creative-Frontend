@@ -201,7 +201,19 @@ export default function Breakage() {
           ccd
           userData={{ shardId: it.id }}
         >
-          <mesh geometry={it.geometry} material={materials} castShadow receiveShadow userData={{ shardId: it.id }} />
+          <mesh
+            geometry={it.geometry}
+            material={materials}
+            castShadow
+            receiveShadow
+            userData={{ shardId: it.id }}
+            onPointerDown={(e) => {
+              e.nativeEvent.__kintsugiHit = true
+              rt.fit?.onShardDown(e, it.id)
+            }}
+            onPointerOver={() => rt.fit?.hover(it.id, true)}
+            onPointerOut={() => rt.fit?.hover(it.id, false)}
+          />
         </RigidBody>
       ))}
     </group>

@@ -10,7 +10,7 @@ import { rt, store } from '../state/store.js'
 const VIEWS = {
   table: { target: [0, 0.04, 0.0], polar: 58, dist: 0.5, yaw: 0 },
   broken: { target: [0, 0.02, 0.0], polar: 50, dist: 0.62, yaw: 0 },
-  work: { target: [0, 0.075, 0.0], polar: 62, dist: 0.42, yaw: 0 },
+  work: { target: [-0.012, 0.045, -0.004], polar: 56, dist: 0.5, yaw: 0 },
   keep: { target: [0, 0.045, 0.0], polar: 66, dist: 0.46, yaw: 0 },
 }
 
