@@ -36,7 +36,7 @@ export default function CameraRig() {
     // keep ~0.40 m of tray visible horizontally in portrait
     const fitDist = aspect < 1 ? v.dist * Math.min(1.9, 0.92 / aspect) : v.dist
     const polar = THREE.MathUtils.degToRad(aspect < 1 ? v.polar - 8 : v.polar)
-    const drift = Math.sin(state.clock.elapsedTime * 0.1) * 0.012 // the slow museum drift
+    const drift = rt.reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.1) * 0.012 // the slow museum drift
     const yaw = v.yaw + drift
     const flip = rt.fit?.flip ?? 0 // a flipped bowl is lifted: follow it up
     tmp.pos.set(

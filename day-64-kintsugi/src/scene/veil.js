@@ -167,7 +167,7 @@ export class VeilCtl {
 
   /** Pull the corner nearest the camera's right up and away. */
   reveal() {
-    if (this.auto || this.leaving) return
+    if (this.auto || !this.ready()) return
     audio.unlock()
     const c = this.cloth
     let k = 0
@@ -196,14 +196,18 @@ export class VeilCtl {
       }
     }
     if (this.auto) {
+      // draw the corner up and away, and keep hold until the mouth is clear
       const a = this.auto
       a.t += dt
       const t = Math.min(1, a.t / 1.1)
       const e = t * t * (3 - 2 * t)
       const [x, y, z] = a.from
-      c.grab(a.k, [x + e * 0.34, y + Math.sin(Math.PI * Math.min(1, t * 1.2)) * 0.12 + e * 0.05, z + e * 0.05])
+      c.grab(a.k, [x + e * 0.42, y + Math.sin(Math.PI * Math.min(1, t * 1.2)) * 0.12 + e * 0.06, z + e * 0.08])
       this.rustle()
-      if (t >= 1) c.release()
+      if ((t >= 1 && c.coverage() < 0.12) || a.t > 3) {
+        c.release()
+        this.auto = null
+      }
     }
     const sub = 2
     const h = Math.min(dt, 1 / 30) / sub

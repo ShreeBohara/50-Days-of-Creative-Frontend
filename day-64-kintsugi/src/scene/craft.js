@@ -215,6 +215,49 @@ export class Craft {
     }, 500)
   }
 
+  // --------------------------------------------------------------- keyboard
+
+  /**
+   * Space held with a tool in hand: apply it without a pointer. The brush
+   * runs along the first unfinished seam, the jar pours as the bowl turns,
+   * the agate polishes seam by seam.
+   */
+  keyApply(dt) {
+    if (!this.tool || this.done || !this.state) return false
+    const st = this.state
+    if (this.tool === 'jar') {
+      if (rt.fit) rt.fit.yawTarget += SIFT_SPIN * dt
+      if (this.pourAz != null) this.gildBand(this.pourAz - (rt.fit?.yaw ?? 0), dt)
+      this.spawnDust(dt)
+      audio.goldSift(0.6)
+    } else {
+      const i = this.seams.findIndex((s, k) =>
+        this.tool === 'brush' ? st[k * 4] > 0 || st[k * 4 + 1] < s.length : st[k * 4 + 3] < 1,
+      )
+      if (i < 0) return false
+      const s = this.seams[i]
+      if (this.tool === 'brush') {
+        if (st[i * 4 + 1] <= st[i * 4]) st[i * 4 + 1] = st[i * 4] = s.length / 2
+        const grow = dt * 0.09
+        st[i * 4] = Math.max(0, st[i * 4] - grow)
+        st[i * 4 + 1] = Math.min(s.length, st[i * 4 + 1] + grow)
+        audio.brushUpdate(0.5)
+      } else {
+        st[i * 4 + 3] = Math.min(1, st[i * 4 + 3] + dt * 2.2)
+        audio.burnishUpdate(0.6)
+      }
+      // keep the seam being worked turned toward the viewer
+      const mid = Math.floor(s.n / 2)
+      if (rt.fit) {
+        const az = Math.atan2(s.pos[mid * 3], s.pos[mid * 3 + 2])
+        const y = rt.fit.yaw
+        rt.fit.yawTarget = y + Math.atan2(Math.sin(-az - y), Math.cos(-az - y))
+      }
+    }
+    this.tex.needsUpdate = true
+    return true
+  }
+
   // ------------------------------------------------------------------ frame
 
   projectSeams() {

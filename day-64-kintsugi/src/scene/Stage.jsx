@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Environment, useTexture } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
@@ -22,7 +22,17 @@ import DebugHandle from './DebugHandle.jsx'
 const DEBUG = typeof location !== 'undefined' && /[?&]debug=1/.test(location.search)
 
 // 2700 K dusk key light through a shoji lattice — the only shadow caster.
-function KeyLight() {
+// The display light follows the visitor's clock: cool morning, neutral noon,
+// the 2700 K dusk this piece was lit for, a dim lamp-warm night.
+function keyForHour(h) {
+  if (h >= 6 && h < 11) return { color: '#ffd6ad', intensity: 13 }
+  if (h >= 11 && h < 16) return { color: '#ffe6c9', intensity: 13.5 }
+  if (h >= 16 && h < 21) return { color: '#ffc58a', intensity: 14 }
+  return { color: '#ffb06a', intensity: 11 }
+}
+
+function KeyLight({ tier }) {
+  const [key] = useState(() => keyForHour(new Date().getHours()))
   const gobo = useTexture(ASSETS.gobo, (t) => {
     t.colorSpace = THREE.SRGBColorSpace
   })
@@ -34,14 +44,14 @@ function KeyLight() {
         target={target}
         map={gobo}
         position={[-0.5, 0.82, 0.52]}
-        color="#ffc58a"
-        intensity={14}
+        color={key.color}
+        intensity={key.intensity}
         distance={0}
         decay={2}
         angle={0.3}
         penumbra={0.65}
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={tier === 'C' ? [1024, 1024] : [2048, 2048]}
         shadow-bias={-0.00035}
         shadow-normalBias={0.0015}
         shadow-camera-near={0.3}
@@ -51,10 +61,10 @@ function KeyLight() {
   )
 }
 
-function Lights() {
+function Lights({ tier }) {
   return (
     <>
-      <KeyLight />
+      <KeyLight tier={tier} />
       {/* cool rim from the right so the glaze separates from the umber */}
       <directionalLight position={[0.8, 0.35, -0.5]} intensity={0.35} color="#9fb6d9" />
       <hemisphereLight args={['#f1e7d3', '#1f1712', 0.18]} />
@@ -79,7 +89,7 @@ function CameraBinder() {
   return null
 }
 
-export default function Stage() {
+export default function Stage({ tier = 'A' }) {
   return (
     <>
       <color attach="background" args={['#1f1712']} />
@@ -98,7 +108,7 @@ export default function Stage() {
           environmentIntensity={0.55}
           environmentRotation={[0, 0.9, 0]}
         />
-        <Lights />
+        <Lights tier={tier} />
         <Physics paused timeStep="vary" gravity={[0, -9.81, 0]}>
           <PhysicsClock />
           <Tray />
@@ -109,7 +119,7 @@ export default function Stage() {
         </Physics>
         <Shelf />
       </Suspense>
-      <Effects />
+      <Effects tier={tier} />
     </>
   )
 }

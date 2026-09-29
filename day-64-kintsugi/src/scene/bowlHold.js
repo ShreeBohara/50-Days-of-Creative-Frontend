@@ -43,6 +43,7 @@ export class BowlHold {
     this._move = (ev) => this.onMove(ev)
     this._up = (ev) => this.onUp(ev)
     this._wheel = (ev) => this.onWheel(ev)
+    this._down2 = (ev) => this.onSecondDown(ev)
   }
 
   bind({ body, mesh, rapier, camera, canvas }) {
@@ -87,10 +88,28 @@ export class BowlHold {
     window.addEventListener('pointerup', this._up)
     window.addEventListener('pointercancel', this._up)
     window.addEventListener('wheel', this._wheel, { passive: false })
+    window.addEventListener('pointerdown', this._down2)
+  }
+
+  /** A second finger while holding twists the bowl (angle between the two). */
+  onSecondDown(ev) {
+    const h = this.h
+    if (!h || ev.pointerId === h.id || ev.pointerType !== 'touch') return
+    h.second = { id: ev.pointerId, x: ev.clientX, y: ev.clientY }
+    h.twistAngle = Math.atan2(ev.clientY - h.y, ev.clientX - h.x)
   }
 
   onMove(ev) {
     const h = this.h
+    if (h?.second && ev.pointerId === h.second.id) {
+      h.second.x = ev.clientX
+      h.second.y = ev.clientY
+      const a = Math.atan2(h.second.y - h.y, h.second.x - h.x)
+      const d = Math.atan2(Math.sin(a - h.twistAngle), Math.cos(a - h.twistAngle))
+      h.twistAngle = a
+      if (h.mode === 'lift') h.yaw -= d
+      return
+    }
     if (!h || ev.pointerId !== h.id) return
     h.x = ev.clientX
     h.y = ev.clientY
@@ -105,11 +124,16 @@ export class BowlHold {
 
   onUp(ev) {
     const h = this.h
+    if (h?.second && ev.pointerId === h.second.id) {
+      h.second = null
+      return
+    }
     if (!h || ev.pointerId !== h.id) return
     window.removeEventListener('pointermove', this._move)
     window.removeEventListener('pointerup', this._up)
     window.removeEventListener('pointercancel', this._up)
     window.removeEventListener('wheel', this._wheel)
+    window.removeEventListener('pointerdown', this._down2)
     if (h.mode === 'pending') {
       const height01 = THREE.MathUtils.clamp(h.hitLocal.y / BOWL_HEIGHT, 0, 1)
       audio.ring({ height01, mended: false, position: h.hitWorld.toArray() })
@@ -118,6 +142,46 @@ export class BowlHold {
       this.release()
     }
     this.h = null
+  }
+
+  /** Keyboard: lift the bowl in place (Space / Enter). */
+  keyLift() {
+    if (store.get().phase !== 'intact' || this.h || !this.body) return false
+    audio.unlock()
+    const t = this.body.translation()
+    this.h = { mode: 'pending', id: 'keys', keys: true, x: 0, y: 0, x0: 0, y0: 0, t0: performance.now() }
+    this.startLift()
+    this.h.keyTarget = new THREE.Vector3(t.x, t.y + 0.1, t.z)
+    return true
+  }
+
+  /** Keyboard: nudge the held bowl (metres). */
+  keyMove(dx, dy, dz) {
+    const h = this.h
+    if (!h?.keys || h.mode !== 'lift') return
+    h.keyTarget.x = THREE.MathUtils.clamp(h.keyTarget.x + dx, -TRAY_X, TRAY_X)
+    h.keyTarget.y = THREE.MathUtils.clamp(h.keyTarget.y + dy, 0.001, MAX_LIFT)
+    h.keyTarget.z = THREE.MathUtils.clamp(h.keyTarget.z + dz, -TRAY_Z, TRAY_Z)
+  }
+
+  keyTwist(d) {
+    if (this.h?.mode === 'lift') this.h.yaw += d
+  }
+
+  /** Keyboard: let go where it is (it falls — low is a set-down, high breaks). */
+  keyRelease() {
+    if (!this.h?.keys || this.h.mode !== 'lift') return false
+    this.release()
+    this.h = null
+    return true
+  }
+
+  /** Keyboard: flick the rim (T) — rings it without lifting. */
+  keyRing() {
+    if (store.get().phase !== 'intact' || !this.body) return
+    audio.unlock()
+    const t = this.body.translation()
+    audio.ring({ height01: 0.95, mended: false, position: [t.x, t.y + 0.08, t.z] })
   }
 
   startLift() {
@@ -136,8 +200,8 @@ export class BowlHold {
     h.tilt = new THREE.Vector2()
     h.plane = facingPlane(this.camera, h.pos)
     const p0 = new THREE.Vector3()
-    pointOnPlane(h.x, h.y, this.camera, this.canvas, h.plane, p0)
-    h.offset = h.pos.clone().sub(p0)
+    if (!h.keys && pointOnPlane(h.x, h.y, this.camera, this.canvas, h.plane, p0)) h.offset = h.pos.clone().sub(p0)
+    else h.offset = new THREE.Vector3()
     h.offset.y += LIFT_ON_GRAB
     h.history = []
     rt.held = h
@@ -165,6 +229,7 @@ export class BowlHold {
     b.setAngvel({ x: v.z * 2.2, y: 0, z: -v.x * 2.2 }, true)
     rt.held = null
     dispatch({ type: 'SET_DOWN' })
+    store.set({ hint: null })
     this.canvas.style.cursor = ''
   }
 
@@ -176,8 +241,11 @@ export class BowlHold {
     if (h.mode === 'pending' && performance.now() - h.t0 > TAP_MAX_MS) this.startLift()
     if (h.mode !== 'lift') return
     const target = _v
-    if (!pointOnPlane(h.x, h.y, this.camera, this.canvas, h.plane, target)) return
-    target.add(h.offset)
+    if (h.keys) target.copy(h.keyTarget)
+    else {
+      if (!pointOnPlane(h.x, h.y, this.camera, this.canvas, h.plane, target)) return
+      target.add(h.offset)
+    }
     target.x = THREE.MathUtils.clamp(target.x, -TRAY_X, TRAY_X)
     target.z = THREE.MathUtils.clamp(target.z, -TRAY_Z, TRAY_Z)
     target.y = THREE.MathUtils.clamp(target.y, 0.001, MAX_LIFT)
@@ -198,6 +266,12 @@ export class BowlHold {
     h.history.push({ t: performance.now(), p: h.pos.clone() })
     if (h.history.length > 24) h.history.shift()
     h.height = h.pos.y
+    // how high it is, in whole centimetres — severity is learnable, not metered
+    const cm = Math.round(h.pos.y * 100)
+    if (cm !== h.cm) {
+      h.cm = cm
+      store.set({ hint: cm >= 2 ? `${cm} cm` : null })
+    }
   }
 
   onCollision(other) {

@@ -46,7 +46,8 @@ function MiniBowl({ entry, index, geometry, material }) {
   }, [d])
 
   if (!d) return null
-  const x = -0.172 + index * 0.055 // left to right, clear of the gold jar
+  // left to right, clear of the gold jar; tighter on portrait screens
+  const x = rt.portrait ? -0.105 + index * 0.042 : -0.172 + index * 0.055
   const yaw = index * 1.9 + 0.4
   const label = `${d.friend ? 'a bowl from a friend' : 'your bowl'} · ${formatColophon({
     pieces: d.pieces,

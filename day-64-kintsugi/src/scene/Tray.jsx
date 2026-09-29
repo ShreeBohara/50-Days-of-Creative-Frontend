@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { ASSETS } from './assets.js'
+import * as THREE from 'three'
 import { rt } from '../state/store.js'
 
 // The hinoki tray + tools from Blender. Physics sees the tray as a deep slab
@@ -12,6 +13,13 @@ const W = 0.42
 const D = 0.3
 const RIM = 0.012
 const WALL = 0.012
+
+// metres to slide each tool toward the bowl on portrait screens
+const PORTRAIT_SHIFT = {
+  brush: [-0.075, 0, -0.012],
+  burnisher: [0.1, 0, 0.005],
+  jar: [-0.065, 0, -0.015],
+}
 
 function toolOf(o) {
   for (let n = o; n; n = n.parent) {
@@ -41,6 +49,27 @@ export default function Tray() {
       brushTip: gltf.scene.getObjectByName('brush_tip'),
       burnisherTip: gltf.scene.getObjectByName('burnisher_tip'),
     }
+    // Portrait screens only see the middle of the tray, so the tools move in
+    // close around the bowl (the brush and agate in front, the jar beside it).
+    const home = {}
+    for (const k of ['brush', 'jar', 'burnisher']) {
+      const o = rt.tools[k]
+      if (o) home[k] = { p: o.position.clone(), q: o.quaternion.clone() }
+    }
+    const layout = () => {
+      const portrait = innerWidth / Math.max(1, innerHeight) < 0.8
+      rt.portrait = portrait
+      for (const k of Object.keys(home)) {
+        const o = rt.tools[k]
+        if (rt.craft?.tool === k) continue // in hand: leave it
+        o.position.copy(home[k].p)
+        o.quaternion.copy(home[k].q)
+        if (portrait) o.position.add(new THREE.Vector3(...PORTRAIT_SHIFT[k]))
+      }
+    }
+    layout()
+    window.addEventListener('resize', layout)
+    return () => window.removeEventListener('resize', layout)
   }, [gltf])
 
   return (

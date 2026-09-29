@@ -295,7 +295,11 @@ export class Fitting {
     store.set({ placed: n })
     if (id !== this.anchorId) {
       audio.snap({ position: this.homeWorld(id).toArray() })
-      navigator.vibrate?.(8)
+      try {
+        navigator.vibrate?.(8)
+      } catch {
+        // no haptics here
+      }
       announce(`Piece ${n} of ${total} placed.`)
     }
     if (n === total) {

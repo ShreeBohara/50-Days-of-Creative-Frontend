@@ -65,6 +65,11 @@ export default function Breakage() {
       if (!dispatch({ type: 'IMPACT', severity: info.severity })) return
       rt.clock.scale = 0 // the instant of impact, held
       audio.crack({ position: info.impactWorld.toArray(), severity: info.severity })
+      try {
+        navigator.vibrate?.(20)
+      } catch {
+        // no haptics here
+      }
       const zone = zoneFromLocalPoint(info.impactLocal.toArray())
       const id = variantId(zone, info.severity)
       store.set({ variant: id })
@@ -97,7 +102,7 @@ export default function Breakage() {
     const r = race.current
     if (r) {
       r.t += dt
-      const k = Math.min(1, r.t / RACE_SECONDS)
+      const k = Math.min(1, r.t / (rt.reduced ? 0.15 : RACE_SECONDS))
       const eased = 1 - Math.pow(1 - k, 2.2) // fast out of the impact, slowing at the tips
       r.mat.userData.uniforms.uFront.value = eased * r.max
       if (k >= 1) {
@@ -151,7 +156,7 @@ export default function Breakage() {
       dir.y = Math.max(dir.y, 0) * 0.4 + 0.35
       dir.normalize()
       const near = Math.exp(-d / 0.05) // pieces at the impact fly furthest
-      const kick = (0.18 + 0.55 * near) * speed * (fling ? 0.55 : 0.32) * (it.anchor ? 0.25 : 1)
+      const kick = (0.18 + 0.55 * near) * speed * (fling ? 0.55 : 0.32) * (it.anchor ? 0.25 : 1) * (rt.reduced ? 0.4 : 1)
       body.setLinvel(
         {
           x: info.velocity.x * 0.12 + dir.x * kick,

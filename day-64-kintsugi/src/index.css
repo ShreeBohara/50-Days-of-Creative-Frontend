@@ -84,6 +84,43 @@ button {
   border: 0;
 }
 
+.stage-wrap {
+  position: fixed;
+  inset: 0;
+}
+
+/* the canvas owns every gesture: no scroll, pinch-zoom or double-tap zoom */
+.stage,
+.stage canvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* a skip-link style hint that only appears for keyboard users */
+.keys-hint {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 5;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  background: rgba(31, 23, 18, 0.88);
+  padding: 8px 10px;
+  border: 1px solid var(--hairline);
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 200ms var(--ease-out);
+  max-width: calc(100vw - 32px);
+}
+
+.keys-hint:focus-visible {
+  transform: none;
+}
+
 /* ---------- Tier D: no WebGL2 → the static page is the experience ---------- */
 
 .fallback {
