@@ -1,0 +1,83 @@
+:root {
+  --mat: #16211d;
+  --paper: #f4eee1;
+  --card: #fbf8f1;
+  --ink: #2a2826;
+  --pink: #ff48b0;
+  --federal: #3d5588;
+  --yellow: #ffe800;
+  --display: 'Caprasimo', Georgia, serif;
+  --serif: 'Newsreader Variable', Georgia, serif;
+  --mono: 'Fragment Mono', ui-monospace, monospace;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--mat);
+  color: var(--paper);
+  font-family: var(--serif);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: fixed !important;
+  inset: 0;
+  touch-action: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 3px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- no-WebGL fallback (index.html) ---- */
+.fallback {
+  display: none;
+}
+.no-webgl .fallback {
+  display: block;
+  height: 100%;
+  overflow: auto;
+  padding: 8vh 6vw;
+  background: var(--paper);
+  color: var(--ink);
+}
+.no-webgl #root {
+  display: none;
+}
+.fallback h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  color: var(--pink);
+  font-size: clamp(42px, 8vw, 88px);
+  margin: 0 0 0.2em;
+}
+.fallback p {
+  max-width: 60ch;
+  font-size: 19px;
+  line-height: 1.5;
+}

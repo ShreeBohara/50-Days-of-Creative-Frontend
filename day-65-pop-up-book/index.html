@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Day 65 of Creative Frontend: SIXTY-FIVE — a riso-printed WebGL pop-up book of the whole series, with paper mechanisms you can turn, pull, spin and lift."
+    />
+    <meta name="theme-color" content="#16211d" />
+    <meta property="og:title" content="Sixty-Five · Day 65" />
+    <meta property="og:description" content="A pop-up book of sixty-five days of creative frontend, printed in riso and cut to fold." />
+    <meta property="og:image" content="https://shreebohara.github.io/50-Days-of-Creative-Frontend/day-65-pop-up-book/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Sixty-Five · Day 65</title>
+    <script>
+      // Gate decided before React loads: no WebGL2 (or ?nowebgl=1) means the
+      // static fallback below is the whole experience.
+      ;(function () {
+        var forced = /[?&]nowebgl=1/.test(location.search)
+        var ok = false
+        if (!forced) {
+          try {
+            var c = document.createElement('canvas')
+            ok = !!(window.WebGL2RenderingContext && c.getContext('webgl2'))
+          } catch (e) {
+            ok = false
+          }
+        }
+        if (!ok) document.documentElement.classList.add('no-webgl')
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <main class="fallback" aria-labelledby="fallback-title">
+      <h1 id="fallback-title">Sixty-Five</h1>
+      <p>
+        A pop-up book of sixty-five days of creative frontend: nine chapters of paper, printed in riso and cut to
+        fold, with tabs to pull, wheels to spin and flaps to lift. It needs WebGL2, which this browser didn&rsquo;t
+        provide.
+      </p>
+      <p><a href="../">Browse all sixty-four days in the gallery instead &rarr;</a></p>
+    </main>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

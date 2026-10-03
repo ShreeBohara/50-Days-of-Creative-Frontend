@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-ssr
+*.local
+*.log
+.DS_Store
+
+# spread previews rendered by scripts/preview-spread.mjs (never shipped)
+_previews/
