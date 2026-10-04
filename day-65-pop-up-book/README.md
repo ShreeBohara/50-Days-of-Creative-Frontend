@@ -30,15 +30,19 @@ Every printed surface (pages, both sides of every card, the cover) is painted as
 - each ink lands slightly off register;
 - inks overprint by multiplying, so pink over yellow prints orange.
 
-Die-cut outlines are traced from drawings (type, shapes) with marching squares and Ramer–Douglas–Peucker (`src/art/trace.js`). Printing runs in a pool of two Web Workers (the whole book prints in about 4 s). The press prints thumbnails of the whole book first, keeps them for good, holds full prints only for the spreads near the reader, and uploads at most one texture per frame, never while paper is moving. Every shader program the book needs is compiled before the cover can be lifted, and the canvas renders only while something changes.
+Die-cut outlines are traced from drawings (type, shapes) with marching squares and Ramer–Douglas–Peucker (`src/art/trace.js`). Printing runs in a pool of two Web Workers (the whole book prints in about 4 s). The press prints the opening spread and the first chapter at full resolution, then thumbnails of the whole book, which it keeps for good; full prints are held only for the spreads near the reader. New prints upload at most one per frame, never while paper is moving, and their source bitmaps are released once the GPU has them. Every shader program the book needs is compiled while the book is still shut, and the canvas renders only while something changes.
+
+The code arrives in parallel chunks (three.js, the renderer stack, the printed spreads, the app), downloaded while the fonts load. Without WebGL2, the page shows the book's contents instead: every chapter and every day, linked to its live demo, without downloading three.js or React (without JavaScript, a short notice and a link to the gallery).
 
 ## Things to find
 
 - **X-ray** (button or X): the paper engineer's view. Every fold is drawn live on the moving paper: valleys blue, mountains pink, glue green, hinges yellow. **Download die-cut sheet** prints the spread's pieces flat at true size with their folds and glue tabs, so you can build it from real card.
-- **Contents**: jump to any chapter or day (the book riffles to it).
+- **Contents**: jump to any chapter or day (the book riffles to it; with reduced motion it simply arrives).
+- **Links**: the address follows the open spread (`#sky`, `#craft`, …), and `#day-18` opens day 18's chapter with its bookplate. A returning reader is offered their bookmark ribbon.
 - **Bookplates**: tap any printed day in a chapter's index, or a piece that depicts a day.
 - **Try**: every spread's tabs, wheels and flaps are also listed as buttons, so a keyboard or a curious reader can work them without hunting.
-- **Day 66**: draw on the blank card. It stays in your browser.
+- **Day 66**: draw on the blank card. It stays in your browser, and **save my page** keeps it as a framed PNG.
+- **Keys**: ← → turn, 1–9 open chapters I–IX, 0 the contents, X the x-ray, `?` lists them all.
 - All sound is synthesized with Web Audio: page lift and whoosh, landing, pops, flaps, the wheel's detents, pull-tab friction, pencil on card, and a record that plays when you spin it.
 
 ## Run it
@@ -46,12 +50,12 @@ Die-cut outlines are traced from drawings (type, shapes) with marching squares a
 ```bash
 npm install
 npm run dev                                    # http://localhost:5173/50-Days-of-Creative-Frontend/day-65-pop-up-book/
-npm test                                       # 151 tests: kinematics, validator, every spread, the press, the book model, sound
+npm test                                       # 154 tests: kinematics, validator, every spread, the press, the book model, links, sound
 npm run spread -- sky                          # preview a spread without a browser → _previews/
 npm run lint
 ```
 
-URL flags: `?debug=1` (exposes `window.__d65`, with `pump(n)`, `snap()`, `tour()` and `mechs(k)` for QA in a paused tab), `?perf=1` (frame pacing: `__perf.table()`), `?tier=C` (phone quality), `?nowebgl=1` (the fallback page).
+URL flags: `?debug=1` (exposes `window.__d65`, with `pump(n)`, `snap()`, `tour()` and `mechs(k)` for QA in a paused tab), `?perf=1` (frame pacing: `__perf.table()`), `?tier=C` (phone quality), `?nowebgl=1` (the fallback page). Hash links: `#<spread id>` and `#day-<n>`.
 
 ### Making a spread
 
