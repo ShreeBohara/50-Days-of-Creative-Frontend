@@ -38,7 +38,7 @@ export function printAtlas(spread, px, layout = layoutAtlas(spread)) {
   return sheet
 }
 
-/** The outside of the covers: { front, back, spine } at res px/cm. */
+/** The outside of the boards: { front, back } at res px/cm. */
 export function printCover(cover, res) {
   const box = { x0: 0, y0: 0, w: W + cover.overhang, h: H + cover.overhang * 2 }
   return {

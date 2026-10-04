@@ -51,7 +51,7 @@ function cuttingMat(res = 18) {
     g.lineTo(MAT_W - ox, oy + y)
     g.stroke()
   }
-  // 45° and 60° guides from a corner
+  // 30°, 45° and 60° guides from a corner
   g.strokeStyle = 'rgba(206,232,214,0.22)'
   g.lineWidth = 0.05
   for (const deg of [30, 45, 60]) {

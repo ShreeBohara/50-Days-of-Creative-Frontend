@@ -1,7 +1,8 @@
 // The reader's eye. Frames the shut book on the mat, then the open spread from
 // the tail of the book at a reading angle, with a breath of parallax from the
 // pointer so the paper reads as depth. Background drags orbit (or, on a
-// narrow portrait screen, slide along the spread); the wheel or a pinch zooms.
+// narrow portrait screen, slide along the spread); the wheel (or a trackpad
+// pinch) zooms. The camera also follows window resizes.
 
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
@@ -32,10 +33,7 @@ export default function CameraRig() {
       end() {
         st.drag = null
       },
-      reset() {
-        st.user = { az: 0, el: 0, zoom: 1, pan: 0 }
-      },
-      /** frame a shot (QA, social card): { az, el, zoom, pan } offsets */
+      /** frame a shot (QA via __d65, the social card): { az, el, zoom, pan } offsets */
       set(v) {
         Object.assign(st.user, v)
       },

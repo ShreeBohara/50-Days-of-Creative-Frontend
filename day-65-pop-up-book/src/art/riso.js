@@ -114,6 +114,8 @@ function makeKit(box, res, seed) {
       if (!c) {
         c = makeCanvas(W, H)
         layers.set(name, c)
+        // the layer is read back once when printing: keep it CPU-side
+        c.getContext('2d', { willReadFrequently: true })
       }
       const ctx = c.getContext('2d')
       ctx.save()

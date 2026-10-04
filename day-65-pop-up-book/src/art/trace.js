@@ -21,7 +21,8 @@ export function trace(box, draw, { res = 24, tol = 0.02 } = {}) {
   const W = Math.ceil(box.w * res) + pad * 2
   const H = Math.ceil(box.h * res) + pad * 2
   const c = makeCanvas(W, H)
-  const ctx = c.getContext('2d')
+  // read back once: a CPU-backed canvas skips a GPU readback per trace
+  const ctx = c.getContext('2d', { willReadFrequently: true })
   ctx.setTransform(res, 0, 0, res, pad - box.x0 * res, pad - box.y0 * res)
   ctx.fillStyle = '#000'
   ctx.strokeStyle = '#000'
@@ -52,16 +53,20 @@ export function trace(box, draw, { res = 24, tol = 0.02 } = {}) {
  * Returns closed loops in pixel coordinates (sample centres at integers).
  */
 export function march(v, W, H, iso) {
-  const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? 0 : v[y * W + x])
+  // a zero-padded copy: no bounds checks in the loop (outside the image = 0)
+  const PW = W + 2
+  const PH = H + 2
+  const P = new Float32Array(PW * PH)
+  for (let y = 0; y < H; y++) P.set(v.subarray(y * W, y * W + W), (y + 1) * PW + 1)
+  const at = (x, y) => P[(y + 1) * PW + (x + 1)]
   const lerp = (a, b) => (iso - a) / (b - a || 1e-9)
-  // segments keyed by their start point; each edge midpoint gets a stable key
+  // segments keyed by their start point; each edge midpoint gets a stable
+  // numeric key (edge 0 = top (x,y)-(x+1,y), 1 = left (x,y)-(x,y+1);
+  // bottom/right belong to the neighbouring cells so shared edges share keys)
   const next = new Map()
   const pts = new Map()
-  const key = (x, y, e) => `${x},${y},${e}`
-  // edge ids: 0 = top (x,y)-(x+1,y), 1 = left (x,y)-(x,y+1); bottom/right
-  // belong to the neighbouring cells so shared edges share keys
   const edgePoint = (x, y, e) => {
-    const k = key(x, y, e)
+    const k = ((y + 1) * PW + (x + 1)) * 2 + e
     if (!pts.has(k)) {
       if (e === 0) pts.set(k, [x + lerp(at(x, y), at(x + 1, y)), y])
       else pts.set(k, [x, y + lerp(at(x, y), at(x, y + 1))])
@@ -74,12 +79,18 @@ export function march(v, W, H, iso) {
   const R = (x, y) => edgePoint(x + 1, y, 1)
   const seg = (a, b) => next.set(a, b)
   for (let y = -1; y < H; y++) {
+    const row = (y + 1) * PW
+    // carry the right-hand samples forward as the next cell's left-hand ones
+    let tl = P[row] > iso ? 8 : 0
+    let bl = P[row + PW] > iso ? 1 : 0
     for (let x = -1; x < W; x++) {
-      const tl = at(x, y) > iso ? 8 : 0
-      const tr = at(x + 1, y) > iso ? 4 : 0
-      const br = at(x + 1, y + 1) > iso ? 2 : 0
-      const bl = at(x, y + 1) > iso ? 1 : 0
+      const i = row + x + 2
+      const tr = P[i] > iso ? 4 : 0
+      const br = P[i + PW] > iso ? 2 : 0
       const c = tl | tr | br | bl
+      tl = tr ? 8 : 0
+      bl = br ? 1 : 0
+      if (c === 0 || c === 15) continue
       // oriented so the filled region is on the right of each segment
       switch (c) {
         case 1: seg(L(x, y), B(x, y)); break
@@ -105,7 +116,7 @@ export function march(v, W, H, iso) {
     if (used.has(start)) continue
     const loop = []
     let k = start
-    while (k && !used.has(k)) {
+    while (k != null && !used.has(k)) {
       used.add(k)
       loop.push(pts.get(k))
       k = next.get(k)

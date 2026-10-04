@@ -6,6 +6,7 @@
 // Writes into _previews/:
 //   <id>-3d.png     the spread posed at six opening angles / viewpoints
 //                   (orthographic, printed textures, simple lamp shading)
+//   <id>-mech.png   each reader mechanism worked (if the spread has any)
 //   <id>-sheet.png  both printed pages, then every card's front and back as a
 //                   flat net with its folds (valley dashed, mountain dash-dot)
 //                   and glue lines (hatched)

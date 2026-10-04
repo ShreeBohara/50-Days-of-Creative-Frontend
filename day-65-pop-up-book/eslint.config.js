@@ -23,9 +23,7 @@ export default defineConfig([
       },
     },
     rules: {
-      // R3F JSX uses three.js element names (mesh, icosahedronGeometry, …)
-      // plus prop names like `args` and `attach` that look unknown to the
-      // react-refresh/react rules but are resolved by the fiber reconciler.
+      // HMR only: a warning, not an error, for modules exporting non-components
       'react-refresh/only-export-components': 'warn',
     },
   },

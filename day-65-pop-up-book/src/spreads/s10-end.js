@@ -5,7 +5,6 @@
 // book the way the opening one opened it.
 
 import { H, W } from '../paper/dims.js'
-import { INKS } from '../art/riso.js'
 import { SERIES } from '../data/days.js'
 import { CHAPTERS } from './chapters.js'
 import { BOOK } from './registry.js'
@@ -111,7 +110,6 @@ function colophon(g) {
     ctx.stroke()
   })
   folio(g, 20, 'L', INK.main)
-  void INKS
 }
 
 function daySixtySix(g) {

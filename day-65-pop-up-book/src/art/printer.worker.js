@@ -1,6 +1,7 @@
 // The print shop, off the main thread: page turns never wait on a press run.
-// Messages in: { id, kind: 'pages' | 'atlas' | 'cover', spread, res, px }.
-// Out: { id, ok, bitmaps } with ImageBitmaps transferred, or { id, ok: false }.
+// Messages in: { id, kind: 'pages' | 'atlas' | 'cover' | 'template', spread, res, px }.
+// Out: { id, ok, bitmaps } with ImageBitmaps transferred (a template replies
+// { id, ok, blob } with a PNG), or { id, ok: false, error }.
 
 import capra from '@fontsource/caprasimo/files/caprasimo-latin-400-normal.woff2?url'
 import news from '@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url'

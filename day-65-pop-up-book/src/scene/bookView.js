@@ -3,7 +3,7 @@
 // purpose — a page turn touches a few dozen matrices and nothing in React.
 
 import * as THREE from 'three'
-import { CARD, CLOSED, H, LEAF, W } from '../paper/dims.js'
+import { CLOSED, H, LEAF, W } from '../paper/dims.js'
 import { poseSpread } from '../paper/spread.js'
 import { layoutAtlas, atlasUV } from '../art/atlas.js'
 import { COVER } from '../spreads/cover.js'
@@ -30,9 +30,11 @@ function paperMaterial(map, grain, repeat = 5) {
 }
 
 /**
- * createBookView({ spreads, tier }) → view
+ * createBookView({ spreads, press, gl, tier }) → view
  *   spreads   compiled spreads (index = spread number)
  *   press     the print shop (createPress)
+ *   gl        the renderer, for uploading prints one per frame
+ *   tier      'A' desktop, 'C' phones
  */
 export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
   const S = spreads.length
@@ -46,7 +48,7 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
   const boardEdge = new THREE.MeshStandardMaterial({ color: '#2b3d63', roughness: 0.9, side: THREE.DoubleSide })
 
   // --- page textures per spread: { L, R } materials whose maps get swapped
-  const pages = spreads.map(() => ({ L: paperMaterial(blank, grain), R: paperMaterial(blank, grain), level: 0, job: null }))
+  const pages = spreads.map(() => ({ L: paperMaterial(blank, grain), R: paperMaterial(blank, grain) }))
   const coverMats = { front: paperMaterial(blank, grain, 3), back: paperMaterial(blank, grain, 3) }
 
   // --- leaves: 0 is the front board, 1…S−1 are card leaves; then the back board
@@ -183,7 +185,7 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
       }
     }
     root.add(group)
-    return { spread, layout, mat, group, meshes, level: 0, job: null, pose: null }
+    return { spread, layout, mat, group, meshes, pose: null }
   })
 
   // --- printing: thumbnails of everything first, full prints near the reader
@@ -221,7 +223,12 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
   function drainUploads(busy) {
     if (!uploads.length || busy) return false
     const { mat, tex } = uploads.shift()
-    if (tex.image) gl?.initTexture(tex)
+    if (tex.image) {
+      gl?.initTexture(tex)
+      // the GPU has its copy: the source bitmap would only double the memory
+      // (three uploads again only if the texture's version changes, never here)
+      tex.image.close?.()
+    }
     mat.map = tex
     onLanded?.()
     return uploads.length > 0
@@ -260,15 +267,24 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
         : { kind: 'atlas', spread: e.k, px: level === LEVEL.full ? atlasPx : 256 }
     const job = press.print(spec, e.kind === 'pages' ? priority : priority + 0.5)
     e.jobs[level] = job
+    const free = (texs) => {
+      for (const t of texs) {
+        t.image?.close?.()
+        t.dispose()
+      }
+    }
     job.then(
       (texs) => {
-        delete e.jobs[level]
+        // a job cancelled while already in a worker still lands: it must not
+        // clear a newer job's handle, nor stack a second copy on the GPU
+        if (e.jobs[level] === job) delete e.jobs[level]
+        if (e.tex[level]) {
+          free(texs)
+          return
+        }
         if (level > e.want) {
           // landed after the reader moved away: not worth the memory
-          for (const t of texs) {
-            t.image?.close?.()
-            t.dispose()
-          }
+          free(texs)
           return
         }
         e.tex[level] = texs
@@ -276,7 +292,7 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
       },
       () => {
         // a failed print simply isn't there; a later visit asks again
-        delete e.jobs[level]
+        if (e.jobs[level] === job) delete e.jobs[level]
       },
     )
   }
@@ -286,7 +302,7 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
     for (const e of [entries[k].pages, entries[k].sheet]) {
       if (!e) continue
       e.want = Math.max(e.want, level)
-      request(e, LEVEL.thumb, level === LEVEL.full ? priority : priority)
+      request(e, LEVEL.thumb, priority)
       if (level === LEVEL.full) request(e, LEVEL.full, priority)
     }
   }
@@ -365,7 +381,6 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
     backBoard,
     drawing,
     sheets,
-    pages,
     boot,
     residency,
     update,
@@ -380,11 +395,5 @@ export function createBookView({ spreads, press, gl = null, tier = 'A' }) {
       return uploads.length > 0
     },
     entries,
-    dispose() {
-      root.traverse((o) => {
-        if (o.isMesh) o.geometry.dispose()
-      })
-    },
-    CARD,
   }
 }
