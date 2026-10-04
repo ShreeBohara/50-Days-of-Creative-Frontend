@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-webgl">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -15,8 +15,8 @@
     <meta name="twitter:card" content="summary_large_image" />
     <title>Sixty-Five · Day 65</title>
     <script>
-      // Gate decided before React loads: no WebGL2 (or ?nowebgl=1) means the
-      // static fallback below is the whole experience.
+      // Gate decided before anything loads: no WebGL2 (or ?nowebgl=1) means
+      // the fallback below — the book's contents as a page — is the whole visit.
       ;(function () {
         var forced = /[?&]nowebgl=1/.test(location.search)
         var ok = false
@@ -28,7 +28,9 @@
             ok = false
           }
         }
-        if (!ok) document.documentElement.classList.add('no-webgl')
+        // the fallback shows by default (no JavaScript at all); only a
+        // browser that can draw the book takes it away
+        if (ok) document.documentElement.classList.remove('no-webgl')
       })()
     </script>
   </head>
@@ -36,12 +38,13 @@
     <div id="root"></div>
     <main class="fallback" aria-labelledby="fallback-title">
       <h1 id="fallback-title">Sixty-Five</h1>
-      <p>
+      <p class="fallback__lead">
         A pop-up book of sixty-five days of creative frontend: nine chapters of paper, printed in riso and cut to
-        fold, with tabs to pull, wheels to spin and flaps to lift. It needs WebGL2, which this browser didn&rsquo;t
-        provide.
+        fold, with tabs to pull, wheels to spin and flaps to lift.
+        <span class="fallback__why">It needs JavaScript and WebGL2, which this browser didn&rsquo;t provide.</span>
       </p>
-      <p><a href="../">Browse all sixty-four days in the gallery instead &rarr;</a></p>
+      <p><a href="../">Or browse all sixty-four days in the gallery &rarr;</a></p>
+      <noscript><p><strong>With JavaScript on, this page lists every day of the book.</strong></p></noscript>
     </main>
     <script type="module" src="/src/main.jsx"></script>
   </body>

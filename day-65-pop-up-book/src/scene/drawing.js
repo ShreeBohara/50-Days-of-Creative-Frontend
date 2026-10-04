@@ -138,6 +138,38 @@ export function createDrawing(box) {
       if (strokes.length > 400) strokes = strokes.slice(-400)
       save(strokes)
     },
+    /**
+     * The reader's page as a keepsake: their drawing on cream card, framed
+     * with the book's crop marks and a printed caption. Resolves a PNG Blob.
+     */
+    toBlob() {
+      const pad = 90
+      const foot = 170
+      const out = document.createElement('canvas')
+      out.width = canvas.width + pad * 2
+      out.height = canvas.height + pad + foot
+      const g = out.getContext('2d')
+      g.fillStyle = '#f4eee1'
+      g.fillRect(0, 0, out.width, out.height)
+      g.shadowColor = 'rgba(40,30,20,0.25)'
+      g.shadowBlur = 24
+      g.shadowOffsetY = 8
+      g.drawImage(canvas, pad, pad)
+      g.shadowColor = 'transparent'
+      const top = out.height - foot
+      const width = out.width - pad * 2
+      g.fillStyle = '#3d5588'
+      g.font = '54px "Caprasimo", Georgia, serif'
+      g.fillText('Day 66', pad, top + 70, width)
+      g.font = 'italic 26px "Newsreader Variable", Georgia, serif'
+      g.fillStyle = '#2a2826'
+      const when = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
+      g.fillText(`drawn in Sixty-Five, a pop-up book · ${when}`, pad, top + 108, width)
+      g.font = '17px "Fragment Mono", monospace'
+      g.fillStyle = '#ff48b0'
+      g.fillText('shreebohara.github.io/50-Days-of-Creative-Frontend/day-65-pop-up-book', pad, top + 140, width)
+      return new Promise((resolve) => out.toBlob(resolve, 'image/png'))
+    },
     undo() {
       strokes.pop()
       save(strokes)

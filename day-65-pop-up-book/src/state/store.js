@@ -31,7 +31,7 @@ function createStore(initial) {
 }
 
 export const store = createStore({
-  ready: false, // first spread printed, the book can open
+  ready: false, // the cover is printed (drives the loading labels)
   spread: -1, // open spread (−1 = shut)
   bookplate: null, // day number whose card is open
   xray: false, // the paper engineer's view
@@ -42,6 +42,9 @@ export const store = createStore({
   drawing: false, // pencil on the blank last page
   strokes: 0, // strokes drawn there
   contents: false, // contents drawer open
+  keys: false, // keyboard shortcuts card open
+  ribbon: null, // spread the reader left off at last visit (offered on return)
+  lost: false, // the WebGL context was lost
 })
 
 // Select a primitive (or a stable reference) — never build objects in `sel`.

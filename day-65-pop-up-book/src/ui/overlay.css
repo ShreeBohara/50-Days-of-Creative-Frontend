@@ -134,8 +134,14 @@
   position: fixed;
   left: 0;
   right: 0;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  margin: 0 auto;
+  padding: 5px 14px 6px;
+  border-radius: 999px;
+  background: rgba(14, 22, 19, 0.6);
+  backdrop-filter: blur(4px);
   bottom: calc(max(18px, env(safe-area-inset-bottom)) + 92px);
-  margin: 0;
   text-align: center;
   font-family: var(--serif);
   font-style: italic;
@@ -349,7 +355,6 @@
   }
   .hint {
     font-size: 14px;
-    padding: 0 24px;
   }
 }
 
@@ -542,5 +547,95 @@
   }
   .hint {
     bottom: calc(max(18px, env(safe-area-inset-bottom)) + 140px);
+  }
+}
+
+/* ---- keyboard shortcuts ---- */
+.keys {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: min(300px, calc(100vw - 40px));
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 14px 16px 12px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  z-index: 4;
+}
+.keys__title {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--pink);
+}
+.keys dl {
+  margin: 0;
+}
+.keys__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed rgba(61, 85, 136, 0.25);
+}
+.keys dt {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--federal);
+  white-space: nowrap;
+}
+.keys dd {
+  margin: 0;
+  font-size: 14px;
+  text-align: right;
+}
+.keys__note {
+  margin: 10px 0 0;
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(42, 40, 38, 0.75);
+}
+
+/* ---- the bookmark ribbon ---- */
+.ribbon {
+  position: fixed;
+  left: 20px;
+  top: calc(max(16px, env(safe-area-inset-top)) + 54px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 3px;
+  padding: 9px 14px 9px 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+  z-index: 3;
+  white-space: nowrap;
+}
+.ribbon b {
+  font-weight: 650;
+  color: var(--federal);
+}
+.ribbon__mark {
+  width: 12px;
+  height: 22px;
+  background: var(--pink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+}
+.ribbon:hover {
+  background: var(--yellow);
+}
+@media (max-width: 640px) {
+  .ribbon {
+    left: 12px;
+    top: calc(max(16px, env(safe-area-inset-top)) + 46px);
+    font-size: 14px;
   }
 }

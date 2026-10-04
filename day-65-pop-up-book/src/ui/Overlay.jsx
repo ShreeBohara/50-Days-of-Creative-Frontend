@@ -10,7 +10,7 @@ import { DAYS } from '../data/days.js'
 import { audio } from '../audio/engine.js'
 import './overlay.css'
 
-const chapterOfDay = new Map(CHAPTERS.flatMap((c, i) => c.days.map((n) => [n, { ...c, spread: i + 1 }])))
+const chapterOfDay = new Map(CHAPTERS.flatMap((c) => c.days.map((n) => [n, c])))
 const dayByN = new Map(DAYS.map((d) => [d.n, d]))
 const pad = (n) => String(n).padStart(2, '0')
 
@@ -59,6 +59,7 @@ function TopBar() {
   const muted = useStore((s) => s.muted)
   const xray = useStore((s) => s.xray)
   const contents = useStore((s) => s.contents)
+  const keys = useStore((s) => s.keys)
   return (
     <header className="top">
       <div className="mark">
@@ -66,8 +67,11 @@ function TopBar() {
         <span className="mark__sub">a pop-up book · day 65</span>
       </div>
       <div className="tools">
-        <button className={`tag ${contents ? 'is-on' : ''}`} onClick={() => store.set({ contents: !contents })} aria-expanded={contents}>
+        <button className={`tag ${contents ? 'is-on' : ''}`} onClick={() => store.set({ contents: !contents, keys: false })} aria-expanded={contents}>
           contents
+        </button>
+        <button className={`tag ${keys ? 'is-on' : ''}`} onClick={() => store.set({ keys: !keys, contents: false })} aria-expanded={keys} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">
+          ?
         </button>
         <button className={`tag ${xray ? 'is-on' : ''}`} onClick={() => store.set({ xray: !xray })} aria-pressed={xray} title="Paper engineer's view (X)">
           x-ray
@@ -140,6 +144,7 @@ function Bookplate() {
   const opener = useRef(null)
   useEffect(() => {
     if (!n) return
+    audio.chime()
     // focus moves into the plate, and comes back where it was when it closes
     const prev = document.activeElement
     opener.current = prev && prev !== document.body ? prev : null
@@ -193,15 +198,21 @@ function XRayPanel() {
   const [busy, setBusy] = useState(false)
   useEffect(() => {
     if (!xray) return
-    let raf = 0
-    const tick = () => {
+    // written only on frames the book draws, and only when the angle changes
+    let last = ''
+    rt.onFrame = () => {
       const sh = rt.view?.sheets[store.get().spread]
-      if (angle.current && sh) angle.current.textContent = `${Math.round(((sh.alpha ?? 0) * 180) / Math.PI)}°`
-      raf = requestAnimationFrame(tick)
+      const t = sh ? `${Math.round(((sh.alpha ?? 0) * 180) / Math.PI)}°` : '—'
+      if (t !== last && angle.current) {
+        angle.current.textContent = t
+        last = t
+      }
     }
-    tick()
-    return () => cancelAnimationFrame(raf)
-  }, [xray])
+    rt.onFrame()
+    return () => {
+      rt.onFrame = null
+    }
+  }, [xray, spread])
   if (!xray || spread < 0) return null
   const sp = rt.view?.sheets[spread]?.spread
   if (!sp) return null
@@ -218,7 +229,10 @@ function XRayPanel() {
         a.click()
         setTimeout(() => URL.revokeObjectURL(a.href), 4000)
       })
-      .catch(() => store.set({ hint: 'the press couldn’t print that sheet on this device' }))
+      .catch(() => {
+        store.set({ hint: 'the press couldn’t print that sheet on this device' })
+        setTimeout(() => store.set({ hint: null }), 5000)
+      })
       .finally(() => setBusy(false))
   }
   return (
@@ -300,7 +314,71 @@ function DrawTools() {
       >
         clear the card
       </button>
+      <button
+        className="tag"
+        disabled={!n}
+        onClick={() =>
+          d.toBlob().then((blob) => {
+            if (!blob) return
+            const a = document.createElement('a')
+            a.href = URL.createObjectURL(blob)
+            a.download = 'sixty-five-day-66.png'
+            a.click()
+            setTimeout(() => URL.revokeObjectURL(a.href), 4000)
+          })
+        }
+      >
+        save my page
+      </button>
     </div>
+  )
+}
+
+const SHORTCUTS = [
+  ['← →', 'turn the page'],
+  ['1 – 9', 'chapters I to IX'],
+  ['0', 'contents'],
+  ['Home · End', 'shut the book · the last page'],
+  ['X', "the paper engineer's x-ray"],
+  ['Esc', 'close a card or panel'],
+  ['?', 'this card'],
+]
+
+function KeysCard() {
+  const open = useStore((s) => s.keys)
+  if (!open) return null
+  return (
+    <aside className="keys" aria-label="Keyboard shortcuts">
+      <h2 className="keys__title">keys</h2>
+      <dl>
+        {SHORTCUTS.map(([k, v]) => (
+          <div key={k} className="keys__row">
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="keys__note">drag a page by its edge, tap a printed day to visit it, and try the tabs, wheels and flaps</p>
+    </aside>
+  )
+}
+
+/** A returning reader's bookmark ribbon, offered while the book is shut. */
+function Ribbon() {
+  const ribbon = useStore((s) => s.ribbon)
+  const spread = useStore((s) => s.spread)
+  if (ribbon == null || spread >= 0) return null
+  return (
+    <button
+      className="ribbon"
+      onClick={() => {
+        store.set({ ribbon: null })
+        rt.ctl?.goto(ribbon)
+      }}
+    >
+      <span className="ribbon__mark" aria-hidden="true" />
+      continue at <b>{spreadLabel(ribbon).title}</b>
+    </button>
   )
 }
 
@@ -322,9 +400,31 @@ function Hint() {
   )
 }
 
+function Lost() {
+  const lost = useStore((s) => s.lost)
+  if (!lost) return null
+  return (
+    <div className="plate-wrap" role="alertdialog" aria-labelledby="lost-title">
+      <article className="plate">
+        <div className="plate__ex">the press stopped</div>
+        <h2 id="lost-title" className="plate__title">
+          The graphics card reset, and the book lost its plates.
+        </h2>
+        <p className="plate__line">Reload to print it again — you&rsquo;ll be back on the same page.</p>
+        <div className="plate__actions">
+          <button className="plate__go" onClick={() => location.reload()}>
+            Reload the book
+          </button>
+        </div>
+      </article>
+    </div>
+  )
+}
+
 export default function Overlay() {
   const announce = useStore((s) => s.announce)
   const plate = useStore((s) => s.bookplate)
+  const lost = useStore((s) => s.lost)
   // the engine remembers the reader's mute choice between visits
   useEffect(() => {
     store.set({ muted: audio.muted })
@@ -332,7 +432,7 @@ export default function Overlay() {
   return (
     <>
       {/* everything behind an open bookplate is out of reach (a modal) */}
-      <div className="chrome" inert={plate ? true : undefined}>
+      <div className="chrome" inert={plate || lost ? true : undefined}>
         <TopBar />
         <Contents />
         <Folio />
@@ -340,8 +440,11 @@ export default function Overlay() {
         <XRayPanel />
         <TryRow />
         <DrawTools />
+        <KeysCard />
+        <Ribbon />
       </div>
       <Bookplate />
+      <Lost />
       <div className="sr" aria-live="polite">
         {announce}
       </div>

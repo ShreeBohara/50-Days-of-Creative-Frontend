@@ -58,14 +58,6 @@ export const spreadAlpha = (book, k) => {
 /** Index of the open spread (−1 while the book is shut). */
 export const openSpread = (book) => book.turned - 1
 
-/** Leaves the reader may grab: the top of each stack. */
-export function grabbable(book) {
-  const out = []
-  if (book.turned < book.S) out.push({ leaf: book.turned, dir: 1 })
-  if (book.turned > 0) out.push({ leaf: book.turned - 1, dir: -1 })
-  return out
-}
-
 export function beginDrag(book, leaf) {
   if (book.held >= 0 || book.queue.length) return false
   if (leaf !== book.turned && leaf !== book.turned - 1) return false
@@ -177,4 +169,15 @@ export function step(book, dt) {
     }
   }
   return moving
+}
+
+/** Finish any queued turns at once and put every leaf at rest (reduced motion). */
+export function settleNow(book) {
+  if (book.held >= 0) return
+  for (const q of book.queue) book.turned = q.dir > 0 ? q.leaf + 1 : q.leaf
+  book.queue = []
+  for (let i = 0; i < book.S; i++) {
+    book.target[i] = book.phi[i] = restAngle(book, i)
+    book.vel[i] = 0
+  }
 }

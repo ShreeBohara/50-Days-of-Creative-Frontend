@@ -10,7 +10,7 @@ import * as THREE from 'three'
 import { H, W } from '../paper/dims.js'
 import { poseSpread, restValue } from '../paper/spread.js'
 import { toWorld } from '../paper/kinematics.js'
-import { beginDrag, createBook, drag, openSpread, release, restAngle, spreadAlpha, step, turnTo } from './model.js'
+import { beginDrag, createBook, drag, openSpread, release, restAngle, settleNow, spreadAlpha, step, turnTo } from './model.js'
 import { audio } from '../audio/engine.js'
 import { rt, store } from '../state/store.js'
 import { SPREADS } from '../spreads/index.js'
@@ -18,8 +18,12 @@ import { SPREADS } from '../spreads/index.js'
 const TAP_PX = 7
 const MECH_KINDS = new Set(['flap', 'wheel', 'slider'])
 
-/** Golden-section refine of a 1-D search after a coarse scan. */
-function search(cost, lo, hi, samples = 48) {
+/**
+ * 1-D search: a coarse scan, then a golden-section refine that reuses one
+ * evaluation per step (a drag runs this on every pointer move, and each
+ * evaluation of a mechanism poses its whole spread).
+ */
+function search(cost, lo, hi, samples = 32) {
   let best = lo
   let bestC = Infinity
   for (let i = 0; i <= samples; i++) {
@@ -33,11 +37,24 @@ function search(cost, lo, hi, samples = 48) {
   let a = Math.max(lo, best - (hi - lo) / samples)
   let b = Math.min(hi, best + (hi - lo) / samples)
   const g = 0.618034
-  for (let i = 0; i < 18; i++) {
-    const x1 = b - g * (b - a)
-    const x2 = a + g * (b - a)
-    if (cost(x1) < cost(x2)) b = x2
-    else a = x1
+  let x1 = b - g * (b - a)
+  let x2 = a + g * (b - a)
+  let f1 = cost(x1)
+  let f2 = cost(x2)
+  for (let i = 0; i < 16; i++) {
+    if (f1 < f2) {
+      b = x2
+      x2 = x1
+      f2 = f1
+      x1 = b - g * (b - a)
+      f1 = cost(x1)
+    } else {
+      a = x1
+      x1 = x2
+      f1 = f2
+      x2 = a + g * (b - a)
+      f2 = cost(x2)
+    }
   }
   return (a + b) / 2
 }
@@ -64,19 +81,20 @@ export function createController({ view, camera, dom }) {
   const ndc = new THREE.Vector2()
   const v3 = new THREE.Vector3()
   let hold = null // what the pointer is doing
-  let hover = null
   let lastOpen = -2
   const opened = new Set() // spreads whose pieces already popped this opening
   let landing = new Float64Array(S) // peak speed per leaf while it moves
 
   // ------------------------------------------------------------ geometry
+  // the canvas size is read once per pointer event, not per projection
+  let rect = { width: 1, height: 1 }
   function toScreen(p) {
     v3.set(p[0], p[1], p[2]).project(camera)
-    const r = dom.getBoundingClientRect()
-    return [(v3.x * 0.5 + 0.5) * r.width, (-v3.y * 0.5 + 0.5) * r.height]
+    return [(v3.x * 0.5 + 0.5) * rect.width, (-v3.y * 0.5 + 0.5) * rect.height]
   }
   function setRay(x, y) {
     const r = dom.getBoundingClientRect()
+    rect = r
     ndc.set((x / r.width) * 2 - 1, -(y / r.height) * 2 + 1)
     ray.setFromCamera(ndc, camera)
   }
@@ -157,6 +175,11 @@ export function createController({ view, camera, dom }) {
     const to = Math.max(-1, Math.min(S - 1, k))
     if (!turnTo(book, to)) return
     closeFlaps(from)
+    // reduced motion: arrive, don't riffle
+    if (rt.reduced && Math.abs(to - from) > 1) {
+      settleNow(book)
+      rt.shadowsDirty = true // nothing moved this frame, but everything changed
+    }
     audio.unlock()
     audio.turnStart(to > from ? 1 : -1)
     // the front board is in the riffle: its thump lands as it settles
@@ -192,10 +215,11 @@ export function createController({ view, camera, dom }) {
     // never takes over a gesture already in progress
     if (hold || e.isPrimary === false || (e.pointerType === 'mouse' && e.button !== 0)) return
     const r = dom.getBoundingClientRect()
+    rect = r
     const x = e.clientX - r.left
     const y = e.clientY - r.top
     audio.unlock()
-    if (store.get().bookplate) return
+    if (store.get().bookplate || store.get().lost) return
     if (book.queue.length) return
     const h = pick(x, y)
     hold = { x0: x, y0: y, x, y, t0: performance.now(), hit: h, mode: 'press', id: e.pointerId }
@@ -254,6 +278,7 @@ export function createController({ view, camera, dom }) {
   function move(e) {
     if (hold && hold.id != null && e.pointerId !== hold.id) return
     const r = dom.getBoundingClientRect()
+    rect = r
     const x = e.clientX - r.left
     const y = e.clientY - r.top
     rt.pointer.x = x / r.width
@@ -409,7 +434,6 @@ export function createController({ view, camera, dom }) {
   }
 
   function setHover(h) {
-    hover = h
     let cursor = 'default'
     if (h?.type === 'draw') cursor = 'crosshair'
     else if (h?.type === 'mech') cursor = 'grab'
@@ -430,9 +454,14 @@ export function createController({ view, camera, dom }) {
 
   // ------------------------------------------------------------ keyboard
   function key(e) {
+    if (store.get().lost) return
     if (e.target?.closest?.('input, textarea, [contenteditable]')) return
     if (store.get().bookplate) {
       if (e.key === 'Escape') store.set({ bookplate: null })
+      return
+    }
+    if (e.key === 'Escape' && (store.get().keys || store.get().contents)) {
+      store.set({ keys: false, contents: false })
       return
     }
     if (e.key === 'ArrowRight' || e.key === 'PageDown') {
@@ -442,7 +471,11 @@ export function createController({ view, camera, dom }) {
       turn(-1)
       e.preventDefault()
     } else if (e.key === 'x' || e.key === 'X') store.set({ xray: !store.get().xray })
-    else if (e.key === 'Home') goto(-1)
+    else if (e.key === '?') store.set({ keys: !store.get().keys, contents: false })
+    else if (/^[0-9]$/.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      // 0 opens the book at its contents, 1–9 at chapters I–IX
+      goto(Number(e.key))
+    } else if (e.key === 'Home') goto(-1)
     else if (e.key === 'End') goto(S - 1)
   }
 
@@ -494,7 +527,6 @@ export function createController({ view, camera, dom }) {
 
   function tick(dt) {
     rt.dt = dt
-    const before = book.turned
     let moving = step(book, dt)
     // sound of leaves in motion
     let speed = 0
@@ -512,9 +544,6 @@ export function createController({ view, camera, dom }) {
       }
     }
     audio.turnMove(speed, pan)
-    if (book.turned !== before && book.queue.length === 0 && book.held < 0) {
-      // keyboard or tap turns start their own sound
-    }
     // mechanisms of every visible spread; a shut spread's flaps lie flat
     for (let k = 0; k < S; k++) {
       if (!mech[k].size) continue
@@ -578,9 +607,6 @@ export function createController({ view, camera, dom }) {
     tick,
     turn,
     goto,
-    get hover() {
-      return hover
-    },
     get holding() {
       return hold?.mode ?? null
     },

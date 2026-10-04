@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useState } from 'react'
+import { Component, useEffect, useState } from 'react'
 import Stage from './scene/Stage.jsx'
 import BookRoot from './scene/BookRoot.jsx'
 import CameraRig from './scene/CameraRig.jsx'
@@ -32,9 +32,70 @@ function budgetDpr() {
   return Math.max(1, Math.min(window.devicePixelRatio || 1, cap, byBudget))
 }
 
+/**
+ * If the 3D book fails at runtime (WebGL2 refused after the gate passed, a
+ * driver error), show the book's contents as a plain page instead of a blank
+ * screen.
+ */
+class Guard extends Component {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  componentDidCatch(err) {
+    console.error(err)
+    // stop printing for a book nobody will see; show the notice at once
+    rt.press?.dispose()
+    const why = 'Its 3D view couldn’t start in this browser.'
+    document.documentElement.classList.add('no-webgl')
+    const note = document.querySelector('.fallback__why')
+    if (note) note.textContent = why
+    import('./fallback.js')
+      .then(({ renderFallback }) => renderFallback(why))
+      .catch(() => {})
+  }
+  render() {
+    return this.state.failed ? null : this.props.children
+  }
+}
+
 export default function App() {
+  return (
+    <Guard>
+      <Book />
+    </Guard>
+  )
+}
+
+function Book() {
   const cursor = useStore((s) => s.cursor)
-  const [dpr] = useState(budgetDpr)
+  const [dpr, setDpr] = useState(budgetDpr)
+  // keep to the pixel budget when the window grows, or moves to a screen with
+  // a different density
+  useEffect(() => {
+    let raf = 0
+    let mq = null
+    const update = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => setDpr(budgetDpr()))
+    }
+    const watchDensity = () => {
+      mq?.removeEventListener('change', onDensity)
+      mq = matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`)
+      mq.addEventListener('change', onDensity)
+    }
+    const onDensity = () => {
+      update()
+      watchDensity()
+    }
+    window.addEventListener('resize', update)
+    watchDensity()
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', update)
+      mq?.removeEventListener('change', onDensity)
+    }
+  }, [])
   return (
     <>
       <Canvas

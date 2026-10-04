@@ -58,10 +58,15 @@ button {
 .fallback {
   display: none;
 }
+/* the fallback is an ordinary, scrollable page */
+html.no-webgl,
+.no-webgl body {
+  height: auto;
+  overflow: auto;
+  background: var(--paper);
+}
 .no-webgl .fallback {
   display: block;
-  height: 100%;
-  overflow: auto;
   padding: 8vh 6vw;
   background: var(--paper);
   color: var(--ink);
@@ -80,4 +85,55 @@ button {
   max-width: 60ch;
   font-size: 19px;
   line-height: 1.5;
+}
+
+.fallback__shot {
+  display: block;
+  width: min(100%, 900px);
+  height: auto;
+  margin: 28px 0 8px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(42, 40, 38, 0.18);
+}
+.fallback__chapters {
+  list-style: none;
+  padding: 0;
+  margin: 28px 0 0;
+  max-width: 900px;
+}
+.fallback__chapters h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 26px;
+  color: var(--federal);
+  margin: 28px 0 8px;
+}
+.fallback__days {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.fallback__days li {
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(61, 85, 136, 0.25);
+  font-size: 16px;
+  line-height: 1.45;
+}
+.fallback__days a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration-color: var(--pink);
+}
+.fallback__days b {
+  font-family: var(--display);
+  font-weight: 400;
+  color: var(--pink);
+}
+.fallback__days span {
+  color: rgba(42, 40, 38, 0.75);
+}
+.fallback a {
+  color: var(--federal);
+  text-decoration-color: var(--pink);
+  text-underline-offset: 3px;
 }
